@@ -1,0 +1,218 @@
+// DLX Phoenix AI Studio - Database Schema
+// Production-ready schema for agentic AI platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// Error Logging
+model ErrorLog {
+  id          String   @id @default(uuid())
+  type        String   // Error class name
+  message     String
+  stack       String?
+  statusCode  Int      @default(500)
+  isOperational Boolean @default(true)
+  timestamp   DateTime @default(now())
+  
+  // Request context
+  method      String?
+  url         String?
+  body        String?  // JSON string
+  params      String?  // JSON string
+  query       String?  // JSON string
+  
+  // Additional metadata
+  metadata    String?  // JSON string
+  
+  @@index([timestamp])
+  @@index([type])
+  @@index([statusCode])
+}
+
+// Agent Memory - Persistent storage for agent state
+model AgentMemory {
+  id        String   @id @default(uuid())
+  agentType String   // 'research', 'code', 'workflow', etc.
+  key       String   // Memory key
+  value     String   // JSON string
+  timestamp DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([agentType, key])
+  @@index([agentType])
+  @@index([timestamp])
+}
+
+// Performance Metrics
+model PerformanceMetric {
+  id        String   @id @default(uuid())
+  name      String   // Endpoint name
+  duration  Int      // Duration in ms
+  slow      Boolean  @default(false)
+  timestamp DateTime @default(now())
+  
+  // Request metadata
+  method    String?
+  path      String?
+  statusCode Int?
+  
+  // Additional metadata
+  metadata  String?  // JSON string
+  
+  @@index([name])
+  @@index([timestamp])
+  @@index([slow])
+}
+
+// User Sessions - OAuth tokens and user data
+model UserSession {
+  id           String    @id @default(uuid())
+  userId       String?   // Google user ID
+  email        String?
+  name         String?
+  picture      String?
+  
+  // OAuth tokens (encrypted)
+  accessToken  String?
+  refreshToken String?
+  tokenType    String?
+  expiresAt    DateTime?
+  scope        String?
+  
+  // Session management
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastUsed     DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([email])
+  @@index([expiresAt])
+}
+
+// Agent Task History
+model AgentTask {
+  id          String   @id @default(uuid())
+  agentType   String   // 'research', 'code', 'workflow', etc.
+  task        String   // Task description
+  status      String   // 'pending', 'running', 'completed', 'failed'
+  result      String?  // JSON string
+  error       String?  // Error message if failed
+  
+  // Timing
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  duration    Int?     // Duration in ms
+  
+  // Metadata
+  metadata    String?  // JSON string
+  
+  @@index([agentType])
+  @@index([status])
+  @@index([startedAt])
+}
+
+// Cache Entries - Persistent cache
+model CacheEntry {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   // JSON string
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@index([expiresAt])
+  @@index([createdAt])
+}
+
+// System Metrics - GPU, CPU, Memory tracking
+model SystemMetric {
+  id        String   @id @default(uuid())
+  type      String   // 'gpu', 'cpu', 'memory', 'disk'
+  value     Float    // Metric value
+  unit      String   // 'percent', 'mb', 'gb', etc.
+  timestamp DateTime @default(now())
+  
+  // Additional metadata
+  metadata  String?  // JSON string
+  
+  @@index([type])
+  @@index([timestamp])
+}
+
+// LLM Usage Tracking
+model LLMUsage {
+  id          String   @id @default(uuid())
+  provider    String   // 'lmstudio', 'ollama', 'google'
+  model       String   // Model name
+  operation   String   // 'chat', 'completion', 'embedding'
+  
+  // Token usage
+  promptTokens     Int?
+  completionTokens Int?
+  totalTokens      Int?
+  
+  // Timing
+  duration    Int      // Duration in ms
+  timestamp   DateTime @default(now())
+  
+  // Cost tracking (if applicable)
+  cost        Float?
+  
+  // Request metadata
+  metadata    String?  // JSON string
+  
+  @@index([provider])
+  @@index([model])
+  @@index([timestamp])
+}
+
+// Workflow Templates
+model WorkflowTemplate {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  category    String?  // 'development', 'content', 'research', etc.
+  steps       String   // JSON array of workflow steps
+  
+  // Metadata
+  author      String?
+  version     String   @default("1.0.0")
+  tags        String?  // JSON array
+  
+  // Usage stats
+  usageCount  Int      @default(0)
+  rating      Float?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([category])
+  @@index([usageCount])
+}
+
+// Integration Credentials (encrypted)
+model Integration {
+  id          String   @id @default(uuid())
+  service     String   // 'google', 'github', 'stripe', etc.
+  userId      String?  // Associated user
+  
+  // Credentials (encrypted)
+  credentials String   // JSON string (encrypted)
+  
+  // Status
+  active      Boolean  @default(true)
+  lastUsed    DateTime?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([service, userId])
+  @@index([service])
+  @@index([userId])
+}

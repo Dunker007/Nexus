@@ -1,0 +1,99 @@
+
+> website-v2@0.1.0 build
+> next build
+
+ ΓÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Repos GIT\Fresh-Start\Fresh-Start\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Repos GIT\Fresh-Start\Fresh-Start\website-v2\package-lock.json
+
+   Γû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 8.0s
+   Running TypeScript ...
+   Collecting page data using 15 workers ...
+   Generating static pages using 15 workers (0/71) ...
+   Generating static pages using 15 workers (17/71) 
+   Generating static pages using 15 workers (35/71) 
+   Generating static pages using 15 workers (53/71) 
+ Γ£ô Generating static pages using 15 workers (71/71) in 1220.1ms
+   Finalizing page optimization ...
+
+Route (app)
+Γöî Γùï /
+Γö£ Γùï /_not-found
+Γö£ Γùï /agents
+Γö£ Γùï /analytics
+Γö£ Γùï /api-keys
+Γö£ Γùï /apps
+Γö£ Γùï /auth/github/callback
+Γö£ Γùï /auth/google/callback
+Γö£ Γùï /backup
+Γö£ Γùï /blog
+Γö£ Γùï /budget
+Γö£ Γùï /calendar
+Γö£ Γùï /changelog
+Γö£ Γùï /chat
+Γö£ Γùï /community
+Γö£ Γùï /compare
+Γö£ Γùï /crypto
+Γö£ Γùï /dashboard
+Γö£ Γùï /deals
+Γö£ Γùï /docs
+Γö£ Γùï /download
+Γö£ Γùï /files
+Γö£ Γùï /finance
+Γö£ Γùï /github
+Γö£ Γùï /google-test
+Γö£ Γùï /home
+Γö£ Γùï /idle
+Γö£ Γùï /income
+Γö£ Γùï /income/ideas
+Γö£ Γùï /income/opportunities
+Γö£ Γùï /income/tracker
+Γö£ Γùï /integrations
+Γö£ Γùï /labs
+Γö£ Γùï /learn
+Γö£ Γùï /logs
+Γö£ Γùï /media
+Γö£ Γùï /meeting
+Γö£ Γùï /models
+Γö£ Γùï /monitoring
+Γö£ Γùï /music
+Γö£ Γùï /news
+Γö£ Γùï /notes
+Γö£ Γùï /notifications
+Γö£ Γùï /playground
+Γö£ Γùï /portfolio
+Γö£ Γùï /profile
+Γö£ Γùï /projects
+Γö£ Γùï /prompts
+Γö£ Γùï /scratchpad
+Γö£ Γùï /search
+Γö£ Γùï /settings
+Γö£ Γùï /setup
+Γö£ Γùï /shortcuts
+Γö£ Γùï /showcase
+Γö£ Γùï /status
+Γö£ Γùï /studio
+Γö£ Γùï /studios
+Γö£ Γùï /studios/art
+Γö£ Γùï /studios/blog
+Γö£ Γùï /studios/dev
+Γö£ Γùï /studios/podcast
+Γö£ Γùï /studios/video
+Γö£ Γùï /terminal
+Γö£ Γùï /themes
+Γö£ Γùï /trading
+Γö£ Γùï /trends
+Γö£ Γùï /vision
+Γö£ Γùï /voice
+Γöö Γùï /workflows
+
+
+Γùï  (Static)  prerendered as static content
+

@@ -1,0 +1,27 @@
+{
+  "id": "build-rest-api",
+  "name": "Build REST API",
+  "description": "Create a production-ready REST API with authentication",
+  "steps": [
+    {
+      "agent": "architect",
+      "task": "Design API architecture with endpoints, models, and auth"
+    },
+    {
+      "agent": "code",
+      "task": "Generate Express.js server with routes and middleware"
+    },
+    {
+      "agent": "code",
+      "task": "Generate Prisma schema and database models"
+    },
+    {
+      "agent": "security",
+      "task": "Add authentication, validation, and security headers"
+    },
+    {
+      "agent": "qa",
+      "task": "Generate unit and integration tests"
+    }
+  ]
+}

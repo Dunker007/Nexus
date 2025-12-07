@@ -1,0 +1,436 @@
+@import "tailwindcss";
+@import "./premium-ui.css";
+
+/* ========================================
+   DLX STUDIO AI - CYBERPUNK DESIGN SYSTEM
+   ======================================== */
+
+:root {
+  /* Deep space backgrounds */
+  --bg-void: #030305;
+  --bg-deep: #050508;
+  --bg-dark: #0a0e1a;
+  --bg-panel: #0d1117;
+
+  /* Neon accent colors */
+  --cyan: #00f5d4;
+  --cyan-glow: #00d4ff;
+  --cyan-dim: rgba(0, 245, 212, 0.3);
+  --magenta: #c77dff;
+  --magenta-glow: #e040fb;
+  --purple-neon: #7b2ff7;
+  --purple-dim: rgba(123, 47, 247, 0.3);
+
+  /* Status colors */
+  --green: #00c853;
+  --yellow: #ffd600;
+  --red: #ff1744;
+
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #a0aec0;
+  --text-muted: #4a5568;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(10, 14, 26, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: blur(20px);
+
+  /* Shadows */
+  --glow-cyan: 0 0 20px rgba(0, 245, 212, 0.5);
+  --glow-magenta: 0 0 20px rgba(199, 125, 255, 0.5);
+  --glow-purple: 0 0 20px rgba(123, 47, 247, 0.5);
+
+  /* Vibe Modes Defaults (Normal) */
+  --vibe-glass-opacity: 0.8;
+  --vibe-glass-blur: 20px;
+  --vibe-accent: var(--cyan);
+  --vibe-bg: var(--bg-void);
+}
+
+:root[data-theme="light"] {
+  /* Light Mode Backgrounds */
+  --bg-void: #f0f2f5;
+  --bg-deep: #ffffff;
+  --bg-dark: #e2e8f0;
+  --bg-panel: #ffffff;
+
+  /* Text Colors */
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+
+  /* Glassmorphism Logic for Light Mode */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.05);
+
+  /* Accents (Keep neon but cleaner) */
+  --cyan: #06b6d4;  /* Darker cyan for contrast */
+  --cyan-glow: #22d3ee;
+  --purple-neon: #7c3aed;
+  --magenta: #d946ef;
+}
+
+/* High Load Mode: Reduce visual effects */
+body[data-vibe="high-load"] {
+  --glass-blur: blur(5px); /* Reduce blur cost */
+  --glow-cyan: none; /* Disable expensive shadows */
+  --glow-magenta: none;
+  --glow-purple: none;
+  --bg-grid-animation: none; /* Stop grid animation */
+}
+
+/* Crisis Mode: High contrast, red alert */
+body[data-vibe="crisis"] {
+  --bg-void: #1a0505; /* Red tint background */
+  --cyan: #ff0000; /* Override cyan with red */
+  --text-primary: #ffffff;
+  --glass-border: rgba(255, 0, 0, 0.5);
+  --glow-cyan: 0 0 30px rgba(255, 0, 0, 0.8);
+}
+
+/* Focus Mode: Dim distractions */
+body[data-vibe="focus"] {
+  --bg-void: #000000;
+  --glass-bg: rgba(0, 0, 0, 0.95); /* Opaque panels */
+  --glass-blur: none;
+  --text-secondary: #444; /* Dim secondary text */
+  --glow-cyan: none;
+}
+
+@theme inline {
+  --color-background: var(--bg-void);
+  --color-foreground: var(--text-primary);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* ========================================
+   BASE STYLES
+   ======================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ========================================
+   ANIMATED BACKGROUND
+   ======================================== */
+
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(0, 245, 212, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 245, 212, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: grid-move 20s linear infinite;
+}
+
+@keyframes grid-move {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 50px 50px;
+  }
+}
+
+/* ========================================
+   GLASSMORPHISM
+   ======================================== */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: var(--cyan);
+  box-shadow: var(--glow-cyan);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   NEON TEXT
+   ======================================== */
+
+.text-glow-cyan {
+  color: var(--cyan);
+  text-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan);
+}
+
+.text-glow-magenta {
+  color: var(--magenta);
+  text-shadow: 0 0 10px var(--magenta), 0 0 20px var(--magenta);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--magenta) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--purple-neon) 100%);
+  color: var(--bg-dark);
+  font-weight: 600;
+  padding: 12px 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-cyan);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--cyan);
+  border: 2px solid var(--cyan);
+  padding: 12px 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-outline:hover {
+  background: var(--cyan);
+  color: var(--bg-dark);
+  box-shadow: var(--glow-cyan);
+}
+
+/* ========================================
+   STATUS INDICATORS
+   ======================================== */
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.online {
+  background: var(--green);
+  box-shadow: 0 0 10px var(--green);
+}
+
+.status-dot.offline {
+  background: var(--red);
+  box-shadow: 0 0 10px var(--red);
+}
+
+.status-dot.loading {
+  background: var(--yellow);
+  box-shadow: 0 0 10px var(--yellow);
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ========================================
+   LOADING STATES
+   ======================================== */
+
+.skeleton {
+  background: linear-gradient(90deg,
+      var(--bg-panel) 0%,
+      var(--bg-dark) 50%,
+      var(--bg-panel) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ========================================
+   SCROLLBAR
+   ======================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cyan-dim);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cyan);
+}
+
+/* ========================================
+   UTILITIES
+   ======================================== */
+
+.container-main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section-padding {
+  padding: 80px 0;
+}
+
+/* Neural network canvas container */
+.neural-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* React Grid Layout Customization */
+.react-grid-layout {
+  position: relative;
+}
+
+.react-grid-item {
+  transition: all 200ms ease;
+  transition-property: left, top, width, height;
+}
+
+.react-grid-item.cssTransforms {
+  transition-property: transform, width, height;
+}
+
+.react-grid-item.resizing {
+  z-index: 1;
+  will-change: width, height;
+}
+
+.react-grid-item.react-draggable-dragging {
+  transition: none;
+  z-index: 3;
+  will-change: transform;
+  box-shadow: 0 0 30px rgba(0, 245, 212, 0.3);
+}
+
+.react-grid-item.dropping {
+  visibility: hidden;
+}
+
+.react-grid-item > .react-resizable-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(0, 245, 212, 0.5);
+  border-bottom: 2px solid rgba(0, 245, 212, 0.5);
+}
+
+.react-resizable-hide > .react-resizable-handle {
+  display: none;
+}
+
+.react-grid-item > .react-resizable-handle.react-resizable-handle-se {
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+}
+
+/* ========================================
+   ANIMATED GRADIENT TEXT
+   ======================================== */
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  animation: gradient-shift 3s ease infinite;
+}
+
+.bg-300\% {
+  background-size: 300% 300%;
+}
+
+/* Delay utilities for staggered animations */
+.delay-500 {
+  animation-delay: 0.5s;
+}
+
+.delay-1000 {
+  animation-delay: 1s;
+}
+
+.delay-1500 {
+  animation-delay: 1.5s;
+}
