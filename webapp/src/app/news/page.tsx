@@ -9,7 +9,8 @@ import {
     NEWS_SOURCES,
     BIAS_COLORS,
     type NewsArticle,
-    MN_KEYWORDS
+    MN_KEYWORDS,
+    fetchAllNews
 } from '@/lib/news-service';
 
 // Breaking news ticker headlines
@@ -128,6 +129,24 @@ export default function NewsPage() {
     const [showFactChecker, setShowFactChecker] = useState(false);
     const [factCheckQuery, setFactCheckQuery] = useState('');
     const [factCheckResult, setFactCheckResult] = useState<any>(null);
+
+    const refreshNews = async () => {
+        setIsLoading(true);
+        try {
+            const liveNews = await fetchAllNews();
+            if (liveNews && liveNews.length > 0) {
+                setArticles(liveNews);
+            }
+        } catch (error) {
+            console.error('Failed to fetch news:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        refreshNews();
+    }, []);
 
     // Research Panel
     const [showResearchPanel, setShowResearchPanel] = useState(false);
@@ -365,6 +384,13 @@ export default function NewsPage() {
                                     ← Back to Dashboard
                                 </Link>
                                 <div className="flex flex-wrap gap-2">
+                                    <button
+                                        onClick={refreshNews}
+                                        disabled={isLoading}
+                                        className={`px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all text-sm font-medium ${isLoading ? 'bg-white/5 opacity-50 cursor-wait' : 'bg-white/10 hover:bg-white/20 text-white'}`}
+                                    >
+                                        {isLoading ? '🔄 Loading...' : '🔄 Refresh Feed'}
+                                    </button>
                                     <button
                                         onClick={() => setShowSourceManager(!showSourceManager)}
                                         className={`px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all text-sm font-medium ${showSourceManager

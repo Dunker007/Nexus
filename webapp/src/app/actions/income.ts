@@ -58,7 +58,12 @@ export async function saveContentProject(projectData: any) {
             data: {
                 title: projectData.niche || 'Untitled Project',
                 description: `Generated assets for tags: ${projectData.tags?.substring(0, 50)}...`,
-                localPath: path,
+                href: path, // Storing local path in href
+                category: 'Creation',
+                priority: 'Medium',
+                agents: '[]',
+                timeline: '{"startMonth":"Now","durationMonths":1,"progress":0}',
+                stats: '{"ideas":0}',
                 status: 'active'
             }
         });

@@ -7,8 +7,10 @@ import {
   Music, Mic, Radio, Play, Pause, Video, Film,
   Volume2, Heart, Share2, Download, Disc, Activity,
   ExternalLink, Copy, Check, ChevronRight, Sparkles,
-  FileVideo, Clapperboard, Upload, Youtube
+  FileVideo, Clapperboard, Upload, Youtube, Newspaper, RefreshCw
 } from 'lucide-react';
+import { fetchAllNews, type NewsArticle } from '@/lib/news-service';
+import { MUSIC_AGENTS } from '@/lib/music-agents';
 import PageLayout, { PageHeader, StatPill } from '@/components/PageLayout';
 
 // --- Types ---
@@ -42,17 +44,22 @@ interface PipelineStep {
 }
 
 const MODES = [
-  { id: 'standard', name: 'Standard Mode', desc: 'Collaborative AI songwriting', icon: Music, color: 'purple' },
-  { id: 'political', name: 'Newsician', desc: 'Political rap duo (Explicit)', icon: Mic, color: 'red' },
-  { id: 'sentinel', name: 'Midwest Sentinel', desc: 'Boom Bap storytelling (Clean)', icon: Radio, color: 'blue' }
+  { id: 'standard', name: 'Studio Mode', desc: 'Manual composition control', icon: Music, color: 'purple' },
+  { id: 'political', name: 'Newsician', desc: 'Political Rap / Truth-to-Power', icon: Mic, color: 'red' },
+  { id: 'sentinel', name: 'Midwest Sentinel', desc: 'Faith, Family, Boom Bap', icon: Radio, color: 'blue' },
+  { id: 'pop', name: 'Neon Icon', desc: 'Viral Pop & Trends', icon: Sparkles, color: 'pink' }
 ];
 
 const GENRES = ['Pop', 'EDM', 'Indie', 'R&B', 'Rock', 'Hip Hop', 'Synthwave', 'Jazz', 'Lofi', 'Ambient'];
 const MOODS = ['Uplifting', 'Energetic', 'Chill', 'Emotional', 'Dark', 'Aggressive', 'Dreamy', 'Nostalgic'];
 
 export default function MusicStudioPage() {
+  /* State */
   const [mode, setMode] = useState('standard');
   const [theme, setTheme] = useState('');
+  const [headlines, setHeadlines] = useState<NewsArticle[]>([]);
+  const [selectedHeadline, setSelectedHeadline] = useState<NewsArticle | null>(null);
+  const [isLoadingNews, setIsLoadingNews] = useState(false);
   const [genre, setGenre] = useState('Synthwave');
   const [mood, setMood] = useState('Dreamy');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -68,82 +75,68 @@ export default function MusicStudioPage() {
   ]);
 
   useEffect(() => {
+    // Load Agents
     fetch(`${LUXRIG_BRIDGE_URL}/music/agents`)
       .then(res => res.json())
       .then(data => setAgents(data.agents || []))
       .catch(() => {
-        // Fallback agents if bridge not running
         setAgents([
           { id: 'lyricist', name: 'Lyricist', emoji: '✍️', style: 'Poetic', color: 'purple', description: 'Writes song lyrics' },
           { id: 'composer', name: 'Composer', emoji: '🎹', style: 'Melodic', color: 'cyan', description: 'Structures the song' },
           { id: 'producer', name: 'Producer', emoji: '🎧', style: 'Technical', color: 'pink', description: 'Refines the prompt' }
         ]);
       });
+
+    // Load News
+    setIsLoadingNews(true);
+    fetchAllNews()
+      .then(news => setHeadlines(news))
+      .catch(err => console.error("News failed", err))
+      .finally(() => setIsLoadingNews(false));
   }, []);
 
   const handleGenerate = async () => {
-    if (!theme && mode === 'standard') return;
+    if (!theme && !selectedHeadline && mode === 'standard') return;
     setIsGenerating(true);
     setResult(null);
 
-    try {
-      const endpoint = mode === 'standard'
-        ? `${LUXRIG_BRIDGE_URL}/music/create`
-        : mode === 'political'
-          ? `${LUXRIG_BRIDGE_URL}/music/political`
-          : `${LUXRIG_BRIDGE_URL}/music/sentinel`;
+    // Context
+    let topic = selectedHeadline ? selectedHeadline.title : theme;
+    let context = selectedHeadline ? selectedHeadline.description : '';
+    let style = `${mood} ${genre}`;
+    let lyrics = '';
 
-      const body = mode === 'standard'
-        ? { theme, genre, mood }
-        : { focusArea: 'minnesota' };
+    // Agent Selection
+    const agent = MUSIC_AGENTS[mode];
 
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setResult(data);
-        // Activate first pipeline step
-        setPipelineSteps(steps => steps.map((s, i) =>
-          i === 0 ? { ...s, status: 'active' } : s
-        ));
-      } else {
-        // Generate locally if bridge fails
-        setResult({
-          theme,
-          genre,
-          mood,
-          sunoPrompt: {
-            fullPrompt: `${mood} ${genre} song about ${theme}`,
-            copyToSuno: `[Genre: ${genre}]\n[Mood: ${mood}]\n[Style: Modern, polished production]\n\nLyrics about: ${theme}\n\nInstrumental: ${genre.toLowerCase()} beat with atmospheric synths and punchy drums`
-          },
-          ready: true
-        });
-        setPipelineSteps(steps => steps.map((s, i) =>
-          i === 0 ? { ...s, status: 'active' } : s
-        ));
-      }
-    } catch (e) {
-      // Fallback generation
-      setResult({
-        theme,
-        genre,
-        mood,
-        sunoPrompt: {
-          fullPrompt: `${mood} ${genre} song about ${theme}`,
-          copyToSuno: `[Genre: ${genre}]\n[Mood: ${mood}]\n[Style: Modern, polished production]\n\nLyrics about: ${theme}\n\nInstrumental: ${genre.toLowerCase()} beat with atmospheric synths and punchy drums`
-        },
-        ready: true
-      });
-      setPipelineSteps(steps => steps.map((s, i) =>
-        i === 0 ? { ...s, status: 'active' } : s
-      ));
-    } finally {
-      setIsGenerating(false);
+    if (agent) {
+      style = agent.style; // Use Agent's preferred style
+      lyrics = agent.generateLyrics(topic, context); // Generate lyrics using Agent's brain
+    } else {
+      // Standard Mode Fallback
+      lyrics = `[Instrumental Intro]\n\n[Verse 1]\n(Write lyrics about ${topic})\n\n[Chorus]\n(Theme: ${mood} ${genre})`;
     }
+
+    // Construct final content for Suno (Lyrics Mode)
+    const copyContent = `[Style]\n${style}\n\n[Lyrics]\n${lyrics}`;
+
+    // Simulate generation delay
+    await new Promise(r => setTimeout(r, 1500));
+
+    setResult({
+      theme: topic,
+      genre: agent ? 'Agent-Defined' : genre,
+      mood: agent ? 'Agent-Defined' : mood,
+      sunoPrompt: {
+        fullPrompt: "Use Custom Mode in Suno and paste the text below.",
+        copyToSuno: copyContent
+      },
+      ready: true
+    });
+
+    // Activate pipeline
+    setPipelineSteps(steps => steps.map((s, i) => i === 0 ? { ...s, status: 'active' } : s));
+    setIsGenerating(false);
   };
 
   const copyToClipboard = () => {
@@ -245,6 +238,65 @@ export default function MusicStudioPage() {
               </div>
             </motion.div>
 
+            {/* News Source Selector */}
+            {(mode !== 'standard' || activeTab === 'create') && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="glass-card p-6 mb-6"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <Newspaper size={18} className="text-cyan-400" />
+                    Source Material
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setIsLoadingNews(true);
+                      fetchAllNews().then(n => { setHeadlines(n); setIsLoadingNews(false); });
+                    }}
+                    className="p-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
+                  >
+                    <RefreshCw size={14} className={isLoadingNews ? 'animate-spin' : ''} />
+                  </button>
+                </div>
+
+                <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x">
+                  {headlines.map(article => (
+                    <button
+                      key={article.id}
+                      onClick={() => {
+                        setSelectedHeadline(selectedHeadline?.id === article.id ? null : article);
+                        setTheme(selectedHeadline?.id === article.id ? '' : article.title);
+                      }}
+                      className={`flex-shrink-0 w-64 p-3 rounded-xl border text-left transition-all snap-start group relative overflow-hidden ${selectedHeadline?.id === article.id
+                        ? 'bg-cyan-500/20 border-cyan-500/50 shadow-lg shadow-cyan-500/10'
+                        : 'bg-black/40 border-white/10 hover:bg-white/5 hover:border-white/20'
+                        }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2 text-xs text-gray-400">
+                        <span>{article.source.logo}</span>
+                        <span className="truncate max-w-[100px]">{article.source.name}</span>
+                        <span className={`ml-auto px-1.5 py-0.5 rounded text-[10px] uppercase ${article.category === 'local' ? 'bg-blue-500/20 text-blue-400' : 'bg-purple-500/20 text-purple-400'
+                          }`}>{article.category}</span>
+                      </div>
+                      <h4 className={`text-sm font-medium line-clamp-3 mb-2 group-hover:text-cyan-400 transition-colors ${selectedHeadline?.id === article.id ? 'text-white' : 'text-gray-300'}`}>
+                        {article.title}
+                      </h4>
+                      <div className="text-[10px] text-gray-500 flex justify-between">
+                        <span>{new Date(article.pubDate).toLocaleDateString()}</span>
+                      </div>
+                    </button>
+                  ))}
+                  {headlines.length === 0 && !isLoadingNews && (
+                    <div className="w-full text-center py-8 text-gray-500 text-sm">
+                      No news loaded. Check connection.
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
             {/* Configuration */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -257,69 +309,94 @@ export default function MusicStudioPage() {
                 Configuration
               </h2>
 
-              {mode === 'standard' ? (
-                <div className="space-y-5">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Theme / Prompt</label>
-                    <input
-                      type="text"
-                      value={theme}
-                      onChange={e => setTheme(e.target.value)}
-                      placeholder="e.g. Neon city nights, lonely hearts..."
-                      className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-purple-400 transition-colors"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Genre</label>
-                    <div className="flex flex-wrap gap-2">
-                      {GENRES.map(g => (
-                        <button
-                          key={g}
-                          onClick={() => setGenre(g)}
-                          className={`px-3 py-1.5 rounded text-xs transition-all ${genre === g
-                            ? 'bg-purple-500 text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]'
-                            : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                            }`}
-                        >
-                          {g}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Mood</label>
-                    <div className="flex flex-wrap gap-2">
-                      {MOODS.map(m => (
-                        <button
-                          key={m}
-                          onClick={() => setMood(m)}
-                          className={`px-3 py-1.5 rounded text-xs transition-all ${mood === m
-                            ? 'bg-cyan-500 text-black font-semibold shadow-[0_0_10px_rgba(6,182,212,0.4)]'
-                            : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                            }`}
-                        >
-                          {m}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                    {selectedHeadline ? 'Selected Context' : 'Topic / Theme'}
+                  </label>
+                  <textarea
+                    value={theme}
+                    onChange={e => {
+                      setTheme(e.target.value);
+                      if (selectedHeadline) setSelectedHeadline(null); // Clear selection if typing manually
+                    }}
+                    placeholder={mode === 'standard' ? "e.g. Neon city nights..." : "Select a headline above or type a topic..."}
+                    className={`w-full bg-[#0a0a0f] border rounded-lg px-4 py-3 focus:outline-none transition-colors min-h-[80px] text-sm resize-none ${selectedHeadline
+                      ? 'border-cyan-500/50 text-cyan-100'
+                      : 'border-white/10 focus:border-purple-400'
+                      }`}
+                  />
                 </div>
-              ) : (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-sm text-red-200">
-                  <div className="font-bold mb-2 flex items-center gap-2">
-                    <Radio size={16} /> Autonomous Mode
+
+                {mode === 'standard' && (
+                  <>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Genre</label>
+                      <div className="flex flex-wrap gap-2">
+                        {GENRES.map(g => (
+                          <button
+                            key={g}
+                            onClick={() => setGenre(g)}
+                            className={`px-3 py-1.5 rounded text-xs transition-all ${genre === g
+                              ? 'bg-purple-500 text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]'
+                              : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                              }`}
+                          >
+                            {g}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Mood</label>
+                      <div className="flex flex-wrap gap-2">
+                        {MOODS.map(m => (
+                          <button
+                            key={m}
+                            onClick={() => setMood(m)}
+                            className={`px-3 py-1.5 rounded text-xs transition-all ${mood === m
+                              ? 'bg-cyan-500 text-black font-semibold shadow-[0_0_10px_rgba(6,182,212,0.4)]'
+                              : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                              }`}
+                          >
+                            {m}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {mode !== 'standard' && (
+                  <div className={`border rounded-lg p-4 text-sm ${mode === 'political' ? 'bg-red-500/10 border-red-500/20 text-red-200' :
+                    mode === 'sentinel' ? 'bg-blue-500/10 border-blue-500/20 text-blue-200' :
+                      'bg-pink-500/10 border-pink-500/20 text-pink-200'
+                    }`}>
+                    <div className="font-bold mb-2 flex items-center gap-2">
+                      {(() => {
+                        const m = MODES.find(m => m.id === mode);
+                        const Icon = m?.icon;
+                        return Icon && <Icon size={16} />;
+                      })()}
+                      {MODES.find(m => m.id === mode)?.name} Persona Active
+                    </div>
+                    <p className="opacity-80">
+                      {MUSIC_AGENTS[mode]?.description || "This agent operates autonomously."}
+                    </p>
                   </div>
-                  This agent operates autonomously. It will scan news sources, select topics, and generate lyrics automatically.
-                </div>
-              )}
+                )}
+              </div>
 
               <div className="mt-8">
                 <button
                   onClick={handleGenerate}
-                  disabled={isGenerating || (mode === 'standard' && !theme)}
-                  className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-white shadow-lg shadow-purple-900/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  disabled={isGenerating || (!theme && !selectedHeadline)}
+                  className={`w-full py-4 rounded-xl font-bold text-white shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${mode === 'political' ? 'bg-gradient-to-r from-red-600 to-orange-600 shadow-red-900/40' :
+                    mode === 'sentinel' ? 'bg-gradient-to-r from-blue-600 to-cyan-600 shadow-blue-900/40' :
+                      mode === 'pop' ? 'bg-gradient-to-r from-pink-500 to-purple-500 shadow-pink-900/40' :
+                        'bg-gradient-to-r from-purple-600 to-pink-600 shadow-purple-900/40'
+                    }`}
                 >
                   {isGenerating ? (
                     <>
@@ -329,7 +406,7 @@ export default function MusicStudioPage() {
                   ) : (
                     <>
                       <Sparkles size={20} />
-                      <span>Generate Track</span>
+                      <span>{selectedHeadline ? 'Auto-Compose Track' : 'Generate Track'}</span>
                     </>
                   )}
                 </button>

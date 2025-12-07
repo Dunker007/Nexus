@@ -14,6 +14,7 @@ const navItems = [
     { href: '/studios', label: 'DLX Studios', icon: '🎨' },
     { href: '/chat', label: 'DLX Chat', icon: '💬', shortcut: 'G C' },
     { href: '/agents', label: 'DLX Agents', icon: '🤖' },
+    { href: '/news', label: 'News', icon: '📡' },
     { href: '/meeting', label: 'Meeting', icon: '👥' },
     { href: '/labs', label: 'DLX Labs', icon: '🔬', shortcut: 'G L' },
     { href: '/income', label: 'Revenue', icon: '💸', shortcut: 'G I' },
