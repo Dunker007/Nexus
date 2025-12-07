@@ -667,6 +667,20 @@ export default function AgentsPage() {
                             ) : (
                                 <div className="mb-4">
                                     <label className="block text-sm text-gray-400 mb-2">Select Agent</label>
+                                    <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                                        {agentsList.map(agent => (
+                                            <button
+                                                key={agent.id}
+                                                onClick={() => setSelectedAgent(agent)}
+                                                className={`flex items-center gap-2 p-2 rounded-lg text-left transition-colors bg-white/5 hover:bg-white/10`}
+                                            >
+                                                <div className="text-xl">{agent.emoji}</div>
+                                                <div className="min-w-0">
+                                                    <div className="font-medium text-xs truncate">{agent.name}</div>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
 
