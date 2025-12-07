@@ -277,146 +277,88 @@ export default function NewsPage() {
         <div className="pb-20 relative overflow-hidden">
             <PageBackground color="red" />
 
-            {/* Breaking News Ticker */}
-            <div className="bg-gradient-to-r from-red-900/80 via-red-800/80 to-red-900/80 border-b border-red-500/30 pt-2">
-                <div className="container-main py-2">
+            {/* Compact Header - Matches Agent HQ Style */}
+            <section className="py-6 border-b border-white/5">
+                <div className="w-full max-w-[1800px] mx-auto px-4 md:px-6">
                     <motion.div
-                        key={tickerIndex}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="flex items-center justify-center gap-3"
-                    >
-                        <span className="animate-pulse">🔴</span>
-                        <span className="text-sm font-medium text-red-100">
-                            {BREAKING_NEWS[tickerIndex]}
-                        </span>
-                        <span className="text-xs text-red-300">
-                            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                    </motion.div>
-                </div>
-            </div>
-
-            {/* Epic Broadcast Header */}
-            <section className="section-padding pb-8 relative overflow-hidden">
-                {/* Scanline Overlay Effect */}
-                <div className="absolute inset-0 pointer-events-none opacity-5">
-                    <div className="w-full h-full" style={{
-                        backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)'
-                    }} />
-                </div>
-
-                <div className="container-main relative z-10">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        {/* Main Header Block */}
-                        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-6">
-                            {/* Left: Title & Stats */}
-                            <div className="flex-1">
-                                {/* Live Badge + Title */}
-                                <div className="flex items-center gap-4 mb-4">
-                                    {/* Animated Live Indicator */}
-                                    <div className="relative">
-                                        <div className="absolute inset-0 bg-red-500 rounded-full blur-md animate-pulse opacity-50" />
-                                        <div className="relative flex items-center gap-2 px-4 py-2 bg-red-600/20 border border-red-500/50 rounded-full backdrop-blur-sm">
-                                            <div className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
-                                            <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Live Feed</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Article Count Badge */}
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full">
-                                        <span className="text-xs text-gray-400">{articles.length} articles</span>
-                                    </div>
-                                </div>
-
-                                {/* Epic Title */}
-                                <div className="flex items-center gap-4 mb-3">
-                                    <div className="relative">
-                                        <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-orange-500 to-red-500 rounded-xl blur-lg opacity-40 animate-pulse" />
-                                        <div className="relative p-3 bg-gradient-to-br from-red-600/20 to-orange-600/20 rounded-xl border border-white/10 backdrop-blur-sm">
-                                            <span className="text-3xl">📡</span>
-                                        </div>
-                                    </div>
-                                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">
-                                        <span className="bg-gradient-to-r from-white via-red-100 to-white bg-clip-text text-transparent">
-                                            DLX
-                                        </span>
-                                        <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent animate-gradient bg-300% ml-2">
-                                            News
-                                        </span>
-                                    </h1>
-                                </div>
-
-                                {/* Subtitle */}
-                                <p className="text-gray-400 text-lg mb-5 max-w-xl">
-                                    Real-time news aggregator with AI fact-checking.
-                                    <span className="text-red-400 ml-1">Stay informed. Stay sharp.</span>
-                                </p>
-
-                                {/* Quick Stats Row */}
-                                <div className="flex flex-wrap gap-3">
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                                        <span className="text-lg">🏠</span>
-                                        <span className="text-xs font-medium text-blue-400">{articles.filter(a => a.category === 'local').length} Local</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-lg">
-                                        <span className="text-lg">🇺🇸</span>
-                                        <span className="text-xs font-medium text-purple-400">{articles.filter(a => a.category === 'national').length} National</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                                        <span className="text-lg">⭐</span>
-                                        <span className="text-xs font-medium text-yellow-400">{savedArticles.size} Saved</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-lg">
-                                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                                        <span className="text-xs font-medium text-green-400">{articles.filter(a => a.factCheck?.status === 'verified').length} Verified</span>
-                                    </div>
+                        {/* Left: Title */}
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-red-500/10 rounded-lg border border-red-500/20">
+                                <span className="text-xl">📡</span>
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-bold flex items-center gap-2">
+                                    News <span className="text-red-400">Hub</span>
+                                </h1>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <span className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse" />
+                                    {articles.length} articles
+                                    <span className="text-green-400">• {articles.filter(a => a.factCheck?.status === 'verified').length} verified</span>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Right: Action Buttons */}
-                            <div className="flex flex-col gap-3">
-                                <Link href="/" className="text-gray-400 hover:text-cyan-400 transition-colors text-sm mb-2">
-                                    ← Back to Dashboard
-                                </Link>
-                                <div className="flex flex-wrap gap-2">
-                                    <button
-                                        onClick={refreshNews}
-                                        disabled={isLoading}
-                                        className={`px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all text-sm font-medium ${isLoading ? 'bg-white/5 opacity-50 cursor-wait' : 'bg-white/10 hover:bg-white/20 text-white'}`}
-                                    >
-                                        {isLoading ? '🔄 Loading...' : '🔄 Refresh Feed'}
-                                    </button>
-                                    <button
-                                        onClick={() => setShowSourceManager(!showSourceManager)}
-                                        className={`px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all text-sm font-medium ${showSourceManager
-                                            ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/30 shadow-lg shadow-cyan-500/10'
-                                            : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-white/10'
-                                            }`}
-                                    >
-                                        ⚙️ Sources
-                                    </button>
-                                    <button
-                                        onClick={() => setShowFactChecker(!showFactChecker)}
-                                        className={`px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all text-sm font-medium ${showFactChecker
-                                            ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-400 border border-purple-500/30 shadow-lg shadow-purple-500/10'
-                                            : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-white/10'
-                                            }`}
-                                    >
-                                        🔍 Fact Check
-                                    </button>
-                                    <button
-                                        onClick={() => setShowResearchPanel(true)}
-                                        className="px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all text-sm font-medium bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/10"
-                                    >
-                                        📚 Research
-                                    </button>
-                                </div>
+                        {/* Center: Quick Stats */}
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center bg-white/5 rounded-lg p-0.5 border border-white/10">
+                                <button
+                                    onClick={() => setActiveTab('all')}
+                                    className={`px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${activeTab === 'all' ? 'bg-red-500/20 text-red-400' : 'text-gray-500 hover:text-white'}`}
+                                >
+                                    All
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('local')}
+                                    className={`px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${activeTab === 'local' ? 'bg-red-500/20 text-red-400' : 'text-gray-500 hover:text-white'}`}
+                                >
+                                    🏠 Local
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('national')}
+                                    className={`px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${activeTab === 'national' ? 'bg-red-500/20 text-red-400' : 'text-gray-500 hover:text-white'}`}
+                                >
+                                    🇺🇸 National
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('saved')}
+                                    className={`px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${activeTab === 'saved' ? 'bg-red-500/20 text-red-400' : 'text-gray-500 hover:text-white'}`}
+                                >
+                                    ⭐ Saved
+                                </button>
                             </div>
+                        </div>
+
+                        {/* Right: Actions */}
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={refreshNews}
+                                disabled={isLoading}
+                                className="px-3 py-1.5 bg-gradient-to-r from-red-600 to-orange-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-50"
+                            >
+                                {isLoading ? '⏳' : '🔄'} Refresh
+                            </button>
+                            <button
+                                onClick={() => setShowSourceManager(!showSourceManager)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 ${showSourceManager ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white'}`}
+                            >
+                                ⚙️ Sources
+                            </button>
+                            <button
+                                onClick={() => setShowFactChecker(!showFactChecker)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 ${showFactChecker ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white'}`}
+                            >
+                                🔍 Fact Check
+                            </button>
+                            <button
+                                onClick={() => setShowResearchPanel(true)}
+                                className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs font-medium flex items-center gap-1.5 text-gray-400 hover:text-white"
+                            >
+                                📚 Research
+                            </button>
                         </div>
                     </motion.div>
                 </div>
@@ -639,29 +581,9 @@ export default function NewsPage() {
                 )}
             </AnimatePresence>
 
-            {/* Filters */}
-            <section className="container-main pb-6">
-                <div className="flex flex-col lg:flex-row gap-4">
-                    {/* Tabs */}
-                    <div className="flex gap-2">
-                        {(['all', 'local', 'national', 'saved'] as FilterTab[]).map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === tab
-                                    ? 'bg-cyan-500 text-black'
-                                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                                    }`}
-                            >
-                                {tab === 'local' && '🏠 '}
-                                {tab === 'national' && '🇺🇸 '}
-                                {tab === 'saved' && '⭐ '}
-                                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                                {tab === 'local' && ' (MN)'}
-                            </button>
-                        ))}
-                    </div>
-
+            {/* Search & Filters */}
+            <section className="w-full max-w-[1800px] mx-auto px-4 md:px-6 pb-6 pt-6">
+                <div className="flex flex-col md:flex-row gap-4">
                     {/* Search */}
                     <div className="flex-1">
                         <input
@@ -669,7 +591,7 @@ export default function NewsPage() {
                             placeholder="Search articles..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2"
+                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:border-red-500/50 focus:outline-none"
                         />
                     </div>
 
