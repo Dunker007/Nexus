@@ -260,114 +260,100 @@ export default function LabsPage() {
                 {/* Content Views */}
                 <AnimatePresence mode="wait">
                     {viewMode === 'gantt' && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-                            {filteredLabs.map(lab => (
-                                <div key={lab.id} className="glass-card p-0 overflow-hidden group">
-                                    <div className="p-4 flex items-center gap-4 cursor-pointer hover:bg-white/5 transition-colors" onClick={() => toggleRow(lab.id)}>
-                                        <div className="text-2xl w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center">{lab.icon}</div>
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-bold truncate flex items-center gap-2">
-                                                {lab.name}
-                                                {lab.content && <FileText size={14} className="text-cyan-400" />}
-                                            </h3>
-                                            <p className="text-sm text-gray-500 truncate">{lab.desc}</p>
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="glass-card p-0 overflow-hidden">
+                            {/* Gantt Header - Month Labels */}
+                            <div className="flex border-b border-white/10 bg-white/5">
+                                <div className="w-[280px] shrink-0 p-3 border-r border-white/10">
+                                    <span className="text-xs uppercase text-gray-500 font-bold">Project</span>
+                                </div>
+                                <div className="flex-1 flex">
+                                    {MONTHS.map((m, i) => (
+                                        <div key={m} className="flex-1 text-center py-2 text-[10px] font-bold text-gray-500 border-r border-white/5 last:border-r-0">
+                                            {m}
                                         </div>
-                                        {/* Status Pill */}
-                                        <div className={`hidden md:block px-2 py-1 rounded text-xs uppercase tracking-wider ${lab.status === 'active' ? 'bg-green-500/20 text-green-400' :
-                                            lab.status === 'preview' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                'bg-gray-500/20 text-gray-400'
-                                            }`}>{lab.status}</div>
+                                    ))}
+                                </div>
+                            </div>
 
-                                        {/* Owner Avatar */}
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${AGENT_COLORS[lab.owner.toLowerCase()] || 'bg-gray-600'}`}>
-                                            {lab.owner[0]}
-                                        </div>
-
-                                        <ChevronDown className={`text-gray-500 transition-transform ${expandedRows.includes(lab.id) ? 'rotate-180' : ''}`} />
-                                    </div>
-
-                                    {/* Expanded Details */}
-                                    <AnimatePresence>
-                                        {expandedRows.includes(lab.id) && (
-                                            <motion.div
-                                                initial={{ height: 0 }}
-                                                animate={{ height: 'auto' }}
-                                                exit={{ height: 0 }}
-                                                className="overflow-hidden border-t border-white/5 bg-black/20"
-                                            >
-                                                <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                    {/* Timeline */}
-                                                    <div className="col-span-2 space-y-2">
-                                                        <h4 className="text-xs uppercase text-gray-500 font-bold mb-2">Development Timeline</h4>
-                                                        <div className="h-12 bg-white/5 rounded-lg relative overflow-hidden flex items-center px-2">
-                                                            {MONTHS.map((m, i) => (
-                                                                <div key={m} className={`flex-1 text-[10px] text-center ${i >= lab.timeline.startMonth && i < lab.timeline.startMonth + lab.timeline.durationMonths ? 'text-white font-bold' : 'text-gray-700'}`}>
-                                                                    {m}
-                                                                </div>
-                                                            ))}
-                                                            <div
-                                                                className="absolute top-0 bottom-0 bg-cyan-500/20 border-l border-r border-cyan-500/50"
-                                                                style={{
-                                                                    left: `${(lab.timeline.startMonth / 12) * 100}%`,
-                                                                    width: `${(lab.timeline.durationMonths / 12) * 100}%`
-                                                                }}
-                                                            >
-                                                                <div
-                                                                    className="h-full bg-cyan-500/40"
-                                                                    style={{ width: `${lab.timeline.progress}%` }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex justify-between text-xs text-gray-500">
-                                                            <span>Start: {MONTHS[lab.timeline.startMonth]}</span>
-                                                            <span>Progress: {lab.timeline.progress}%</span>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Actions */}
-                                                    <div className="space-y-2">
-                                                        <h4 className="text-xs uppercase text-gray-500 font-bold mb-2">Actions</h4>
-                                                        {lab.href ? (
-                                                            <Link href={lab.href} className="flex items-center justify-between w-full p-3 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 rounded-lg transition-colors border border-cyan-500/30">
-                                                                <span>Open Lab</span>
-                                                                <ArrowUpRight size={16} />
-                                                            </Link>
-                                                        ) : (
-                                                            <div className="w-full p-3 bg-white/5 text-gray-500 rounded-lg border border-white/5 cursor-not-allowed">
-                                                                In Concept Phase
-                                                            </div>
-                                                        )}
-
-                                                        {lab.content && (
-                                                            <button
-                                                                onClick={() => setViewContent(lab.content || null)}
-                                                                className="flex items-center justify-between w-full p-3 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 rounded-lg transition-colors border border-purple-500/30"
-                                                            >
-                                                                <span>View Plan Document</span>
-                                                                <FileText size={16} />
-                                                            </button>
-                                                        )}
-
-                                                        <button
-                                                            className="flex items-center justify-between w-full p-3 bg-white/5 hover:bg-white/10 text-gray-300 rounded-lg transition-colors"
-                                                            onClick={(e) => {
-                                                                const event = new CustomEvent('new-milestone', { detail: { labId: lab.id } });
-                                                                window.dispatchEvent(event);
-                                                                const btn = e.currentTarget;
-                                                                btn.style.backgroundColor = 'rgba(0, 255, 0, 0.2)';
-                                                                setTimeout(() => btn.style.backgroundColor = '', 200);
-                                                            }}
-                                                        >
-                                                            <span>+ Add Milestone</span>
-                                                            <Calendar size={16} />
-                                                        </button>
+                            {/* Gantt Rows */}
+                            <div className="divide-y divide-white/5">
+                                {filteredLabs.map((lab, idx) => (
+                                    <div
+                                        key={lab.id}
+                                        className="flex hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                                        onClick={() => lab.href ? window.location.href = lab.href : setViewContent(lab.content || null)}
+                                    >
+                                        {/* Project Info */}
+                                        <div className="w-[280px] shrink-0 p-3 border-r border-white/10 flex items-center gap-3">
+                                            <div className="text-xl w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                                                {lab.icon}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-semibold text-sm truncate group-hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+                                                    {lab.name}
+                                                    {lab.href && <ArrowUpRight size={10} className="text-gray-600 group-hover:text-cyan-400" />}
+                                                </h3>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`text-[9px] px-1.5 py-0.5 rounded uppercase tracking-wide ${lab.status === 'active' ? 'bg-green-500/20 text-green-400' :
+                                                            lab.status === 'preview' ? 'bg-yellow-500/20 text-yellow-400' :
+                                                                'bg-gray-500/20 text-gray-400'
+                                                        }`}>{lab.status}</span>
+                                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white ${AGENT_COLORS[lab.owner.toLowerCase()] || 'bg-gray-600'}`}>
+                                                        {lab.owner[0]}
                                                     </div>
                                                 </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
+                                            </div>
+                                        </div>
+
+                                        {/* Timeline Bar Area */}
+                                        <div className="flex-1 relative flex items-center py-2">
+                                            {/* Month grid lines */}
+                                            <div className="absolute inset-0 flex">
+                                                {MONTHS.map((_, i) => (
+                                                    <div key={i} className="flex-1 border-r border-white/5 last:border-r-0" />
+                                                ))}
+                                            </div>
+
+                                            {/* Timeline Bar */}
+                                            <div
+                                                className="absolute h-6 rounded-full bg-gradient-to-r from-cyan-600/40 to-cyan-500/40 border border-cyan-500/50 flex items-center overflow-hidden"
+                                                style={{
+                                                    left: `${(lab.timeline.startMonth / 12) * 100}%`,
+                                                    width: `${(lab.timeline.durationMonths / 12) * 100}%`
+                                                }}
+                                            >
+                                                {/* Progress fill */}
+                                                <div
+                                                    className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 rounded-l-full"
+                                                    style={{ width: `${lab.timeline.progress}%` }}
+                                                />
+                                                {/* Progress label */}
+                                                <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-white drop-shadow-sm">
+                                                    {lab.timeline.progress}%
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Footer Legend */}
+                            <div className="p-3 border-t border-white/10 bg-white/[0.02] flex items-center justify-between">
+                                <div className="flex items-center gap-4 text-[10px] text-gray-500">
+                                    <span className="flex items-center gap-1">
+                                        <div className="w-2 h-2 bg-green-500 rounded-full" /> Active
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <div className="w-2 h-2 bg-yellow-500 rounded-full" /> Preview
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <div className="w-2 h-2 bg-gray-500 rounded-full" /> Concept
+                                    </span>
                                 </div>
-                            ))}
+                                <span className="text-[10px] text-gray-500">
+                                    {filteredLabs.length} projects • Click to open
+                                </span>
+                            </div>
                         </motion.div>
                     )}
 
