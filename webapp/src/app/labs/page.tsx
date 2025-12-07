@@ -112,6 +112,7 @@ const INITIAL_LABS_DATA: Lab[] = [
     { id: 'dataweave', icon: '🌐', name: 'Data Weave', desc: 'ETL & Data pipes.', status: 'active', category: 'Intelligence', priority: 'Low', agents: ['bytebot'], href: null, ideas: 0, timeline: { startMonth: 4, durationMonths: 2, progress: 10 }, owner: 'ByteBot' },
 
     // Creation
+    { id: 'music-studio', icon: '🎵', name: 'Music Studio', desc: 'Suno → Neural Frames → DaVinci → YouTube + TikTok', status: 'active', category: 'Creation', priority: 'High', agents: ['lyricist', 'composer', 'producer'], href: '/music', ideas: 5, timeline: { startMonth: 10, durationMonths: 3, progress: 75 }, owner: 'Producer' },
     { id: 'forge', icon: '🔨', name: 'Agent Forge', desc: 'Build AI agents.', status: 'preview', category: 'Creation', priority: 'High', agents: ['lux'], href: '/agents', ideas: 8, timeline: { startMonth: 1, durationMonths: 5, progress: 50 }, owner: 'Lux' },
     { id: 'codegen', icon: '💻', name: 'Code Generator', desc: 'AI refactoring tools.', status: 'active', category: 'Creation', priority: 'High', agents: ['bytebot'], href: '/playground', ideas: 4, timeline: { startMonth: 0, durationMonths: 3, progress: 75 }, owner: 'ByteBot' },
     { id: 'vision', icon: '👁️', name: 'Vision Lab', desc: 'Computer vision tools.', status: 'concept', category: 'Creation', priority: 'Low', agents: ['lux'], href: null, ideas: 1, timeline: { startMonth: 5, durationMonths: 6, progress: 5 }, owner: 'Lux' },
@@ -135,7 +136,10 @@ const AGENT_COLORS: Record<string, string> = {
     oracle: 'bg-indigo-500',
     qa: 'bg-pink-500',
     security: 'bg-red-500',
-    antigravity: 'bg-yellow-500'
+    antigravity: 'bg-yellow-500',
+    lyricist: 'bg-violet-500',
+    composer: 'bg-blue-500',
+    producer: 'bg-emerald-500'
 };
 
 export default function LabsPage() {
@@ -224,8 +228,8 @@ export default function LabsPage() {
                                 key={cat}
                                 onClick={() => setFilterCategory(cat)}
                                 className={`px-4 py-2 rounded-full text-sm whitespace-nowrap border transition-all ${filterCategory === cat
-                                        ? 'bg-cyan-500 text-black border-cyan-500 font-bold'
-                                        : 'bg-black/30 text-gray-400 border-white/10 hover:border-white/30'
+                                    ? 'bg-cyan-500 text-black border-cyan-500 font-bold'
+                                    : 'bg-black/30 text-gray-400 border-white/10 hover:border-white/30'
                                     }`}
                             >
                                 {cat}
@@ -270,8 +274,8 @@ export default function LabsPage() {
                                         </div>
                                         {/* Status Pill */}
                                         <div className={`hidden md:block px-2 py-1 rounded text-xs uppercase tracking-wider ${lab.status === 'active' ? 'bg-green-500/20 text-green-400' :
-                                                lab.status === 'preview' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                    'bg-gray-500/20 text-gray-400'
+                                            lab.status === 'preview' ? 'bg-yellow-500/20 text-yellow-400' :
+                                                'bg-gray-500/20 text-gray-400'
                                             }`}>{lab.status}</div>
 
                                         {/* Owner Avatar */}
