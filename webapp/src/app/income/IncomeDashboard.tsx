@@ -12,7 +12,11 @@ import RevenueAgentWidget from '@/components/RevenueAgentWidget';
 import RevenueTracker from '@/components/RevenueTracker';
 import PageBackground from '@/components/PageBackground';
 import { STREAM_TEMPLATES_DATA } from '@/lib/income-templates';
-import { toggleStreamStep, activateStream, saveContentProject } from '@/app/actions/income';
+
+// Stub functions to replace server actions (will use bridge API later)
+const toggleStreamStep = async (streamId: string, stepIndex: number) => { console.log('toggleStreamStep', streamId, stepIndex); };
+const activateStream = async (streamId: string) => { console.log('activateStream', streamId); };
+const saveContentProject = async (streamId: string, data: any) => { console.log('saveContentProject', streamId, data); return { path: '/stub/path' }; };
 
 const IconMap: any = { Music, Video, ShoppingBag, Mic, Printer, Zap, TrendingUp };
 
@@ -68,7 +72,7 @@ export default function IncomeDashboard({ dbStreams }: IncomeDashboardProps) {
         if (!generatorData) return;
         setSaving(true);
         try {
-            const res = await saveContentProject({ niche: nicheInput, ...generatorData });
+            const res = await saveContentProject('default', { niche: nicheInput, ...generatorData });
             alert(`Project created at: ${res.path}`);
         } catch (e) {
             console.error(e);

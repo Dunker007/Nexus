@@ -1,9 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
-  output: "standalone",
+  // Static export for Tauri
+  output: "export",
+  // Required for static export
+  images: {
+    unoptimized: true,
+  },
+  // Ensure trailing slashes for static files
+  trailingSlash: true,
 };
 
 export default nextConfig;

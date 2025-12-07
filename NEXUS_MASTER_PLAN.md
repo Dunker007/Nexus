@@ -21,9 +21,36 @@
 
 **Ideas can be 0% built. They cannot be 0% possible.**
 
+## Known Pain Points
+
+Track friction here. Fix later, don't slow down now.
+
+| Issue | Impact | Notes |
+|-------|--------|-------|
+| App restart is cumbersome | Medium | F5 reload added but dev cycle still clunky. Need better hot-reload or launcher script. |
+| Backend must start separately | Medium | Bridge not auto-launching with Tauri. Need unified start. |
+| NODE_ENV warning spam | Low | Work environment bleed. Cosmetic. |
+| Prisma CommonJS warnings | Low | Falls back to in-memory. Works but noisy. |
+
 ---
 
-## What Nexus Is
+## The 80/20 Rule (Current Phase)
+
+**80% Hardening** — dig in, connect, make work:
+- Wire up what exists
+- Fix broken connections
+- Polish rough edges
+- Make it actually usable daily
+
+**20% New Ideas** — but focused:
+- Can one new thing replace 6 tasks?
+- Streamlining over feature creep
+- Big trends or releases worth catching
+- Cost/effort reduction
+
+**Not chasing shiny things. Building foundation.**
+
+---
 
 **Nexus** is a Tauri-based desktop application — your personal AI command center running on LuxRig, accessible from anywhere via Tailscale.
 

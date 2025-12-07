@@ -8,6 +8,11 @@ out/
 dist/
 build/
 
+# Tauri
+webapp/src-tauri/target/
+webapp/src-tauri/bridge-bundle/
+webapp/src-tauri/gen/
+
 # IDE
 .idea/
 .vscode/
@@ -23,6 +28,12 @@ build/
 logs/
 *.log
 npm-debug.log*
+
+# Data (runtime)
+data/cache/*
+data/logs/*
+data/published/*
+!data/**/.gitkeep
 
 # OS
 .DS_Store

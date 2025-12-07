@@ -1,0 +1,55 @@
+{
+    "LMStudio": {
+        "ApiUrl": "http://localhost:1234/v1/chat/completions",
+        "Model": "qwen2.5-vl-7b-instruct",
+        "MaxTokens": 2000,
+        "Temperature": 0.7
+    },
+    "WordPress": {
+        "Enabled": false,
+        "SiteUrl": "https://dlxstudios.ai",
+        "Username": "",
+        "AppPassword": "",
+        "DefaultStatus": "draft",
+        "Categories": [
+            "AI",
+            "Technology"
+        ],
+        "Tags": [
+            "automation",
+            "artificial intelligence"
+        ]
+    },
+    "Revenue": {
+        "AdSense": {
+            "Enabled": true,
+            "ClientId": "ca-pub-XXXXXXXXXXXXXXXX",
+            "Slots": {
+                "Sidebar": "1234567890",
+                "InContent": "0987654321"
+            }
+        },
+        "Affiliates": {
+            "Enabled": true,
+            "Programs": [
+                {
+                    "Name": "ExampleHost",
+                    "Url": "https://example.com/ref/dlx",
+                    "Keywords": [
+                        "hosting",
+                        "server",
+                        "cloud"
+                    ]
+                }
+            ]
+        }
+    },
+    "Paths": {
+        "Logs": "../../data/logs",
+        "Output": "../../data/published"
+    },
+    "Defaults": {
+        "Topic": "The Future of AI Automation",
+        "SystemPrompt": "You are a helpful assistant that writes engaging blog posts."
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "systemPrompt": "You are a professional content writer specializing in SEO-optimized blog posts. Your task is to create engaging, informative content that ranks well in search engines.",
+    "userTemplate": "Write a comprehensive blog post about {{topic}}. Include the following keywords naturally: {{keywords}}. Aim for approximately {{wordCount}} words. Structure the post with an introduction, multiple subheadings, and a conclusion. Make it engaging and informative.",
+    "defaults": {
+        "wordCount": 500
+    }
+}

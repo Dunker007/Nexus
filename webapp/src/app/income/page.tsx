@@ -1,7 +1,7 @@
-import { getIncomeStreams } from '@/app/actions/income';
+'use client';
+
 import IncomeDashboard from './IncomeDashboard';
 
-export default async function IncomePage() {
-    const streams = await getIncomeStreams();
-    return <IncomeDashboard dbStreams={streams} />;
+export default function IncomePage() {
+    return <IncomeDashboard dbStreams={[]} />;
 }
