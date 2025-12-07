@@ -7,7 +7,7 @@ import {
   Music, Mic, Radio, Play, Pause, Video, Film,
   Volume2, Heart, Share2, Download, Disc, Activity,
   ExternalLink, Copy, Check, ChevronRight, Sparkles,
-  FileVideo, Clapperboard, Upload, Youtube, Newspaper, RefreshCw
+  FileVideo, Clapperboard, Upload, Youtube, Newspaper, RefreshCw, Smartphone
 } from 'lucide-react';
 import { fetchAllNews, type NewsArticle } from '@/lib/news-service';
 import { MUSIC_AGENTS } from '@/lib/music-agents';
@@ -71,7 +71,8 @@ export default function MusicStudioPage() {
     { id: 'suno', name: 'Suno AI', icon: Music, status: 'pending', link: 'https://suno.com/create', description: 'Generate AI music from prompt' },
     { id: 'neural', name: 'Neural Frames', icon: Film, status: 'pending', link: 'https://www.neuralframes.com/', description: 'Create AI music visualizer' },
     { id: 'davinci', name: 'DaVinci Resolve', icon: Clapperboard, status: 'pending', description: 'Professional editing & polish' },
-    { id: 'youtube', name: 'YouTube Upload', icon: Youtube, status: 'pending', link: 'https://studio.youtube.com/', description: 'Publish to YouTube' }
+    { id: 'youtube', name: 'YouTube', icon: Youtube, status: 'pending', link: 'https://studio.youtube.com/', description: 'Publish to YouTube' },
+    { id: 'tiktok', name: 'TikTok', icon: Smartphone, status: 'pending', link: 'https://www.tiktok.com/creator', description: 'Music Shorts & viral clips' }
   ]);
 
   useEffect(() => {
@@ -96,7 +97,8 @@ export default function MusicStudioPage() {
   }, []);
 
   const handleGenerate = async () => {
-    if (!theme && !selectedHeadline && mode === 'standard') return;
+    // For standard mode, require a theme or headline. For agent modes, use the selected topic or a default.
+    if (mode === 'standard' && !theme && !selectedHeadline) return;
     setIsGenerating(true);
     setResult(null);
 
@@ -551,7 +553,7 @@ export default function MusicStudioPage() {
             </motion.div>
 
             {/* External Tools */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <a
                 href="https://studio.youtube.com/"
                 target="_blank"
@@ -561,8 +563,22 @@ export default function MusicStudioPage() {
                   <Youtube className="text-red-400" size={20} />
                 </div>
                 <div>
-                  <div className="font-medium group-hover:text-red-400 transition-colors">YouTube Studio</div>
+                  <div className="font-medium group-hover:text-red-400 transition-colors">YouTube</div>
                   <div className="text-xs text-gray-500">Upload & publish</div>
+                </div>
+                <ExternalLink size={14} className="ml-auto text-gray-600" />
+              </a>
+              <a
+                href="https://www.tiktok.com/creator"
+                target="_blank"
+                className="glass-card p-4 flex items-center gap-3 hover:border-pink-500/30 transition-colors group"
+              >
+                <div className="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center">
+                  <Smartphone className="text-pink-400" size={20} />
+                </div>
+                <div>
+                  <div className="font-medium group-hover:text-pink-400 transition-colors">TikTok</div>
+                  <div className="text-xs text-gray-500">Music Shorts</div>
                 </div>
                 <ExternalLink size={14} className="ml-auto text-gray-600" />
               </a>
@@ -575,8 +591,8 @@ export default function MusicStudioPage() {
                   <Clapperboard className="text-orange-400" size={20} />
                 </div>
                 <div>
-                  <div className="font-medium group-hover:text-orange-400 transition-colors">DaVinci Resolve</div>
-                  <div className="text-xs text-gray-500">Pro video editing</div>
+                  <div className="font-medium group-hover:text-orange-400 transition-colors">DaVinci</div>
+                  <div className="text-xs text-gray-500">Pro editing</div>
                 </div>
                 <ExternalLink size={14} className="ml-auto text-gray-600" />
               </a>
@@ -599,8 +615,8 @@ export default function MusicStudioPage() {
                 {[
                   { step: 1, name: 'AI Composition', tool: 'Suno AI', icon: Music, color: 'purple', desc: 'Generate AI music from text prompts. Export as MP3/WAV.', tips: ['Use specific genre tags', 'Include mood descriptors', 'Mention instruments'] },
                   { step: 2, name: 'Visual Creation', tool: 'Neural Frames', icon: Film, color: 'cyan', desc: 'Create stunning AI music videos with beat-synced visuals.', tips: ['Upload your Suno track', 'Choose visual style', 'Sync to audio'] },
-                  { step: 3, name: 'Professional Polish', tool: 'DaVinci Resolve', icon: Clapperboard, color: 'orange', desc: 'Add intros, outros, titles, and final touches.', tips: ['Add channel branding', 'Color grade', 'Export 4K'] },
-                  { step: 4, name: 'Distribution', tool: 'YouTube', icon: Youtube, color: 'red', desc: 'Upload and optimize for discovery.', tips: ['SEO-rich title', 'Custom thumbnail', 'Playlists'] }
+                  { step: 3, name: 'Professional Polish', tool: 'DaVinci Resolve', icon: Clapperboard, color: 'orange', desc: 'Add intros, outros, titles, and final touches.', tips: ['Add channel branding', 'Color grade', 'Export 4K + vertical 9:16'] },
+                  { step: 4, name: 'Distribution', tool: 'YouTube + TikTok', icon: Youtube, color: 'red', desc: 'Upload to YouTube and create TikTok music shorts.', tips: ['SEO-rich title', 'Vertical cuts for TikTok', 'Cross-promote'] }
                 ].map(item => (
                   <div key={item.step} className={`glass-card p-6 border-l-4 border-${item.color}-500`}>
                     <div className="flex items-start gap-4">
