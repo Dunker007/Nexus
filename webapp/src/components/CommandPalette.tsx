@@ -57,11 +57,17 @@ export default function CommandPalette() {
         localStorage.setItem('dlx-recent-commands', JSON.stringify(updated));
     };
 
+    const triggerThemeToggle = () => {
+        window.dispatchEvent(new CustomEvent('toggle-theme'));
+    };
+
     const commands: CommandItem[] = [
         // Quick Actions
         { id: 'new-chat', icon: '💬', label: 'New Chat with Lux', shortcut: 'N', category: 'Quick Actions', action: () => router.push('/chat') },
         { id: 'deploy-agent', icon: '🚀', label: 'Deploy an Agent', category: 'Quick Actions', action: () => router.push('/agents') },
         { id: 'check-revenue', icon: '💰', label: 'Check Revenue', category: 'Quick Actions', action: () => router.push('/income') },
+        { id: 'start-meeting', icon: '👥', label: 'Start AI Meeting', category: 'Quick Actions', action: () => router.push('/meeting') },
+        { id: 'voice-mode', icon: '🎙️', label: 'Activate Voice Mode', category: 'Quick Actions', action: () => router.push('/voice') },
 
         // Core Navigation
         { id: 'home', icon: '🏠', label: 'Go to Home', shortcut: 'G H', category: 'Navigation', action: () => router.push('/') },
@@ -74,13 +80,22 @@ export default function CommandPalette() {
         { id: 'agents', icon: '🤖', label: 'Agent Headquarters', category: 'AI', action: () => router.push('/agents') },
         { id: 'labs', icon: '🔬', label: 'AI Labs', shortcut: 'G L', category: 'AI', action: () => router.push('/labs') },
         { id: 'studios', icon: '🎨', label: 'Studios', category: 'AI', action: () => router.push('/studios') },
+        { id: 'meeting', icon: '👥', label: 'AI Staff Meeting', category: 'AI', action: () => router.push('/meeting') },
+        { id: 'voice', icon: '🎙️', label: 'Voice Control', category: 'AI', action: () => router.push('/voice') },
+
+        // Creative
+        { id: 'music', icon: '🎵', label: 'Music Studio', shortcut: 'G M', category: 'Creative', action: () => router.push('/music') },
+        { id: 'playground', icon: '🎮', label: 'Playground', category: 'Creative', action: () => router.push('/playground') },
 
         // Finance
         { id: 'income', icon: '💸', label: 'Revenue Command', shortcut: 'G I', category: 'Finance', action: () => router.push('/income') },
+        { id: 'crypto', icon: '💎', label: 'Crypto Lab', category: 'Finance', action: () => router.push('/crypto') },
 
         // System
-        { id: 'theme-switch', icon: '🎨', label: 'Switch Theme', category: 'System', action: () => router.push('/settings') },
+        { id: 'theme-switch', icon: '🌓', label: 'Toggle Theme', shortcut: 'T', category: 'System', action: triggerThemeToggle },
         { id: 'status', icon: '🚦', label: 'System Status', category: 'System', action: () => router.push('/status') },
+        { id: 'housekeeper', icon: '🧹', label: 'Housekeeper (Backup/Cleanup)', category: 'System', action: () => router.push('/backup') },
+        { id: 'models', icon: '🧠', label: 'LLM Models', category: 'System', action: () => router.push('/models') },
     ];
 
     const filteredCommands = search

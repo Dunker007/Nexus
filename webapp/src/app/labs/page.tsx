@@ -46,6 +46,8 @@ const INITIAL_LABS_DATA: Lab[] = [
 
     // Experimental
     { id: 'aura', icon: '✨', name: 'AURA Interface', desc: 'Natural UI research.', status: 'concept', category: 'Experimental', priority: 'Low', agents: ['lux'], href: null, ideas: 9, timeline: { startMonth: 6, durationMonths: 6, progress: 0 }, owner: 'Lux' },
+    { id: 'pcoptimize', icon: '⚡', name: 'PC Optimizer', desc: 'System performance tuning & resource management.', status: 'concept', category: 'Experimental', priority: 'Medium', agents: ['bytebot', 'guardian'], href: null, ideas: 4, timeline: { startMonth: 3, durationMonths: 4, progress: 0 }, owner: 'ByteBot' },
+    { id: 'llmoptimize', icon: '🧠', name: 'LLM Lab', desc: 'Local model tuning, quantization & benchmarking.', status: 'concept', category: 'Experimental', priority: 'High', agents: ['architect', 'oracle'], href: null, ideas: 7, timeline: { startMonth: 2, durationMonths: 6, progress: 0 }, owner: 'Architect' },
 ];
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -110,6 +112,37 @@ export default function LabsPage() {
     const handleUpdateLab = (id: string, updates: any) => {
         setLabsData(prev => prev.map(l => l.id === id ? { ...l, ...updates } : l));
         // Optional: Flash feedback or toast
+    };
+
+    const handleAddMilestone = (labId: string) => {
+        // For now, increment ideas count and advance progress slightly
+        setLabsData(prev => prev.map(l => {
+            if (l.id === labId) {
+                return {
+                    ...l,
+                    ideas: l.ideas + 1,
+                    timeline: {
+                        ...l.timeline,
+                        progress: Math.min(l.timeline.progress + 5, 100)
+                    }
+                };
+            }
+            return l;
+        }));
+        // Announce milestone in meeting panel
+        const lab = labsData.find(l => l.id === labId);
+        if (lab) {
+            const event = new CustomEvent('new-milestone', {
+                detail: { labId, labName: lab.name, message: `New milestone added to ${lab.name}` }
+            });
+            window.dispatchEvent(event);
+        }
+    };
+
+    const handleQuickIdea = (labId: string) => {
+        setLabsData(prev => prev.map(l =>
+            l.id === labId ? { ...l, ideas: l.ideas + 1 } : l
+        ));
     };
 
     const categories = ['Operations', 'Intelligence', 'Creation', 'Capital', 'Experimental'];
@@ -319,7 +352,10 @@ export default function LabsPage() {
                                                                 </div>
                                                                 <div className="p-3 bg-white/5 rounded border border-white/10">
                                                                     <div className="text-xs text-gray-500 uppercase font-bold mb-2">Actions</div>
-                                                                    <button className="w-full py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs rounded mb-2">
+                                                                    <button
+                                                                        onClick={() => handleAddMilestone(lab.id)}
+                                                                        className="w-full py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs rounded mb-2 transition-colors"
+                                                                    >
                                                                         + Add Milestone
                                                                     </button>
                                                                     {lab.href && <Link href={lab.href} className="block w-full text-center py-1 bg-white/5 hover:bg-white/10 text-white text-xs rounded">Go to Lab</Link>}
@@ -357,7 +393,7 @@ export default function LabsPage() {
                                             </h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 {labsInCategory.map(lab => (
-                                                    <LabCard key={lab.id} lab={lab} />
+                                                    <LabCard key={lab.id} lab={lab} onQuickIdea={handleQuickIdea} />
                                                 ))}
                                             </div>
                                         </div>
@@ -383,7 +419,7 @@ export default function LabsPage() {
                                         </div>
                                         <div className="space-y-4">
                                             {filteredLabs.filter(l => l.status === status).map(lab => (
-                                                <LabCard key={lab.id} lab={lab} simple />
+                                                <LabCard key={lab.id} lab={lab} simple onQuickIdea={handleQuickIdea} />
                                             ))}
                                         </div>
                                     </div>
@@ -471,7 +507,7 @@ export default function LabsPage() {
     );
 }
 
-function LabCard({ lab, simple = false }: { lab: Lab, simple?: boolean }) {
+function LabCard({ lab, simple = false, onQuickIdea }: { lab: Lab, simple?: boolean, onQuickIdea?: (labId: string) => void }) {
     return (
         <motion.div
             layout
@@ -530,7 +566,10 @@ function LabCard({ lab, simple = false }: { lab: Lab, simple?: boolean }) {
 
             {/* Inbox Quick Drop (Hover Overlay) */}
             <div className="absolute inset-0 bg-black/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-6 text-center pointer-events-none group-hover:pointer-events-auto">
-                <button className="mb-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-bold flex items-center gap-2">
+                <button
+                    onClick={() => onQuickIdea?.(lab.id)}
+                    className="mb-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors"
+                >
                     <Plus size={16} /> Add Quick Idea
                 </button>
                 {lab.href && (
