@@ -4,6 +4,7 @@
  */
 
 import { Agent } from './agent-core.js';
+import { lmstudioService } from './lmstudio.js';
 
 /**
  * Lyricist Agent - Writes lyrics, hooks, and emotional content
@@ -530,40 +531,112 @@ export class NewsicianAgent extends Agent {
     }
 
     async createPoliticalRap(headlines = [], focusArea = 'minnesota') {
-        // Simulated news synthesis (in production, would fetch from news API)
         const newsContext = this.synthesizeNews(headlines, focusArea);
 
-        return {
-            title: this.generatePoliticalTitle(newsContext),
-            bpm: '90-100 BPM (hard-hitting trap beat)',
-            key: 'Minor key for intensity',
-            explicitLabel: true,
-            structure: {
-                intro: '[News clips / radio static / "Breaking news..." sample]',
-                verse1_truthTeller: this.generateVerse('truthTeller', newsContext, 1),
-                hook: this.generatePoliticalHook(newsContext),
-                verse2_outlaw: this.generateVerse('outlaw', newsContext, 2),
-                hook2: '[Repeat hook with ad-libs]',
-                bridge: '[Dual voice breakdown - facts and emotion collide]',
-                verse3_both: '[Trading bars - Truth Teller / Outlaw / Truth Teller / Outlaw]',
-                outro: '[Call to action - vote, speak up, stay informed]'
-            },
-            voices: this.voices,
-            production: {
-                style: 'Country-Trap / Political Hip-Hop hybrid',
-                elements: [
-                    'Heavy 808s with acoustic guitar stabs',
-                    'News clip samples throughout',
-                    'Siren effects on hook',
-                    'Crowd chants for chorus',
-                    'Switch between clean and distorted vocals'
-                ],
-                references: ['Tom MacDonald', 'Yelawolf', 'Struggle Jennings', 'Adam Calhoun']
-            },
-            sunoPrompt: this.generateNewsicianPrompt(newsContext),
-            sources: newsContext.sources,
-            timestamp: new Date()
-        };
+        const systemPrompt = `You are Newsician, a political rapper.
+Your mission is to turn news headlines into aggressive, anti-establishment, political hip-hop tracks.
+You use two distinct vocal styles:
+1. "The Truth Teller" - Clear, deliberate, fast flow. Cites specific facts, names, and statistics from the news.
+2. "The Outlaw" - Aggressive, emotional, country-trap flow. Focuses on the impact on real people.
+
+Your lyrics must be explicit, rhyming, and hard-hitting.
+Structure your song with:
+- Intro (News clips)
+- Verse 1 (The Truth Teller)
+- Hook (Anthemic/Aggressive)
+- Verse 2 (The Outlaw)
+- Bridge (Dual voice)
+- Outro
+
+Return the result as a JSON object with keys: title, structure (object with verse keys), and sunoPrompt.`;
+
+        const userPrompt = `Focus Area: ${focusArea}
+News Headlines:
+${newsContext.headlines.map(h => `- ${h.title} (${h.source})`).join('\n')}
+
+Key Facts:
+${newsContext.synthesized.facts.join('\n')}
+
+Generate a partial track (Intro, Verse 1, Hook, Verse 2) based on these headlines.`;
+
+        try {
+            console.log(`[Newsician] Calling LLM for ${focusArea}...`);
+            const completion = await lmstudioService.chat([
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt }
+            ]);
+
+            const content = completion.content;
+
+            // Try to parse JSON from LLM response (handling markdown code blocks)
+            let parsed = {};
+            try {
+                const jsonMatch = content.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    parsed = JSON.parse(jsonMatch[0]);
+                } else {
+                    throw new Error('No JSON found');
+                }
+            } catch (e) {
+                // Fallback if not valid JSON - wrap text
+                parsed = {
+                    title: this.generatePoliticalTitle(newsContext),
+                    structure: {
+                        verse1_truthTeller: content.slice(0, 500) + '...', // truncate for safety
+                        raw_output: content
+                    }
+                };
+            }
+
+            return {
+                title: parsed.title || this.generatePoliticalTitle(newsContext),
+                bpm: '95 BPM',
+                key: 'Minor',
+                explicitLabel: true,
+                structure: parsed.structure || {
+                    intro: '[News clips]',
+                    verse1_truthTeller: content, // Use full content as fallback
+                    hook: this.generatePoliticalHook(newsContext)
+                },
+                voices: this.voices,
+                production: {
+                    style: 'Country-Trap / Political Hip-Hop',
+                    elements: ['808s', 'Acoustic Guitar', 'News Samples']
+                },
+                sunoPrompt: parsed.sunoPrompt || this.generateNewsicianPrompt(newsContext),
+                sources: newsContext.sources,
+                timestamp: new Date()
+            };
+
+        } catch (error) {
+            console.error('[Newsician] LLM call failed, using template fallback:', error);
+            // Fallback to original template method
+            return {
+                title: this.generatePoliticalTitle(newsContext),
+                bpm: '90-100 BPM (hard-hitting trap beat)',
+                key: 'Minor key for intensity',
+                explicitLabel: true,
+                structure: {
+                    intro: '[News clips / radio static / "Breaking news..." sample]',
+                    verse1_truthTeller: this.generateVerse('truthTeller', newsContext, 1),
+                    hook: this.generatePoliticalHook(newsContext),
+                    verse2_outlaw: this.generateVerse('outlaw', newsContext, 2),
+                    hook2: '[Repeat hook with ad-libs]',
+                    bridge: '[Dual voice breakdown - facts and emotion collide]',
+                    verse3_both: '[Trading bars - Truth Teller / Outlaw / Truth Teller / Outlaw]',
+                    outro: '[Call to action - vote, speak up, stay informed]'
+                },
+                voices: this.voices,
+                production: {
+                    style: 'Country-Trap / Political Hip-Hop hybrid',
+                    elements: ['Heavy 808s', 'News clip samples', 'Siren effects'],
+                    references: ['Tom MacDonald', 'Yelawolf']
+                },
+                sunoPrompt: this.generateNewsicianPrompt(newsContext),
+                sources: newsContext.sources,
+                timestamp: new Date()
+            };
+        }
     }
 
     synthesizeNews(headlines, focusArea) {
@@ -575,27 +648,21 @@ export class NewsicianAgent extends Agent {
             { title: 'DFL majority pushes through controversial spending bill', source: 'Alpha News MN', topic: 'politics' }
         ];
 
-        const news = headlines.length > 0 ? headlines : defaultHeadlines;
+        // Ensure we have an array
+        const news = (headlines && headlines.length > 0) ? headlines : defaultHeadlines;
 
         return {
             focusArea,
-            mainTopics: [...new Set(news.map(h => h.topic))],
-            sources: [...new Set(news.map(h => h.source))],
+            mainTopics: [...new Set(news.map(h => h.topic || 'general'))],
+            sources: [...new Set(news.map(h => h.source?.name || h.source || 'Unknown'))],
             headlines: news,
             synthesized: {
-                politicians: ['Walz', 'Ellison', 'Frey', 'DFL Leadership'],
-                issues: ['crime', 'economy', 'mandates', 'spending'],
-                facts: [
-                    'Crime up 23% year over year',
-                    'Small business closures at record high',
-                    'Executive orders bypassing legislature',
-                    'Billions in new spending'
-                ],
+                politicians: ['Walz', 'Ellison', 'Frey'],
+                issues: ['crime', 'economy', 'mandates'],
+                facts: news.map(h => h.title), // Use actual titles as facts
                 impacts: [
                     'Working families struggling',
-                    'Neighborhoods unsafe',
-                    'Jobs leaving the state',
-                    'Taxpayers footing the bill'
+                    'Neighborhoods unsafe'
                 ]
             }
         };
@@ -1061,6 +1128,122 @@ export class SongwriterRoom {
     }
 }
 
+/**
+ * Mic Agent - Music Studio Manager
+ * Orchestrates the studio, coordinates other agents, and provides strategic direction
+ */
+export class MicAgent extends Agent {
+    constructor() {
+        super({
+            id: 'mic-agent',
+            name: 'Mic',
+            description: 'Studio Manager who orchestrates workflows, tracks trends, and manages the artist roster',
+            capabilities: ['studio-management', 'agent-coordination', 'trend-analysis', 'strategy']
+        });
+        this.persona = {
+            emoji: '🎙️',
+            color: '#111827', // Dark/Professional
+            style: 'Professional, strategic, efficient, visionary'
+        };
+    }
+
+    async processTask(task, context) {
+        const { action, input, team = [] } = task;
+
+        switch (action) {
+            case 'manage-session':
+                return await this.manageSession(input);
+            case 'coordinate-task':
+                return await this.coordinateTask(input, team);
+            case 'strategic-advice':
+                return await this.provideStrategy(input);
+            default:
+                return await this.manageSession(input);
+        }
+    }
+
+    async manageSession(userInput) {
+        const systemPrompt = `You are Mic, the Nexus Music Studio Manager.
+Your job is to orchestrate the music creation process. You manage a team of AI artists:
+- Newsician (Political Rap)
+- Midwest Sentinel (Boom Bap / Storytelling)
+- Neon Icon (Pop / Trends)
+- Lyricist, Composer, Producer (Core Studio Staff)
+
+When a user gives you a request, you should:
+1. Analyze the request.
+2. Decide which artist or agent is best suited for the job.
+3. Formulate a plan or specific task for that agent.
+4. Provide a strategic overview of *why* this is the right move.
+
+Return your response in JSON format:
+{
+    "analysis": "Brief analysis of the request",
+    "selectedAgent": "ID of the agent (newsician, sentinel, pop, etc.)",
+    "strategy": "Your strategic advice",
+    "suggestedTask": {
+        "action": "The action to run (e.g., create-political-rap)",
+        "parameters": { ...params for the agent... }
+    }
+}`;
+
+        try {
+            console.log(`[Mic] Analyzing request: ${userInput.substring(0, 50)}...`);
+            const completion = await lmstudioService.chat([
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userInput }
+            ]);
+
+            const content = completion.content;
+            let parsed = {};
+            try {
+                const jsonMatch = content.match(/\{[\s\S]*\}/);
+                if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+            } catch (e) {
+                console.warn("[Mic] Failed to parse JSON, using fallback");
+            }
+
+            return {
+                agent: 'Mic',
+                ...parsed,
+                rawOutput: content,
+                timestamp: new Date()
+            };
+
+        } catch (error) {
+            console.error("[Mic] Error:", error);
+            return {
+                error: "Mic is offline or experienced an error.",
+                details: error.message
+            };
+        }
+    }
+
+    async coordinateTask(taskDescription, teamMembers) {
+        return {
+            status: "coordinated",
+            plan: `Mic has assigned "${taskDescription}" to ${teamMembers.length} agents.`,
+            timestamp: new Date()
+        };
+    }
+
+    async provideStrategy(topic) {
+        const systemPrompt = `You are Mic, providing high-level music industry strategy.
+Topic: ${topic}
+Provide 3 key strategic insights or opportunities related to this topic per your expertise.`;
+
+        const completion = await lmstudioService.chat([
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: "Give me the strategy." }
+        ]);
+
+        return {
+            strategy: completion.content,
+            timestamp: new Date()
+        };
+    }
+}
+
 // Export songwriter agents
 export const songwriterAgentRegistry = {
     lyricist: LyricistAgent,
@@ -1068,6 +1251,7 @@ export const songwriterAgentRegistry = {
     critic: CriticAgent,
     producer: ProducerAgent,
     newsician: NewsicianAgent,
-    sentinel: MidwestSentinelAgent
+    sentinel: MidwestSentinelAgent,
+    mic: MicAgent
 };
 

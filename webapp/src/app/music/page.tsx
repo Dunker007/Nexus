@@ -8,7 +8,7 @@ import {
   Volume2, Heart, Share2, Download, Disc, Activity,
   ExternalLink, Copy, Check, ChevronRight, Sparkles,
   FileVideo, Clapperboard, Upload, Youtube, Newspaper, RefreshCw, Smartphone,
-  Wifi, WifiOff, AlertCircle
+  Wifi, WifiOff, AlertCircle, UserCog
 } from 'lucide-react';
 import { fetchAllNews, refreshNewsSources, type NewsArticle } from '@/lib/news-service';
 import { MUSIC_AGENTS } from '@/lib/music-agents';
@@ -48,7 +48,8 @@ const MODES = [
   { id: 'standard', name: 'Studio Mode', desc: 'Manual composition control', icon: Music, color: 'purple' },
   { id: 'political', name: 'Newsician', desc: 'Political Rap / Truth-to-Power', icon: Mic, color: 'red' },
   { id: 'sentinel', name: 'Midwest Sentinel', desc: 'Faith, Family, Boom Bap', icon: Radio, color: 'blue' },
-  { id: 'pop', name: 'Neon Icon', desc: 'Viral Pop & Trends', icon: Sparkles, color: 'pink' }
+  { id: 'pop', name: 'Neon Icon', desc: 'Viral Pop & Trends', icon: Sparkles, color: 'pink' },
+  { id: 'manager', name: 'Mic (Manager)', desc: 'Strategy & Orchestration', icon: UserCog, color: 'gray' }
 ];
 
 const GENRES = ['Pop', 'EDM', 'Indie', 'R&B', 'Rock', 'Hip Hop', 'Synthwave', 'Jazz', 'Lofi', 'Ambient'];
@@ -160,6 +161,12 @@ export default function MusicStudioPage() {
       } else if (mode === 'pop') {
         agentType = 'lyricist'; // Use lyricist for Pop for now
         task = { action: 'write-lyrics', theme: topic, mood: 'energetic', genre: 'pop' };
+      } else if (mode === 'manager') {
+        agentType = 'mic';
+        task = {
+          action: 'manage-session',
+          input: topic + (context ? `\nContext: ${context}` : '')
+        };
       }
 
       // Execute Agent
@@ -521,7 +528,8 @@ export default function MusicStudioPage() {
                   className={`w-full py-4 rounded-xl font-bold text-white shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${mode === 'political' ? 'bg-gradient-to-r from-red-600 to-orange-600 shadow-red-900/40' :
                     mode === 'sentinel' ? 'bg-gradient-to-r from-blue-600 to-cyan-600 shadow-blue-900/40' :
                       mode === 'pop' ? 'bg-gradient-to-r from-pink-500 to-purple-500 shadow-pink-900/40' :
-                        'bg-gradient-to-r from-purple-600 to-pink-600 shadow-purple-900/40'
+                        mode === 'manager' ? 'bg-gradient-to-r from-gray-700 to-gray-900 shadow-gray-900/40' :
+                          'bg-gradient-to-r from-purple-600 to-pink-600 shadow-purple-900/40'
                     }`}
                 >
                   {isGenerating ? (

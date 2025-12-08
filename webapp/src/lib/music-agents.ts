@@ -78,5 +78,18 @@ Ooh-whoa! It's a moment, it's a vibe
 Living for the now, with my whole tribe
 Can't stop, won't stop, dancing to the beat
 This headline energy is bringing the heat!`
+    },
+
+    manager: {
+        id: 'mic',
+        name: 'Mic (Manager)',
+        role: 'Studio Orchestrator',
+        description: 'Orchestrates the entire studio, handling strategy and coordinating other agents.',
+        style: 'Professional, Strategic, Visionary',
+        generateLyrics: (topic: string, context: string) => `[Mic's Strategy Log]
+Analyzing request: "${topic}"
+Context: ${context.slice(0, 50)}...
+Strategy: Leveraging best-fit agent matrix.
+Recommendation: Deploy Newsician for maximum impact.`
     }
 };
