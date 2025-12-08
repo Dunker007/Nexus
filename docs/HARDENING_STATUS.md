@@ -52,9 +52,9 @@
   - `/agents/meeting/status` - Get transcript and personas ✅
   - `/agents/meeting/stop` - End meeting ✅
   - Multi-agent debate with Architect, Security, QA personas working
-- [ ] ⬜ Link projects to their respective "front door" pages
+- [x] ✅ Link projects to their respective "front door" pages
   - Projects with href navigate correctly
-  - **TODO:** Ensure all active projects have valid hrefs
+  - Updated `INITIAL_LABS_DATA` with correct paths (e.g. `/docs`, `/meeting`, `/dashboard`)
 
 ---
 
