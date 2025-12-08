@@ -34,7 +34,10 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["msi", "nsis"],
+    "targets": [
+      "msi",
+      "nsis"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -50,7 +53,9 @@
         "displayLanguageSelector": false
       }
     },
-    "resources": ["bridge-bundle"]
+    "resources": [
+      "bridge-bundle"
+    ]
   },
   "plugins": {}
 }

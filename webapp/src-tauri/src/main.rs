@@ -49,7 +49,7 @@ fn start_bridge(app_handle: &tauri::AppHandle) -> Option<Child> {
         .path()
         .resource_dir()
         .ok()
-        .map(|p| p.join("bridge"))
+        .map(|p| p.join("bridge-bundle"))
         .filter(|p| p.join("server.js").exists())
         .unwrap_or_else(|| std::path::PathBuf::from(r"C:\Repos GIT\Nexus\bridge"));
 
