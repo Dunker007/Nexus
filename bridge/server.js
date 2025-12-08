@@ -22,6 +22,7 @@ import { githubService } from './services/github.js';
 import { createAgent, SongwriterRoom } from './services/agents.js';
 import { errorHandler, errorLogger, rateLimiter, asyncHandler, validate } from './services/errors.js';
 import { performanceMonitor, cache } from './services/performance.js';
+import { prisma } from './services/database.js';
 // Security and swagger imports - commented out temporarily for debugging
 // import { security, securityHeaders, sessionMiddleware } from './services/security.js';
 // import { swaggerSpec } from './config/swagger.js';
@@ -756,6 +757,227 @@ app.post('/music/sentinel', async (req, res) => {
         res.json(result);
     } catch (error) {
         console.error('Sentinel error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============ Projects Routes (Labs Hub) ============
+
+// In-memory projects store as fallback
+const inMemoryProjects = new Map();
+
+// List all projects
+app.get('/projects', async (req, res) => {
+    try {
+        // Try database first
+        let projects = [];
+        try {
+            projects = await prisma.project.findMany({
+                orderBy: { updatedAt: 'desc' }
+            });
+        } catch (dbError) {
+            console.log('DB query failed, using in-memory:', dbError.message);
+        }
+
+        // If DB is empty but we have in-memory data, use that
+        if (projects.length === 0 && inMemoryProjects.size > 0) {
+            projects = Array.from(inMemoryProjects.values());
+            res.json({ projects, total: projects.length, source: 'memory' });
+            return;
+        }
+
+        // Transform from DB format to frontend format
+        const transformed = projects.map(p => ({
+            id: p.id,
+            icon: p.icon || '📦',
+            name: p.title,
+            desc: p.description || '',
+            status: p.status,
+            category: p.category,
+            priority: p.priority,
+            agents: typeof p.agents === 'string' ? JSON.parse(p.agents || '[]') : (p.agents || []),
+            href: p.href,
+            ideas: typeof p.stats === 'string' ? (JSON.parse(p.stats || '{}').ideas || 0) : (p.ideas || 0),
+            timeline: typeof p.timeline === 'string' ? JSON.parse(p.timeline || '{"startMonth":0,"durationMonths":3,"progress":0}') : (p.timeline || {}),
+            owner: p.owner || 'Unknown'
+        }));
+
+        res.json({ projects: transformed, total: transformed.length, source: 'database' });
+    } catch (error) {
+        console.error('Projects list error:', error);
+        // Return in-memory as last resort
+        if (inMemoryProjects.size > 0) {
+            res.json({ projects: Array.from(inMemoryProjects.values()), total: inMemoryProjects.size, source: 'memory' });
+        } else {
+            res.status(500).json({ error: error.message, projects: [] });
+        }
+    }
+});
+
+// Get single project
+app.get('/projects/:id', async (req, res) => {
+    try {
+        const project = await prisma.project.findUnique({
+            where: { id: req.params.id }
+        });
+
+        if (!project) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        res.json({
+            id: project.id,
+            icon: project.icon || '📦',
+            name: project.title,
+            desc: project.description || '',
+            status: project.status,
+            category: project.category,
+            priority: project.priority,
+            agents: JSON.parse(project.agents || '[]'),
+            href: project.href,
+            ideas: JSON.parse(project.stats || '{}').ideas || 0,
+            timeline: JSON.parse(project.timeline || '{"startMonth":0,"durationMonths":3,"progress":0}'),
+            owner: project.owner || 'Unknown'
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Create project
+app.post('/projects', async (req, res) => {
+    try {
+        const { name, desc, icon, status, category, priority, agents, href, timeline, owner } = req.body;
+
+        const project = await prisma.project.create({
+            data: {
+                title: name,
+                description: desc,
+                icon: icon || '💡',
+                status: status || 'concept',
+                category: category || 'Experimental',
+                priority: priority || 'Medium',
+                agents: JSON.stringify(agents || ['architect']),
+                href: href || null,
+                timeline: JSON.stringify(timeline || { startMonth: new Date().getMonth(), durationMonths: 3, progress: 0 }),
+                stats: JSON.stringify({ ideas: 0 }),
+                owner: owner || 'Architect'
+            }
+        });
+
+        res.json({ success: true, project: { ...project, name: project.title, desc: project.description } });
+    } catch (error) {
+        console.error('Project create error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update project
+app.put('/projects/:id', async (req, res) => {
+    try {
+        const { name, desc, icon, status, category, priority, agents, href, timeline, owner, ideas } = req.body;
+
+        const updateData = {};
+        if (name !== undefined) updateData.title = name;
+        if (desc !== undefined) updateData.description = desc;
+        if (icon !== undefined) updateData.icon = icon;
+        if (status !== undefined) updateData.status = status;
+        if (category !== undefined) updateData.category = category;
+        if (priority !== undefined) updateData.priority = priority;
+        if (agents !== undefined) updateData.agents = JSON.stringify(agents);
+        if (href !== undefined) updateData.href = href;
+        if (timeline !== undefined) updateData.timeline = JSON.stringify(timeline);
+        if (owner !== undefined) updateData.owner = owner;
+        if (ideas !== undefined) updateData.stats = JSON.stringify({ ideas });
+
+        const project = await prisma.project.update({
+            where: { id: req.params.id },
+            data: updateData
+        });
+
+        res.json({ success: true, project });
+    } catch (error) {
+        console.error('Project update error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete project
+app.delete('/projects/:id', async (req, res) => {
+    try {
+        await prisma.project.delete({
+            where: { id: req.params.id }
+        });
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Seed projects from static data (one-time migration)
+app.post('/projects/seed', async (req, res) => {
+    try {
+        const { projects } = req.body;
+
+        if (!projects || !Array.isArray(projects)) {
+            return res.status(400).json({ error: 'Projects array required' });
+        }
+
+        const results = [];
+        let useMemory = false;
+
+        for (const p of projects) {
+            try {
+                const existing = await prisma.project.findFirst({
+                    where: { title: p.name }
+                });
+
+                if (!existing) {
+                    const created = await prisma.project.create({
+                        data: {
+                            id: p.id,
+                            title: p.name,
+                            description: p.desc,
+                            icon: p.icon,
+                            status: p.status,
+                            category: p.category,
+                            priority: p.priority,
+                            agents: JSON.stringify(p.agents),
+                            href: p.href,
+                            timeline: JSON.stringify(p.timeline),
+                            stats: JSON.stringify({ ideas: p.ideas }),
+                            owner: p.owner
+                        }
+                    });
+                    results.push({ id: created.id, name: p.name, action: 'created' });
+                } else {
+                    results.push({ id: existing.id, name: p.name, action: 'skipped' });
+                }
+            } catch (dbError) {
+                // Fallback to in-memory storage
+                useMemory = true;
+                inMemoryProjects.set(p.id, p);
+                results.push({ id: p.id, name: p.name, action: 'memory' });
+            }
+        }
+
+        res.json({
+            success: true,
+            results,
+            seeded: results.filter(r => r.action === 'created' || r.action === 'memory').length,
+            source: useMemory ? 'memory' : 'database'
+        });
+    } catch (error) {
+        console.error('Seed error:', error);
+        // Last resort: store all in memory
+        try {
+            const { projects } = req.body;
+            if (projects && Array.isArray(projects)) {
+                projects.forEach(p => inMemoryProjects.set(p.id, p));
+                res.json({ success: true, seeded: projects.length, source: 'memory' });
+                return;
+            }
+        } catch { }
         res.status(500).json({ error: error.message });
     }
 });

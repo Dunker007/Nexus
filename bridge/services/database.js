@@ -4,14 +4,23 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import Database from 'better-sqlite3';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Initialize Prisma Client
-// Initialize Prisma Client
+// Get current directory for relative database path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const dbPath = path.join(__dirname, '../prisma/dev.db');
+
+// Initialize Prisma Client with SQLite adapter
 let prismaInstance;
 try {
-    prismaInstance = new PrismaClient({
-        log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-    });
+    const sqlite = new Database(dbPath);
+    const adapter = new PrismaBetterSqlite3(sqlite);
+    prismaInstance = new PrismaClient({ adapter });
+    console.log('✅ Prisma Client initialized with SQLite adapter');
 } catch (e) {
     console.error('Failed to initialize Prisma Client, falling back to mock:', e.message);
     // Create a proxy that swallows all calls or simple mock

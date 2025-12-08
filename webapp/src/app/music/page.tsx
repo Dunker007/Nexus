@@ -7,7 +7,8 @@ import {
   Music, Mic, Radio, Play, Pause, Video, Film,
   Volume2, Heart, Share2, Download, Disc, Activity,
   ExternalLink, Copy, Check, ChevronRight, Sparkles,
-  FileVideo, Clapperboard, Upload, Youtube, Newspaper, RefreshCw, Smartphone
+  FileVideo, Clapperboard, Upload, Youtube, Newspaper, RefreshCw, Smartphone,
+  Wifi, WifiOff, AlertCircle
 } from 'lucide-react';
 import { fetchAllNews, type NewsArticle } from '@/lib/news-service';
 import { MUSIC_AGENTS } from '@/lib/music-agents';
@@ -67,6 +68,8 @@ export default function MusicStudioPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'create' | 'pipeline' | 'library'>('create');
+  const [bridgeStatus, setBridgeStatus] = useState<'online' | 'offline' | 'checking'>('checking');
+  const [bridgeError, setBridgeError] = useState<string | null>(null);
   const [pipelineSteps, setPipelineSteps] = useState<PipelineStep[]>([
     { id: 'suno', name: 'Suno AI', icon: Music, status: 'pending', link: 'https://suno.com/create', description: 'Generate AI music from prompt' },
     { id: 'neural', name: 'Neural Frames', icon: Film, status: 'pending', link: 'https://www.neuralframes.com/', description: 'Create AI music visualizer' },
@@ -75,12 +78,43 @@ export default function MusicStudioPage() {
     { id: 'tiktok', name: 'TikTok', icon: Smartphone, status: 'pending', link: 'https://www.tiktok.com/creator', description: 'Music Shorts & viral clips' }
   ]);
 
+  // Check bridge connection status
+  const checkBridgeStatus = async () => {
+    setBridgeStatus('checking');
+    try {
+      const response = await fetch(`${LUXRIG_BRIDGE_URL}/status`, {
+        signal: AbortSignal.timeout(5000)
+      });
+      if (response.ok) {
+        setBridgeStatus('online');
+        setBridgeError(null);
+        return true;
+      }
+      setBridgeStatus('offline');
+      setBridgeError('Bridge returned error');
+      return false;
+    } catch (error) {
+      setBridgeStatus('offline');
+      setBridgeError('Cannot connect to LuxRig Bridge');
+      return false;
+    }
+  };
+
   useEffect(() => {
+    // Check bridge status first
+    checkBridgeStatus();
+
     // Load Agents
-    fetch(`${LUXRIG_BRIDGE_URL}/music/agents`)
+    fetch(`${LUXRIG_BRIDGE_URL}/music/agents`, { signal: AbortSignal.timeout(5000) })
       .then(res => res.json())
-      .then(data => setAgents(data.agents || []))
+      .then(data => {
+        setAgents(data.agents || []);
+        setBridgeStatus('online');
+        setBridgeError(null);
+      })
       .catch(() => {
+        setBridgeStatus('offline');
+        setBridgeError('Bridge offline - using fallback agents');
         setAgents([
           { id: 'lyricist', name: 'Lyricist', emoji: '✍️', style: 'Poetic', color: 'purple', description: 'Writes song lyrics' },
           { id: 'composer', name: 'Composer', emoji: '🎹', style: 'Melodic', color: 'cyan', description: 'Structures the song' },
@@ -173,7 +207,14 @@ export default function MusicStudioPage() {
         color="purple"
         stats={
           <>
-            <StatPill label={`${agents.length} Agents`} color="green" pulse />
+            {/* Bridge Connection Status */}
+            <StatPill
+              label={bridgeStatus === 'online' ? 'Bridge Online' : bridgeStatus === 'checking' ? 'Connecting...' : 'Bridge Offline'}
+              color={bridgeStatus === 'online' ? 'green' : bridgeStatus === 'checking' ? 'amber' : 'red'}
+              pulse={bridgeStatus === 'checking'}
+              icon={bridgeStatus === 'online' ? <Wifi size={12} /> : bridgeStatus === 'checking' ? <RefreshCw size={12} className="animate-spin" /> : <WifiOff size={12} />}
+            />
+            <StatPill label={`${agents.length} Agents`} color="green" />
             <StatPill label={MODES.find(m => m.id === mode)?.name || 'Standard'} color="purple" />
             {result && (
               <StatPill
@@ -206,6 +247,30 @@ export default function MusicStudioPage() {
           </div>
         }
       />
+
+      {/* Bridge Offline Warning */}
+      {bridgeStatus === 'offline' && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center gap-3"
+        >
+          <AlertCircle size={20} className="text-red-400 shrink-0" />
+          <div className="flex-1">
+            <div className="text-sm font-medium text-red-300">Bridge Offline</div>
+            <div className="text-xs text-red-400/70">
+              {bridgeError || 'Cannot connect to LuxRig Bridge. Using fallback agents with local generation.'}
+            </div>
+          </div>
+          <button
+            onClick={checkBridgeStatus}
+            className="px-3 py-1.5 text-xs font-medium bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-colors flex items-center gap-1.5"
+          >
+            <RefreshCw size={12} />
+            Retry
+          </button>
+        </motion.div>
+      )}
 
       {/* Create Tab */}
       {activeTab === 'create' && (

@@ -11,12 +11,12 @@ import { NavItem } from '@/components/NavItem';
 
 const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: '📊', shortcut: 'G D' },
-    { href: '/studios', label: 'DLX Studios', icon: '🎨' },
-    { href: '/chat', label: 'DLX Chat', icon: '💬', shortcut: 'G C' },
-    { href: '/agents', label: 'DLX Agents', icon: '🤖' },
+    { href: '/studios', label: 'Studios', icon: '🎨' },
+    { href: '/chat', label: 'Chat', icon: '💬', shortcut: 'G C' },
+    { href: '/agents', label: 'Agents', icon: '🤖' },
     { href: '/news', label: 'News', icon: '📡' },
     { href: '/meeting', label: 'Meeting', icon: '👥' },
-    { href: '/labs', label: 'DLX Labs', icon: '🔬', shortcut: 'G L' },
+    { href: '/labs', label: 'Labs', icon: '🔬', shortcut: 'G L' },
     { href: '/income', label: 'Revenue', icon: '💸', shortcut: 'G I' },
     { href: '/settings', label: 'Settings', icon: '⚙️', shortcut: 'G S' },
 ];
@@ -41,8 +41,7 @@ export default function Navigation() {
 
     return (
         <nav
-            className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 transition-colors duration-300 backdrop-blur-xl bg-[#050508]/60"
-            style={{ backgroundColor: 'var(--bg-void, rgba(5, 5, 8, 0.6))' }}
+            className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 transition-colors duration-300 backdrop-blur-md bg-black/30"
         >
             <div className="w-full px-6">
                 <div className="flex items-center h-16 relative justify-between">

@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, LayoutGrid, List, Kanban, Plus, Lightbulb, Users, ArrowUpRight, MoreHorizontal, MessageSquare, Calendar, ChevronRight, ChevronDown, X, FileText } from 'lucide-react';
+import { Search, Filter, LayoutGrid, List, Kanban, Plus, Lightbulb, Users, ArrowUpRight, MoreHorizontal, MessageSquare, Calendar, ChevronRight, ChevronDown, X, FileText, Database, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import Link from 'next/link';
 import PageBackground from '@/components/PageBackground';
 import StaffMeetingPanel from '@/components/StaffMeetingPanel';
+import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 
 // Types
 interface Lab {
@@ -152,6 +153,64 @@ export default function LabsPage() {
     const [isIdeaModalOpen, setIsIdeaModalOpen] = useState(false);
     const [viewContent, setViewContent] = useState<string | null>(null);
     const [newIdea, setNewIdea] = useState({ title: '', desc: '', category: 'Operations' });
+    const [dbStatus, setDbStatus] = useState<'connected' | 'disconnected' | 'loading'>('loading');
+    const [isSyncing, setIsSyncing] = useState(false);
+
+    // Fetch projects from database
+    useEffect(() => {
+        const fetchProjects = async () => {
+            setDbStatus('loading');
+            try {
+                const response = await fetch(`${LUXRIG_BRIDGE_URL}/projects`, {
+                    signal: AbortSignal.timeout(5000)
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.projects && data.projects.length > 0) {
+                        // Merge with static data for content fields
+                        const merged = data.projects.map((p: Lab) => {
+                            const staticMatch = INITIAL_LABS_DATA.find(s => s.id === p.id || s.name === p.name);
+                            return { ...p, content: staticMatch?.content };
+                        });
+                        setLabsData(merged);
+                        setDbStatus('connected');
+                    } else {
+                        // Database empty, use static data
+                        setLabsData(INITIAL_LABS_DATA);
+                        setDbStatus('disconnected');
+                    }
+                } else {
+                    setDbStatus('disconnected');
+                }
+            } catch (error) {
+                console.error('Failed to fetch projects:', error);
+                setDbStatus('disconnected');
+            }
+        };
+        fetchProjects();
+    }, []);
+
+    // Seed database with static data
+    const seedDatabase = async () => {
+        setIsSyncing(true);
+        try {
+            const response = await fetch(`${LUXRIG_BRIDGE_URL}/projects/seed`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ projects: INITIAL_LABS_DATA })
+            });
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Seeded:', result);
+                // Refresh
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Seed failed:', error);
+        } finally {
+            setIsSyncing(false);
+        }
+    };
 
     const handleAddIdea = () => {
         if (!newIdea.title) return;
@@ -213,10 +272,35 @@ export default function LabsPage() {
                         </h1>
                         <p className="text-gray-400 mt-1">Experimental feature roadmap & agent assignments</p>
                     </div>
-                    <div className="flex gap-2 bg-black/30 p-1 rounded-lg border border-white/10">
-                        <button onClick={() => setViewMode('gantt')} className={`p-2 rounded ${viewMode === 'gantt' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-400 hover:text-white'}`}><List size={20} /></button>
-                        <button onClick={() => setViewMode('grid')} className={`p-2 rounded ${viewMode === 'grid' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-400 hover:text-white'}`}><LayoutGrid size={20} /></button>
-                        <button onClick={() => setViewMode('kanban')} className={`p-2 rounded ${viewMode === 'kanban' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-400 hover:text-white'}`}><Kanban size={20} /></button>
+                    <div className="flex items-center gap-3">
+                        {/* Database Status */}
+                        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border ${dbStatus === 'connected' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
+                                dbStatus === 'loading' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' :
+                                    'bg-red-500/10 border-red-500/30 text-red-400'
+                            }`}>
+                            {dbStatus === 'connected' ? <Database size={14} /> :
+                                dbStatus === 'loading' ? <RefreshCw size={14} className="animate-spin" /> :
+                                    <WifiOff size={14} />}
+                            {dbStatus === 'connected' ? 'DB Connected' :
+                                dbStatus === 'loading' ? 'Loading...' :
+                                    'Static Data'}
+                        </div>
+                        {dbStatus === 'disconnected' && (
+                            <button
+                                onClick={seedDatabase}
+                                disabled={isSyncing}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 rounded-lg text-xs font-medium text-cyan-400 transition-colors disabled:opacity-50"
+                            >
+                                <RefreshCw size={12} className={isSyncing ? 'animate-spin' : ''} />
+                                Sync to DB
+                            </button>
+                        )}
+                        {/* View Mode Buttons */}
+                        <div className="flex gap-2 bg-black/30 p-1 rounded-lg border border-white/10">
+                            <button onClick={() => setViewMode('gantt')} className={`p-2 rounded ${viewMode === 'gantt' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-400 hover:text-white'}`}><List size={20} /></button>
+                            <button onClick={() => setViewMode('grid')} className={`p-2 rounded ${viewMode === 'grid' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-400 hover:text-white'}`}><LayoutGrid size={20} /></button>
+                            <button onClick={() => setViewMode('kanban')} className={`p-2 rounded ${viewMode === 'kanban' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-400 hover:text-white'}`}><Kanban size={20} /></button>
+                        </div>
                     </div>
                 </div>
 
@@ -295,8 +379,8 @@ export default function LabsPage() {
                                                 </h3>
                                                 <div className="flex items-center gap-2">
                                                     <span className={`text-[9px] px-1.5 py-0.5 rounded uppercase tracking-wide ${lab.status === 'active' ? 'bg-green-500/20 text-green-400' :
-                                                            lab.status === 'preview' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                                'bg-gray-500/20 text-gray-400'
+                                                        lab.status === 'preview' ? 'bg-yellow-500/20 text-yellow-400' :
+                                                            'bg-gray-500/20 text-gray-400'
                                                         }`}>{lab.status}</span>
                                                     <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white ${AGENT_COLORS[lab.owner.toLowerCase()] || 'bg-gray-600'}`}>
                                                         {lab.owner[0]}
