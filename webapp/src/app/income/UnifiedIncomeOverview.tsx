@@ -271,34 +271,55 @@ export default function UnifiedIncomeOverview() {
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
                 <Link
                     href="/income/music"
                     className="p-4 bg-pink-600/20 border border-pink-500/30 rounded-xl hover:bg-pink-600/30 transition-colors text-center"
                 >
                     <Music className="w-6 h-6 text-pink-400 mx-auto mb-2" />
-                    <span className="text-sm text-pink-300">Music Revenue</span>
+                    <span className="text-sm text-pink-300">Music</span>
                 </Link>
                 <Link
                     href="/income/art"
                     className="p-4 bg-orange-600/20 border border-orange-500/30 rounded-xl hover:bg-orange-600/30 transition-colors text-center"
                 >
                     <Palette className="w-6 h-6 text-orange-400 mx-auto mb-2" />
-                    <span className="text-sm text-orange-300">Art Revenue</span>
+                    <span className="text-sm text-orange-300">Art</span>
                 </Link>
                 <Link
                     href="/pipeline"
                     className="p-4 bg-purple-600/20 border border-purple-500/30 rounded-xl hover:bg-purple-600/30 transition-colors text-center"
                 >
                     <FileText className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                    <span className="text-sm text-purple-300">Content Pipeline</span>
+                    <span className="text-sm text-purple-300">Pipeline</span>
+                </Link>
+                <Link
+                    href="/income/ideas"
+                    className="p-4 bg-cyan-600/20 border border-cyan-500/30 rounded-xl hover:bg-cyan-600/30 transition-colors text-center"
+                >
+                    <TrendingUp className="w-6 h-6 text-cyan-400 mx-auto mb-2" />
+                    <span className="text-sm text-cyan-300">Ideas</span>
+                </Link>
+                <Link
+                    href="/income/opportunities"
+                    className="p-4 bg-emerald-600/20 border border-emerald-500/30 rounded-xl hover:bg-emerald-600/30 transition-colors text-center"
+                >
+                    <Target className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
+                    <span className="text-sm text-emerald-300">Opportunities</span>
+                </Link>
+                <Link
+                    href="/income/tracker"
+                    className="p-4 bg-amber-600/20 border border-amber-500/30 rounded-xl hover:bg-amber-600/30 transition-colors text-center"
+                >
+                    <DollarSign className="w-6 h-6 text-amber-400 mx-auto mb-2" />
+                    <span className="text-sm text-amber-300">Tracker</span>
                 </Link>
                 <Link
                     href="/studios"
-                    className="p-4 bg-cyan-600/20 border border-cyan-500/30 rounded-xl hover:bg-cyan-600/30 transition-colors text-center"
+                    className="p-4 bg-blue-600/20 border border-blue-500/30 rounded-xl hover:bg-blue-600/30 transition-colors text-center"
                 >
-                    <Palette className="w-6 h-6 text-cyan-400 mx-auto mb-2" />
-                    <span className="text-sm text-cyan-300">Create Content</span>
+                    <Palette className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+                    <span className="text-sm text-blue-300">Create</span>
                 </Link>
             </div>
         </div>
