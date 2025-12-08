@@ -109,7 +109,7 @@ const DEMO_ARTICLES: NewsArticle[] = [
     }
 ];
 
-type FilterTab = 'all' | 'local' | 'national' | 'saved';
+type FilterTab = 'all' | 'local' | 'national' | 'alternative' | 'saved';
 type FactCheckStatus = 'verified' | 'disputed' | 'unverified' | 'mixed';
 
 const FACT_CHECK_STYLES: Record<FactCheckStatus, { bg: string; text: string; icon: string; label: string }> = {
@@ -210,6 +210,8 @@ export default function NewsPage() {
         ...NEWS_SOURCES.national,
         ...NEWS_SOURCES.local,
         ...NEWS_SOURCES.alternative,
+        ...NEWS_SOURCES.center,
+        ...NEWS_SOURCES.left,
         ...customSources
     ];
 
@@ -217,7 +219,8 @@ export default function NewsPage() {
     const filteredArticles = articles.filter(article => {
         // Tab filter
         if (activeTab === 'local' && article.category !== 'local') return false;
-        if (activeTab === 'national' && article.category !== 'national') return false;
+        if (activeTab === 'national' && !['national', 'center', 'left'].includes(article.category)) return false;
+        if (activeTab === 'alternative' && article.category !== 'alternative') return false;
         if (activeTab === 'saved' && !savedArticles.has(article.id)) return false;
 
         // Bias filter
@@ -322,6 +325,12 @@ export default function NewsPage() {
                                     className={`px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${activeTab === 'national' ? 'bg-red-500/20 text-red-400' : 'text-gray-500 hover:text-white'}`}
                                 >
                                     🇺🇸 National
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('alternative')}
+                                    className={`px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${activeTab === 'alternative' ? 'bg-red-500/20 text-red-400' : 'text-gray-500 hover:text-white'}`}
+                                >
+                                    👀 Alternative
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('saved')}

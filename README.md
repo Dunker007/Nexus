@@ -8,7 +8,7 @@ A unified command center for AI orchestration, creative studios, and autonomous 
 
 Nexus is now a standalone desktop application.
 
-1.  **Download & Install**: Run the latest installer (e.g., `Nexus_1.0.0_x64-setup.exe`).
+1.  **Download & Install**: Run the latest installer (e.g., `Nexus_2.0.0_x64-setup.exe`).
 2.  **Launch**: Open **Nexus** from your Start Menu or Desktop.
     *   The app will automatically start the backend Bridge (server.js) in the background.
     *   The app runs systematically in the System Tray.
@@ -38,9 +38,10 @@ Nexus/
 ## ✨ Features
 
 - **AI Chat** - Multi-provider AI conversations (LM Studio, Ollama, Google AI)
-- **AI Agents** - Specialized AI assistants for tasks
+- **News Hub 2.0** - Aggregation from 100+ sources with bias transparency
+- **Revenue Hub** - Unified dashboard for income streams (Music, Art, Pipeline)
+- **Content Pipeline** - Automated content generation & publishing engine
 - **Studios** - Creative workspaces (Music, Art, Dev, Video)
-- **Revenue Lab** - Passive income tracking and automation
 - **System Tray** - Runs in background, minimize to tray
 - **Remote Access** - Access via Tailscale on mobile devices
 

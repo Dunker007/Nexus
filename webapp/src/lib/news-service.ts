@@ -162,7 +162,7 @@ export interface NewsArticle {
         logo: string;
         bias: string;
     };
-    category: 'national' | 'local' | 'alternative';
+    category: 'national' | 'local' | 'alternative' | 'center' | 'left';
     region?: string;
     factCheck?: {
         status: 'verified' | 'disputed' | 'unverified' | 'mixed';
