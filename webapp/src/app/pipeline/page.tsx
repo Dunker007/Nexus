@@ -63,7 +63,7 @@ interface PipelineConfig {
     };
 }
 
-const BRIDGE_URL = 'http://localhost:3456';
+import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 
 export default function PipelinePage() {
     const [status, setStatus] = useState<PipelineStatus | null>(null);
@@ -79,7 +79,7 @@ export default function PipelinePage() {
     // Fetch pipeline status
     const fetchStatus = useCallback(async () => {
         try {
-            const res = await fetch(`${BRIDGE_URL}/pipeline/status`);
+            const res = await fetch(`${LUXRIG_BRIDGE_URL}/pipeline/status`);
             const data = await res.json();
             if (data.success) {
                 setStatus(data.status);
@@ -92,7 +92,7 @@ export default function PipelinePage() {
     // Fetch content queue
     const fetchQueue = useCallback(async () => {
         try {
-            const res = await fetch(`${BRIDGE_URL}/pipeline/queue`);
+            const res = await fetch(`${LUXRIG_BRIDGE_URL}/pipeline/queue`);
             const data = await res.json();
             if (data.success) {
                 setQueue(data.queue);
@@ -105,7 +105,7 @@ export default function PipelinePage() {
     // Fetch config
     const fetchConfig = useCallback(async () => {
         try {
-            const res = await fetch(`${BRIDGE_URL}/pipeline/config`);
+            const res = await fetch(`${LUXRIG_BRIDGE_URL}/pipeline/config`);
             const data = await res.json();
             if (data.success) {
                 setConfig(data.config);
@@ -134,7 +134,7 @@ export default function PipelinePage() {
         setGenerating(true);
         setError(null);
         try {
-            const res = await fetch(`${BRIDGE_URL}/pipeline/generate`, {
+            const res = await fetch(`${LUXRIG_BRIDGE_URL}/pipeline/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic: topic || undefined })
@@ -156,7 +156,7 @@ export default function PipelinePage() {
     // Stop pipeline
     const handleStop = async () => {
         try {
-            await fetch(`${BRIDGE_URL}/pipeline/stop`, { method: 'POST' });
+            await fetch(`${LUXRIG_BRIDGE_URL}/pipeline/stop`, { method: 'POST' });
             await fetchStatus();
         } catch (err) {
             setError('Failed to stop pipeline');
@@ -166,7 +166,7 @@ export default function PipelinePage() {
     // Update content status
     const updateContentStatus = async (id: number, newStatus: string) => {
         try {
-            await fetch(`${BRIDGE_URL}/pipeline/queue/${id}`, {
+            await fetch(`${LUXRIG_BRIDGE_URL}/pipeline/queue/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
@@ -180,7 +180,7 @@ export default function PipelinePage() {
     // Delete content
     const deleteContent = async (id: number) => {
         try {
-            await fetch(`${BRIDGE_URL}/pipeline/queue/${id}`, { method: 'DELETE' });
+            await fetch(`${LUXRIG_BRIDGE_URL}/pipeline/queue/${id}`, { method: 'DELETE' });
             await fetchQueue();
             if (selectedItem?.id === id) {
                 setSelectedItem(null);
@@ -193,7 +193,7 @@ export default function PipelinePage() {
     // Publish content
     const publishContent = async (id: number) => {
         try {
-            const res = await fetch(`${BRIDGE_URL}/pipeline/publish/${id}`, { method: 'POST' });
+            const res = await fetch(`${LUXRIG_BRIDGE_URL}/pipeline/publish/${id}`, { method: 'POST' });
             const data = await res.json();
             if (!data.success) {
                 setError(data.error);
@@ -253,8 +253,8 @@ export default function PipelinePage() {
                     <div className="flex items-center gap-4">
                         {/* Status Indicator */}
                         <div className={`px-4 py-2 rounded-full flex items-center gap-2 ${status?.running
-                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                : 'bg-gray-800 text-gray-400 border border-gray-700'
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            : 'bg-gray-800 text-gray-400 border border-gray-700'
                             }`}>
                             {status?.running ? (
                                 <>
@@ -387,8 +387,8 @@ export default function PipelinePage() {
                                         onClick={handleGenerate}
                                         disabled={status?.running || generating}
                                         className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all ${status?.running || generating
-                                                ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                                                : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg shadow-purple-500/25'
+                                            ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                                            : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg shadow-purple-500/25'
                                             }`}
                                     >
                                         {generating ? (
@@ -467,8 +467,8 @@ export default function PipelinePage() {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             className={`p-4 rounded-lg border transition-colors cursor-pointer ${selectedItem?.id === item.id
-                                                    ? 'bg-purple-900/30 border-purple-500/50'
-                                                    : 'bg-gray-900/50 border-gray-700 hover:border-gray-600'
+                                                ? 'bg-purple-900/30 border-purple-500/50'
+                                                : 'bg-gray-900/50 border-gray-700 hover:border-gray-600'
                                                 }`}
                                             onClick={() => setSelectedItem(item)}
                                         >

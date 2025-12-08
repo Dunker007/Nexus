@@ -60,7 +60,7 @@ interface IncomeSummary {
     milestones: Milestone[];
 }
 
-const BRIDGE_URL = 'http://localhost:3456';
+import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 
 export default function UnifiedIncomeOverview() {
     const [summary, setSummary] = useState<IncomeSummary | null>(null);
@@ -68,7 +68,7 @@ export default function UnifiedIncomeOverview() {
 
     const fetchData = useCallback(async () => {
         try {
-            const res = await fetch(`${BRIDGE_URL}/income/summary`);
+            const res = await fetch(`${LUXRIG_BRIDGE_URL}/income/summary`);
             const data = await res.json();
             if (data.success) {
                 setSummary(data.summary);
@@ -228,8 +228,8 @@ export default function UnifiedIncomeOverview() {
                             <Youtube className="w-5 h-5 text-red-500" />
                             <span className="font-medium text-white">YouTube</span>
                             <span className={`ml-auto text-xs px-2 py-0.5 rounded ${summary.platforms.youtube.status === 'monetized'
-                                    ? 'bg-emerald-500/20 text-emerald-400'
-                                    : 'bg-amber-500/20 text-amber-400'
+                                ? 'bg-emerald-500/20 text-emerald-400'
+                                : 'bg-amber-500/20 text-amber-400'
                                 }`}>
                                 {summary.platforms.youtube.status}
                             </span>

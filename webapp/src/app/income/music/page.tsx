@@ -52,7 +52,7 @@ interface YouTubeStatus {
     estimatedTimeToEligibility: string;
 }
 
-const BRIDGE_URL = 'http://localhost:3456';
+import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 
 export default function MusicRevenuePage() {
     const [songs, setSongs] = useState<Song[]>([]);
@@ -65,9 +65,9 @@ export default function MusicRevenuePage() {
     const fetchData = useCallback(async () => {
         try {
             const [songsRes, summaryRes, ytRes] = await Promise.all([
-                fetch(`${BRIDGE_URL}/distribution/songs`),
-                fetch(`${BRIDGE_URL}/distribution/summary`),
-                fetch(`${BRIDGE_URL}/distribution/youtube`)
+                fetch(`${LUXRIG_BRIDGE_URL}/distribution/songs`),
+                fetch(`${LUXRIG_BRIDGE_URL}/distribution/summary`),
+                fetch(`${LUXRIG_BRIDGE_URL}/distribution/youtube`)
             ]);
 
             const songsData = await songsRes.json();
@@ -92,7 +92,7 @@ export default function MusicRevenuePage() {
         if (!newSong.title) return;
 
         try {
-            const res = await fetch(`${BRIDGE_URL}/distribution/songs`, {
+            const res = await fetch(`${LUXRIG_BRIDGE_URL}/distribution/songs`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newSong)
@@ -111,7 +111,7 @@ export default function MusicRevenuePage() {
 
     const updateStatus = async (id: number, status: string) => {
         try {
-            await fetch(`${BRIDGE_URL}/distribution/songs/${id}/status`, {
+            await fetch(`${LUXRIG_BRIDGE_URL}/distribution/songs/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })
@@ -124,7 +124,7 @@ export default function MusicRevenuePage() {
 
     const deleteSong = async (id: number) => {
         try {
-            await fetch(`${BRIDGE_URL}/distribution/songs/${id}`, { method: 'DELETE' });
+            await fetch(`${LUXRIG_BRIDGE_URL}/distribution/songs/${id}`, { method: 'DELETE' });
             setSongs(songs.filter(s => s.id !== id));
             fetchData();
         } catch (err) {

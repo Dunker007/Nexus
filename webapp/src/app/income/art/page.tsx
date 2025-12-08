@@ -48,7 +48,7 @@ interface ArtSummary {
     averagePrice: number;
 }
 
-const BRIDGE_URL = 'http://localhost:3456';
+import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 
 const PLATFORM_COLORS: Record<string, string> = {
     etsy: 'bg-orange-500/20 text-orange-400',
@@ -79,10 +79,10 @@ export default function ArtRevenuePage() {
     const fetchData = useCallback(async () => {
         try {
             const [productsRes, summaryRes, catsRes, stylesRes] = await Promise.all([
-                fetch(`${BRIDGE_URL}/art/products`),
-                fetch(`${BRIDGE_URL}/art/summary`),
-                fetch(`${BRIDGE_URL}/art/categories`),
-                fetch(`${BRIDGE_URL}/art/styles`)
+                fetch(`${LUXRIG_BRIDGE_URL}/art/products`),
+                fetch(`${LUXRIG_BRIDGE_URL}/art/summary`),
+                fetch(`${LUXRIG_BRIDGE_URL}/art/categories`),
+                fetch(`${LUXRIG_BRIDGE_URL}/art/styles`)
             ]);
 
             const productsData = await productsRes.json();
@@ -109,7 +109,7 @@ export default function ArtRevenuePage() {
         if (!newProduct.title) return;
 
         try {
-            const res = await fetch(`${BRIDGE_URL}/art/products`, {
+            const res = await fetch(`${LUXRIG_BRIDGE_URL}/art/products`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newProduct)
@@ -128,7 +128,7 @@ export default function ArtRevenuePage() {
 
     const updateStatus = async (id: number, status: string) => {
         try {
-            await fetch(`${BRIDGE_URL}/art/products/${id}/status`, {
+            await fetch(`${LUXRIG_BRIDGE_URL}/art/products/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })
@@ -141,7 +141,7 @@ export default function ArtRevenuePage() {
 
     const deleteProduct = async (id: number) => {
         try {
-            await fetch(`${BRIDGE_URL}/art/products/${id}`, { method: 'DELETE' });
+            await fetch(`${LUXRIG_BRIDGE_URL}/art/products/${id}`, { method: 'DELETE' });
             setProducts(products.filter(p => p.id !== id));
             fetchData();
         } catch (err) {
@@ -155,8 +155,8 @@ export default function ArtRevenuePage() {
 
         try {
             const [descRes, keywordsRes] = await Promise.all([
-                fetch(`${BRIDGE_URL}/art/products/${product.id}/description`, { method: 'POST' }),
-                fetch(`${BRIDGE_URL}/art/products/${product.id}/keywords`, { method: 'POST' })
+                fetch(`${LUXRIG_BRIDGE_URL}/art/products/${product.id}/description`, { method: 'POST' }),
+                fetch(`${LUXRIG_BRIDGE_URL}/art/products/${product.id}/keywords`, { method: 'POST' })
             ]);
 
             const descData = await descRes.json();
