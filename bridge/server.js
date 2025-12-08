@@ -32,6 +32,7 @@ import { contentService } from './services/content.js';
 import { settingsService } from './services/settings.js';
 import pipelineRoutes from './routes/pipeline.js';
 import distributionRoutes from './routes/distribution.js';
+import artProductsRoutes from './routes/art-products.js';
 const app = express();
 const PORT = process.env.PORT || 3456;
 
@@ -49,6 +50,7 @@ app.use(performanceMonitor.middleware()); // Track all request performance
 // Growth Phase Routes
 app.use('/pipeline', pipelineRoutes);
 app.use('/distribution', distributionRoutes);
+app.use('/art', artProductsRoutes);
 
 // Create HTTP server for both Express and WebSocket
 const server = createServer(app);
