@@ -51,7 +51,7 @@ fn start_bridge(app_handle: &tauri::AppHandle) -> Option<Child> {
         .ok()
         .map(|p| p.join("bridge-bundle"))
         .filter(|p| p.join("server.js").exists())
-        .unwrap_or_else(|| std::path::PathBuf::from(r"C:\Repos GIT\Nexus\bridge"));
+        .unwrap_or_else(|| std::path::PathBuf::from(r"C:\Repos GIT\Nexus\Nexus\bridge"));
 
     println!("Starting Bridge from: {:?}", bridge_path);
 

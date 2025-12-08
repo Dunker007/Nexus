@@ -7,6 +7,22 @@ import { motion } from 'framer-motion';
 
 export function ThemeToggle() {
     const { theme, setTheme } = useTheme();
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return (
+            <button
+                className="relative p-2 rounded-full glass-panel border border-white/5"
+                aria-label="Toggle theme"
+            >
+                <div className="w-5 h-5" />
+            </button>
+        );
+    }
 
     return (
         <motion.button

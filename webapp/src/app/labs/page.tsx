@@ -7,6 +7,7 @@ import Link from 'next/link';
 import PageBackground from '@/components/PageBackground';
 import StaffMeetingPanel from '@/components/StaffMeetingPanel';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
+import { INITIAL_LABS_DATA } from '@/lib/data';
 
 // Types
 interface Lab {
@@ -25,108 +26,7 @@ interface Lab {
     owner: string;
 }
 
-const NEXUS_PLAN_MD = `# Unified Project Evaluation & Implementation Plan
-
-## Evaluation Checklist
-- [ ] Review overall architecture and AI integration flow
-- [ ] Audit code quality (lint, TypeScript, unused imports)
-- [ ] Measure performance (bundle size, runtime FPS)
-- [ ] Verify accessibility (ARIA, focus management)
-- [ ] Check SEO fundamentals
-- [ ] Evaluate UI/UX consistency
-- [ ] Assess theme system
-- [ ] Review documentation
-- [ ] Validate testing coverage
-- [ ] Scan for security issues
-- [ ] Identify opportunities for AI-driven enhancements
-
-## Implementation Plan
-### 1️⃣ Dark-Mode & Theming
-- [x] Add ThemeProvider context
-- [x] Move colors to CSS variables
-- [x] Create ThemeToggle
-- [x] Update glass utility
-
-### 2️⃣ Component Refactorings
-- [x] Split Navigation
-- [x] Extract ShortcutModal
-- [x] Break MeetingRoom
-- [x] Export reusable UI components
-
-### 3️⃣ Accessibility Enhancements
-- [x] Add aria-labels
-- [x] Implement focus trapping
-- [x] Verify WCAG AA contrast
-
-### 4️⃣ Bundle & Performance
-- Use next/dynamic
-- Lazy-load images
-- optimize chunk size
-
-### 5️⃣ Testing & CI
-- [x] Configure Jest
-- [x] Write unit tests
-- [x] Add test script
-
-### 6️⃣ Dependency Audit
-- [x] Run npm audit
-- Update packages
-
-## 2026 AI & Vibe-Coding Wishes
-### Action-Oriented Agents
-- [x] Design TaskAgent
-- [x] Expose /api/agent
-
-### Multimodal Mastery
-- [x] Add MultimodalViewer
-- [x] Mock /api/multimodal
-
-### Responsible AGI
-- [x] Create SafetyGuard
-- [x] Log AI outputs
-
-### Human-AI Collaboration
-- [x] Implement CollaborationToolbar
-- [x] Store decisions
-
-### Governance
-- [x] Add GovernanceDashboard
-- [x] Role-based access
-
-### Creativity
-- [x] Provide CreativePrompt
-
-See full docs/PRIMARY_PLAN.md for details.
-`;
-
-const INITIAL_LABS_DATA: Lab[] = [
-    // Operations
-    { id: 'nexus-plan', icon: '📜', name: 'Nexus Implementation Plan', desc: 'Unified project roadmap.', content: NEXUS_PLAN_MD, status: 'active', category: 'Operations', priority: 'High', agents: ['antigravity'], href: '/docs', ideas: 99, timeline: { startMonth: 11, durationMonths: 12, progress: 40 }, owner: 'Antigravity' },
-    { id: 'meeting', icon: '👥', name: 'AI Staff Meeting', desc: 'Multi-agent debate room.', status: 'active', category: 'Operations', priority: 'High', agents: ['architect', 'qa'], href: '/meeting', ideas: 3, timeline: { startMonth: 0, durationMonths: 4, progress: 80 }, owner: 'Architect' },
-    { id: 'voice', icon: '🎙️', name: 'Voice Command', desc: 'System-wide God Mode.', status: 'active', category: 'Operations', priority: 'High', agents: ['guardian'], href: '/voice', ideas: 1, timeline: { startMonth: 0, durationMonths: 6, progress: 90 }, owner: 'Guardian' },
-    { id: 'automation', icon: '⚡', name: 'Automation Lab', desc: 'Workflow builder.', status: 'active', category: 'Operations', priority: 'Medium', agents: ['bytebot'], href: '/workflows', ideas: 5, timeline: { startMonth: 1, durationMonths: 3, progress: 60 }, owner: 'ByteBot' },
-    { id: 'smarthome', icon: '🏠', name: 'Smart Home Control', desc: 'Home automation hub.', status: 'active', category: 'Operations', priority: 'Medium', agents: ['bytebot'], href: '/home', ideas: 2, timeline: { startMonth: 0, durationMonths: 12, progress: 45 }, owner: 'ByteBot' },
-
-    // Intelligence
-    { id: 'analytics', icon: '📊', name: 'Analytics Hub', desc: 'Performance dashboards.', status: 'active', category: 'Intelligence', priority: 'Medium', agents: ['oracle'], href: '/analytics', ideas: 0, timeline: { startMonth: 2, durationMonths: 4, progress: 40 }, owner: 'Oracle' },
-    { id: 'knowledge', icon: '📚', name: 'Knowledge Base', desc: 'Doc search & index.', status: 'preview', category: 'Intelligence', priority: 'Medium', agents: ['oracle'], href: '/learn', ideas: 2, timeline: { startMonth: 3, durationMonths: 5, progress: 20 }, owner: 'Oracle' },
-    { id: 'dataweave', icon: '🌐', name: 'Data Weave', desc: 'ETL & Data pipes.', status: 'active', category: 'Intelligence', priority: 'Low', agents: ['bytebot'], href: '/data', ideas: 0, timeline: { startMonth: 4, durationMonths: 2, progress: 10 }, owner: 'ByteBot' },
-
-    // Creation
-    { id: 'music-studio', icon: '🎵', name: 'Music Studio', desc: 'Suno → Neural Frames → DaVinci → YouTube + TikTok', status: 'active', category: 'Creation', priority: 'High', agents: ['lyricist', 'composer', 'producer'], href: '/music', ideas: 5, timeline: { startMonth: 10, durationMonths: 3, progress: 75 }, owner: 'Producer' },
-    { id: 'forge', icon: '🔨', name: 'Agent Forge', desc: 'Build AI agents.', status: 'preview', category: 'Creation', priority: 'High', agents: ['lux'], href: '/agents', ideas: 8, timeline: { startMonth: 1, durationMonths: 5, progress: 50 }, owner: 'Lux' },
-    { id: 'codegen', icon: '💻', name: 'Code Generator', desc: 'AI refactoring tools.', status: 'active', category: 'Creation', priority: 'High', agents: ['bytebot'], href: '/playground', ideas: 4, timeline: { startMonth: 0, durationMonths: 3, progress: 75 }, owner: 'ByteBot' },
-    { id: 'vision', icon: '👁️', name: 'Vision Lab', desc: 'Computer vision tools.', status: 'concept', category: 'Creation', priority: 'Low', agents: ['lux'], href: '/vision', ideas: 1, timeline: { startMonth: 5, durationMonths: 6, progress: 5 }, owner: 'Lux' },
-
-    // Capital
-    { id: 'income', icon: '💸', name: 'Passive Income', desc: 'Revenue tracking.', status: 'active', category: 'Capital', priority: 'High', agents: ['oracle'], href: '/income', ideas: 12, timeline: { startMonth: 0, durationMonths: 12, progress: 60 }, owner: 'Oracle' },
-    { id: 'crypto', icon: '💎', name: 'Crypto Lab', desc: 'DeFi & Solana.', status: 'active', category: 'Capital', priority: 'Medium', agents: ['oracle'], href: '/crypto', ideas: 3, timeline: { startMonth: 2, durationMonths: 4, progress: 30 }, owner: 'Oracle' },
-
-    // Experimental
-    { id: 'aura', icon: '✨', name: 'AURA Interface', desc: 'Natural UI research.', status: 'concept', category: 'Experimental', priority: 'Low', agents: ['lux'], href: '/aura', ideas: 9, timeline: { startMonth: 6, durationMonths: 6, progress: 0 }, owner: 'Lux' },
-    { id: 'pcoptimize', icon: '⚡', name: 'PC Optimizer', desc: 'System performance tuning & resource management.', status: 'concept', category: 'Experimental', priority: 'Medium', agents: ['bytebot', 'guardian'], href: '/dashboard', ideas: 4, timeline: { startMonth: 3, durationMonths: 4, progress: 0 }, owner: 'ByteBot' },
-    { id: 'llmoptimize', icon: '🧠', name: 'LLM Lab', desc: 'Local model tuning, quantization & benchmarking.', status: 'concept', category: 'Experimental', priority: 'High', agents: ['architect', 'oracle'], href: '/settings', ideas: 7, timeline: { startMonth: 2, durationMonths: 6, progress: 0 }, owner: 'Architect' },
-];
+// Data moved to @/lib/data.ts
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const AGENT_COLORS: Record<string, string> = {
