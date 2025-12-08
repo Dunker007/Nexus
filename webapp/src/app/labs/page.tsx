@@ -101,7 +101,7 @@ See full docs/PRIMARY_PLAN.md for details.
 
 const INITIAL_LABS_DATA: Lab[] = [
     // Operations
-    { id: 'nexus-plan', icon: '📜', name: 'Nexus Implementation Plan', desc: 'Unified project roadmap.', content: NEXUS_PLAN_MD, status: 'active', category: 'Operations', priority: 'High', agents: ['antigravity'], href: null, ideas: 99, timeline: { startMonth: 11, durationMonths: 12, progress: 40 }, owner: 'Antigravity' },
+    { id: 'nexus-plan', icon: '📜', name: 'Nexus Implementation Plan', desc: 'Unified project roadmap.', content: NEXUS_PLAN_MD, status: 'active', category: 'Operations', priority: 'High', agents: ['antigravity'], href: '/docs', ideas: 99, timeline: { startMonth: 11, durationMonths: 12, progress: 40 }, owner: 'Antigravity' },
     { id: 'meeting', icon: '👥', name: 'AI Staff Meeting', desc: 'Multi-agent debate room.', status: 'active', category: 'Operations', priority: 'High', agents: ['architect', 'qa'], href: '/meeting', ideas: 3, timeline: { startMonth: 0, durationMonths: 4, progress: 80 }, owner: 'Architect' },
     { id: 'voice', icon: '🎙️', name: 'Voice Command', desc: 'System-wide God Mode.', status: 'active', category: 'Operations', priority: 'High', agents: ['guardian'], href: '/voice', ideas: 1, timeline: { startMonth: 0, durationMonths: 6, progress: 90 }, owner: 'Guardian' },
     { id: 'automation', icon: '⚡', name: 'Automation Lab', desc: 'Workflow builder.', status: 'active', category: 'Operations', priority: 'Medium', agents: ['bytebot'], href: '/workflows', ideas: 5, timeline: { startMonth: 1, durationMonths: 3, progress: 60 }, owner: 'ByteBot' },
@@ -110,22 +110,22 @@ const INITIAL_LABS_DATA: Lab[] = [
     // Intelligence
     { id: 'analytics', icon: '📊', name: 'Analytics Hub', desc: 'Performance dashboards.', status: 'active', category: 'Intelligence', priority: 'Medium', agents: ['oracle'], href: '/analytics', ideas: 0, timeline: { startMonth: 2, durationMonths: 4, progress: 40 }, owner: 'Oracle' },
     { id: 'knowledge', icon: '📚', name: 'Knowledge Base', desc: 'Doc search & index.', status: 'preview', category: 'Intelligence', priority: 'Medium', agents: ['oracle'], href: '/learn', ideas: 2, timeline: { startMonth: 3, durationMonths: 5, progress: 20 }, owner: 'Oracle' },
-    { id: 'dataweave', icon: '🌐', name: 'Data Weave', desc: 'ETL & Data pipes.', status: 'active', category: 'Intelligence', priority: 'Low', agents: ['bytebot'], href: null, ideas: 0, timeline: { startMonth: 4, durationMonths: 2, progress: 10 }, owner: 'ByteBot' },
+    { id: 'dataweave', icon: '🌐', name: 'Data Weave', desc: 'ETL & Data pipes.', status: 'active', category: 'Intelligence', priority: 'Low', agents: ['bytebot'], href: '/data', ideas: 0, timeline: { startMonth: 4, durationMonths: 2, progress: 10 }, owner: 'ByteBot' },
 
     // Creation
     { id: 'music-studio', icon: '🎵', name: 'Music Studio', desc: 'Suno → Neural Frames → DaVinci → YouTube + TikTok', status: 'active', category: 'Creation', priority: 'High', agents: ['lyricist', 'composer', 'producer'], href: '/music', ideas: 5, timeline: { startMonth: 10, durationMonths: 3, progress: 75 }, owner: 'Producer' },
     { id: 'forge', icon: '🔨', name: 'Agent Forge', desc: 'Build AI agents.', status: 'preview', category: 'Creation', priority: 'High', agents: ['lux'], href: '/agents', ideas: 8, timeline: { startMonth: 1, durationMonths: 5, progress: 50 }, owner: 'Lux' },
     { id: 'codegen', icon: '💻', name: 'Code Generator', desc: 'AI refactoring tools.', status: 'active', category: 'Creation', priority: 'High', agents: ['bytebot'], href: '/playground', ideas: 4, timeline: { startMonth: 0, durationMonths: 3, progress: 75 }, owner: 'ByteBot' },
-    { id: 'vision', icon: '👁️', name: 'Vision Lab', desc: 'Computer vision tools.', status: 'concept', category: 'Creation', priority: 'Low', agents: ['lux'], href: null, ideas: 1, timeline: { startMonth: 5, durationMonths: 6, progress: 5 }, owner: 'Lux' },
+    { id: 'vision', icon: '👁️', name: 'Vision Lab', desc: 'Computer vision tools.', status: 'concept', category: 'Creation', priority: 'Low', agents: ['lux'], href: '/vision', ideas: 1, timeline: { startMonth: 5, durationMonths: 6, progress: 5 }, owner: 'Lux' },
 
     // Capital
     { id: 'income', icon: '💸', name: 'Passive Income', desc: 'Revenue tracking.', status: 'active', category: 'Capital', priority: 'High', agents: ['oracle'], href: '/income', ideas: 12, timeline: { startMonth: 0, durationMonths: 12, progress: 60 }, owner: 'Oracle' },
     { id: 'crypto', icon: '💎', name: 'Crypto Lab', desc: 'DeFi & Solana.', status: 'active', category: 'Capital', priority: 'Medium', agents: ['oracle'], href: '/crypto', ideas: 3, timeline: { startMonth: 2, durationMonths: 4, progress: 30 }, owner: 'Oracle' },
 
     // Experimental
-    { id: 'aura', icon: '✨', name: 'AURA Interface', desc: 'Natural UI research.', status: 'concept', category: 'Experimental', priority: 'Low', agents: ['lux'], href: null, ideas: 9, timeline: { startMonth: 6, durationMonths: 6, progress: 0 }, owner: 'Lux' },
-    { id: 'pcoptimize', icon: '⚡', name: 'PC Optimizer', desc: 'System performance tuning & resource management.', status: 'concept', category: 'Experimental', priority: 'Medium', agents: ['bytebot', 'guardian'], href: null, ideas: 4, timeline: { startMonth: 3, durationMonths: 4, progress: 0 }, owner: 'ByteBot' },
-    { id: 'llmoptimize', icon: '🧠', name: 'LLM Lab', desc: 'Local model tuning, quantization & benchmarking.', status: 'concept', category: 'Experimental', priority: 'High', agents: ['architect', 'oracle'], href: null, ideas: 7, timeline: { startMonth: 2, durationMonths: 6, progress: 0 }, owner: 'Architect' },
+    { id: 'aura', icon: '✨', name: 'AURA Interface', desc: 'Natural UI research.', status: 'concept', category: 'Experimental', priority: 'Low', agents: ['lux'], href: '/aura', ideas: 9, timeline: { startMonth: 6, durationMonths: 6, progress: 0 }, owner: 'Lux' },
+    { id: 'pcoptimize', icon: '⚡', name: 'PC Optimizer', desc: 'System performance tuning & resource management.', status: 'concept', category: 'Experimental', priority: 'Medium', agents: ['bytebot', 'guardian'], href: '/dashboard', ideas: 4, timeline: { startMonth: 3, durationMonths: 4, progress: 0 }, owner: 'ByteBot' },
+    { id: 'llmoptimize', icon: '🧠', name: 'LLM Lab', desc: 'Local model tuning, quantization & benchmarking.', status: 'concept', category: 'Experimental', priority: 'High', agents: ['architect', 'oracle'], href: '/settings', ideas: 7, timeline: { startMonth: 2, durationMonths: 6, progress: 0 }, owner: 'Architect' },
 ];
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -275,8 +275,8 @@ export default function LabsPage() {
                     <div className="flex items-center gap-3">
                         {/* Database Status */}
                         <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border ${dbStatus === 'connected' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
-                                dbStatus === 'loading' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' :
-                                    'bg-red-500/10 border-red-500/30 text-red-400'
+                            dbStatus === 'loading' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' :
+                                'bg-red-500/10 border-red-500/30 text-red-400'
                             }`}>
                             {dbStatus === 'connected' ? <Database size={14} /> :
                                 dbStatus === 'loading' ? <RefreshCw size={14} className="animate-spin" /> :

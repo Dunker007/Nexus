@@ -23,6 +23,7 @@ model Project {
   agents      String   // JSON string of string[]
   timeline    String   // JSON string of {startMonth, durationMonths, progress}
   stats       String   // JSON string of {ideas: number}
+  content     String?  // Markdown content
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   

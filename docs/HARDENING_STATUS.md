@@ -155,9 +155,9 @@ All 4 phase pages verified via browser:
 
 ## Known Gaps / Next Steps
 
-1. **Phase 5 Build:** Tauri build pending final completion (slow compilation, but environment healthy).
-2. **Labs Database Empty:** `/projects` returns 0 projects. Static fallback is working.
-3. **Project Front Door:** Links for "Vision Lab", "AURA", etc. need implementation.
+1. **Phase 5 Build:** Tauri build environment verified, integration in progress.
+2. **Labs Database:** Seeding operational (currently using in-memory fallback), data available in UI.
+3. **Project Front Door:** Links updated and functional in Labs Hub.
 4. **LM Studio Model:** Chat needs a loaded model to function.
 
 ---

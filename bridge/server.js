@@ -840,7 +840,8 @@ app.get('/projects', async (req, res) => {
             href: p.href,
             ideas: typeof p.stats === 'string' ? (JSON.parse(p.stats || '{}').ideas || 0) : (p.ideas || 0),
             timeline: typeof p.timeline === 'string' ? JSON.parse(p.timeline || '{"startMonth":0,"durationMonths":3,"progress":0}') : (p.timeline || {}),
-            owner: p.owner || 'Unknown'
+            owner: p.owner || 'Unknown',
+            content: p.content
         }));
 
         res.json({ projects: transformed, total: transformed.length, source: 'database' });
@@ -878,7 +879,8 @@ app.get('/projects/:id', async (req, res) => {
             href: project.href,
             ideas: JSON.parse(project.stats || '{}').ideas || 0,
             timeline: JSON.parse(project.timeline || '{"startMonth":0,"durationMonths":3,"progress":0}'),
-            owner: project.owner || 'Unknown'
+            owner: project.owner || 'Unknown',
+            content: project.content
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -888,7 +890,7 @@ app.get('/projects/:id', async (req, res) => {
 // Create project
 app.post('/projects', async (req, res) => {
     try {
-        const { name, desc, icon, status, category, priority, agents, href, timeline, owner } = req.body;
+        const { name, desc, icon, status, category, priority, agents, href, timeline, owner, content } = req.body;
 
         const project = await prisma.project.create({
             data: {
@@ -902,7 +904,8 @@ app.post('/projects', async (req, res) => {
                 href: href || null,
                 timeline: JSON.stringify(timeline || { startMonth: new Date().getMonth(), durationMonths: 3, progress: 0 }),
                 stats: JSON.stringify({ ideas: 0 }),
-                owner: owner || 'Architect'
+                owner: owner || 'Architect',
+                content: content
             }
         });
 
@@ -916,7 +919,7 @@ app.post('/projects', async (req, res) => {
 // Update project
 app.put('/projects/:id', async (req, res) => {
     try {
-        const { name, desc, icon, status, category, priority, agents, href, timeline, owner, ideas } = req.body;
+        const { name, desc, icon, status, category, priority, agents, href, timeline, owner, ideas, content } = req.body;
 
         const updateData = {};
         if (name !== undefined) updateData.title = name;
@@ -930,6 +933,7 @@ app.put('/projects/:id', async (req, res) => {
         if (timeline !== undefined) updateData.timeline = JSON.stringify(timeline);
         if (owner !== undefined) updateData.owner = owner;
         if (ideas !== undefined) updateData.stats = JSON.stringify({ ideas });
+        if (content !== undefined) updateData.content = content;
 
         const project = await prisma.project.update({
             where: { id: req.params.id },
@@ -987,7 +991,8 @@ app.post('/projects/seed', async (req, res) => {
                             href: p.href,
                             timeline: JSON.stringify(p.timeline),
                             stats: JSON.stringify({ ideas: p.ideas }),
-                            owner: p.owner
+                            owner: p.owner,
+                            content: p.content
                         }
                     });
                     results.push({ id: created.id, name: p.name, action: 'created' });
