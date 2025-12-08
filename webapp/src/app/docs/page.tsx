@@ -103,6 +103,74 @@ const endpoints = [
 }`,
         category: 'LLM'
     },
+    // Growth Phase: Pipeline
+    {
+        method: 'GET',
+        path: '/pipeline/status',
+        description: 'Get content pipeline status',
+        response: `{ "success": true, "status": { "running": false, "lastRun": null } }`,
+        category: 'Pipeline'
+    },
+    {
+        method: 'POST',
+        path: '/pipeline/generate',
+        description: 'Trigger content generation',
+        body: `{ "topic": "AI productivity tips", "count": 3 }`,
+        response: `{ "success": true, "message": "Generation started", "jobId": "..." }`,
+        category: 'Pipeline'
+    },
+    {
+        method: 'GET',
+        path: '/pipeline/queue',
+        description: 'List pending content items',
+        response: `{ "success": true, "queue": [{ "id": 1, "title": "...", "status": "draft" }] }`,
+        category: 'Pipeline'
+    },
+    // Growth Phase: Distribution
+    {
+        method: 'GET',
+        path: '/distribution/songs',
+        description: 'List distributed songs',
+        response: `{ "success": true, "songs": [{ "id": 1, "title": "...", "platforms": [...] }] }`,
+        category: 'Distribution'
+    },
+    {
+        method: 'GET',
+        path: '/distribution/summary',
+        description: 'Get music revenue summary',
+        response: `{ "success": true, "summary": { "totalRevenue": 0, "totalStreams": 0 } }`,
+        category: 'Distribution'
+    },
+    // Growth Phase: Art Products
+    {
+        method: 'GET',
+        path: '/art/products',
+        description: 'List art products',
+        response: `{ "success": true, "products": [{ "id": 1, "title": "...", "status": "listed" }] }`,
+        category: 'Art'
+    },
+    {
+        method: 'POST',
+        path: '/art/products/:id/keywords',
+        description: 'Generate SEO keywords for a product',
+        response: `{ "success": true, "keywords": ["..."] }`,
+        category: 'Art'
+    },
+    // Growth Phase: Unified Income
+    {
+        method: 'GET',
+        path: '/income/summary',
+        description: 'Get unified income summary across all streams',
+        response: `{ "success": true, "summary": { "totalRevenue": 0, "streams": {...}, "goals": {...} } }`,
+        category: 'Income'
+    },
+    {
+        method: 'GET',
+        path: '/income/goals',
+        description: 'Get income goals',
+        response: `{ "success": true, "goals": { "monthly": 100, "yearly": 1200 } }`,
+        category: 'Income'
+    },
 ];
 
 const sdks = [
