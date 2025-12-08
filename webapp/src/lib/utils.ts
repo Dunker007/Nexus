@@ -8,7 +8,7 @@ export const LUXRIG_BRIDGE_URL = process.env.NEXT_PUBLIC_BRIDGE_URL || 'http://l
 // App Configuration
 export const APP_CONFIG = {
     name: 'DLX Studio',
-    version: '1.0.0',
+    version: '2.0.0',
     description: 'AI Command Center',
     github: 'https://github.com/Dunker007',
 };

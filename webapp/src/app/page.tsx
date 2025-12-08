@@ -19,17 +19,17 @@ const staggerContainer = {
 const tools = [
   { icon: '👨‍💻', name: 'Dev Studio', desc: 'GitHub repos, deployments, and local dev environment.', color: 'cyan', href: '/studios/dev' },
   { icon: '🎵', name: 'Music Studio', desc: 'AI songwriting with Suno integration.', color: 'pink', href: '/music' },
+  { icon: '💰', name: 'Revenue Hub', desc: 'Track income from all streams in one place.', color: 'green', href: '/income' },
+  { icon: '🚀', name: 'Content Pipeline', desc: 'Automated content generation and publishing.', color: 'purple', href: '/pipeline' },
   { icon: '📰', name: 'News Hub', desc: 'AI-curated news with bias analysis.', color: 'blue', href: '/news' },
-  { icon: '💬', name: 'Neural Chat', desc: 'Multi-model chat with context memory.', color: 'purple', href: '/chat' },
   { icon: '🎨', name: 'Creative Studios', desc: 'Art, video, podcast generation.', color: 'orange', href: '/studios' },
-  { icon: '📊', name: 'Dashboard', desc: 'System metrics and quick actions.', color: 'green', href: '/dashboard' },
 ];
 
 const stats = [
   { value: '10+', label: 'Local LLMs', icon: '🤖' },
-  { value: '65+', label: 'Pages Built', icon: '📄' },
-  { value: '6', label: 'AI Agents', icon: '🎯' },
-  { value: '0', label: 'API Costs', icon: '💰' },
+  { value: '76', label: 'Pages Built', icon: '📄' },
+  { value: '8', label: 'AI Studios', icon: '🎯' },
+  { value: '$0', label: 'API Costs', icon: '💰' },
 ];
 
 export default function Home() {

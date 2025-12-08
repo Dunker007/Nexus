@@ -66,12 +66,14 @@ export default function CommandPalette() {
         { id: 'new-chat', icon: '💬', label: 'New Chat with Lux', shortcut: 'N', category: 'Quick Actions', action: () => router.push('/chat') },
         { id: 'deploy-agent', icon: '🚀', label: 'Deploy an Agent', category: 'Quick Actions', action: () => router.push('/agents') },
         { id: 'check-revenue', icon: '💰', label: 'Check Revenue', category: 'Quick Actions', action: () => router.push('/income') },
+        { id: 'run-pipeline', icon: '⚡', label: 'Run Content Pipeline', category: 'Quick Actions', action: () => router.push('/pipeline') },
         { id: 'start-meeting', icon: '👥', label: 'Start AI Meeting', category: 'Quick Actions', action: () => router.push('/meeting') },
         { id: 'voice-mode', icon: '🎙️', label: 'Activate Voice Mode', category: 'Quick Actions', action: () => router.push('/voice') },
 
         // Core Navigation
         { id: 'home', icon: '🏠', label: 'Go to Home', shortcut: 'G H', category: 'Navigation', action: () => router.push('/') },
         { id: 'dashboard', icon: '📊', label: 'Go to Dashboard', shortcut: 'G D', category: 'Navigation', action: () => router.push('/dashboard') },
+        { id: 'pipeline', icon: '🚀', label: 'Go to Pipeline', shortcut: 'G P', category: 'Navigation', action: () => router.push('/pipeline') },
         { id: 'news', icon: '📰', label: 'Go to News', shortcut: 'G N', category: 'Navigation', action: () => router.push('/news') },
         { id: 'settings', icon: '⚙️', label: 'Settings', shortcut: 'G S', category: 'Navigation', action: () => router.push('/settings') },
 
@@ -87,9 +89,13 @@ export default function CommandPalette() {
         { id: 'music', icon: '🎵', label: 'Music Studio', shortcut: 'G M', category: 'Creative', action: () => router.push('/music') },
         { id: 'playground', icon: '🎮', label: 'Playground', category: 'Creative', action: () => router.push('/playground') },
 
-        // Finance
-        { id: 'income', icon: '💸', label: 'Revenue Command', shortcut: 'G I', category: 'Finance', action: () => router.push('/income') },
-        { id: 'crypto', icon: '💎', label: 'Crypto Lab', category: 'Finance', action: () => router.push('/crypto') },
+        // Revenue (Growth Phase)
+        { id: 'income', icon: '💸', label: 'Revenue Hub', shortcut: 'G I', category: 'Revenue', action: () => router.push('/income') },
+        { id: 'music-revenue', icon: '🎵', label: 'Music Revenue', category: 'Revenue', action: () => router.push('/income/music') },
+        { id: 'art-revenue', icon: '🎨', label: 'Art Revenue', category: 'Revenue', action: () => router.push('/income/art') },
+        { id: 'ideas', icon: '💡', label: 'Income Ideas', category: 'Revenue', action: () => router.push('/income/ideas') },
+        { id: 'tracker', icon: '📈', label: 'Income Tracker', category: 'Revenue', action: () => router.push('/income/tracker') },
+        { id: 'crypto', icon: '💎', label: 'Crypto Lab', category: 'Revenue', action: () => router.push('/crypto') },
 
         // System
         { id: 'theme-switch', icon: '🌓', label: 'Toggle Theme', shortcut: 'T', category: 'System', action: triggerThemeToggle },
