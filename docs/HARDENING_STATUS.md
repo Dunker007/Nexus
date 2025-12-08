@@ -2,7 +2,7 @@
 
 **Objective:** Top-down hardening with Music Studio operational first. Creative but grounded.
 
-**Last Verified:** 2025-12-07 @ 22:15 CST
+**Last Verified:** 2025-12-07 @ 22:20 CST
 
 ---
 
@@ -47,16 +47,18 @@
   - ✅ Green "DB Connected" status indicator in header
   - ✅ In-memory fallback for when Prisma operations fail
   - Prisma 7 with better-sqlite3 adapter configured
-- [ ] 🔧 Staff Meeting Panel integration testing
-  - `/agents/meeting` endpoint exists
-  - Panel component imported, **TODO:** Test from Labs UI
+- [x] ✅ Staff Meeting Panel API tested
+  - `/agents/meeting/start` - Start meeting with topic ✅
+  - `/agents/meeting/status` - Get transcript and personas ✅
+  - `/agents/meeting/stop` - End meeting ✅
+  - Multi-agent debate with Architect, Security, QA personas working
 - [ ] ⬜ Link projects to their respective "front door" pages
   - Projects with href navigate correctly
   - **TODO:** Ensure all active projects have valid hrefs
 
 ---
 
-## Phase 3: Agents Hub → Core Infrastructure ⚠️ 60%
+## Phase 3: Agents Hub → Core Infrastructure ✅ 95%
 *Priority: Foundation for everything else*
 
 - [x] ✅ Audit all 21 agent services in bridge/services/
@@ -65,7 +67,8 @@
   - 16 agent types registered in agentRegistry
 - [x] ✅ Test agent invocation from webapp
   - `/agents/execute` tested successfully
-- [ ] 🔧 Document which agents are operational vs stubs
+- [x] ✅ Document which agents are operational vs stubs
+  - Created `docs/AGENTS.md` with full documentation
 
 ### Agent Status:
 | Agent | Status |

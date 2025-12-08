@@ -26,7 +26,7 @@ import { prisma } from './services/database.js';
 // Security and swagger imports - commented out temporarily for debugging
 // import { security, securityHeaders, sessionMiddleware } from './services/security.js';
 // import { swaggerSpec } from './config/swagger.js';
-// import { StaffMeetingAgent } from './services/agents-staff-meeting.js';
+import { StaffMeetingAgent } from './services/agents-staff-meeting.js';
 
 const app = express();
 const PORT = process.env.PORT || 3456;
@@ -368,6 +368,47 @@ app.get('/github/repos', async (req, res) => {
 // ============ Agent Routes ============
 
 // activeAgents is defined earlier now.
+
+// Staff Meeting Routes (must be before parameterized routes)
+// Start a meeting
+app.post('/agents/meeting/start', async (req, res) => {
+    try {
+        const { topic } = req.body;
+
+        if (!topic) {
+            return res.status(400).json({ error: 'Topic is required' });
+        }
+
+        const result = await staffMeetingAgent.startMeeting(topic);
+        res.json(result);
+    } catch (error) {
+        console.error('Meeting start error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get meeting status
+app.get('/agents/meeting/status', async (req, res) => {
+    try {
+        const status = staffMeetingAgent.getMeetingStatus();
+        res.json(status);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Stop meeting
+app.post('/agents/meeting/stop', async (req, res) => {
+    try {
+        const result = staffMeetingAgent.stopMeeting();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Initialize Staff Meeting Agent
+const staffMeetingAgent = new StaffMeetingAgent();
 
 // Create and execute agent task
 app.post('/agents/execute', async (req, res) => {
