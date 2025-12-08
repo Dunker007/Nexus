@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   keywords: ["AI", "LLM", "LM Studio", "Ollama", "Machine Learning", "Local AI"],
 };
 
+import { SettingsProvider } from "@/components/SettingsContext";
 import { VibeProvider } from "@/components/VibeContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SafetyProvider } from "@/components/SafetyGuard";
@@ -28,17 +29,19 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-grid`}>
         <ThemeProvider defaultTheme="dark" storageKey="dlx-theme">
-          <VibeProvider>
-            <SafetyProvider>
-              <Suspense fallback={null}>
-                <Navigation />
-              </Suspense>
-              <main className="pt-16 min-h-screen">
-                {children}
-              </main>
-              <AppOverlays />
-            </SafetyProvider>
-          </VibeProvider>
+          <SettingsProvider>
+            <VibeProvider>
+              <SafetyProvider>
+                <Suspense fallback={null}>
+                  <Navigation />
+                </Suspense>
+                <main className="pt-16 min-h-screen">
+                  {children}
+                </main>
+                <AppOverlays />
+              </SafetyProvider>
+            </VibeProvider>
+          </SettingsProvider>
         </ThemeProvider>
       </body>
     </html>

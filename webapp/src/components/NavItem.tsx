@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface NavItemProps {
     href: string;
     label: string;
-    icon: string;
+    icon: React.ReactNode;
     shortcut?: string;
     isActive: boolean;
     isHovered: boolean;
@@ -51,7 +51,7 @@ export function NavItem({
 
                 {/* Content */}
                 <span className={`relative z-10 flex items-center gap-2 ${isActive ? 'text-cyan-400' : 'text-gray-300 hover:text-white'}`}>
-                    <span className="text-sm">{icon}</span>
+                    <span className="text-sm flex items-center justify-center w-5 h-5">{icon}</span>
                     <span className="text-sm font-medium">{label}</span>
                 </span>
             </Link>

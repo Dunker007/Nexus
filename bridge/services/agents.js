@@ -7,7 +7,7 @@ import { Agent } from './agent-core.js';
 import { RevenueAgent } from './agents-revenue.js';
 import { IntentAgent } from './agents-intent.js';
 import { StaffMeetingAgent } from './agents-staff-meeting.js';
-import { LyricistAgent, ComposerAgent, CriticAgent, ProducerAgent, SongwriterRoom } from './agents-songwriter.js';
+import { LyricistAgent, ComposerAgent, CriticAgent, ProducerAgent, SongwriterRoom, NewsicianAgent, MidwestSentinelAgent } from './agents-songwriter.js';
 
 export { Agent };
 
@@ -713,7 +713,9 @@ export const agentRegistry = {
     lyricist: LyricistAgent,
     composer: ComposerAgent,
     critic: CriticAgent,
-    producer: ProducerAgent
+    producer: ProducerAgent,
+    newsician: NewsicianAgent,
+    'midwest-sentinel': MidwestSentinelAgent
 };
 
 // Export SongwriterRoom for music pipeline

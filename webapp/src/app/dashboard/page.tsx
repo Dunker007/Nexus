@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Responsive, WidthProvider, Layout } from 'react-grid-layout';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Settings, Move, Maximize2, Minimize2 } from 'lucide-react';
+import { X, Plus, Settings, Move, Send, Loader2 } from 'lucide-react';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 import { parseRSSFeed, NEWS_SOURCES } from '@/lib/news-service';
 import PageBackground from '@/components/PageBackground';
@@ -15,7 +15,7 @@ import 'react-resizable/css/styles.css';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 // Widget Types
-type WidgetType = 'weather' | 'calendar' | 'news' | 'tasks' | 'quote' | 'email' | 'system' | 'quicklinks';
+type WidgetType = 'quick_ai' | 'calendar' | 'news' | 'tasks' | 'quote' | 'system' | 'quicklinks';
 
 interface WidgetConfig {
     i: string;
@@ -28,29 +28,28 @@ interface WidgetConfig {
 
 // Available Widgets
 const WIDGET_CATALOG: Record<WidgetType, { title: string; icon: string; defaultW: number; defaultH: number; minW: number; minH: number }> = {
-    weather: { title: '🌤️ Weather', icon: '🌤️', defaultW: 1, defaultH: 2, minW: 1, minH: 2 },
+    quick_ai: { title: '⚡ Quick AI', icon: '⚡', defaultW: 2, defaultH: 3, minW: 2, minH: 2 },
     calendar: { title: '📅 Calendar', icon: '📅', defaultW: 1, defaultH: 3, minW: 1, minH: 2 },
     news: { title: '📰 News', icon: '📰', defaultW: 2, defaultH: 3, minW: 1, minH: 2 },
     tasks: { title: '✅ Tasks', icon: '✅', defaultW: 1, defaultH: 3, minW: 1, minH: 2 },
     quote: { title: '✨ Quote', icon: '✨', defaultW: 1, defaultH: 2, minW: 1, minH: 1 },
-    email: { title: '📧 Email', icon: '📧', defaultW: 1, defaultH: 2, minW: 1, minH: 2 },
     system: { title: '🖥️ System', icon: '🖥️', defaultW: 2, defaultH: 2, minW: 1, minH: 2 },
     quicklinks: { title: '🔗 Quick Links', icon: '🔗', defaultW: 1, defaultH: 2, minW: 1, minH: 1 },
 };
 
 // Default Layout
 const DEFAULT_LAYOUT: Layout[] = [
-    { i: 'weather-1', x: 0, y: 0, w: 1, h: 2 },
-    { i: 'system-1', x: 1, y: 0, w: 2, h: 2 },
-    { i: 'news-1', x: 0, y: 2, w: 2, h: 3 },
-    { i: 'calendar-1', x: 2, y: 2, w: 1, h: 3 },
-    { i: 'tasks-1', x: 0, y: 5, w: 1, h: 3 },
-    { i: 'quote-1', x: 1, y: 5, w: 1, h: 2 },
-    { i: 'quicklinks-1', x: 2, y: 5, w: 1, h: 2 },
+    { i: 'quick_ai-1', x: 0, y: 0, w: 2, h: 3 },
+    { i: 'system-1', x: 2, y: 0, w: 1, h: 2 },
+    { i: 'news-1', x: 0, y: 3, w: 2, h: 3 },
+    { i: 'calendar-1', x: 2, y: 3, w: 1, h: 3 },
+    { i: 'tasks-1', x: 0, y: 6, w: 1, h: 3 },
+    { i: 'quote-1', x: 1, y: 6, w: 1, h: 2 },
+    { i: 'quicklinks-1', x: 2, y: 6, w: 1, h: 2 },
 ];
 
 const DEFAULT_WIDGETS: WidgetConfig[] = [
-    { i: 'weather-1', type: 'weather', title: '🌤️ Weather', icon: '🌤️' },
+    { i: 'quick_ai-1', type: 'quick_ai', title: '⚡ Quick AI', icon: '⚡' },
     { i: 'system-1', type: 'system', title: '🖥️ System', icon: '🖥️' },
     { i: 'news-1', type: 'news', title: '📰 News', icon: '📰' },
     { i: 'calendar-1', type: 'calendar', title: '📅 Calendar', icon: '📅' },
@@ -103,12 +102,45 @@ export default function DashboardPage() {
     const [widgets, setWidgets] = useState<WidgetConfig[]>(DEFAULT_WIDGETS);
 
     // Data States
-    const [systemStats, setSystemStats] = useState<any>(null);
-    const [news, setNews] = useState<any[]>(SAMPLE_NEWS);
+    // Interfaces
+    interface SystemStats {
+        services?: {
+            lmstudio?: { online: boolean };
+            ollama?: { online: boolean };
+        };
+        system?: {
+            gpu?: {
+                temperature?: number; // or string if it comes as string
+                utilization?: number;
+            };
+        };
+    }
+
+    interface NewsItem {
+        title: string;
+        source: string;
+        time: string;
+        link: string;
+        pubDate?: string;
+    }
+
+    interface CalendarEvent {
+        title: string;
+        time: string;
+        type: 'meeting' | 'work' | 'personal';
+    }
+
+    const [systemStats, setSystemStats] = useState<SystemStats | null>(null);
+    const [news, setNews] = useState<NewsItem[]>(SAMPLE_NEWS);
     const [loadingNews, setLoadingNews] = useState(true);
-    const [calendarEvents, setCalendarEvents] = useState<any[]>(STATIC_CALENDAR_EVENTS);
+    const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(STATIC_CALENDAR_EVENTS as CalendarEvent[]);
     const [googleConnected, setGoogleConnected] = useState(false);
     const [quote] = useState(DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)]);
+
+    // Quick AI State
+    const [quickAiInput, setQuickAiInput] = useState('');
+    const [quickAiResponse, setQuickAiResponse] = useState('');
+    const [isAiThinking, setIsAiThinking] = useState(false);
 
     // Load saved layout
     useEffect(() => {
@@ -123,6 +155,7 @@ export default function DashboardPage() {
     }, []);
 
     // Save layout changes
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onLayoutChange = useCallback((currentLayout: Layout[], allLayouts: any) => {
         setLayouts(allLayouts);
         localStorage.setItem('dashboard-layout', JSON.stringify(allLayouts));
@@ -149,7 +182,8 @@ export default function DashboardPage() {
 
     async function fetchSystemStats() {
         try {
-            const res = await fetch(`${LUXRIG_BRIDGE_URL}/system`);
+            // Using /status for detailed breakdown, or /health for simple checks
+            const res = await fetch(`${LUXRIG_BRIDGE_URL}/status`);
             if (res.ok) setSystemStats(await res.json());
         } catch { }
     }
@@ -184,17 +218,49 @@ export default function DashboardPage() {
             if (response.ok) {
                 const events = await response.json();
                 if (Array.isArray(events) && events.length > 0) {
-                    const formatted = events.map((event: any) => ({
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const formatted: CalendarEvent[] = events.map((event: any) => ({
                         title: event.summary || 'No title',
                         time: event.start?.dateTime
                             ? new Date(event.start.dateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
                             : 'All day',
-                        type: event.summary?.toLowerCase().includes('meeting') ? 'meeting' : 'work'
+                        type: (event.summary?.toLowerCase().includes('meeting') ? 'meeting' : 'work') as CalendarEvent['type']
                     }));
                     setCalendarEvents(formatted);
                 }
             }
         } catch { }
+    }
+
+    async function handleQuickAiSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        if (!quickAiInput.trim()) return;
+
+        setIsAiThinking(true);
+        setQuickAiResponse(''); // Clear previous response
+
+        try {
+            const res = await fetch(`${LUXRIG_BRIDGE_URL}/llm/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: [{ role: 'user', content: quickAiInput }],
+                    provider: 'lmstudio' // Default to LM Studio as requested
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                // Assuming data structure matches OpenAI chat completion
+                setQuickAiResponse(data.choices?.[0]?.message?.content || data.content || 'No response text received.');
+            } else {
+                setQuickAiResponse('Error: Failed to get response from AI.');
+            }
+        } catch (error) {
+            setQuickAiResponse('Error: Could not connect to Bridge.');
+        } finally {
+            setIsAiThinking(false);
+        }
     }
 
     function getTimeAgo(dateStr: string) {
@@ -255,19 +321,42 @@ export default function DashboardPage() {
     // Render Widget Content
     function renderWidgetContent(widget: WidgetConfig) {
         switch (widget.type) {
-            case 'weather':
+            case 'quick_ai':
                 return (
-                    <div className="flex flex-col h-full justify-between">
-                        <div>
-                            <div className="text-4xl font-bold">28°F</div>
-                            <div className="text-gray-400 text-sm">Minneapolis • Partly Cloudy</div>
+                    <div className="flex flex-col h-full">
+                        <div className="flex-1 overflow-auto custom-scrollbar mb-4 bg-black/20 rounded p-3 min-h-[100px]">
+                            {quickAiResponse ? (
+                                <div className="prose prose-invert prose-sm">
+                                    <p className="whitespace-pre-wrap">{quickAiResponse}</p>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+                                    {isAiThinking ? (
+                                        <div className="flex items-center gap-2">
+                                            <Loader2 className="animate-spin" size={16} /> Thinking...
+                                        </div>
+                                    ) : (
+                                        'Ask me anything...'
+                                    )}
+                                </div>
+                            )}
                         </div>
-                        <div className="text-5xl text-center">❄️</div>
-                        <div className="flex gap-4 text-xs text-gray-400">
-                            <span>H: 32°</span>
-                            <span>L: 18°</span>
-                            <span>💨 8 mph</span>
-                        </div>
+                        <form onSubmit={handleQuickAiSubmit} className="relative">
+                            <input
+                                type="text"
+                                value={quickAiInput}
+                                onChange={(e) => setQuickAiInput(e.target.value)}
+                                placeholder="Send a message..."
+                                className="w-full bg-white/5 border border-white/10 rounded-lg pl-4 pr-10 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-colors"
+                            />
+                            <button
+                                type="submit"
+                                disabled={!quickAiInput.trim() || isAiThinking}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                {isAiThinking ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />}
+                            </button>
+                        </form>
                     </div>
                 );
 
@@ -325,47 +414,36 @@ export default function DashboardPage() {
                     </div>
                 );
 
-            case 'email':
-                return (
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2 p-2 rounded bg-white/5">
-                            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm">JD</div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate">Project Update</p>
-                                <p className="text-xs text-gray-500 truncate">Hey, just wanted to check in...</p>
-                            </div>
-                            <span className="text-xs text-gray-500">2h</span>
-                        </div>
-                        <a href="https://mail.google.com" target="_blank" className="text-xs text-cyan-400 hover:underline">Open Gmail →</a>
-                    </div>
-                );
-
             case 'system':
+                // /status provides: { services: { lmstudio: { online: bool }, ollama: { online: bool } }, system: { ... } }
+                const lmStudioOnline = systemStats?.services?.lmstudio?.online ?? false;
+                const ollamaOnline = systemStats?.services?.ollama?.online ?? false;
+                const gpuTemp = systemStats?.system?.gpu?.temperature ?? '--';
+                const gpuUtil = systemStats?.system?.gpu?.utilization ?? 0;
+
                 return (
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="p-3 rounded-lg bg-white/5">
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className={`w-2 h-2 rounded-full ${systemStats ? 'bg-green-400' : 'bg-red-400'}`}></span>
-                                <span className="text-xs font-medium">LM Studio</span>
+                    <div className="grid grid-cols-2 gap-3 h-full">
+                        <div className="p-3 rounded-lg bg-white/5 flex flex-col justify-center">
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className={`w-2 h-2 rounded-full ${lmStudioOnline ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                                <span className="text-xs font-medium truncate">LM Studio</span>
                             </div>
-                            <p className="text-lg font-bold">{systemStats?.services?.lmstudio?.modelCount || 0}</p>
-                            <p className="text-xs text-gray-500">models</p>
+                            <p className="text-xs text-gray-500">{lmStudioOnline ? 'Online' : 'Offline'}</p>
                         </div>
-                        <div className="p-3 rounded-lg bg-white/5">
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className={`w-2 h-2 rounded-full ${systemStats ? 'bg-green-400' : 'bg-red-400'}`}></span>
-                                <span className="text-xs font-medium">Ollama</span>
+                        <div className="p-3 rounded-lg bg-white/5 flex flex-col justify-center">
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className={`w-2 h-2 rounded-full ${ollamaOnline ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                                <span className="text-xs font-medium truncate">Ollama</span>
                             </div>
-                            <p className="text-lg font-bold">{systemStats?.services?.ollama?.modelCount || 0}</p>
-                            <p className="text-xs text-gray-500">models</p>
+                            <p className="text-xs text-gray-500">{ollamaOnline ? 'Online' : 'Offline'}</p>
                         </div>
-                        <div className="p-3 rounded-lg bg-white/5 col-span-2">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs font-medium">GPU</span>
-                                <span className="text-xs text-cyan-400">{systemStats?.gpu?.temperature || '--'}°C</span>
+                        <div className="p-3 rounded-lg bg-white/5 col-span-2 flex flex-col justify-center">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-xs font-medium">GPU Load</span>
+                                <span className="text-xs text-cyan-400">{gpuTemp}°C</span>
                             </div>
-                            <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
-                                <div className="bg-gradient-to-r from-cyan-500 to-purple-500 h-2 rounded-full" style={{ width: `${systemStats?.gpu?.utilization || 0}%` }}></div>
+                            <div className="w-full bg-gray-700 rounded-full h-2">
+                                <div className="bg-gradient-to-r from-cyan-500 to-purple-500 h-2 rounded-full transition-all duration-300" style={{ width: `${gpuUtil}%` }}></div>
                             </div>
                         </div>
                     </div>
@@ -443,11 +521,11 @@ export default function DashboardPage() {
                     draggableHandle=".drag-handle"
                 >
                     {widgets.map(widget => (
-                        <div key={widget.i} className={`glass-card overflow-hidden group relative ${editMode ? 'ring-2 ring-cyan-500/30' : ''}`}>
+                        <div key={widget.i} className={`glass-card overflow-hidden group relative flex flex-col ${editMode ? 'ring-2 ring-cyan-500/30' : ''}`}>
                             {/* Hover Glow Effect */}
                             <div className={`absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}></div>
 
-                            <div className={`flex items-center justify-between mb-3 relative z-10 ${editMode ? 'drag-handle cursor-move' : ''}`}>
+                            <div className={`flex items-center justify-between mb-3 relative z-10 flex-shrink-0 ${editMode ? 'drag-handle cursor-move' : ''}`}>
                                 <h3 className="font-bold text-sm flex items-center gap-2">
                                     {editMode && <Move size={14} className="text-cyan-400" />}
                                     {widget.title}
@@ -458,7 +536,7 @@ export default function DashboardPage() {
                                     </button>
                                 )}
                             </div>
-                            <div className="flex-1 overflow-auto custom-scrollbar relative z-10">
+                            <div className="flex-1 overflow-auto custom-scrollbar relative z-10 min-h-0">
                                 {renderWidgetContent(widget)}
                             </div>
                         </div>

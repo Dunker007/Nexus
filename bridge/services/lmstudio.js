@@ -4,6 +4,11 @@
  */
 
 const LMSTUDIO_URL = process.env.LMSTUDIO_URL || 'http://127.0.0.1:1234';
+import { settingsService } from './settings.js';
+
+function getUrl() {
+    return settingsService.get('lmstudio_url') || LMSTUDIO_URL;
+}
 
 export const lmstudioService = {
 
@@ -12,7 +17,7 @@ export const lmstudioService = {
      */
     async getStatus() {
         try {
-            const response = await fetch(`${LMSTUDIO_URL}/v1/models`, {
+            const response = await fetch(`${getUrl()}/v1/models`, {
                 signal: AbortSignal.timeout(3000)
             });
 
@@ -23,14 +28,14 @@ export const lmstudioService = {
 
             return {
                 online: true,
-                url: LMSTUDIO_URL,
+                url: getUrl(),
                 modelCount: models.length,
                 loadedModel: models[0]?.id || null
             };
         } catch (error) {
             return {
                 online: false,
-                url: LMSTUDIO_URL,
+                url: getUrl(),
                 error: error.message
             };
         }
@@ -41,8 +46,8 @@ export const lmstudioService = {
      */
     async listModels() {
         try {
-            console.log(`[LMStudio] Fetching models from ${LMSTUDIO_URL}/v1/models...`);
-            const response = await fetch(`${LMSTUDIO_URL}/v1/models`);
+            console.log(`[LMStudio] Fetching models from ${getUrl()}/v1/models...`);
+            const response = await fetch(`${getUrl()}/v1/models`);
             if (!response.ok) {
                 console.error(`[LMStudio] Response not OK: ${response.status} ${response.statusText}`);
                 throw new Error(`HTTP ${response.status}`);
@@ -67,7 +72,7 @@ export const lmstudioService = {
      * Chat completion
      */
     async chat(messages, model = null) {
-        const response = await fetch(`${LMSTUDIO_URL}/v1/chat/completions`, {
+        const response = await fetch(`${getUrl()}/v1/chat/completions`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

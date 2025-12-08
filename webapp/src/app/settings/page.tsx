@@ -2,81 +2,82 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useState } from 'react';
-import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
+import { useState, useEffect } from 'react';
 import PageBackground from '@/components/PageBackground';
 import { useVibe } from '@/components/VibeContext';
-
-interface Settings {
-    // General
-    theme: string;
-    language: string;
-    timezone: string;
-
-    // AI
-    defaultProvider: string;
-    defaultModel: string;
-    temperature: number;
-    maxTokens: number;
-    streamResponses: boolean;
-
-    // Privacy
-    saveHistory: boolean;
-    analytics: boolean;
-    sendCrashReports: boolean;
-
-    // Bridge
-    bridgeUrl: string;
-    autoConnect: boolean;
-    reconnectInterval: number;
-
-    // Notifications
-    notifyOnComplete: boolean;
-    notifyOnError: boolean;
-    soundEffects: boolean;
-}
-
-const defaultSettings: Settings = {
-    theme: 'cyberpunk',
-    language: 'en',
-    timezone: 'America/Chicago',
-    defaultProvider: 'lmstudio',
-    defaultModel: 'gemma-3n-E4B-it-QAT',
-    temperature: 0.7,
-    maxTokens: 1000,
-    streamResponses: true,
-    saveHistory: true,
-    analytics: false,
-    sendCrashReports: true,
-    bridgeUrl: LUXRIG_BRIDGE_URL,
-    autoConnect: true,
-    reconnectInterval: 5000,
-    notifyOnComplete: true,
-    notifyOnError: true,
-    soundEffects: false,
-};
+import { useSettings, AppSettings } from '@/components/SettingsContext';
+import { ThemeId } from '@/lib/themes';
+import { enable, disable, isEnabled } from '@tauri-apps/plugin-autostart';
 
 export default function SettingsPage() {
-    const [settings, setSettings] = useState<Settings>(defaultSettings);
+    const { settings, updateSettings, isLoading } = useSettings();
     const [saved, setSaved] = useState(false);
-    const [activeTab, setActiveTab] = useState<'general' | 'ai' | 'privacy' | 'bridge' | 'google' | 'notifications'>('general');
+    const [activeTab, setActiveTab] = useState<'general' | 'ai' | 'privacy' | 'bridge' | 'google' | 'notifications' | 'remote'>('general');
 
     // Theme from global context
-    const { themeId, setTheme, availableThemes, theme } = useVibe();
+    const { themeId, setTheme, availableThemes } = useVibe();
 
-    function updateSetting<K extends keyof Settings>(key: K, value: Settings[K]) {
-        setSettings(prev => ({ ...prev, [key]: value }));
+    // Local form state
+    const [localSettings, setLocalSettings] = useState<AppSettings>(settings);
+    const [startOnBoot, setStartOnBoot] = useState(false);
+
+    // Sync local state when settings load
+    useEffect(() => {
+        setLocalSettings(settings);
+    }, [settings]);
+
+    // Check autostart status
+    useEffect(() => {
+        const checkAutostart = async () => {
+            try {
+                const active = await isEnabled();
+                setStartOnBoot(active);
+            } catch (e) {
+                // Plugin likely not available (web mode)
+            }
+        };
+        checkAutostart();
+    }, []);
+
+    const toggleAutostart = async (checked: boolean) => {
+        try {
+            if (checked) {
+                await enable();
+            } else {
+                await disable();
+            }
+            setStartOnBoot(checked);
+        } catch (e) {
+            console.error('Failed to toggle autostart', e);
+        }
     }
 
-    function saveSettings() {
-        // In production, save to localStorage or API
-        localStorage.setItem('DLX-settings', JSON.stringify(settings));
+    // Sync theme from settings to Vibe if changed externally
+    useEffect(() => {
+        if (settings.theme && settings.theme !== themeId) {
+            setTheme(settings.theme as ThemeId);
+        }
+    }, [settings.theme, themeId, setTheme]);
+
+    // Helper to update a single setting via context
+    function updateLocalSetting<K extends keyof AppSettings>(key: K, value: AppSettings[K]) {
+        setLocalSettings(prev => ({ ...prev, [key]: value }));
+
+        // Live preview for theme
+        if (key === 'theme') {
+            setTheme(value as ThemeId);
+        }
+    }
+
+    async function handleSave() {
+        await updateSettings(localSettings);
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
     }
 
-    function resetSettings() {
-        setSettings(defaultSettings);
+    function handleReset() {
+        setLocalSettings(settings);
+        setTheme(settings.theme as ThemeId);
     }
 
     const tabs = [
@@ -84,9 +85,14 @@ export default function SettingsPage() {
         { id: 'ai', label: 'AI', icon: '🤖' },
         { id: 'privacy', label: 'Privacy', icon: '🔒' },
         { id: 'bridge', label: 'Bridge', icon: '🌉' },
+        { id: 'remote', label: 'Remote', icon: '📡' },
         { id: 'google', label: 'Google', icon: '🔐' },
         { id: 'notifications', label: 'Notifications', icon: '🔔' },
     ];
+
+    if (isLoading && !localSettings.theme) {
+        return <div className="min-h-screen flex items-center justify-center text-cyan-400">Loading settings...</div>;
+    }
 
     return (
         <div className="min-h-screen relative">
@@ -147,16 +153,31 @@ export default function SettingsPage() {
                                 <div className="space-y-6">
                                     <h2 className="text-xl font-bold">⚙️ General Settings</h2>
 
+                                    <div className="p-4 bg-white/5 border border-white/10 rounded-xl mb-6">
+                                        <label className="flex items-center justify-between cursor-pointer">
+                                            <div>
+                                                <span className="font-semibold text-white block">Start Nexus on Boot</span>
+                                                <span className="text-xs text-gray-500">Automatically launch system tray icon on login</span>
+                                            </div>
+                                            <input
+                                                type="checkbox"
+                                                checked={startOnBoot}
+                                                onChange={(e) => toggleAutostart(e.target.checked)}
+                                                className="w-5 h-5 accent-cyan-500"
+                                            />
+                                        </label>
+                                    </div>
+
                                     <div>
                                         <label className="block text-sm text-gray-400 mb-3">Theme</label>
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                             {availableThemes.map((t) => (
                                                 <button
                                                     key={t.id}
-                                                    onClick={() => setTheme(t.id)}
-                                                    className={`p-4 rounded-xl border-2 transition-all text-left ${themeId === t.id
-                                                            ? 'border-cyan-400 bg-cyan-500/10 scale-105'
-                                                            : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'
+                                                    onClick={() => updateLocalSetting('theme', t.id)}
+                                                    className={`p-4 rounded-xl border-2 transition-all text-left ${localSettings.theme === t.id
+                                                        ? 'border-cyan-400 bg-cyan-500/10 scale-105'
+                                                        : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'
                                                         }`}
                                                 >
                                                     {/* Color Preview */}
@@ -184,8 +205,8 @@ export default function SettingsPage() {
                                     <div>
                                         <label className="block text-sm text-gray-400 mb-2">Language</label>
                                         <select
-                                            value={settings.language}
-                                            onChange={(e) => updateSetting('language', e.target.value)}
+                                            value={localSettings.language}
+                                            onChange={(e) => updateLocalSetting('language', e.target.value)}
                                             className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2"
                                         >
                                             <option value="en">English</option>
@@ -199,8 +220,8 @@ export default function SettingsPage() {
                                     <div>
                                         <label className="block text-sm text-gray-400 mb-2">Timezone</label>
                                         <select
-                                            value={settings.timezone}
-                                            onChange={(e) => updateSetting('timezone', e.target.value)}
+                                            value={localSettings.timezone}
+                                            onChange={(e) => updateLocalSetting('timezone', e.target.value)}
                                             className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2"
                                         >
                                             <option value="America/Chicago">Central Time (CT)</option>
@@ -221,8 +242,8 @@ export default function SettingsPage() {
                                     <div>
                                         <label className="block text-sm text-gray-400 mb-2">Default Provider</label>
                                         <select
-                                            value={settings.defaultProvider}
-                                            onChange={(e) => updateSetting('defaultProvider', e.target.value)}
+                                            value={localSettings.defaultProvider}
+                                            onChange={(e) => updateLocalSetting('defaultProvider', e.target.value)}
                                             className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2"
                                         >
                                             <option value="lmstudio">LM Studio</option>
@@ -234,15 +255,15 @@ export default function SettingsPage() {
 
                                     <div>
                                         <label className="block text-sm text-gray-400 mb-2">
-                                            Temperature: {settings.temperature}
+                                            Temperature: {localSettings.temperature}
                                         </label>
                                         <input
                                             type="range"
                                             min="0"
                                             max="2"
                                             step="0.1"
-                                            value={settings.temperature}
-                                            onChange={(e) => updateSetting('temperature', parseFloat(e.target.value))}
+                                            value={localSettings.temperature}
+                                            onChange={(e) => updateLocalSetting('temperature', parseFloat(e.target.value))}
                                             className="w-full"
                                         />
                                         <p className="text-xs text-gray-500 mt-1">
@@ -252,15 +273,15 @@ export default function SettingsPage() {
 
                                     <div>
                                         <label className="block text-sm text-gray-400 mb-2">
-                                            Max Tokens: {settings.maxTokens}
+                                            Max Tokens: {localSettings.maxTokens}
                                         </label>
                                         <input
                                             type="range"
                                             min="100"
                                             max="4000"
                                             step="100"
-                                            value={settings.maxTokens}
-                                            onChange={(e) => updateSetting('maxTokens', parseInt(e.target.value))}
+                                            value={localSettings.maxTokens}
+                                            onChange={(e) => updateLocalSetting('maxTokens', parseInt(e.target.value))}
                                             className="w-full"
                                         />
                                     </div>
@@ -272,11 +293,35 @@ export default function SettingsPage() {
                                         </div>
                                         <input
                                             type="checkbox"
-                                            checked={settings.streamResponses}
-                                            onChange={(e) => updateSetting('streamResponses', e.target.checked)}
+                                            checked={localSettings.streamResponses}
+                                            onChange={(e) => updateLocalSetting('streamResponses', e.target.checked)}
                                             className="w-5 h-5"
                                         />
                                     </label>
+
+                                    <div className="pt-4 border-t border-gray-700 mt-4">
+                                        <h3 className="text-lg font-bold mb-4">Service URLs</h3>
+
+                                        <div className="mb-4">
+                                            <label className="block text-sm text-gray-400 mb-2">LM Studio URL</label>
+                                            <input
+                                                type="text"
+                                                value={localSettings.lmstudioUrl}
+                                                onChange={(e) => updateLocalSetting('lmstudioUrl', e.target.value)}
+                                                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 font-mono"
+                                            />
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <label className="block text-sm text-gray-400 mb-2">Ollama URL</label>
+                                            <input
+                                                type="text"
+                                                value={localSettings.ollamaUrl}
+                                                onChange={(e) => updateLocalSetting('ollamaUrl', e.target.value)}
+                                                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 font-mono"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             )}
 
@@ -292,8 +337,8 @@ export default function SettingsPage() {
                                         </div>
                                         <input
                                             type="checkbox"
-                                            checked={settings.saveHistory}
-                                            onChange={(e) => updateSetting('saveHistory', e.target.checked)}
+                                            checked={localSettings.saveHistory}
+                                            onChange={(e) => updateLocalSetting('saveHistory', e.target.checked)}
                                             className="w-5 h-5"
                                         />
                                     </label>
@@ -305,8 +350,8 @@ export default function SettingsPage() {
                                         </div>
                                         <input
                                             type="checkbox"
-                                            checked={settings.analytics}
-                                            onChange={(e) => updateSetting('analytics', e.target.checked)}
+                                            checked={localSettings.analytics}
+                                            onChange={(e) => updateLocalSetting('analytics', e.target.checked)}
                                             className="w-5 h-5"
                                         />
                                     </label>
@@ -318,8 +363,8 @@ export default function SettingsPage() {
                                         </div>
                                         <input
                                             type="checkbox"
-                                            checked={settings.sendCrashReports}
-                                            onChange={(e) => updateSetting('sendCrashReports', e.target.checked)}
+                                            checked={localSettings.sendCrashReports}
+                                            onChange={(e) => updateLocalSetting('sendCrashReports', e.target.checked)}
                                             className="w-5 h-5"
                                         />
                                     </label>
@@ -332,19 +377,57 @@ export default function SettingsPage() {
                                 </div>
                             )}
 
+                            {/* Remote Access */}
+                            {activeTab === 'remote' && (
+                                <div className="space-y-6">
+                                    <h2 className="text-xl font-bold">📡 Remote Access</h2>
+
+                                    <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                                        <p className="text-sm text-blue-300">
+                                            To access Nexus remotely (e.g. from your phone), install <strong>Tailscale</strong> on both devices.
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <h3 className="font-semibold mb-2">Access URLs</h3>
+                                        <div className="space-y-2">
+                                            <div className="p-3 bg-black/30 rounded-lg flex justify-between items-center">
+                                                <span className="text-gray-400">Local Network</span>
+                                                <code className="text-cyan-400">http://YOUR-PC-IP:3000</code>
+                                            </div>
+                                            <div className="p-3 bg-black/30 rounded-lg flex justify-between items-center">
+                                                <span className="text-gray-400">Tailscale</span>
+                                                <code className="text-cyan-400">http://TAILSCALE-IP:3000</code>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm text-gray-400 mb-2">Security Access Token (Optional)</label>
+                                        <input
+                                            type="password"
+                                            placeholder="Enter a secret token..."
+                                            className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 font-mono"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">Require this token for remote connections (Coming Soon)</p>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Bridge */}
                             {activeTab === 'bridge' && (
                                 <div className="space-y-6">
                                     <h2 className="text-xl font-bold">🌉 Bridge Settings</h2>
 
                                     <div>
-                                        <label className="block text-sm text-gray-400 mb-2">Bridge URL</label>
+                                        <label className="block text-sm text-gray-400 mb-2">Bridge URL (Frontend Config)</label>
                                         <input
                                             type="text"
-                                            value={settings.bridgeUrl}
-                                            onChange={(e) => updateSetting('bridgeUrl', e.target.value)}
+                                            value={localSettings.bridgeUrl}
+                                            onChange={(e) => updateLocalSetting('bridgeUrl', e.target.value)}
                                             className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 font-mono"
                                         />
+                                        <p className="text-xs text-gray-500 mt-1">URL where this app connects to the bridge.</p>
                                     </div>
 
                                     <label className="flex items-center justify-between">
@@ -354,23 +437,23 @@ export default function SettingsPage() {
                                         </div>
                                         <input
                                             type="checkbox"
-                                            checked={settings.autoConnect}
-                                            onChange={(e) => updateSetting('autoConnect', e.target.checked)}
+                                            checked={localSettings.autoConnect}
+                                            onChange={(e) => updateLocalSetting('autoConnect', e.target.checked)}
                                             className="w-5 h-5"
                                         />
                                     </label>
 
                                     <div>
                                         <label className="block text-sm text-gray-400 mb-2">
-                                            Reconnect Interval: {settings.reconnectInterval / 1000}s
+                                            Reconnect Interval: {localSettings.reconnectInterval / 1000}s
                                         </label>
                                         <input
                                             type="range"
                                             min="1000"
                                             max="30000"
                                             step="1000"
-                                            value={settings.reconnectInterval}
-                                            onChange={(e) => updateSetting('reconnectInterval', parseInt(e.target.value))}
+                                            value={localSettings.reconnectInterval}
+                                            onChange={(e) => updateLocalSetting('reconnectInterval', parseInt(e.target.value))}
                                             className="w-full"
                                         />
                                     </div>
@@ -418,8 +501,8 @@ export default function SettingsPage() {
                                         </div>
                                         <input
                                             type="checkbox"
-                                            checked={settings.notifyOnComplete}
-                                            onChange={(e) => updateSetting('notifyOnComplete', e.target.checked)}
+                                            checked={localSettings.notifyOnComplete}
+                                            onChange={(e) => updateLocalSetting('notifyOnComplete', e.target.checked)}
                                             className="w-5 h-5"
                                         />
                                     </label>
@@ -431,8 +514,8 @@ export default function SettingsPage() {
                                         </div>
                                         <input
                                             type="checkbox"
-                                            checked={settings.notifyOnError}
-                                            onChange={(e) => updateSetting('notifyOnError', e.target.checked)}
+                                            checked={localSettings.notifyOnError}
+                                            onChange={(e) => updateLocalSetting('notifyOnError', e.target.checked)}
                                             className="w-5 h-5"
                                         />
                                     </label>
@@ -444,8 +527,8 @@ export default function SettingsPage() {
                                         </div>
                                         <input
                                             type="checkbox"
-                                            checked={settings.soundEffects}
-                                            onChange={(e) => updateSetting('soundEffects', e.target.checked)}
+                                            checked={localSettings.soundEffects}
+                                            onChange={(e) => updateLocalSetting('soundEffects', e.target.checked)}
                                             className="w-5 h-5"
                                         />
                                     </label>
@@ -455,7 +538,7 @@ export default function SettingsPage() {
                             {/* Actions */}
                             <div className="mt-8 pt-6 border-t border-gray-700 flex items-center justify-between">
                                 <button
-                                    onClick={resetSettings}
+                                    onClick={handleReset}
                                     className="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20"
                                 >
                                     Reset to Defaults
@@ -465,7 +548,7 @@ export default function SettingsPage() {
                                         <span className="text-green-400 text-sm">✓ Saved!</span>
                                     )}
                                     <button
-                                        onClick={saveSettings}
+                                        onClick={handleSave}
                                         className="btn-primary"
                                     >
                                         Save Settings

@@ -95,6 +95,11 @@ fn start_bridge(app_handle: &tauri::AppHandle) -> Option<Child> {
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            Some(vec![]),
+        ))
+
         .manage(BridgeProcess(Mutex::new(None)))
         .setup(|app| {
             // Start the Bridge process
@@ -112,7 +117,7 @@ fn main() {
             let _tray = TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
                 .menu(&tray_menu)
-                .menu_on_left_click(false)
+
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show" => {
                         if let Some(window) = app.get_webview_window("main") {

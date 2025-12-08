@@ -4,21 +4,26 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Command, Palette } from 'lucide-react';
+import { Command } from 'lucide-react';
 import { useVibe } from './VibeContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NavItem } from '@/components/NavItem';
 
+import {
+    LayoutDashboard, Palette, MessageSquare, Bot, Radio, Users,
+    FlaskConical, DollarSign, Settings
+} from 'lucide-react';
+
 const navItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: '📊', shortcut: 'G D' },
-    { href: '/studios', label: 'Studios', icon: '🎨' },
-    { href: '/chat', label: 'Chat', icon: '💬', shortcut: 'G C' },
-    { href: '/agents', label: 'Agents', icon: '🤖' },
-    { href: '/news', label: 'News', icon: '📡' },
-    { href: '/meeting', label: 'Meeting', icon: '👥' },
-    { href: '/labs', label: 'Labs', icon: '🔬', shortcut: 'G L' },
-    { href: '/income', label: 'Revenue', icon: '💸', shortcut: 'G I' },
-    { href: '/settings', label: 'Settings', icon: '⚙️', shortcut: 'G S' },
+    { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, shortcut: 'G D' },
+    { href: '/studios', label: 'Studios', icon: <Palette size={20} /> },
+    { href: '/chat', label: 'Chat', icon: <MessageSquare size={20} />, shortcut: 'G C' },
+    { href: '/agents', label: 'Agents', icon: <Bot size={20} /> },
+    { href: '/news', label: 'News', icon: <Radio size={20} /> },
+    { href: '/meeting', label: 'Meeting', icon: <Users size={20} /> },
+    { href: '/labs', label: 'Labs', icon: <FlaskConical size={20} />, shortcut: 'G L' },
+    { href: '/income', label: 'Revenue', icon: <DollarSign size={20} />, shortcut: 'G I' },
+    { href: '/settings', label: 'Settings', icon: <Settings size={20} />, shortcut: 'G S' },
 ];
 
 export default function Navigation() {

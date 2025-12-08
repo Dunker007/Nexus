@@ -19,7 +19,7 @@ import { ollamaService } from './services/ollama.js';
 import { systemService } from './services/system.js';
 import { googleService } from './services/google.js';
 import { githubService } from './services/github.js';
-import { createAgent, SongwriterRoom } from './services/agents.js';
+import { createAgent, SongwriterRoom, agentRegistry } from './services/agents.js';
 import { errorHandler, errorLogger, rateLimiter, asyncHandler, validate } from './services/errors.js';
 import { performanceMonitor, cache } from './services/performance.js';
 import { prisma } from './services/database.js';
@@ -27,7 +27,9 @@ import { prisma } from './services/database.js';
 // import { security, securityHeaders, sessionMiddleware } from './services/security.js';
 // import { swaggerSpec } from './config/swagger.js';
 import { StaffMeetingAgent } from './services/agents-staff-meeting.js';
-
+import { newsService } from './services/news.js';
+import { contentService } from './services/content.js';
+import { settingsService } from './services/settings.js';
 const app = express();
 const PORT = process.env.PORT || 3456;
 
@@ -478,10 +480,10 @@ app.get('/agents/:type/memory', async (req, res) => {
     }
 });
 
-// List all active agents
+// List all active and available agents
 app.get('/agents', (req, res) => {
     try {
-        const agents = Array.from(activeAgents.values()).map(agent => ({
+        const active = Array.from(activeAgents.values()).map(agent => ({
             id: agent.id,
             name: agent.name,
             description: agent.description,
@@ -490,7 +492,18 @@ app.get('/agents', (req, res) => {
             memorySize: agent.memory.length
         }));
 
-        res.json({ agents, total: agents.length });
+        const available = Object.entries(agentRegistry).map(([key, AgentClass]) => {
+            // Instantiate a temporary agent to get metadata if static properties aren't available
+            // Optimized: Create a lightweight object if description/name were static, but they are instance props.
+            // For now, let's just map the keys. Ideally Agent classes would have static capability lists.
+            // We'll trust the keys map to the types.
+            return {
+                type: key,
+                name: key.charAt(0).toUpperCase() + key.slice(1) + ' Agent'
+            };
+        });
+
+        res.json({ active, available, total: active.length });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -802,6 +815,82 @@ app.post('/music/sentinel', async (req, res) => {
     }
 });
 
+// ============ News Aggregation Routes ============
+
+// Get news items
+app.get('/news', async (req, res) => {
+    try {
+        const { category, region, limit } = req.query;
+        const news = await newsService.getNews({
+            category,
+            region,
+            limit: parseInt(limit) || 100
+        });
+        res.json(news);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Refresh news items
+app.post('/news/refresh', async (req, res) => {
+    try {
+        const result = await newsService.refreshNews();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============ Content Queue Routes ============
+
+// Get content queue
+app.get('/content/queue', async (req, res) => {
+    try {
+        const { status, type } = req.query;
+        const queue = await contentService.getQueue(status, type);
+        res.json(queue);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Add to queue
+app.post('/content/queue', async (req, res) => {
+    try {
+        const { type, data } = req.body;
+        if (!type || !data) {
+            return res.status(400).json({ error: 'Type and data are required' });
+        }
+
+        const item = await contentService.addToQueue(type, data);
+        res.json(item);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update queue item
+app.patch('/content/queue/:id', async (req, res) => {
+    try {
+        const { status, result } = req.body;
+        const item = await contentService.updateStatus(req.params.id, status, result);
+        res.json(item);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete queue item
+app.delete('/content/queue/:id', async (req, res) => {
+    try {
+        await contentService.deleteItem(req.params.id);
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // ============ Projects Routes (Labs Hub) ============
 
 // In-memory projects store as fallback
@@ -1028,6 +1117,22 @@ app.post('/projects/seed', async (req, res) => {
     }
 });
 
+// ============ Settings Routes ============
+
+app.get('/settings', (req, res) => {
+    res.json(settingsService.getAll());
+});
+
+app.post('/settings', async (req, res) => {
+    try {
+        const updates = req.body;
+        await settingsService.updateMany(updates);
+        res.json({ success: true, settings: settingsService.getAll() });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // ============ Error Handler (Must be last) ============
 app.use(errorHandler);
 
@@ -1047,8 +1152,11 @@ setInterval(async () => {
 }, 5000);
 */
 
+// Initialize Settings
+settingsService.init().catch(console.error);
+
 // Start server
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════════╗
 ║                   LUXRIG BRIDGE v1.0.0                    ║

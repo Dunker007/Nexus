@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { LUXRIG_BRIDGE_URL, storage } from '@/lib/utils';
+import { useSettings } from '@/components/SettingsContext';
 import PageBackground from '@/components/PageBackground';
 import {
     Cpu, Shield, Terminal, Search, Layout,
@@ -99,6 +100,9 @@ const AGENTS: AgentProfile[] = [
 ];
 
 export default function ChatPage() {
+    const { settings } = useSettings();
+    const BRIDGE_URL = settings.bridgeUrl;
+
     // --- State ---
     const [viewMode, setViewMode] = useState<'agents' | 'models'>('agents');
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -116,10 +120,6 @@ export default function ChatPage() {
     const [selectedModel, setSelectedModel] = useState<{ provider: 'lmstudio' | 'ollama', id: string } | null>(null);
     const [customSystemPrompt, setCustomSystemPrompt] = useState('You are a helpful AI assistant connected to the DLX Studio Neural Hub.');
     const [showPromptEditor, setShowPromptEditor] = useState(false);
-
-    // Settings (for Agent Mode fallback)
-    const [defaultProvider, setDefaultProvider] = useState('lmstudio');
-    const [defaultModelName, setDefaultModelName] = useState('');
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const activeAgent = AGENTS.find(a => a.id === activeAgentId) || AGENTS[0];
@@ -144,11 +144,6 @@ export default function ChatPage() {
                 lmstudio,
                 ollama
             });
-
-            // If no model selected yet, maybe select first available?
-            if (!selectedModel && data.lmstudio?.length > 0) {
-                // Don't auto-select to force user choice in UI
-            }
         } catch (e) {
             console.error('Failed to fetch models', e);
         }
@@ -156,13 +151,27 @@ export default function ChatPage() {
 
     // --- Effects ---
     useEffect(() => {
-        // Load settings
-        const settings = storage.get('DLX-settings', { defaultProvider: 'lmstudio', defaultModel: '' });
-        setDefaultProvider(settings.defaultProvider || 'lmstudio');
-        setDefaultModelName(settings.defaultModel || '');
-
-        fetchAllModels();
+        // Load history
+        const savedMessages = storage.get<Message[]>('DLX-chat-messages', []);
+        if (savedMessages.length > 0) {
+            // Restore Date objects from JSON strings
+            setMessages(savedMessages.map(m => ({ ...m, timestamp: new Date(m.timestamp) })));
+        }
     }, []);
+
+    // Refetch models when bridge URL changes
+    useEffect(() => {
+        if (BRIDGE_URL) {
+            fetchAllModels();
+        }
+    }, [BRIDGE_URL]);
+
+    // Persist messages
+    useEffect(() => {
+        if (messages.length > 0) {
+            storage.set('DLX-chat-messages', messages);
+        }
+    }, [messages]);
 
     useEffect(() => {
         if (messages.length === 0 && viewMode === 'agents') {
@@ -212,9 +221,11 @@ export default function ChatPage() {
             }));
 
             // Determine Request Params
-            let reqProvider = defaultProvider;
-            let reqModel = defaultModelName;
+            let reqProvider = settings.defaultProvider;
+            let reqModel = settings.defaultModel;
             let reqSystem = activeAgent.systemPrompt;
+            let reqTemp = settings.temperature;
+            let reqMaxTokens = settings.maxTokens;
 
             if (viewMode === 'models' && selectedModel) {
                 reqProvider = selectedModel.provider;
@@ -228,6 +239,8 @@ export default function ChatPage() {
                 body: JSON.stringify({
                     provider: reqProvider,
                     model: reqModel,
+                    temperature: reqTemp,
+                    max_tokens: reqMaxTokens,
                     messages: [
                         { role: 'system', content: reqSystem },
                         ...history,
@@ -246,6 +259,10 @@ export default function ChatPage() {
                 timestamp: new Date(),
                 agentId: viewMode === 'agents' ? activeAgentId : selectedModel?.id
             }]);
+
+            if (settings.notifyOnComplete) {
+                // Play sound or notification (not implemented yet, but hook is there)
+            }
 
         } catch (e) {
             setMessages(prev => [...prev, {

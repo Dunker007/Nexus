@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import { LUXRIG_BRIDGE_URL, storage } from '@/lib/utils';
+import { useSettings } from '@/components/SettingsContext';
 
 // Lux personality and tips per page context
 const LUX_TIPS: Record<string, string[]> = {
@@ -71,6 +71,8 @@ interface LuxHelperProps {
 
 export default function LuxHelper({ initialOpen = false }: LuxHelperProps) {
     const pathname = usePathname();
+    const { settings } = useSettings(); // Use context
+
     const [showChat, setShowChat] = useState(initialOpen);
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState<{ role: string, content: string }[]>([]);
@@ -113,14 +115,13 @@ export default function LuxHelper({ initialOpen = false }: LuxHelperProps) {
 
         // 2. Fallback to LuxRig LLM
         try {
-            const settings = storage.get('DLX-settings', { defaultProvider: 'lmstudio', defaultModel: '' });
-
-            const res = await fetch(`${LUXRIG_BRIDGE_URL}/llm/chat`, {
+            // Using settings from context
+            const res = await fetch(`${settings.bridgeUrl}/llm/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    provider: settings.defaultProvider || 'lmstudio',
-                    model: settings.defaultModel || '',
+                    provider: settings.defaultProvider,
+                    model: settings.defaultModel,
                     messages: [
                         { role: 'system', content: 'You are Lux, a specific AI assistant for this DLX Studio app. Be concise (max 2 sentences), helpful, and slightly witty. You are helping the user navigate their app.' },
                         { role: 'user', content: input }

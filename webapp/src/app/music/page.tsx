@@ -10,7 +10,7 @@ import {
   FileVideo, Clapperboard, Upload, Youtube, Newspaper, RefreshCw, Smartphone,
   Wifi, WifiOff, AlertCircle
 } from 'lucide-react';
-import { fetchAllNews, type NewsArticle } from '@/lib/news-service';
+import { fetchAllNews, refreshNewsSources, type NewsArticle } from '@/lib/news-service';
 import { MUSIC_AGENTS } from '@/lib/music-agents';
 import PageLayout, { PageHeader, StatPill } from '@/components/PageLayout';
 
@@ -131,7 +131,6 @@ export default function MusicStudioPage() {
   }, []);
 
   const handleGenerate = async () => {
-    // For standard mode, require a theme or headline. For agent modes, use the selected topic or a default.
     if (mode === 'standard' && !theme && !selectedHeadline) return;
     setIsGenerating(true);
     setResult(null);
@@ -139,40 +138,97 @@ export default function MusicStudioPage() {
     // Context
     let topic = selectedHeadline ? selectedHeadline.title : theme;
     let context = selectedHeadline ? selectedHeadline.description : '';
-    let style = `${mood} ${genre}`;
-    let lyrics = '';
 
-    // Agent Selection
-    const agent = MUSIC_AGENTS[mode];
+    try {
+      let agentType = 'lyricist'; // Default
+      let task: any = { action: 'write-lyrics', theme: topic, mood, genre };
 
-    if (agent) {
-      style = agent.style; // Use Agent's preferred style
-      lyrics = agent.generateLyrics(topic, context); // Generate lyrics using Agent's brain
-    } else {
-      // Standard Mode Fallback
-      lyrics = `[Instrumental Intro]\n\n[Verse 1]\n(Write lyrics about ${topic})\n\n[Chorus]\n(Theme: ${mood} ${genre})`;
+      if (mode === 'political') {
+        agentType = 'newsician';
+        task = {
+          action: 'create-political-rap',
+          headlines: selectedHeadline ? [selectedHeadline] : [],
+          focusArea: 'minnesota'
+        };
+      } else if (mode === 'sentinel') {
+        agentType = 'midwest-sentinel';
+        task = {
+          action: 'create-sentinel-track',
+          headlines: selectedHeadline ? [selectedHeadline] : [],
+          focusArea: 'midwest'
+        };
+      } else if (mode === 'pop') {
+        agentType = 'lyricist'; // Use lyricist for Pop for now
+        task = { action: 'write-lyrics', theme: topic, mood: 'energetic', genre: 'pop' };
+      }
+
+      // Execute Agent
+      const response = await fetch(`${LUXRIG_BRIDGE_URL}/agents/execute`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agentType, task })
+      });
+
+      if (!response.ok) throw new Error('Agent execution failed');
+      const data = await response.json();
+      const agentResult = data.result;
+
+      // Map Agent result to UI format
+      let sunoPromptText = '';
+      let copyContent = '';
+
+      if (agentResult.sunoPrompt) {
+        // Unify format
+        const sp = agentResult.sunoPrompt;
+        sunoPromptText = sp.fullPrompt || sp; // Handle string or obj
+        copyContent = sp.copyToSuno || sp;
+      } else {
+        // Fallback if no explicit suno prompt
+        copyContent = JSON.stringify(agentResult, null, 2);
+      }
+
+      const finalResult = {
+        theme: topic,
+        genre: agentResult.genre || genre,
+        mood: agentResult.mood || mood,
+        sunoPrompt: {
+          fullPrompt: sunoPromptText || "See copy text",
+          copyToSuno: copyContent
+        },
+        ready: true
+      };
+
+      setResult(finalResult);
+
+      // Save to Content Queue
+      try {
+        await fetch(`${LUXRIG_BRIDGE_URL}/content/queue`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'song',
+            data: {
+              ...finalResult,
+              agentType,
+              mode,
+              source: selectedHeadline ? 'news' : 'manual'
+            }
+          })
+        });
+        console.log("Saved to content queue");
+      } catch (qErr) {
+        console.error("Failed to save to queue:", qErr);
+      }
+
+      // Activate pipeline
+      setPipelineSteps(steps => steps.map((s, i) => i === 0 ? { ...s, status: 'active' } : s));
+
+    } catch (error) {
+      console.error("Generation failed:", error);
+      alert("Failed to generate track. Bridge may be offline or agent not found.");
+    } finally {
+      setIsGenerating(false);
     }
-
-    // Construct final content for Suno (Lyrics Mode)
-    const copyContent = `[Style]\n${style}\n\n[Lyrics]\n${lyrics}`;
-
-    // Simulate generation delay
-    await new Promise(r => setTimeout(r, 1500));
-
-    setResult({
-      theme: topic,
-      genre: agent ? 'Agent-Defined' : genre,
-      mood: agent ? 'Agent-Defined' : mood,
-      sunoPrompt: {
-        fullPrompt: "Use Custom Mode in Suno and paste the text below.",
-        copyToSuno: copyContent
-      },
-      ready: true
-    });
-
-    // Activate pipeline
-    setPipelineSteps(steps => steps.map((s, i) => i === 0 ? { ...s, status: 'active' } : s));
-    setIsGenerating(false);
   };
 
   const copyToClipboard = () => {
@@ -320,7 +376,10 @@ export default function MusicStudioPage() {
                   <button
                     onClick={() => {
                       setIsLoadingNews(true);
-                      fetchAllNews().then(n => { setHeadlines(n); setIsLoadingNews(false); });
+                      refreshNewsSources()
+                        .then(() => fetchAllNews())
+                        .then(n => { setHeadlines(n); setIsLoadingNews(false); })
+                        .catch(() => setIsLoadingNews(false));
                     }}
                     className="p-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
                   >
@@ -648,16 +707,15 @@ export default function MusicStudioPage() {
                 <ExternalLink size={14} className="ml-auto text-gray-600" />
               </a>
               <a
-                href="https://www.blackmagicdesign.com/products/davinciresolve"
-                target="_blank"
-                className="glass-card p-4 flex items-center gap-3 hover:border-orange-500/30 transition-colors group"
+                href="#"
+                className="glass-card p-4 flex items-center gap-3 hover:border-blue-500/30 transition-colors group"
               >
-                <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
-                  <Clapperboard className="text-orange-400" size={20} />
+                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                  <Share2 className="text-blue-400" size={20} />
                 </div>
                 <div>
-                  <div className="font-medium group-hover:text-orange-400 transition-colors">DaVinci</div>
-                  <div className="text-xs text-gray-500">Pro editing</div>
+                  <div className="font-medium group-hover:text-blue-400 transition-colors">DistroKid</div>
+                  <div className="text-xs text-gray-500">Distribution</div>
                 </div>
                 <ExternalLink size={14} className="ml-auto text-gray-600" />
               </a>
@@ -666,77 +724,22 @@ export default function MusicStudioPage() {
         </div>
       )}
 
-      {/* Pipeline Tab */}
+      {/* Pipeline Tab Placeholder */}
       {activeTab === 'pipeline' && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="space-y-6"
-        >
-          <div className="glass-card p-8">
-            <h2 className="text-2xl font-bold mb-6 text-center">Music Production Pipeline</h2>
-            <div className="max-w-4xl mx-auto">
-              <div className="grid gap-6">
-                {[
-                  { step: 1, name: 'AI Composition', tool: 'Suno AI', icon: Music, color: 'purple', desc: 'Generate AI music from text prompts. Export as MP3/WAV.', tips: ['Use specific genre tags', 'Include mood descriptors', 'Mention instruments'] },
-                  { step: 2, name: 'Visual Creation', tool: 'Neural Frames', icon: Film, color: 'cyan', desc: 'Create stunning AI music videos with beat-synced visuals.', tips: ['Upload your Suno track', 'Choose visual style', 'Sync to audio'] },
-                  { step: 3, name: 'Professional Polish', tool: 'DaVinci Resolve', icon: Clapperboard, color: 'orange', desc: 'Add intros, outros, titles, and final touches.', tips: ['Add channel branding', 'Color grade', 'Export 4K + vertical 9:16'] },
-                  { step: 4, name: 'Distribution', tool: 'YouTube + TikTok', icon: Youtube, color: 'red', desc: 'Upload to YouTube and create TikTok music shorts.', tips: ['SEO-rich title', 'Vertical cuts for TikTok', 'Cross-promote'] }
-                ].map(item => (
-                  <div key={item.step} className={`glass-card p-6 border-l-4 border-${item.color}-500`}>
-                    <div className="flex items-start gap-4">
-                      <div className={`w-12 h-12 rounded-xl bg-${item.color}-500/20 flex items-center justify-center shrink-0`}>
-                        <item.icon className={`text-${item.color}-400`} size={24} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs px-2 py-0.5 bg-white/10 rounded">Step {item.step}</span>
-                          <h3 className="font-bold">{item.name}</h3>
-                        </div>
-                        <p className="text-gray-400 text-sm mb-3">{item.desc}</p>
-                        <div className="flex flex-wrap gap-2">
-                          {item.tips.map(tip => (
-                            <span key={tip} className="text-xs px-2 py-1 bg-white/5 rounded text-gray-500">
-                              💡 {tip}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <a
-                        href={item.tool === 'Suno AI' ? 'https://suno.com' :
-                          item.tool === 'Neural Frames' ? 'https://neuralframes.com' :
-                            item.tool === 'YouTube' ? 'https://youtube.com' : '#'}
-                        target="_blank"
-                        className={`px-4 py-2 rounded-lg bg-${item.color}-500/20 text-${item.color}-400 text-sm hover:bg-${item.color}-500/30 transition-colors flex items-center gap-1`}
-                      >
-                        {item.tool}
-                        <ExternalLink size={12} />
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        <div className="flex flex-col items-center justify-center h-[400px] text-gray-500">
+          <Film size={48} className="mb-4 opacity-50" />
+          <h3 className="text-lg font-medium">Production Pipeline</h3>
+          <p>Task kanban and status tracking coming soon.</p>
+        </div>
       )}
 
-      {/* Library Tab */}
+      {/* Library Tab Placeholder */}
       {activeTab === 'library' && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="glass-card p-8 text-center"
-        >
-          <div className="w-20 h-20 rounded-full bg-purple-500/20 flex items-center justify-center mx-auto mb-6">
-            <Music size={40} className="text-purple-400" />
-          </div>
-          <h2 className="text-2xl font-bold mb-2">Song Library</h2>
-          <p className="text-gray-400 mb-6">Your generated tracks and production history will appear here.</p>
-          <div className="text-sm text-gray-600">
-            Coming soon: Track history, favorites, and quick re-generate
-          </div>
-        </motion.div>
+        <div className="flex flex-col items-center justify-center h-[400px] text-gray-500">
+          <Music size={48} className="mb-4 opacity-50" />
+          <h3 className="text-lg font-medium">Concept Library</h3>
+          <p>History of generated concepts coming soon.</p>
+        </div>
       )}
 
     </PageLayout>

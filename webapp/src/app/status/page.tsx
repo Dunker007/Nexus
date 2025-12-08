@@ -3,9 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
-
-const BRIDGE_URL = LUXRIG_BRIDGE_URL;
+import { useSettings } from '@/components/SettingsContext';
 
 interface ServiceStatus {
     name: string;
@@ -15,6 +13,9 @@ interface ServiceStatus {
 }
 
 export default function StatusPage() {
+    const { settings } = useSettings();
+    const BRIDGE_URL = settings.bridgeUrl;
+
     const [services, setServices] = useState<ServiceStatus[]>([
         { name: 'LuxRig Bridge', status: 'checking', icon: '🌉' },
         { name: 'LM Studio API', status: 'checking', icon: '🖥️' },
@@ -28,6 +29,7 @@ export default function StatusPage() {
     const [overallStatus, setOverallStatus] = useState<'operational' | 'degraded' | 'down'>('operational');
 
     async function checkAllServices() {
+        if (!BRIDGE_URL) return;
         const startTime = Date.now();
 
         try {
@@ -94,10 +96,12 @@ export default function StatusPage() {
     }
 
     useEffect(() => {
-        checkAllServices();
-        const interval = setInterval(checkAllServices, 30000); // Check every 30s
-        return () => clearInterval(interval);
-    }, []);
+        if (settings.bridgeUrl) {
+            checkAllServices();
+            const interval = setInterval(checkAllServices, 30000); // Check every 30s
+            return () => clearInterval(interval);
+        }
+    }, [settings.bridgeUrl]);
 
     function updateService(name: string, status: ServiceStatus['status'], latency?: number) {
         setServices(prev => prev.map(s =>

@@ -272,48 +272,39 @@ export async function parseRSSFeed(url: string): Promise<any[]> {
 /**
  * Fetch all news from configured sources
  */
-export async function fetchAllNews(): Promise<NewsArticle[]> {
-    const allSources = [
-        ...NEWS_SOURCES.national,
-        ...NEWS_SOURCES.local,
-        ...NEWS_SOURCES.alternative
-    ];
+/**
+ * Fetch all news from Bridge
+ */
+export async function fetchAllNews(filters: { category?: string; region?: string; limit?: number } = {}): Promise<NewsArticle[]> {
+    try {
+        const query = new URLSearchParams();
+        if (filters.category) query.append('category', filters.category);
+        if (filters.region) query.append('region', filters.region);
+        if (filters.limit) query.append('limit', filters.limit.toString());
 
-    const allArticles: NewsArticle[] = [];
+        const response = await fetch(`${LUXRIG_BRIDGE_URL}/news?${query.toString()}`);
+        if (!response.ok) throw new Error('Failed to fetch news from Bridge');
 
-    for (const source of allSources) {
-        try {
-            const items = await parseRSSFeed(source.rss);
-
-            items.forEach((item: any, index: number) => {
-                allArticles.push({
-                    id: `${source.id}-${index}-${Date.now()}`,
-                    title: item.title || 'Untitled',
-                    description: item.description?.replace(/<[^>]*>/g, '').slice(0, 200) || '',
-                    link: item.link || '',
-                    pubDate: item.pubDate || new Date().toISOString(),
-                    source: {
-                        id: source.id,
-                        name: source.name,
-                        logo: source.logo,
-                        bias: source.bias
-                    },
-                    category: source.category as any,
-                    region: (source as any).region,
-                    factCheck: {
-                        status: 'unverified'
-                    }
-                });
-            });
-        } catch (error) {
-            console.error(`Error fetching from ${source.name}:`, error);
-        }
+        const articles = await response.json();
+        return articles;
+    } catch (error) {
+        console.error("News fetch error:", error);
+        return [];
     }
+}
 
-    // Sort by date (newest first)
-    return allArticles.sort((a, b) =>
-        new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
-    );
+/**
+ * Trigger backend news refresh
+ */
+export async function refreshNewsSources(): Promise<{ count: number }> {
+    try {
+        const response = await fetch(`${LUXRIG_BRIDGE_URL}/news/refresh`, { method: 'POST' });
+        if (!response.ok) throw new Error('Refresh failed');
+        return await response.json();
+    } catch (error) {
+        console.error("News refresh error:", error);
+        return { count: 0 };
+    }
 }
 
 /**

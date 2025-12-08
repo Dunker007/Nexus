@@ -4,84 +4,59 @@
 
 A unified command center for AI orchestration, creative studios, and autonomous revenue generation.
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Desktop App)
 
-### Prerequisites
-- Node.js 20+
-- npm or pnpm
+Nexus is now a standalone desktop application.
 
-### Start the Web App
+1.  **Download & Install**: Run the latest installer (e.g., `Nexus_1.0.0_x64-setup.exe`).
+2.  **Launch**: Open **Nexus** from your Start Menu or Desktop.
+    *   The app will automatically start the backend Bridge (server.js) in the background.
+    *   The app runs systematically in the System Tray.
+
+### Development Mode
+If you want to contribute or modify the source:
 ```bash
 cd webapp
 npm install
-npm run dev
+npm run tauri dev
 ```
-Open http://localhost:3000
-
-### Start the Bridge API (optional)
-```bash
-cd bridge
-npm install
-npm start
-```
-API runs on http://localhost:3456
 
 ## 📁 Structure
 
 ```
 Nexus/
-├── webapp/           # Next.js 16 web application
+├── webapp/           # Next.js 16 + Tauri 2.0 application
+│   ├── src-tauri/    # Rust backend for Desktop App
 │   ├── src/app/      # App routes and pages
-│   ├── src/components/ # Reusable components
-│   └── src/lib/      # Utilities and services
-├── bridge/           # Express.js API backend
+│   └── src/components/ # Reusable components
+├── bridge/           # Express.js API backend (bundled with app)
 │   ├── routes/       # API endpoints
 │   └── services/     # Business logic
-├── docs/             # Documentation
-└── .agent/           # Workflow configs
+└── docs/             # Documentation
 ```
 
 ## ✨ Features
 
 - **AI Chat** - Multi-provider AI conversations (LM Studio, Ollama, Google AI)
 - **AI Agents** - Specialized AI assistants for tasks
-- **AI Meeting** - Multi-agent debate and brainstorming
 - **Studios** - Creative workspaces (Music, Art, Dev, Video)
 - **Revenue Lab** - Passive income tracking and automation
-- **Voice Control** - God Mode voice commands
-- **Labs** - R&D project pipeline
+- **System Tray** - Runs in background, minimize to tray
+- **Remote Access** - Access via Tailscale on mobile devices
 
 ## 🛠️ Tech Stack
 
+- **Desktop**: Tauri 2.0 (Rust)
 - **Frontend**: Next.js 16, React 19, Tailwind CSS 4, Framer Motion
-- **Backend**: Express.js, Prisma, SQLite
+- **Backend**: Express.js, Prisma, SQLite (Bridge)
 - **AI**: LM Studio, Ollama, Google AI Studio
 
-## ⚡ Daily Startup Guide
+## 📱 Remote Access
 
-The best way to use Nexus is as a standalone App.
-
-1.  **Launch Server**: Double-click `launch_nexus.bat` in the root folder.
-2.  **Open App**: 
-    - Open Chrome/Edge to `http://localhost:3002`
-    - Click **Settings (⋮) > Save and Share > Install Nexus**
-    - Pin the installed app to your specific taskbar location.
-
-**Pro-Tip**: Create a shortcut to `launch_nexus.bat`, name it "Nexus Server", and give it a cool icon. Place it in your `shell:startup` folder to have the server ready automatically when you log in.
-
-## 🖥️ LuxRig Production Deployment
-
-To deploy Nexus on the LuxRig node for autonomous operation:
-
-1.  **Dependencies**: Ensure `Node.js` is installed.
-2.  **Install & Build**:
-    - Run `setup_luxrig.bat`
-    - This installs dependencies, deploys the database schema, and builds the production application.
-3.  **Launch**:
-    - Run `launch_nexus_prod.bat`
-    - Starts the production server on port **3002**.
-
-**Note**: The installer automatically configures `webapp/.env` using `luxrig_params.env`.
+Nexus v0.4.1+ supports remote access via Tailscale.
+1.  Go to **Settings > Remote Access** in the app.
+2.  Install Tailscale on your host PC and mobile device.
+3.  Use the provided IP to access Nexus from your phone.
 
 ## 📝 License
 

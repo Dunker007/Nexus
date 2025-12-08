@@ -4,6 +4,11 @@
  */
 
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
+import { settingsService } from './settings.js';
+
+function getUrl() {
+    return settingsService.get('ollama_url') || OLLAMA_URL;
+}
 
 export const ollamaService = {
 
@@ -12,7 +17,7 @@ export const ollamaService = {
      */
     async getStatus() {
         try {
-            const response = await fetch(`${OLLAMA_URL}/api/tags`, {
+            const response = await fetch(`${getUrl()}/api/tags`, {
                 signal: AbortSignal.timeout(3000)
             });
 
@@ -24,7 +29,7 @@ export const ollamaService = {
             // Check what's currently running
             let running = [];
             try {
-                const psResponse = await fetch(`${OLLAMA_URL}/api/ps`);
+                const psResponse = await fetch(`${getUrl()}/api/ps`);
                 const psData = await psResponse.json();
                 running = psData.models || [];
             } catch (e) {
@@ -33,7 +38,7 @@ export const ollamaService = {
 
             return {
                 online: true,
-                url: OLLAMA_URL,
+                url: getUrl(),
                 modelCount: models.length,
                 runningModels: running.map(m => m.name),
                 version: data.version
@@ -41,7 +46,7 @@ export const ollamaService = {
         } catch (error) {
             return {
                 online: false,
-                url: OLLAMA_URL,
+                url: getUrl(),
                 error: error.message
             };
         }
@@ -52,8 +57,8 @@ export const ollamaService = {
      */
     async listModels() {
         try {
-            console.log(`[Ollama] Fetching models from ${OLLAMA_URL}/api/tags...`);
-            const response = await fetch(`${OLLAMA_URL}/api/tags`);
+            console.log(`[Ollama] Fetching models from ${getUrl()}/api/tags...`);
+            const response = await fetch(`${getUrl()}/api/tags`);
             if (!response.ok) {
                 console.error(`[Ollama] Response not OK: ${response.status} ${response.statusText}`);
                 throw new Error(`HTTP ${response.status}`);
@@ -79,7 +84,7 @@ export const ollamaService = {
      * Chat completion
      */
     async chat(messages, model = 'llama3.2') {
-        const response = await fetch(`${OLLAMA_URL}/api/chat`, {
+        const response = await fetch(`${getUrl()}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -108,7 +113,7 @@ export const ollamaService = {
      * Generate (non-chat) completion
      */
     async generate(prompt, model = 'llama3.2') {
-        const response = await fetch(`${OLLAMA_URL}/api/generate`, {
+        const response = await fetch(`${getUrl()}/api/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
