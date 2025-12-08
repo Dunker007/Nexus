@@ -2,15 +2,16 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
-import CommandPalette from "@/components/CommandPalette";
-import LuxHelper from "@/components/LuxHelper";
-import KeyboardShortcuts from "@/components/KeyboardShortcuts";
-import CollaborationToolbar from "@/components/CollaborationToolbar";
-import ConsentBanner from "@/components/ConsentBanner";
-import VibeController from "@/components/VibeController";
-import VoiceControl from "@/components/VoiceControl";
+import dynamic from 'next/dynamic';
 
+const Navigation = dynamic(() => import("@/components/Navigation"), { ssr: true });
+const CommandPalette = dynamic(() => import("@/components/CommandPalette"), { ssr: false });
+const LuxHelper = dynamic(() => import("@/components/LuxHelper"), { ssr: false });
+const KeyboardShortcuts = dynamic(() => import("@/components/KeyboardShortcuts"), { ssr: false });
+const CollaborationToolbar = dynamic(() => import("@/components/CollaborationToolbar"), { ssr: false });
+const ConsentBanner = dynamic(() => import("@/components/ConsentBanner"), { ssr: false });
+const VibeController = dynamic(() => import("@/components/VibeController"), { ssr: false });
+const VoiceControl = dynamic(() => import("@/components/VoiceControl"), { ssr: false });
 
 const inter = Inter({ subsets: ["latin"] });
 

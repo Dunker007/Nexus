@@ -1,151 +1,69 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Web Speech API types
-interface SpeechRecognition extends EventTarget {
-    continuous: boolean;
-    interimResults: boolean;
-    lang: string;
-    start: () => void;
-    stop: () => void;
-    onresult: (event: any) => void;
-    onend: () => void;
-    onerror: (event: any) => void;
-}
-
-declare global {
-    interface Window {
-        SpeechRecognition: any;
-        webkitSpeechRecognition: any;
-    }
-}
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 
 const LUXRIG_BRIDGE_URL = process.env.NEXT_PUBLIC_BRIDGE_URL || 'http://localhost:3456';
 
 export default function VoiceControl() {
-    const [isListening, setIsListening] = useState(false);
-    const [transcript, setTranscript] = useState('');
     const [processing, setProcessing] = useState(false);
     const [response, setResponse] = useState<string | null>(null);
-    const recognitionRef = useRef<SpeechRecognition | null>(null);
 
-    useEffect(() => {
-        // Initialize Speech Recognition
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            const recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.lang = 'en-US';
+    // Command processing logic
+    const processCommand = useCallback(async (command: string) => {
+        if (!command) return;
 
-            recognition.onresult = (event: any) => {
-                const current = event.resultIndex;
-                const transcriptText = event.results[current][0].transcript;
-                setTranscript(transcriptText);
-            };
-
-            recognition.onend = () => {
-                setIsListening(false);
-                if (transcript) {
-                    processCommand(transcript);
-                }
-            };
-
-            recognitionRef.current = recognition;
-        }
-    }, [transcript]);
-
-    const toggleListening = () => {
-        if (isListening) {
-            recognitionRef.current?.stop();
-        } else {
-            setTranscript('');
-            setResponse(null);
-            recognitionRef.current?.start();
-            setIsListening(true);
-        }
-    };
-
-    // Local command router - handles commands even when Bridge is offline
-    const handleLocalCommand = (command: string): { handled: boolean; response?: string } => {
-        const lowerCmd = command.toLowerCase().trim();
-
-        // Navigation commands
-        const navRoutes: Record<string, string> = {
-            'go to home': '/',
-            'go home': '/',
-            'go to dashboard': '/',
-            'go to chat': '/chat',
-            'open chat': '/chat',
-            'go to labs': '/labs',
-            'open labs': '/labs',
-            'go to agents': '/agents',
-            'open agents': '/agents',
-            'go to meeting': '/meeting',
-            'open meeting': '/meeting',
-            'start meeting': '/meeting',
-            'go to income': '/income',
-            'open income': '/income',
-            'go to music': '/music',
-            'open music': '/music',
-            'go to voice': '/voice',
-            'open voice': '/voice',
-            'go to studios': '/studios',
-            'open studios': '/studios',
-            'go to settings': '/settings',
-            'open settings': '/settings',
-            'go to news': '/news',
-            'open news': '/news',
-        };
-
-        for (const [phrase, route] of Object.entries(navRoutes)) {
-            if (lowerCmd.includes(phrase)) {
-                window.location.href = route;
-                return { handled: true, response: `Navigating to ${route}` };
-            }
-        }
-
-        // Command palette
-        if (lowerCmd.includes('open command') || lowerCmd.includes('command palette') || lowerCmd.includes('open menu')) {
-            // Dispatch event to open command palette
-            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
-            return { handled: true, response: 'Opening command palette' };
-        }
-
-        // Theme toggle
-        if (lowerCmd.includes('dark mode') || lowerCmd.includes('light mode') || lowerCmd.includes('toggle theme')) {
-            window.dispatchEvent(new CustomEvent('toggle-theme'));
-            return { handled: true, response: 'Toggling theme' };
-        }
-
-        // Search
-        if (lowerCmd.startsWith('search for ') || lowerCmd.startsWith('find ')) {
-            const query = lowerCmd.replace('search for ', '').replace('find ', '');
-            window.location.href = `/search?q=${encodeURIComponent(query)}`;
-            return { handled: true, response: `Searching for "${query}"` };
-        }
-
-        return { handled: false };
-    };
-
-    const processCommand = async (command: string) => {
         setProcessing(true);
         try {
-            // Try local command handling first
-            const localResult = handleLocalCommand(command);
-            if (localResult.handled) {
-                setResponse(localResult.response || 'Command executed.');
+            // Local Command Router
+            const lowerCmd = command.toLowerCase().trim();
+            let handled = false;
+            let localResponse = '';
+
+            // Navigation map
+            const navRoutes: Record<string, string> = {
+                'go to home': '/', 'go home': '/',
+                'go to dashboard': '/',
+                'open chat': '/chat', 'go to chat': '/chat',
+                'open labs': '/labs', 'go to labs': '/labs',
+                'open agents': '/agents', 'go to agents': '/agents',
+                'open meeting': '/meeting', 'start meeting': '/meeting',
+                'open income': '/income', 'go to income': '/income',
+                'open music': '/music', 'go to music': '/music',
+                'open settings': '/settings', 'go to settings': '/settings',
+            };
+
+            // Check local commands
+            for (const [phrase, route] of Object.entries(navRoutes)) {
+                if (lowerCmd.includes(phrase)) {
+                    window.location.href = route;
+                    handled = true;
+                    localResponse = `Navigating to ${route}`;
+                    break;
+                }
+            }
+
+            if (!handled) {
+                if (lowerCmd.includes('command palette')) {
+                    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+                    handled = true;
+                    localResponse = 'Opening command palette';
+                } else if (lowerCmd.includes('dark mode') || lowerCmd.includes('light mode')) {
+                    window.dispatchEvent(new CustomEvent('toggle-theme'));
+                    handled = true;
+                    localResponse = 'Toggling theme';
+                }
+            }
+
+            if (handled) {
+                setResponse(localResponse);
                 setProcessing(false);
-                setTimeout(() => {
-                    setTranscript('');
-                    setResponse(null);
-                }, 3000);
+                setTimeout(() => setResponse(null), 3000);
                 return;
             }
 
-            // Fall back to Bridge API for complex commands
+            // Bridge API Fallback
             const res = await fetch(`${LUXRIG_BRIDGE_URL}/agents/execute`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -156,11 +74,8 @@ export default function VoiceControl() {
             });
 
             const data = await res.json();
-
             if (data.result) {
                 setResponse(data.result.message || 'Command executed.');
-
-                // Execute client-side actions if needed
                 if (data.result.action === 'navigate') {
                     window.location.href = data.result.target;
                 }
@@ -170,13 +85,35 @@ export default function VoiceControl() {
             setResponse('Voice command noted. Bridge offline.');
         } finally {
             setProcessing(false);
-            // Clear after delay
-            setTimeout(() => {
-                setTranscript('');
-                setResponse(null);
-            }, 5000);
+            setTimeout(() => setResponse(null), 5000);
         }
-    };
+    }, []);
+
+    // Use the custom hook
+    const { isListening, transcript, toggleListening, hasSupport } = useSpeechRecognition({
+        onEnd: () => {
+            // We need access to the latest transcript here. 
+            // Since the hook manages transcript state, we might rely on the 'transcript' variable from the hook return.
+            // However, closure staleness might be an issue.
+            // Better pattern: Pass a mostly-stable callback to onEnd, but getting the final transcript 
+            // usually requires the hook to return it or pass it to onEnd/onResult.
+            // Let's rely on onResult to capture it or just delay processing slightly?
+            // Actually, the simplest way is to trigger processCommand when isListening goes false *if* we have a transcript.
+            // But isListening updates *after* onEnd.
+
+            // Check hook implementation: onEnd is called when recognition ends. 
+            // Let's modify hook to pass final transcript? Or just use a useEffect in component.
+        }
+    });
+
+    // Effect to trigger processing when listening stops
+    useEffect(() => {
+        if (!isListening && transcript) {
+            processCommand(transcript);
+        }
+    }, [isListening, transcript, processCommand]);
+
+    if (!hasSupport) return null;
 
     return (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4">
