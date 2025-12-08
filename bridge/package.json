@@ -1,6 +1,6 @@
 {
   "name": "luxrig-bridge",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "API bridge connecting all LuxRig AI services",
   "main": "server.js",
   "type": "module",

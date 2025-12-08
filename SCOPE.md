@@ -1,8 +1,8 @@
 # PROJECT SCOPE
 
-**Version:** 1.0.0  
-**Last Updated:** December 7, 2025  
-**Status:** Foundation Phase (~88 days remaining)
+**Version:** 1.1.0  
+**Last Updated:** December 8, 2025  
+**Status:** Growth Phase (Active)
 
 ---
 
@@ -18,9 +18,19 @@ This file is the quick reference. The Master Plan has full context.
 
 | Module | Location | Status |
 |--------|----------|--------|
-| **Music Studio** | webapp/src/app/music | 🟡 Primary focus |
+| **Music Studio** | webapp/src/app/music | 🟢 Operational |
+| **Content Pipeline** | pipeline/ | 🟢 UNFROZEN - Active |
+| **Income Dashboard** | webapp/src/app/income | 🟡 Building |
 | **Dev Studio** | webapp/src/app/studios/dev | 🟡 Rises with tide |
-| **Agents Hub** | webapp/src/app/agents | 🟡 Core infrastructure |
+| **Agents Hub** | webapp/src/app/agents | 🟢 Core infrastructure |
+
+### Revenue Streams (Growth Phase)
+
+| Stream | Location | Status |
+|--------|----------|--------|
+| Blog/AdSense | pipeline/ + WordPress | 🟢 Ready to activate |
+| Music/Streaming | webapp/src/app/music | 🟡 Distribution tracking |
+| Art/Etsy | webapp/src/app/studios/art | 🔘 Planned |
 
 ### Supporting Cast (Maintain)
 
@@ -28,9 +38,9 @@ This file is the quick reference. The Master Plan has full context.
 |--------|----------|--------|
 | News Hub | webapp/src/app/news | 🟢 Working |
 | Chat | webapp/src/app/chat | 🟢 Working |
-| Dashboard | webapp/src/app/dashboard | 🟡 Needs cleanup |
+| Dashboard | webapp/src/app/dashboard | 🟢 Working |
 | Terminal | webapp/src/app/terminal | 🟢 Working |
-| Settings | webapp/src/app/settings | 🟡 Needs work |
+| Settings | webapp/src/app/settings | 🟢 Working |
 
 ### Backend
 
@@ -42,40 +52,40 @@ This file is the quick reference. The Master Plan has full context.
 
 ---
 
-## 🚫 FROZEN
+## 🟢 CONTENT PIPELINE (UNFROZEN)
 
-**Location:** `pipeline/` (to be migrated)
+**Location:** `pipeline/`
 
-The PowerShell content pipeline is **frozen** until Foundation Phase completes.
+The PowerShell content pipeline is now **ACTIVE** for Growth Phase.
 
-### What It Is
+### What It Does
 - LM Studio → content generation
 - WordPress/HTML publishing
-- Automated blog posts
+- Automated blog posts with AdSense
+- Affiliate link injection
 
-### Why Frozen
-Foundation Before Revenue. We build the platform first.
+### Activation Checklist
+Before running in production:
+- [ ] Verify `pipeline/core/Config.json` has correct WordPress credentials
+- [ ] Test with `WordPress.Enabled: false` first
+- [ ] Confirm AdSense account is approved
+- [ ] Run `.\tests\verify_phases_1_2_3.ps1` to validate
 
-### DO NOT
-- Modify pipeline code
-- Activate scheduled tasks
-- Start revenue experiments
+### Running the Pipeline
+```powershell
+cd pipeline/core
+.\Orchestrator.ps1
+```
 
 ---
 
-## 💡 Ideas Only (No Code Yet)
+## 🟡 In Progress (Growth Phase)
 
-These exist in the Master Plan backlog only:
-
-- Etsy/Print-on-Demand
-- CafePress
-- Blog/AdSense (pipeline ready, just frozen)
-
-**No code until:**
-1. Income Seeker researches
-2. Legal Advisor reviews
-3. Planning Meeting approves
-4. Human gives GO
+| Stream | Status | Next Step |
+|--------|--------|-----------|
+| Blog/AdSense | Ready | Configure WordPress, run pipeline |
+| Music/Streaming | Tracking | Build distribution dashboard |
+| Art/Etsy | Planned | Create Art Studio UI |
 
 ---
 
@@ -86,6 +96,7 @@ These exist in the Master Plan backlog only:
 - Git operations
 - Documentation
 - Bug fixes in active modules
+- Revenue feature development
 
 ---
 
@@ -98,11 +109,11 @@ These exist in the Master Plan backlog only:
 3. ✅ Read AI_PROTOCOL.md for handoff rules
 4. ❓ If unclear, ask before building
 
-**If a task mentions:**
-- "content generation" / "blog posts" / "AdSense" → STOP, it's frozen
-- "new revenue stream" / "monetization" → Needs Planning Meeting
-- Active modules above → GO
+**Growth Phase Rules:**
+- Content generation → ✅ GO (pipeline is active)
+- Revenue features → ✅ GO (approved in Growth Phase)
+- New revenue streams → Check against plan first
 
 ---
 
-*Stay in bounds. Build what matters.*
+*Revenue engine activated. Build, ship, earn.*

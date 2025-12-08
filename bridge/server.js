@@ -30,6 +30,7 @@ import { StaffMeetingAgent } from './services/agents-staff-meeting.js';
 import { newsService } from './services/news.js';
 import { contentService } from './services/content.js';
 import { settingsService } from './services/settings.js';
+import pipelineRoutes from './routes/pipeline.js';
 const app = express();
 const PORT = process.env.PORT || 3456;
 
@@ -43,6 +44,9 @@ app.use(performanceMonitor.middleware()); // Track all request performance
 
 // Swagger UI - commented out temporarily
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Pipeline routes (Growth Phase)
+app.use('/pipeline', pipelineRoutes);
 
 // Create HTTP server for both Express and WebSocket
 const server = createServer(app);
@@ -1159,7 +1163,7 @@ settingsService.init().catch(console.error);
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════════╗
-║                   LUXRIG BRIDGE v1.0.0                    ║
+║                   LUXRIG BRIDGE v1.1.0                    ║
 ╠═══════════════════════════════════════════════════════════╣
 ║  REST API:    http://localhost:${PORT}                      ║
 ║  WebSocket:   DISABLED                                    ║
@@ -1168,6 +1172,7 @@ server.listen(PORT, '0.0.0.0', () => {
 ║    • LM Studio  → localhost:1234                          ║
 ║    • Ollama     → localhost:11434                         ║
 ║    • System     → nvidia-smi, WMI                         ║
+║    • Pipeline   → ACTIVE (Growth Phase)                   ║
 ╚═══════════════════════════════════════════════════════════╝
     `);
 });
