@@ -3,15 +3,9 @@ import { Suspense } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import dynamic from 'next/dynamic';
+import AppOverlays from "@/components/AppOverlays";
 
 const Navigation = dynamic(() => import("@/components/Navigation"), { ssr: true });
-const CommandPalette = dynamic(() => import("@/components/CommandPalette"), { ssr: false });
-const LuxHelper = dynamic(() => import("@/components/LuxHelper"), { ssr: false });
-const KeyboardShortcuts = dynamic(() => import("@/components/KeyboardShortcuts"), { ssr: false });
-const CollaborationToolbar = dynamic(() => import("@/components/CollaborationToolbar"), { ssr: false });
-const ConsentBanner = dynamic(() => import("@/components/ConsentBanner"), { ssr: false });
-const VibeController = dynamic(() => import("@/components/VibeController"), { ssr: false });
-const VoiceControl = dynamic(() => import("@/components/VoiceControl"), { ssr: false });
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,16 +33,10 @@ export default function RootLayout({
               <Suspense fallback={null}>
                 <Navigation />
               </Suspense>
-              <CommandPalette />
-              <KeyboardShortcuts />
               <main className="pt-16 min-h-screen">
                 {children}
               </main>
-              <VibeController />
-              <VoiceControl />
-              <LuxHelper />
-              <CollaborationToolbar />
-              <ConsentBanner />
+              <AppOverlays />
             </SafetyProvider>
           </VibeProvider>
         </ThemeProvider>
