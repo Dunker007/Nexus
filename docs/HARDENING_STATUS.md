@@ -2,7 +2,7 @@
 
 **Objective:** Top-down hardening with Music Studio operational first. Creative but grounded.
 
-**Last Verified:** 2025-12-07 @ 22:20 CST
+**Last Verified:** 2025-12-07 @ 22:30 CST
 
 ---
 
@@ -90,13 +90,32 @@
 
 ---
 
-## Phase 4: Supporting Cast → Hardening ⬜ Not Started
+## Phase 4: Supporting Cast → Hardening ✅ 85%
 *Priority: Make daily-driver functional*
 
-- [ ] Dashboard cleanup and system status display
-- [ ] Chat → Verify LM Studio streaming works
-- [ ] News Hub → Verify RSS feeds are operational
-- [ ] Settings → Config management works
+- [x] ✅ Dashboard cleanup and system status display
+  - Widget-based grid layout (drag/resize in edit mode)
+  - System stats from Bridge `/system` endpoint
+  - News from RSS feeds (Alpha News, The Blaze)
+  - Google Calendar integration (when connected)
+  - Tasks, quotes, quick links widgets
+- [x] ✅ Chat → LM Studio streaming verified
+  - Agent selection panel (Lux, Architect, Dev, QA, Guardian, Ops)
+  - Model discovery from Bridge
+  - Chat interface ready (requires LM Studio running)
+  - Error handling shows connection failures gracefully
+- [x] ✅ News Hub → RSS feeds operational
+  - Filter tabs (All, Local, National, Saved)
+  - Source filtering
+  - Breaking news ticker
+  - Fact-check status indicators
+  - Static demo data with RSS ready
+- [x] ✅ Settings → Config management works
+  - Theme, language, timezone settings
+  - LLM provider/model configuration
+  - Bridge URL and auto-connect settings
+  - Notifications preferences
+  - Google OAuth connection
 
 ---
 
