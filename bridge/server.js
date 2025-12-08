@@ -1169,16 +1169,17 @@ settingsService.init().catch(console.error);
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════════╗
-║                   LUXRIG BRIDGE v1.1.0                    ║
+║                   LUXRIG BRIDGE v2.0.0                    ║
+║              🎉 GROWTH PHASE COMPLETE 🎉                  ║
 ╠═══════════════════════════════════════════════════════════╣
 ║  REST API:    http://localhost:${PORT}                      ║
 ║  WebSocket:   DISABLED                                    ║
 ╠═══════════════════════════════════════════════════════════╣
-║  Services:                                                ║
-║    • LM Studio  → localhost:1234                          ║
-║    • Ollama     → localhost:11434                         ║
-║    • System     → nvidia-smi, WMI                         ║
-║    • Pipeline   → ACTIVE (Growth Phase)                   ║
+║  Revenue Streams:                                         ║
+║    • Pipeline   → /pipeline (Content Generation)          ║
+║    • Music      → /distribution (Streaming Revenue)       ║
+║    • Art        → /art (Etsy/POD Products)                ║
+║    • Income     → /income (Unified Dashboard)             ║
 ╚═══════════════════════════════════════════════════════════╝
     `);
 });

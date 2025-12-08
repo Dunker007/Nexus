@@ -256,11 +256,11 @@
 | 8 | Tailscale Remote | 0.4.1 | Remote access works |
 | 9 | Cleanup & Polish | 0.5.0 | No dead ends |
 | 10 | Foundation Complete | 1.0.0 | Ready for Growth Phase |
-| **11** | **Pipeline Unfreeze** | **1.1.0** | **Content pipeline active** |
-| 12 | Pipeline Integration | 1.2.0 | Control pipeline from webapp |
-| 13 | Music Revenue | 1.3.0 | Distribution tracking live |
-| 14 | Art Studio | 1.4.0 | Digital art products pipeline |
-| 15 | Income Dashboard | 1.5.0 → 2.0.0 | Unified revenue tracking |
+| **11** | **Pipeline Unfreeze** | **1.1.0** | **Content pipeline active** ✅ |
+| **12** | **Pipeline Integration** | **1.2.0** | **Control pipeline from webapp** ✅ |
+| **13** | **Music Revenue** | **1.3.0** | **Distribution tracking live** ✅ |
+| **14** | **Art Studio** | **1.4.0** | **Digital art products pipeline** ✅ |
+| **15** | **Income Dashboard** | **2.0.0** | **Unified revenue tracking** ✅ |
 
 ---
 
