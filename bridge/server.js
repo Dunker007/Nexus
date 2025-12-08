@@ -31,6 +31,7 @@ import { newsService } from './services/news.js';
 import { contentService } from './services/content.js';
 import { settingsService } from './services/settings.js';
 import pipelineRoutes from './routes/pipeline.js';
+import distributionRoutes from './routes/distribution.js';
 const app = express();
 const PORT = process.env.PORT || 3456;
 
@@ -45,8 +46,9 @@ app.use(performanceMonitor.middleware()); // Track all request performance
 // Swagger UI - commented out temporarily
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Pipeline routes (Growth Phase)
+// Growth Phase Routes
 app.use('/pipeline', pipelineRoutes);
+app.use('/distribution', distributionRoutes);
 
 // Create HTTP server for both Express and WebSocket
 const server = createServer(app);

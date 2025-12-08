@@ -11,7 +11,7 @@ import { NavItem } from '@/components/NavItem';
 
 import {
     LayoutDashboard, Palette, MessageSquare, Bot, Radio, Users,
-    FlaskConical, DollarSign, Settings
+    FlaskConical, DollarSign, Settings, Workflow
 } from 'lucide-react';
 
 const navItems = [
@@ -22,6 +22,7 @@ const navItems = [
     { href: '/news', label: 'News', icon: <Radio size={20} /> },
     { href: '/meeting', label: 'Meeting', icon: <Users size={20} /> },
     { href: '/labs', label: 'Labs', icon: <FlaskConical size={20} />, shortcut: 'G L' },
+    { href: '/pipeline', label: 'Pipeline', icon: <Workflow size={20} />, shortcut: 'G P' },
     { href: '/income', label: 'Revenue', icon: <DollarSign size={20} />, shortcut: 'G I' },
     { href: '/settings', label: 'Settings', icon: <Settings size={20} />, shortcut: 'G S' },
 ];
