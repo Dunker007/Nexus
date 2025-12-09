@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import PageBackground from '@/components/PageBackground';
-import ResearchPanel from '@/components/ResearchPanel';
+// Lazy load ResearchPanel (heavy component with Markdown/Animation)
+const ResearchPanel = dynamic(() => import('@/components/ResearchPanel'), { ssr: false });
 import {
     NEWS_SOURCES,
     BIAS_COLORS,

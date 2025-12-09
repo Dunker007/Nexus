@@ -127,14 +127,14 @@ export default function ChatPage() {
     // --- Actions ---
     async function fetchAllModels() {
         try {
-            console.log("Fetching models from:", `${BRIDGE_URL}/llm/models`);
+            // console.log("Fetching models from:", `${BRIDGE_URL}/llm/models`);
             const res = await fetch(`${BRIDGE_URL}/llm/models`, { cache: 'no-store' });
             if (!res.ok) {
                 console.error("Fetch failed:", res.status, res.statusText);
                 return;
             }
             const data = await res.json();
-            console.log("Models received:", data);
+            // console.log("Models received:", data);
 
             // Validate data structure before setting state
             const lmstudio = Array.isArray(data.lmstudio) ? data.lmstudio : [];
