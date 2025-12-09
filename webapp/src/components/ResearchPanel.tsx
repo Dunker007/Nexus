@@ -1,12 +1,16 @@
 'use client';
 
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 import {
     FolderPlus, Folder, FolderOpen, X, ExternalLink,
     BookOpen, Trash2, ChevronRight, Search, FileText,
-    Sparkles, Copy, Check, HardDrive
+    Sparkles, Copy, Check, HardDrive, BrainCircuit,
+    Cpu, Activity, Zap
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface ResearchFolder {
     id: string;
@@ -14,7 +18,13 @@ interface ResearchFolder {
     color: string;
     articles: SavedArticle[];
     createdAt: string;
+    analysis?: {
+        summary: string;
+        keyPoints: string[];
+        timestamp: string;
+    };
 }
+
 
 interface SavedArticle {
     id: string;
@@ -47,6 +57,8 @@ export default function ResearchPanel({ isOpen, onClose, articleToAdd, onArticle
     const [newFolderColor, setNewFolderColor] = useState('blue');
     const [searchQuery, setSearchQuery] = useState('');
     const [copied, setCopied] = useState<string | null>(null);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [showAnalysis, setShowAnalysis] = useState(false);
 
     // Load folders from localStorage
     useEffect(() => {
@@ -127,6 +139,62 @@ export default function ResearchPanel({ isOpen, onClose, articleToAdd, onArticle
         setTimeout(() => setCopied(null), 2000);
     };
 
+
+    const analyzeFolder = async (folder: ResearchFolder) => {
+        setIsAnalyzing(true);
+        setShowAnalysis(true);
+
+        try {
+            // Prepare context for the agent
+            const context = folder.articles.map(a => `Title: ${a.title}\nSource: ${a.source}\nURL: ${a.url}`).join('\n\n');
+            const prompt = `Analyze these articles and provide a research briefing.
+Folder: ${folder.name}
+
+Articles:
+${context}
+
+Format as Markdown with:
+- 🎯 Executive Summary
+- 🔑 Key Insights (bullet points)
+- ⚖️ Conflicting Viewpoints (if any)
+- 🔗 Connected Themes`;
+
+            const response = await fetch(`${LUXRIG_BRIDGE_URL}/agents/execute`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    agentType: 'mic', // Use Mic as the Studio Manager/Analyst
+                    task: {
+                        action: 'strategic-advice', // Reuse strategy capability
+                        input: prompt
+                    }
+                })
+            });
+
+            if (!response.ok) throw new Error('Analysis failed');
+
+            const data = await response.json();
+            const analysisText = data.result?.strategy || "Analysis failed to generate content.";
+
+            setFolders(folders.map(f => {
+                if (f.id !== folder.id) return f;
+                return {
+                    ...f,
+                    analysis: {
+                        summary: analysisText,
+                        keyPoints: [],
+                        timestamp: new Date().toISOString()
+                    }
+                };
+            }));
+
+        } catch (error) {
+            console.error("Analysis error:", error);
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
     const copyArticleUrls = (folder: ResearchFolder) => {
         const urls = folder.articles.map(a => a.url).join('\n');
         navigator.clipboard.writeText(urls);
@@ -150,21 +218,24 @@ export default function ResearchPanel({ isOpen, onClose, articleToAdd, onArticle
                     />
 
                     <motion.div
-                        className="fixed right-0 top-0 h-full w-full max-w-md z-50 bg-[#0a0a0f] border-l border-white/10 shadow-2xl overflow-hidden flex flex-col"
+                        className="fixed right-0 top-0 h-full w-full max-w-lg z-50 bg-[#0a0a0f] border-l border-white/10 shadow-2xl overflow-hidden flex flex-col"
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                     >
                         {/* Header */}
-                        <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-gradient-to-l from-amber-500/5 via-transparent to-transparent">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
-                                    <BookOpen size={20} />
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-900/20">
+                                    <BrainCircuit size={20} className="text-white" />
                                 </div>
                                 <div>
-                                    <h2 className="font-bold">Research Folders</h2>
-                                    <p className="text-xs text-gray-500">Save stories → NotebookLM</p>
+                                    <h2 className="font-bold flex items-center gap-2">
+                                        Nexus Intelligence
+                                        <span className="text-[10px] font-mono bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30">LAB</span>
+                                    </h2>
+                                    <p className="text-xs text-gray-500">AI-Powered Research Station</p>
                                 </div>
                             </div>
                             <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
@@ -291,75 +362,112 @@ export default function ResearchPanel({ isOpen, onClose, articleToAdd, onArticle
                                 /* Folder Detail View */
                                 <div className="h-full flex flex-col">
                                     <div className="p-4 border-b border-white/10">
-                                        <button onClick={() => setSelectedFolder(null)} className="text-xs text-gray-500 hover:text-white mb-2">← Back</button>
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-10 h-10 rounded-lg bg-${selectedFolderData?.color}-500/20 flex items-center justify-center`}>
-                                                <FolderOpen className={`text-${selectedFolderData?.color}-400`} size={20} />
+                                        <button onClick={() => { setSelectedFolder(null); setShowAnalysis(false); }} className="text-xs text-gray-500 hover:text-white mb-2 flex items-center gap-1">
+                                            <ChevronRight className="rotate-180" size={12} /> Back to Folders
+                                        </button>
+                                        <div className="flex items-center gap-3 mt-2">
+                                            <div className={`w-12 h-12 rounded-xl bg-${selectedFolderData?.color}-500/20 flex items-center justify-center border border-${selectedFolderData?.color}-500/30`}>
+                                                <FolderOpen className={`text-${selectedFolderData?.color}-400`} size={24} />
                                             </div>
                                             <div>
-                                                <div className="font-bold">{selectedFolderData?.name}</div>
-                                                <div className="text-xs text-gray-500">{selectedFolderData?.articles.length} articles</div>
+                                                <div className="font-bold text-lg">{selectedFolderData?.name}</div>
+                                                <div className="text-xs text-gray-500 flex items-center gap-2">
+                                                    <span className="bg-white/10 px-1.5 py-0.5 rounded">{selectedFolderData?.articles.length} sources</span>
+                                                    {selectedFolderData?.analysis && <span className="text-green-400 flex items-center gap-1"><Check size={10} /> Analyzed</span>}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Actions */}
-                                    <div className="p-4 border-b border-white/5 space-y-2">
+
+
+                                    {/* AI Actions */}
+                                    <div className="px-4 py-3 bg-gradient-to-r from-purple-900/20 to-indigo-900/20 border-b border-purple-500/20">
+                                        <button
+                                            onClick={() => selectedFolderData && analyzeFolder(selectedFolderData)}
+                                            disabled={isAnalyzing || !selectedFolderData?.articles.length}
+                                            className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-lg shadow-lg shadow-purple-900/40 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
+                                        >
+                                            {isAnalyzing ? (
+                                                <>
+                                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                    <span>Analyzing...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <BrainCircuit size={18} className="text-purple-200 group-hover:scale-110 transition-transform" />
+                                                    <span>{selectedFolderData?.analysis ? 'Update Analysis' : 'Synthesize Research'}</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+
+                                    {/* Analysis View */}
+                                    {selectedFolderData?.analysis && showAnalysis && (
+                                        <div className="p-4 bg-purple-500/5 border-b border-purple-500/20 max-h-[300px] overflow-y-auto custom-scrollbar">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <h4 className="text-xs font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                                                    <Activity size={12} />
+                                                    Intelligence Briefing
+                                                </h4>
+                                                <span className="text-[10px] text-gray-500">
+                                                    {new Date(selectedFolderData.analysis.timestamp).toLocaleTimeString()}
+                                                </span>
+                                            </div>
+                                            <div className="prose prose-invert prose-xs max-w-none">
+                                                <ReactMarkdown>{selectedFolderData.analysis.summary}</ReactMarkdown>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Sub Actions */}
+                                    <div className="p-4 border-b border-white/5 grid grid-cols-2 gap-2">
+                                        <button
+                                            onClick={() => selectedFolderData && openInNotebookLM(selectedFolderData)}
+                                            disabled={!selectedFolderData?.articles.length}
+                                            className="py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/30 rounded-lg text-xs font-medium flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                                        >
+                                            <Sparkles size={14} />
+                                            NotebookLM Export
+                                        </button>
                                         <button
                                             onClick={() => selectedFolderData && saveToGoogleDrive(selectedFolderData)}
                                             disabled={!selectedFolderData?.articles.length}
-                                            className="w-full py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium rounded-lg text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                                            className="py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg text-xs font-medium flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                                         >
-                                            <HardDrive size={16} />
-                                            {copied?.startsWith('drive-') ? 'Copied! Opening Drive...' : 'Save to Google Drive'}
+                                            <HardDrive size={14} />
+                                            Save to Drive
                                         </button>
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => selectedFolderData && openInNotebookLM(selectedFolderData)}
-                                                disabled={!selectedFolderData?.articles.length}
-                                                className="flex-1 py-2 bg-amber-500/20 text-amber-400 rounded-lg text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-                                            >
-                                                <Sparkles size={14} />
-                                                {copied === selectedFolder ? 'URLs Copied!' : 'NotebookLM'}
-                                            </button>
-                                            <button
-                                                onClick={() => selectedFolderData && copyArticleUrls(selectedFolderData)}
-                                                disabled={!selectedFolderData?.articles.length}
-                                                className="px-4 py-2 bg-white/10 rounded-lg text-sm disabled:opacity-50"
-                                            >
-                                                {copied === `urls-${selectedFolder}` ? <Check size={14} /> : <Copy size={14} />}
-                                            </button>
-                                        </div>
-                                    </div>
 
-                                    {/* Article List */}
-                                    <div className="flex-1 overflow-y-auto p-4">
-                                        {selectedFolderData?.articles.length === 0 ? (
-                                            <div className="text-center py-8 text-gray-500">
-                                                <FileText size={40} className="mx-auto mb-3 opacity-50" />
-                                                <p>No articles yet</p>
-                                                <p className="text-xs mt-1">Click "Add to Research" on any news article</p>
-                                            </div>
-                                        ) : (
-                                            <div className="space-y-2">
-                                                {selectedFolderData?.articles.map(article => (
-                                                    <div key={article.id} className="group p-3 bg-white/5 rounded-lg border border-white/10">
-                                                        <div className="flex items-start justify-between gap-2">
-                                                            <div className="flex-1 min-w-0">
-                                                                <a href={article.url} target="_blank" className="font-medium text-sm hover:text-amber-400 line-clamp-2">{article.title}</a>
-                                                                <div className="text-xs text-gray-500 mt-1">{article.source}</div>
+                                        {/* Article List */}
+                                        <div className="flex-1 overflow-y-auto p-4">
+                                            {selectedFolderData?.articles.length === 0 ? (
+                                                <div className="text-center py-8 text-gray-500">
+                                                    <FileText size={40} className="mx-auto mb-3 opacity-50" />
+                                                    <p>No articles yet</p>
+                                                    <p className="text-xs mt-1">Click "Add to Research" on any news article</p>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    {selectedFolderData?.articles.map(article => (
+                                                        <div key={article.id} className="group p-3 bg-white/5 rounded-lg border border-white/10">
+                                                            <div className="flex items-start justify-between gap-2">
+                                                                <div className="flex-1 min-w-0">
+                                                                    <a href={article.url} target="_blank" className="font-medium text-sm hover:text-amber-400 line-clamp-2">{article.title}</a>
+                                                                    <div className="text-xs text-gray-500 mt-1">{article.source}</div>
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => removeArticleFromFolder(selectedFolder!, article.id)}
+                                                                    className="p-1 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 rounded"
+                                                                >
+                                                                    <X size={14} className="text-red-400" />
+                                                                </button>
                                                             </div>
-                                                            <button
-                                                                onClick={() => removeArticleFromFolder(selectedFolder!, article.id)}
-                                                                className="p-1 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 rounded"
-                                                            >
-                                                                <X size={14} className="text-red-400" />
-                                                            </button>
                                                         </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -376,8 +484,8 @@ export default function ResearchPanel({ isOpen, onClose, articleToAdd, onArticle
                                             key={folder.id}
                                             onClick={() => addArticleToFolder(folder.id, articleToAdd)}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${folder.articles.some(a => a.id === articleToAdd.id)
-                                                    ? 'bg-green-500/20 text-green-400'
-                                                    : `bg-${folder.color}-500/20 text-${folder.color}-400`
+                                                ? 'bg-green-500/20 text-green-400'
+                                                : `bg-${folder.color}-500/20 text-${folder.color}-400`
                                                 }`}
                                         >
                                             {folder.articles.some(a => a.id === articleToAdd.id) ? '✓ ' : ''}{folder.name}

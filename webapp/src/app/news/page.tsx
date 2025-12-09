@@ -10,8 +10,11 @@ import {
     BIAS_COLORS,
     type NewsArticle,
     MN_KEYWORDS,
-    fetchAllNews
+    fetchAllNews,
+    type SubjectTracker,
+    countTrackerMatches
 } from '@/lib/news-service';
+import { Radar, Youtube, Radio, PlayCircle, Plus, Trash2, Target } from 'lucide-react';
 
 // Breaking news ticker headlines
 const BREAKING_NEWS = [
@@ -109,7 +112,7 @@ const DEMO_ARTICLES: NewsArticle[] = [
     }
 ];
 
-type FilterTab = 'all' | 'local' | 'national' | 'alternative' | 'saved';
+type FilterTab = 'all' | 'local' | 'national' | 'alternative' | 'saved' | 'watch';
 type FactCheckStatus = 'verified' | 'disputed' | 'unverified' | 'mixed';
 
 const FACT_CHECK_STYLES: Record<FactCheckStatus, { bg: string; text: string; icon: string; label: string }> = {
@@ -129,6 +132,48 @@ export default function NewsPage() {
     const [showFactChecker, setShowFactChecker] = useState(false);
     const [factCheckQuery, setFactCheckQuery] = useState('');
     const [factCheckResult, setFactCheckResult] = useState<any>(null);
+
+    // Subject Radar State
+    const [showRadar, setShowRadar] = useState(false);
+    const [trackers, setTrackers] = useState<SubjectTracker[]>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('nexus-trackers');
+            return saved ? JSON.parse(saved) : [];
+        }
+        return [];
+    });
+    const [newTrackerKeyword, setNewTrackerKeyword] = useState('');
+
+    // Persist trackers
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('nexus-trackers', JSON.stringify(trackers));
+        }
+    }, [trackers]);
+
+    const addTracker = () => {
+        if (!newTrackerKeyword.trim()) return;
+        const color = ['red', 'cyan', 'green', 'purple', 'amber'][trackers.length % 5];
+        const newTracker: SubjectTracker = {
+            id: `tracker-${Date.now()}`,
+            keyword: newTrackerKeyword.trim(),
+            color,
+            lastCount: 0
+        };
+        setTrackers([...trackers, newTracker]);
+        setNewTrackerKeyword('');
+    };
+
+    const removeTracker = (id: string) => {
+        setTrackers(trackers.filter(t => t.id !== id));
+    };
+
+    // Update matches on refresh
+    useEffect(() => {
+        if (articles.length > 0) {
+            setTrackers(prev => countTrackerMatches(articles, prev));
+        }
+    }, [articles]);
 
     const refreshNews = async () => {
         setIsLoading(true);
@@ -221,7 +266,14 @@ export default function NewsPage() {
         if (activeTab === 'local' && article.category !== 'local') return false;
         if (activeTab === 'national' && !['national', 'center', 'left'].includes(article.category)) return false;
         if (activeTab === 'alternative' && article.category !== 'alternative') return false;
+        if (activeTab === 'alternative' && article.category !== 'alternative') return false;
         if (activeTab === 'saved' && !savedArticles.has(article.id)) return false;
+        if (activeTab === 'watch') {
+            const isVideoSource = ['banned-video', 'infowars', 'fox-news', 'joe-rogan', 'charlie-kirk', 'ben-shapiro'].includes(article.source.id);
+            const hasVideoLink = article.link.includes('youtube') || article.link.includes('rumble') || article.link.includes('video');
+            const hasVideoTitle = article.title.toLowerCase().includes('watch:') || article.title.toLowerCase().includes('video:');
+            return isVideoSource || hasVideoLink || hasVideoTitle;
+        }
 
         // Bias filter
         if (selectedBias && article.source.bias !== selectedBias) return false;
@@ -295,12 +347,13 @@ export default function NewsPage() {
                             </div>
                             <div>
                                 <h1 className="text-xl font-bold flex items-center gap-2">
-                                    News <span className="text-red-400">Hub</span>
+                                    Nexus <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-amber-400">Intelligence</span>
                                 </h1>
                                 <div className="flex items-center gap-2 text-xs text-gray-500">
-                                    <span className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse" />
-                                    {articles.length} articles
-                                    <span className="text-green-400">• {articles.filter(a => a.factCheck?.status === 'verified').length} verified</span>
+                                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                                    System Online
+                                    <span className="text-gray-600">|</span>
+                                    {articles.length} sources active
                                 </div>
                             </div>
                         </div>
@@ -338,6 +391,12 @@ export default function NewsPage() {
                                 >
                                     ⭐ Saved
                                 </button>
+                                <button
+                                    onClick={() => setActiveTab('watch')}
+                                    className={`px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${activeTab === 'watch' ? 'bg-red-500/20 text-red-400' : 'text-gray-500 hover:text-white'}`}
+                                >
+                                    <PlayCircle size={12} /> Watch
+                                </button>
                             </div>
                         </div>
 
@@ -368,230 +427,302 @@ export default function NewsPage() {
                             >
                                 📚 Research
                             </button>
+                            <button
+                                onClick={() => setShowRadar(!showRadar)}
+                                className={`px-3 py-1.5 border rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors ${showRadar ? 'bg-green-500/20 border-green-500/30 text-green-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'}`}
+                            >
+                                <Radar size={14} /> Radar
+                            </button>
                         </div>
                     </motion.div>
                 </div>
             </section>
 
+            {/* Radar Panel */}
+            <AnimatePresence>
+                {
+                    showRadar && (
+                        <motion.section
+                            className="container-main pb-6"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                        >
+                            <div className="glass-card border-l-4 border-l-green-500/50">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-bold flex items-center gap-2 text-green-400">
+                                        <Target size={20} /> Subject Radar
+                                    </h3>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Add keyword..."
+                                            value={newTrackerKeyword}
+                                            onChange={(e) => setNewTrackerKeyword(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && addTracker()}
+                                            className="bg-black/30 border border-green-500/30 rounded px-2 py-1 text-sm text-green-100 focus:outline-none focus:border-green-500"
+                                        />
+                                        <button onClick={addTracker} className="p-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30">
+                                            <Plus size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {trackers.length === 0 ? (
+                                    <div className="text-center py-4 text-gray-600 text-sm">
+                                        No subjects tracked. Add keywords to monitor coverage.
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                                        {trackers.map(tracker => (
+                                            <div key={tracker.id} className="bg-black/40 border border-white/5 rounded-lg p-3 flex flex-col relative group">
+                                                <button
+                                                    onClick={() => removeTracker(tracker.id)}
+                                                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-red-400 hover:bg-white/10 p-0.5 rounded"
+                                                >
+                                                    <Trash2 size={12} />
+                                                </button>
+                                                <span className="text-xs text-gray-500 uppercase tracking-wider mb-1">Target</span>
+                                                <span className="font-bold text-white truncate" title={tracker.keyword}>{tracker.keyword}</span>
+                                                <div className="mt-2 flex items-center justify-between">
+                                                    <span className={`text-[10px] px-1.5 py-0.5 rounded bg-${tracker.color}-500/20 text-${tracker.color}-400`}>
+                                                        Active
+                                                    </span>
+                                                    <span className="text-lg font-mono font-bold text-white">{tracker.lastCount}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </motion.section>
+                    )
+                }
+            </AnimatePresence >
+
             {/* Source Manager Panel */}
             <AnimatePresence>
-                {showSourceManager && (
-                    <motion.section
-                        className="container-main pb-8"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                    >
-                        <div className="glass-card border-2 border-cyan-500/30">
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-xl font-bold flex items-center gap-2">
-                                    ⚙️ Source Manager
-                                </h3>
-                                <span className="text-sm text-gray-400">
-                                    {allSources.length - disabledSources.size} active / {allSources.length} total
-                                </span>
-                            </div>
-
-                            {/* Add Custom Source */}
-                            <div className="bg-black/20 rounded-lg p-4 mb-6">
-                                <h4 className="font-medium mb-3 text-cyan-400">➕ Add Custom Source</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                                    <input
-                                        type="text"
-                                        placeholder="Source name"
-                                        value={newSource.name}
-                                        onChange={(e) => setNewSource({ ...newSource, name: e.target.value })}
-                                        className="bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm"
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="RSS feed URL"
-                                        value={newSource.rss}
-                                        onChange={(e) => setNewSource({ ...newSource, rss: e.target.value })}
-                                        className="bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm"
-                                    />
-                                    <select
-                                        value={newSource.bias}
-                                        onChange={(e) => setNewSource({ ...newSource, bias: e.target.value })}
-                                        className="bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm"
-                                    >
-                                        <option value="right">Right</option>
-                                        <option value="right-center">Right-Center</option>
-                                        <option value="center">Center</option>
-                                        <option value="right-libertarian">Libertarian</option>
-                                    </select>
-                                    <button
-                                        onClick={addCustomSource}
-                                        className="btn-primary text-sm"
-                                    >
-                                        Add Source
-                                    </button>
+                {
+                    showSourceManager && (
+                        <motion.section
+                            className="container-main pb-8"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                        >
+                            <div className="glass-card border-2 border-cyan-500/30">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-xl font-bold flex items-center gap-2">
+                                        ⚙️ Source Manager
+                                    </h3>
+                                    <span className="text-sm text-gray-400">
+                                        {allSources.length - disabledSources.size} active / {allSources.length} total
+                                    </span>
                                 </div>
-                            </div>
 
-                            {/* Discover Similar Sources */}
-                            <div className="bg-gradient-to-r from-purple-500/10 to-cyan-500/10 rounded-lg p-4 mb-6 border border-purple-500/20">
-                                <h4 className="font-medium mb-3 text-purple-400">🔮 Discover Similar Sources</h4>
-                                <p className="text-sm text-gray-400 mb-4">Based on your active sources, you might like:</p>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    {[
-                                        { name: 'Townhall', rss: 'https://townhall.com/rss/featuredcolumnists/', bias: 'right', desc: 'Conservative commentary' },
-                                        { name: 'RedState', rss: 'https://redstate.com/feed', bias: 'right', desc: 'Right-leaning news' },
-                                        { name: 'PJ Media', rss: 'https://pjmedia.com/feed', bias: 'right', desc: 'Conservative analysis' },
-                                        { name: 'Newsmax', rss: 'https://www.newsmax.com/rss/Newsmax-RSS/', bias: 'right', desc: 'Conservative TV news' },
-                                        { name: 'American Thinker', rss: 'https://www.americanthinker.com/blog/m/feed.xml', bias: 'right', desc: 'Conservative essays' },
-                                        { name: 'Just The News', rss: 'https://justthenews.com/rss.xml', bias: 'right-center', desc: 'Straight news reporting' },
-                                    ].filter(s => !customSources.find(c => c.name === s.name)).map((suggestion) => (
-                                        <div key={suggestion.name} className="flex items-center justify-between bg-black/20 rounded-lg p-3">
-                                            <div>
-                                                <span className="font-medium text-sm">{suggestion.name}</span>
-                                                <p className="text-xs text-gray-500">{suggestion.desc}</p>
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    setCustomSources([...customSources, {
-                                                        id: `custom-${Date.now()}`,
-                                                        name: suggestion.name,
-                                                        rss: suggestion.rss,
-                                                        logo: '📌',
-                                                        bias: suggestion.bias,
-                                                        category: 'national',
-                                                        custom: true
-                                                    }]);
-                                                }}
-                                                className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded text-xs hover:bg-purple-500/30 transition-colors"
-                                            >
-                                                + Add
-                                            </button>
-                                        </div>
-                                    ))}
+                                {/* Add Custom Source */}
+                                <div className="bg-black/20 rounded-lg p-4 mb-6">
+                                    <h4 className="font-medium mb-3 text-cyan-400">➕ Add Custom Source</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                        <input
+                                            type="text"
+                                            placeholder="Source name"
+                                            value={newSource.name}
+                                            onChange={(e) => setNewSource({ ...newSource, name: e.target.value })}
+                                            className="bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="RSS feed URL"
+                                            value={newSource.rss}
+                                            onChange={(e) => setNewSource({ ...newSource, rss: e.target.value })}
+                                            className="bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm"
+                                        />
+                                        <select
+                                            value={newSource.bias}
+                                            onChange={(e) => setNewSource({ ...newSource, bias: e.target.value })}
+                                            className="bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm"
+                                        >
+                                            <option value="right">Right</option>
+                                            <option value="right-center">Right-Center</option>
+                                            <option value="center">Center</option>
+                                            <option value="right-libertarian">Libertarian</option>
+                                        </select>
+                                        <button
+                                            onClick={addCustomSource}
+                                            className="btn-primary text-sm"
+                                        >
+                                            Add Source
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Current Sources List */}
-                            <div>
-                                <h4 className="font-medium mb-3">📋 All Sources</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto">
-                                    {allSources.map((source: any) => {
-                                        const isDisabled = disabledSources.has(source.id);
-                                        const biasStyle = BIAS_COLORS[source.bias as keyof typeof BIAS_COLORS];
-                                        return (
-                                            <div
-                                                key={source.id}
-                                                className={`flex items-center justify-between p-2 rounded-lg border transition-colors ${isDisabled
-                                                    ? 'bg-black/20 border-white/5 opacity-50'
-                                                    : 'bg-white/5 border-white/10'
-                                                    }`}
-                                            >
-                                                <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                    <span>{source.logo}</span>
-                                                    <span className="text-sm truncate">{source.name}</span>
-                                                    {biasStyle && (
-                                                        <span className={`text-xs px-1 rounded ${biasStyle.bg} ${biasStyle.text}`}>
-                                                            {biasStyle.label}
-                                                        </span>
-                                                    )}
+                                {/* Discover Similar Sources */}
+                                <div className="bg-gradient-to-r from-purple-500/10 to-cyan-500/10 rounded-lg p-4 mb-6 border border-purple-500/20">
+                                    <h4 className="font-medium mb-3 text-purple-400">🔮 Discover Similar Sources</h4>
+                                    <p className="text-sm text-gray-400 mb-4">Based on your active sources, you might like:</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        {[
+                                            { name: 'Townhall', rss: 'https://townhall.com/rss/featuredcolumnists/', bias: 'right', desc: 'Conservative commentary' },
+                                            { name: 'RedState', rss: 'https://redstate.com/feed', bias: 'right', desc: 'Right-leaning news' },
+                                            { name: 'PJ Media', rss: 'https://pjmedia.com/feed', bias: 'right', desc: 'Conservative analysis' },
+                                            { name: 'Newsmax', rss: 'https://www.newsmax.com/rss/Newsmax-RSS/', bias: 'right', desc: 'Conservative TV news' },
+                                            { name: 'American Thinker', rss: 'https://www.americanthinker.com/blog/m/feed.xml', bias: 'right', desc: 'Conservative essays' },
+                                            { name: 'Just The News', rss: 'https://justthenews.com/rss.xml', bias: 'right-center', desc: 'Straight news reporting' },
+                                        ].filter(s => !customSources.find(c => c.name === s.name)).map((suggestion) => (
+                                            <div key={suggestion.name} className="flex items-center justify-between bg-black/20 rounded-lg p-3">
+                                                <div>
+                                                    <span className="font-medium text-sm">{suggestion.name}</span>
+                                                    <p className="text-xs text-gray-500">{suggestion.desc}</p>
                                                 </div>
-                                                <div className="flex items-center gap-1">
-                                                    <button
-                                                        onClick={() => toggleSourceEnabled(source.id)}
-                                                        className={`p-1 rounded text-xs ${isDisabled
-                                                            ? 'text-gray-500 hover:text-green-400'
-                                                            : 'text-green-400 hover:text-gray-500'
-                                                            }`}
-                                                        title={isDisabled ? 'Enable' : 'Disable'}
-                                                    >
-                                                        {isDisabled ? '○' : '●'}
-                                                    </button>
-                                                    {source.custom && (
+                                                <button
+                                                    onClick={() => {
+                                                        setCustomSources([...customSources, {
+                                                            id: `custom-${Date.now()}`,
+                                                            name: suggestion.name,
+                                                            rss: suggestion.rss,
+                                                            logo: '📌',
+                                                            bias: suggestion.bias,
+                                                            category: 'national',
+                                                            custom: true
+                                                        }]);
+                                                    }}
+                                                    className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded text-xs hover:bg-purple-500/30 transition-colors"
+                                                >
+                                                    + Add
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Current Sources List */}
+                                <div>
+                                    <h4 className="font-medium mb-3">📋 All Sources</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto">
+                                        {allSources.map((source: any) => {
+                                            const isDisabled = disabledSources.has(source.id);
+                                            const biasStyle = BIAS_COLORS[source.bias as keyof typeof BIAS_COLORS];
+                                            return (
+                                                <div
+                                                    key={source.id}
+                                                    className={`flex items-center justify-between p-2 rounded-lg border transition-colors ${isDisabled
+                                                        ? 'bg-black/20 border-white/5 opacity-50'
+                                                        : 'bg-white/5 border-white/10'
+                                                        }`}
+                                                >
+                                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                        <span>{source.logo}</span>
+                                                        <span className="text-sm truncate">{source.name}</span>
+                                                        {biasStyle && (
+                                                            <span className={`text-xs px-1 rounded ${biasStyle.bg} ${biasStyle.text}`}>
+                                                                {biasStyle.label}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
                                                         <button
-                                                            onClick={() => removeCustomSource(source.id)}
-                                                            className="p-1 text-red-400 hover:text-red-300 text-xs"
-                                                            title="Remove"
+                                                            onClick={() => toggleSourceEnabled(source.id)}
+                                                            className={`p-1 rounded text-xs ${isDisabled
+                                                                ? 'text-gray-500 hover:text-green-400'
+                                                                : 'text-green-400 hover:text-gray-500'
+                                                                }`}
+                                                            title={isDisabled ? 'Enable' : 'Disable'}
                                                         >
-                                                            ✕
+                                                            {isDisabled ? '○' : '●'}
                                                         </button>
-                                                    )}
+                                                        {source.custom && (
+                                                            <button
+                                                                onClick={() => removeCustomSource(source.id)}
+                                                                className="p-1 text-red-400 hover:text-red-300 text-xs"
+                                                                title="Remove"
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        );
-                                    })}
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </motion.section>
-                )}
-            </AnimatePresence>
+                        </motion.section>
+                    )
+                }
+            </AnimatePresence >
 
             {/* Fact Checker Panel */}
             <AnimatePresence>
-                {showFactChecker && (
-                    <motion.section
-                        className="container-main pb-8"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                    >
-                        <div className="glass-card border-2 border-purple-500/30">
-                            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                🔍 AI Fact Checker
-                            </h3>
-                            <div className="flex gap-4 mb-4">
-                                <input
-                                    type="text"
-                                    placeholder="Enter a claim to fact-check..."
-                                    value={factCheckQuery}
-                                    onChange={(e) => setFactCheckQuery(e.target.value)}
-                                    className="flex-1 bg-black/30 border border-white/10 rounded-lg px-4 py-3"
-                                    onKeyDown={(e) => e.key === 'Enter' && runFactCheck()}
-                                />
-                                <button
-                                    onClick={runFactCheck}
-                                    disabled={isLoading}
-                                    className="btn-primary px-6"
-                                >
-                                    {isLoading ? 'Checking...' : 'Check'}
-                                </button>
-                            </div>
+                {
+                    showFactChecker && (
+                        <motion.section
+                            className="container-main pb-8"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                        >
+                            <div className="glass-card border-2 border-purple-500/30">
+                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                    🔍 AI Fact Checker
+                                </h3>
+                                <div className="flex gap-4 mb-4">
+                                    <input
+                                        type="text"
+                                        placeholder="Enter a claim to fact-check..."
+                                        value={factCheckQuery}
+                                        onChange={(e) => setFactCheckQuery(e.target.value)}
+                                        className="flex-1 bg-black/30 border border-white/10 rounded-lg px-4 py-3"
+                                        onKeyDown={(e) => e.key === 'Enter' && runFactCheck()}
+                                    />
+                                    <button
+                                        onClick={runFactCheck}
+                                        disabled={isLoading}
+                                        className="btn-primary px-6"
+                                    >
+                                        {isLoading ? 'Checking...' : 'Check'}
+                                    </button>
+                                </div>
 
-                            {factCheckResult && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="bg-black/20 rounded-lg p-4"
-                                >
-                                    <p className="text-sm text-gray-400 mb-3">
-                                        Results for: <span className="text-white">"{factCheckResult.query}"</span>
-                                    </p>
+                                {factCheckResult && (
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="bg-black/20 rounded-lg p-4"
+                                    >
+                                        <p className="text-sm text-gray-400 mb-3">
+                                            Results for: <span className="text-white">"{factCheckResult.query}"</span>
+                                        </p>
 
-                                    {factCheckResult.findings?.length > 0 && (
-                                        <div className="mb-4">
-                                            <p className="text-sm font-medium mb-2">External Fact-Checks:</p>
-                                            <div className="flex flex-wrap gap-2">
-                                                {factCheckResult.findings.map((f: any, i: number) => (
-                                                    <span key={i} className="px-3 py-1 bg-white/5 rounded text-sm">
-                                                        {f.source}: <span className="text-yellow-400">{f.rating}</span>
-                                                    </span>
-                                                ))}
+                                        {factCheckResult.findings?.length > 0 && (
+                                            <div className="mb-4">
+                                                <p className="text-sm font-medium mb-2">External Fact-Checks:</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {factCheckResult.findings.map((f: any, i: number) => (
+                                                        <span key={i} className="px-3 py-1 bg-white/5 rounded text-sm">
+                                                            {f.source}: <span className="text-yellow-400">{f.rating}</span>
+                                                        </span>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    {factCheckResult.aiAnalysis && (
-                                        <div className="border-t border-white/10 pt-4">
-                                            <p className="text-sm font-medium mb-2 text-purple-400">🤖 AI Analysis:</p>
-                                            <p className="text-gray-300 text-sm">{factCheckResult.aiAnalysis}</p>
-                                        </div>
-                                    )}
-                                </motion.div>
-                            )}
-                        </div>
-                    </motion.section>
-                )}
-            </AnimatePresence>
+                                        {factCheckResult.aiAnalysis && (
+                                            <div className="border-t border-white/10 pt-4">
+                                                <p className="text-sm font-medium mb-2 text-purple-400">🤖 AI Analysis:</p>
+                                                <p className="text-gray-300 text-sm">{factCheckResult.aiAnalysis}</p>
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </div>
+                        </motion.section>
+                    )
+                }
+            </AnimatePresence >
 
             {/* Search & Filters */}
-            <section className="w-full max-w-[1800px] mx-auto px-4 md:px-6 pb-6 pt-6">
+            < section className="w-full max-w-[1800px] mx-auto px-4 md:px-6 pb-6 pt-6" >
                 <div className="flex flex-col md:flex-row gap-4">
                     {/* Search */}
                     <div className="flex-1">
@@ -616,10 +747,10 @@ export default function NewsPage() {
                         ))}
                     </select>
                 </div>
-            </section>
+            </section >
 
             {/* Priority Sources */}
-            <section className="container-main pb-6">
+            < section className="container-main pb-6" >
                 <div className="flex items-center gap-4 overflow-x-auto pb-2">
                     <span className="text-sm text-gray-500 whitespace-nowrap">🔥 Priority:</span>
                     {[...NEWS_SOURCES.local, ...NEWS_SOURCES.national].filter((s: any) => s.priority).map((source) => (
@@ -632,10 +763,10 @@ export default function NewsPage() {
                         </button>
                     ))}
                 </div>
-            </section>
+            </section >
 
             {/* Articles Grid */}
-            <section className="container-main pb-16">
+            < section className="container-main pb-16" >
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredArticles.map((article, i) => {
                         const biasStyle = BIAS_COLORS[article.source.bias as keyof typeof BIAS_COLORS];
@@ -650,6 +781,13 @@ export default function NewsPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.05 }}
                             >
+                                {activeTab === 'watch' && (
+                                    <div className="absolute top-3 right-3 z-10">
+                                        <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center shadow-lg shadow-red-900/50 animate-pulse">
+                                            <PlayCircle size={16} className="text-white fill-white" />
+                                        </div>
+                                    </div>
+                                )}
                                 {/* Hover Glow Effect */}
                                 <div className={`absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}></div>
                                 {/* Top bar */}
@@ -720,16 +858,18 @@ export default function NewsPage() {
                     })}
                 </div>
 
-                {filteredArticles.length === 0 && (
-                    <div className="text-center py-16 text-gray-500">
-                        <p className="text-4xl mb-4">📭</p>
-                        <p>No articles found matching your filters.</p>
-                    </div>
-                )}
-            </section>
+                {
+                    filteredArticles.length === 0 && (
+                        <div className="text-center py-16 text-gray-500">
+                            <p className="text-4xl mb-4">📭</p>
+                            <p>No articles found matching your filters.</p>
+                        </div>
+                    )
+                }
+            </section >
 
             {/* Sources Legend */}
-            <section className="container-main pb-16">
+            < section className="container-main pb-16" >
                 <div className="glass-card">
                     <h3 className="font-bold mb-4">📊 Source Legend</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -747,7 +887,7 @@ export default function NewsPage() {
                         </p>
                     </div>
                 </div>
-            </section>
+            </section >
 
             <ResearchPanel
                 isOpen={showResearchPanel}
@@ -755,6 +895,6 @@ export default function NewsPage() {
                 articleToAdd={articleToResearch}
                 onArticleAdded={() => setArticleToResearch(null)}
             />
-        </div>
+        </div >
     );
 }

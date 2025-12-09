@@ -104,7 +104,9 @@ export const NEWS_SOURCES = {
         { id: 'tablet', name: 'Tablet Magazine', rss: 'https://www.tabletmag.com/feed', logo: '📱', bias: 'center', category: 'alternative' },
         { id: 'common-sense', name: 'Common Sense', rss: 'https://www.commonsense.news/feed', logo: '💡', bias: 'center', category: 'alternative' },
         { id: 'persuasion', name: 'Persuasion', rss: 'https://www.persuasion.community/feed', logo: '💬', bias: 'center', category: 'alternative' },
-        { id: 'semafor', name: 'Semafor', rss: 'https://www.semafor.com/feed', logo: '🚦', bias: 'center', category: 'alternative' }
+        { id: 'semafor', name: 'Semafor', rss: 'https://www.semafor.com/feed', logo: '🚦', bias: 'center', category: 'alternative' },
+        { id: 'infowars', name: 'InfoWars', rss: 'https://www.infowars.com/rss.xml', logo: '👁️', bias: 'far-right', category: 'alternative' },
+        { id: 'banned-video', name: 'Banned.Video', rss: 'https://api.banned.video/rss/channels/5b92a1e6568f22455f55be2b', logo: '🎥', bias: 'far-right', category: 'alternative' }
     ],
 
     // Center Sources (10) - Wire Services & Mainstream
@@ -193,9 +195,6 @@ export async function parseRSSFeed(url: string): Promise<any[]> {
     }
 }
 
-/**
- * Fetch all news from configured sources
- */
 /**
  * Fetch all news from Bridge
  */
@@ -322,5 +321,26 @@ export function filterMinnesotaNews(articles: NewsArticle[]): NewsArticle[] {
     return articles.filter(article => {
         const text = `${article.title} ${article.description}`.toLowerCase();
         return MN_KEYWORDS.some(keyword => text.includes(keyword));
+    });
+}
+
+/**
+ * Subject Radar Tracking
+ */
+export interface SubjectTracker {
+    id: string;
+    keyword: string;
+    color: string;
+    lastCount: number;
+}
+
+export function countTrackerMatches(articles: NewsArticle[], trackers: SubjectTracker[]): SubjectTracker[] {
+    return trackers.map(tracker => {
+        const keyword = tracker.keyword.toLowerCase();
+        const count = articles.filter(a =>
+            (a.title && a.title.toLowerCase().includes(keyword)) ||
+            (a.description && a.description.toLowerCase().includes(keyword))
+        ).length;
+        return { ...tracker, lastCount: count };
     });
 }
