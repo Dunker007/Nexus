@@ -1,8 +1,8 @@
 # PROJECT SCOPE
 
-**Version:** 1.1.0  
-**Last Updated:** December 8, 2025  
-**Status:** Growth Phase (Active)
+**Version:** 1.2.0  
+**Last Updated:** December 16, 2025  
+**Status:** Hardening Phase
 
 ---
 
@@ -14,33 +14,26 @@ This file is the quick reference. The Master Plan has full context.
 
 ## Active Development
 
-### Deep Focus (Build These)
+### Desktop Tools (Active)
 
 | Module | Location | Status |
 |--------|----------|--------|
-| **Music Studio** | webapp/src/app/music | 🟢 Operational |
-| **Content Pipeline** | pipeline/ | 🟢 UNFROZEN - Active |
-| **Income Dashboard** | webapp/src/app/income | 🟡 Building |
-| **Dev Studio** | webapp/src/app/studios/dev | 🟡 Rises with tide |
-| **Agents Hub** | webapp/src/app/agents | 🟢 Core infrastructure |
+| **Chat** | webapp/src/app/chat | 🟢 Working |
+| **News Hub** | webapp/src/app/news | 🟢 Working |
+| **Agents Hub** | webapp/src/app/agents | 🟢 Working |
+| **Dashboard** | webapp/src/app/dashboard | 🟢 Working |
+| **Settings** | webapp/src/app/settings | 🟢 Working |
+| **Terminal** | webapp/src/app/terminal | 🟢 Working |
+| **Music Studio** | webapp/src/app/music | 🟢 Working |
 
-### Revenue Streams (Growth Phase)
-
-| Stream | Location | Status |
-|--------|----------|--------|
-| Blog/AdSense | pipeline/ + WordPress | 🟢 Ready to activate |
-| Music/Streaming | webapp/src/app/music | 🟡 Distribution tracking |
-| Art/Etsy | webapp/src/app/studios/art | 🔘 Planned |
-
-### Supporting Cast (Maintain)
+### Profit Side (Deferred)
 
 | Module | Location | Status |
 |--------|----------|--------|
-| News Hub | webapp/src/app/news | 🟢 Working |
-| Chat | webapp/src/app/chat | 🟢 Working |
-| Dashboard | webapp/src/app/dashboard | 🟢 Working |
-| Terminal | webapp/src/app/terminal | 🟢 Working |
-| Settings | webapp/src/app/settings | 🟢 Working |
+| **Content Pipeline** | pipeline/ | ⏸️ Deferred |
+| **Income Dashboard** | webapp/src/app/income | ⏸️ Deferred |
+| **Distribution** | bridge/routes/distribution.js | ⏸️ Deferred |
+| **Art Studio** | webapp/src/app/studios/art | ⏸️ Deferred |
 
 ### Backend
 
@@ -52,26 +45,18 @@ This file is the quick reference. The Master Plan has full context.
 
 ---
 
-## 🟢 CONTENT PIPELINE (UNFROZEN)
+## ⏸️ CONTENT PIPELINE (DEFERRED)
 
 **Location:** `pipeline/`
 
-The PowerShell content pipeline is now **ACTIVE** for Growth Phase.
+The PowerShell content pipeline is deferred until Hardening Phase is complete.
 
-### What It Does
+### What It Does (When Active)
 - LM Studio → content generation
 - WordPress/HTML publishing
-- Automated blog posts with AdSense
-- Affiliate link injection
+- Automated blog posts
 
-### Activation Checklist
-Before running in production:
-- [ ] Verify `pipeline/core/Config.json` has correct WordPress credentials
-- [x] Test with `WordPress.Enabled: false` first (Verified successful dry-run)
-- [ ] Confirm AdSense account is approved
-- [x] Run `.\tests\verify_phases_1_2_3.ps1` to validate (Passed)
-
-### Running the Pipeline
+### To Resume Later
 ```powershell
 cd pipeline/core
 .\Orchestrator.ps1
@@ -79,24 +64,14 @@ cd pipeline/core
 
 ---
 
-## 🟡 In Progress (Growth Phase)
-
-| Stream | Status | Next Step |
-|--------|--------|-----------|
-| Blog/AdSense | Ready | Configure WordPress, run pipeline |
-| Music/Streaming | Tracking | Build distribution dashboard |
-| Art/Etsy | Planned | Create Art Studio UI |
-
----
-
 ## Infrastructure Work (Always Allowed)
 
-- Tauri shell setup
+- Tauri shell improvements
 - Build tooling
 - Git operations
 - Documentation
-- Bug fixes in active modules
-- Revenue feature development
+- Bug fixes in desktop modules
+- Local LLM integration improvements
 
 ---
 
@@ -109,11 +84,12 @@ cd pipeline/core
 3. ✅ Read AI_PROTOCOL.md for handoff rules
 4. ❓ If unclear, ask before building
 
-**Growth Phase Rules:**
-- Content generation → ✅ GO (pipeline is active)
-- Revenue features → ✅ GO (approved in Growth Phase)
-- New revenue streams → Check against plan first
+**Hardening Phase Rules:**
+- Desktop tools → ✅ GO (improvements allowed)
+- Profit/Revenue features → ⏸️ DEFERRED
+- New features → Only for desktop tools
 
 ---
 
-*Revenue engine activated. Build, ship, earn.*
+*Fix what exists. Polish what works.*
+

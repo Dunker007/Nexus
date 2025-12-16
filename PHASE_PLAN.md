@@ -1,8 +1,9 @@
-# NEXUS 10-PHASE PLAN
+# NEXUS PHASE PLAN
 
-**Version:** 1.0.0  
+**Version:** 1.2.0  
 **Created:** December 8, 2025  
-**Status:** Foundation Phase
+**Updated:** December 16, 2025  
+**Status:** Hardening Phase
 
 ---
 
@@ -18,23 +19,22 @@
 - If it breaks the desktop build, it doesn't ship
 
 ### Version Strategy
-- `0.1.x` — Foundation Phase (current)
-- `0.2.x` — Core features complete
-- `0.3.x` — Music Studio functional
-- `1.0.0` — Foundation Phase complete
+- `1.0.x` — Foundation Phase (complete)
+- `1.2.x` — Hardening Phase (current)
+- `2.0.0` — Future (TBD)
 
 ---
 
 ## Current State
 
-- ✅ Tauri desktop app builds and installs (v0.2.0)
+- ✅ Tauri desktop app builds and installs
 - ✅ Bridge auto-spawns with app
-- ✅ 72 page routes exist (mostly stubs)
+- ✅ 60+ page routes exist
 - ✅ 15+ agents defined in bridge/services
 - ✅ LM Studio + Ollama connected
-- ✅ Content Pipeline Unfrozen & Verifed
-- ❌ No unified data flow
-- ❌ Agents not wired to UI (Music Studio excepted)
+- ✅ Prisma database migrated
+- ✅ Desktop tools working (Chat, News, Agents, Dashboard, Settings)
+- ⏸️ Profit side deferred (Pipeline, Income, Distribution)
 
 ---
 
@@ -272,110 +272,41 @@
 4. **If it breaks production, roll back first**
 5. **Test on fresh install, not just dev mode**
 
+# DEFERRED: PROFIT PHASE
+
+The following phases are deferred until Hardening Phase is complete:
+
+- Phase 11: Pipeline Unfreeze *(previously completed, now re-deferred)*
+- Phase 12: Pipeline Integration
+- Phase 13: Music Revenue
+- Phase 14: Art Studio
+- Phase 15: Income Dashboard
+
+These will be revisited when desktop tools are fully polished.
+
 ---
 
-# GROWTH PHASE (v1.1.0 → v2.0.0)
+# HARDENING PHASE (Current)
 
-## Phase 11: Pipeline Unfreeze
-**Duration:** Week 1  
-**Version Target:** 1.1.0
+## Focus Areas
 
-**Goal:** Activate the frozen content pipeline
-
-| Task | What |
+| Area | Goal |
 |------|------|
-| ✅ Update documentation | SCOPE.md, MASTER_PLAN.md, PHASE_PLAN.md |
-| ✅ Mark pipeline as active | Remove frozen status |
-| ✅ Run verification tests | `.\tests\verify_phases_1_2_3.ps1` |
-| ✅ Test pipeline dry-run | WordPress.Enabled: false |
+| Desktop Tools | Fix bugs, improve UX |
+| Local LLMs | Better Chat/Agent integration |
+| Database | Ensure persistence works |
+| Documentation | Keep up to date |
 
-**Exit Criteria:** Pipeline generates HTML content without errors.
+## Success Metrics
 
-**Status**: [x] Completed
-
----
-
-## Phase 12: Pipeline → Bridge Integration
-**Duration:** Week 2-3  
-**Version Target:** 1.2.0
-
-**Goal:** Control PowerShell pipeline from webapp
-
-| Task | What |
-|------|------|
-| ✅ Create pipeline routes | `/pipeline/generate`, `/pipeline/status`, `/pipeline/queue` |
-| ✅ Bridge spawn logic | PowerShell child process management |
-| ✅ Pipeline UI page | Control dashboard at `/pipeline` |
-| ❌ Queue management | View, approve, publish content (Backend verification failed) |
-
-**Exit Criteria:** Generate content from webapp, see it in queue, publish with one click.
-
-**Status**: [ ] Paused (Blocked by path/process spawning issues on Windows)
+| Metric | Target |
+|--------|--------|
+| Bridge starts clean | No Prisma errors |
+| All desktop pages load | No 500 errors |
+| Chat works | LM Studio responds |
+| Settings persist | Across restarts |
 
 ---
 
-## Phase 13: Music Revenue
-**Duration:** Week 3-4  
-**Version Target:** 1.3.0
+*Fix what exists. Polish what works.*
 
-**Goal:** Track music distribution and royalties
-
-| Task | What |
-|------|------|
-| Distribution service | Track songs sent to DistroKid/Amuse |
-| Music income page | Revenue per track, platform stats |
-| Export workflow | Suno → Audio files → Distribution |
-| YouTube tracking | Content ID status, view counts |
-
-**Exit Criteria:** See all distributed songs with projected/actual revenue.
-
----
-
-## Phase 14: Art Studio
-**Duration:** Week 4-5  
-**Version Target:** 1.4.0
-
-**Goal:** Visual art revenue stream
-
-| Task | What |
-|------|------|
-| Art Studio UI | AI art generation prompts |
-| Product templates | Digital prints, wallpapers, mockups |
-| Etsy integration | Listing generator, pricing |
-| Asset management | Track products across platforms |
-
-**Exit Criteria:** Create AI art, generate Etsy listing, track sales.
-
----
-
-## Phase 15: Unified Income Dashboard
-**Duration:** Week 5-6  
-**Version Target:** 1.5.0 → 2.0.0
-
-**Goal:** All revenue in one place
-
-| Task | What |
-|------|------|
-| Income aggregator | Pull from all sources |
-| Dashboard redesign | Unified revenue view |
-| Goal tracking | First $100/month milestone |
-| Projections | Monthly/yearly estimates |
-| Export | Tax-ready reports |
-
-**Exit Criteria:** See total revenue across all streams, track against goals.
-
----
-
-## Growth Phase Success Metrics
-
-| Metric | Target | Timeline |
-|--------|--------|----------|
-| Content Pipeline running | 2+ posts/week | Week 2 |
-| YouTube videos uploaded | 25+ | Month 2 |
-| Streaming releases | 10+ on Spotify | Month 2 |
-| First dollar earned | $1 | Month 2-3 |
-| First $100/month | Milestone | Month 4-6 |
-
----
-
-*Build the app. Ship the app. Earn with the app.*
