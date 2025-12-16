@@ -15,7 +15,7 @@ import 'react-resizable/css/styles.css';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 // Widget Types
-type WidgetType = 'quick_ai' | 'calendar' | 'news' | 'tasks' | 'quote' | 'system' | 'quicklinks';
+type WidgetType = 'quick_ai' | 'calendar' | 'news' | 'tasks' | 'quote' | 'system' | 'quicklinks' | 'scratchpad' | 'music' | 'recent';
 
 interface WidgetConfig {
     i: string;
@@ -35,6 +35,9 @@ const WIDGET_CATALOG: Record<WidgetType, { title: string; icon: string; defaultW
     quote: { title: '✨ Quote', icon: '✨', defaultW: 1, defaultH: 2, minW: 1, minH: 1 },
     system: { title: '🖥️ System', icon: '🖥️', defaultW: 2, defaultH: 2, minW: 1, minH: 2 },
     quicklinks: { title: '🔗 Quick Links', icon: '🔗', defaultW: 1, defaultH: 2, minW: 1, minH: 1 },
+    scratchpad: { title: '📝 Scratchpad', icon: '📝', defaultW: 1, defaultH: 3, minW: 1, minH: 2 },
+    music: { title: '🎵 Music', icon: '🎵', defaultW: 1, defaultH: 3, minW: 1, minH: 2 },
+    recent: { title: '🕐 Recent', icon: '🕐', defaultW: 1, defaultH: 2, minW: 1, minH: 1 },
 };
 
 // Default Layout
@@ -71,12 +74,7 @@ const STATIC_CALENDAR_EVENTS = [
     { title: 'AI research session', time: '4:30 PM', type: 'personal' },
 ];
 
-const PROJECT_TASKS = [
-    { title: 'Finish News Hub UI polish', status: 'done', priority: 'high' },
-    { title: 'Set up YouTube channel', status: 'in-progress', priority: 'high' },
-    { title: 'Create first Suno song', status: 'todo', priority: 'medium' },
-    { title: 'Connect Neural Frames API', status: 'todo', priority: 'low' },
-];
+// Tasks are now managed in component state with localStorage persistence
 
 const DAILY_QUOTES = [
     { content: '"The best way to predict the future is to create it."', author: 'Peter Drucker' },
@@ -138,6 +136,27 @@ export default function DashboardPage() {
     const [quote] = useState(DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)]);
     const [quickLinks, setQuickLinks] = useState(DEFAULT_QUICK_LINKS);
 
+    // Scratchpad State
+    const [scratchpadText, setScratchpadText] = useState('');
+
+    // Music Player State
+    const [musicMode, setMusicMode] = useState<'youtube' | 'local'>('youtube');
+    const [youtubeUrl, setYoutubeUrl] = useState('');
+    const [localAudioFile, setLocalAudioFile] = useState<string | null>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    // Tasks State (editable)
+    const [tasks, setTasks] = useState([
+        { id: '1', title: 'Finish News Hub UI polish', status: 'done', priority: 'high' },
+        { id: '2', title: 'Set up YouTube channel', status: 'in-progress', priority: 'high' },
+        { id: '3', title: 'Create first Suno song', status: 'todo', priority: 'medium' },
+        { id: '4', title: 'Connect Neural Frames API', status: 'todo', priority: 'low' },
+    ]);
+    const [newTaskTitle, setNewTaskTitle] = useState('');
+
+    // Recent Activity State
+    const [recentPages, setRecentPages] = useState<{ path: string; title: string; time: string }[]>([]);
+
     // Quick AI State
     const [quickAiInput, setQuickAiInput] = useState('');
     const [quickAiResponse, setQuickAiResponse] = useState('');
@@ -148,6 +167,9 @@ export default function DashboardPage() {
         const saved = localStorage.getItem('dashboard-layout');
         const savedWidgets = localStorage.getItem('dashboard-widgets');
         const savedQuickLinks = localStorage.getItem('dashboard-quicklinks');
+        const savedScratchpad = localStorage.getItem('dashboard-scratchpad');
+        const savedTasks = localStorage.getItem('dashboard-tasks');
+        const savedRecent = localStorage.getItem('dashboard-recent');
         if (saved) {
             try { setLayouts(JSON.parse(saved)); } catch { }
         }
@@ -156,6 +178,15 @@ export default function DashboardPage() {
         }
         if (savedQuickLinks) {
             try { setQuickLinks(JSON.parse(savedQuickLinks)); } catch { }
+        }
+        if (savedScratchpad) {
+            setScratchpadText(savedScratchpad);
+        }
+        if (savedTasks) {
+            try { setTasks(JSON.parse(savedTasks)); } catch { }
+        }
+        if (savedRecent) {
+            try { setRecentPages(JSON.parse(savedRecent)); } catch { }
         }
     }, []);
 
@@ -398,16 +429,64 @@ export default function DashboardPage() {
                 );
 
             case 'tasks':
+                const toggleTaskStatus = (id: string) => {
+                    const updated = tasks.map(t => {
+                        if (t.id === id) {
+                            const nextStatus = t.status === 'todo' ? 'in-progress' : t.status === 'in-progress' ? 'done' : 'todo';
+                            return { ...t, status: nextStatus };
+                        }
+                        return t;
+                    });
+                    setTasks(updated);
+                    localStorage.setItem('dashboard-tasks', JSON.stringify(updated));
+                };
+                const addTask = () => {
+                    if (!newTaskTitle.trim()) return;
+                    const updated = [...tasks, { id: Date.now().toString(), title: newTaskTitle, status: 'todo', priority: 'medium' }];
+                    setTasks(updated);
+                    setNewTaskTitle('');
+                    localStorage.setItem('dashboard-tasks', JSON.stringify(updated));
+                };
+                const deleteTask = (id: string) => {
+                    const updated = tasks.filter(t => t.id !== id);
+                    setTasks(updated);
+                    localStorage.setItem('dashboard-tasks', JSON.stringify(updated));
+                };
+
                 return (
-                    <div className="space-y-2">
-                        {PROJECT_TASKS.map((task, i) => (
-                            <div key={i} className="flex items-center gap-2 p-2 rounded bg-white/5">
-                                <span className={`px-2 py-0.5 text-xs rounded ${getTaskStatusStyle(task.status)}`}>
-                                    {task.status === 'done' ? '✓' : task.status === 'in-progress' ? '◉' : '○'}
-                                </span>
-                                <span className="text-sm flex-1 truncate">{task.title}</span>
-                            </div>
-                        ))}
+                    <div className="h-full flex flex-col">
+                        <div className="flex-1 space-y-1 overflow-auto">
+                            {tasks.map((task) => (
+                                <div key={task.id} className="flex items-center gap-2 p-2 rounded bg-white/5 group">
+                                    <button
+                                        onClick={() => toggleTaskStatus(task.id)}
+                                        className={`px-2 py-0.5 text-xs rounded ${getTaskStatusStyle(task.status)} hover:opacity-80`}
+                                    >
+                                        {task.status === 'done' ? '✓' : task.status === 'in-progress' ? '◉' : '○'}
+                                    </button>
+                                    <span className={`text-sm flex-1 truncate ${task.status === 'done' ? 'line-through text-gray-500' : ''}`}>
+                                        {task.title}
+                                    </span>
+                                    <button
+                                        onClick={() => deleteTask(task.id)}
+                                        className="text-red-400 opacity-0 group-hover:opacity-100 text-xs hover:text-red-300"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex gap-1 mt-2">
+                            <input
+                                type="text"
+                                value={newTaskTitle}
+                                onChange={(e) => setNewTaskTitle(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && addTask()}
+                                placeholder="Add task..."
+                                className="flex-1 bg-black/20 border border-white/10 rounded px-2 py-1 text-xs focus:outline-none focus:border-cyan-500/50"
+                            />
+                            <button onClick={addTask} className="px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded text-xs hover:bg-cyan-500/30">+</button>
+                        </div>
                     </div>
                 );
 
@@ -463,6 +542,109 @@ export default function DashboardPage() {
                                 <div className="text-xs text-gray-400 mt-1 truncate">{link.title}</div>
                             </a>
                         ))}
+                    </div>
+                );
+
+            case 'scratchpad':
+                return (
+                    <div className="h-full flex flex-col">
+                        <textarea
+                            value={scratchpadText}
+                            onChange={(e) => {
+                                setScratchpadText(e.target.value);
+                                localStorage.setItem('dashboard-scratchpad', e.target.value);
+                            }}
+                            placeholder="Quick notes, ideas, copy/paste staging..."
+                            className="flex-1 w-full bg-black/20 border border-white/10 rounded-lg p-3 text-sm resize-none focus:outline-none focus:border-cyan-500/50 placeholder:text-gray-600"
+                        />
+                    </div>
+                );
+
+            case 'music':
+                const getYoutubeId = (url: string) => {
+                    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&\n?#]+)/);
+                    return match ? match[1] : null;
+                };
+                const videoId = getYoutubeId(youtubeUrl);
+
+                return (
+                    <div className="h-full flex flex-col space-y-2">
+                        {/* Mode Toggle */}
+                        <div className="flex bg-white/5 rounded-lg p-0.5">
+                            <button
+                                onClick={() => setMusicMode('youtube')}
+                                className={`flex-1 py-1 text-xs rounded-md transition-all ${musicMode === 'youtube' ? 'bg-red-500/20 text-red-400' : 'text-gray-400'}`}
+                            >
+                                YouTube
+                            </button>
+                            <button
+                                onClick={() => setMusicMode('local')}
+                                className={`flex-1 py-1 text-xs rounded-md transition-all ${musicMode === 'local' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-400'}`}
+                            >
+                                Local
+                            </button>
+                        </div>
+
+                        {musicMode === 'youtube' ? (
+                            <>
+                                <input
+                                    type="text"
+                                    value={youtubeUrl}
+                                    onChange={(e) => setYoutubeUrl(e.target.value)}
+                                    placeholder="Paste YouTube URL..."
+                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500/50"
+                                />
+                                {videoId && (
+                                    <div className="flex-1 min-h-0">
+                                        <iframe
+                                            src={`https://www.youtube.com/embed/${videoId}?autoplay=0`}
+                                            className="w-full h-full rounded-lg"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowFullScreen
+                                        />
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            setLocalAudioFile(URL.createObjectURL(file));
+                                        }
+                                    }}
+                                    className="w-full text-xs text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-cyan-500/20 file:text-cyan-400"
+                                />
+                                {localAudioFile && (
+                                    <audio
+                                        src={localAudioFile}
+                                        controls
+                                        className="w-full mt-2"
+                                        style={{ height: '40px' }}
+                                    />
+                                )}
+                                <p className="text-xs text-gray-500">Play local audio files from your studio</p>
+                            </>
+                        )}
+                    </div>
+                );
+
+            case 'recent':
+                return (
+                    <div className="space-y-2">
+                        {recentPages.length === 0 ? (
+                            <p className="text-xs text-gray-500">No recent activity yet</p>
+                        ) : (
+                            recentPages.slice(0, 5).map((page, i) => (
+                                <Link key={i} href={page.path} className="block p-2 rounded bg-white/5 hover:bg-white/10">
+                                    <div className="text-sm truncate">{page.title}</div>
+                                    <div className="text-xs text-gray-500">{page.time}</div>
+                                </Link>
+                            ))
+                        )}
                     </div>
                 );
 
