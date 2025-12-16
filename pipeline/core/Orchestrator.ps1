@@ -39,8 +39,14 @@ function Log {
 Log -Message "Orchestrator started." -Level "INFO"
 
 # 1. Define Task
-$Topic = $Config.Defaults.Topic
-Log -Message "Selected topic: $Topic" -Level "INFO"
+if ($env:PIPELINE_TOPIC) {
+    $Topic = $env:PIPELINE_TOPIC
+    Log -Message "Selected topic (from env): $Topic" -Level "INFO"
+}
+else {
+    $Topic = $Config.Defaults.Topic
+    Log -Message "Selected topic (from config): $Topic" -Level "INFO"
+}
 
 # 2. Call LM Studio
 Log -Message "Connecting to LM Studio at $($Config.LMStudio.ApiUrl)..." -Level "INFO"
@@ -73,7 +79,7 @@ if ($Result.Success) {
     $PublishResult = Publish-ContentAsHtml `
         -Title $Topic `
         -Content $Result.Content `
-        -OutputDir $Config.Paths.Output `
+        -OutputDir $OutputDir `
         -Keywords $Keywords `
         -Config $Config
         

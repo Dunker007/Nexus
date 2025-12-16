@@ -8,10 +8,10 @@ Log "=== DOUBLE CHECKING PHASES 1, 2, and 3 ==="
 Log "Checking Phase 1: Core Infrastructure..."
 try {
     $Modules = @(
-        "src\core\ConfigManager.psm1",
-        "src\core\Logger.psm1",
-        "src\core\ModuleLoader.psm1",
-        "src\core\Orchestrator.ps1"
+        "pipeline\core\ConfigManager.psm1",
+        "pipeline\core\Logger.psm1",
+        "pipeline\core\ModuleLoader.psm1",
+        "pipeline\core\Orchestrator.ps1"
     )
     foreach ($m in $Modules) {
         if (Test-Path $m) { Log "  [OK] Found $m" } else { throw "Missing $m" }
@@ -26,8 +26,8 @@ catch {
 # --- PHASE 2: AI PIPELINE (LM STUDIO) ---
 Log "`nChecking Phase 2: AI Pipeline..."
 try {
-    if (Test-Path "src\core\LMStudio-Client.psm1") {
-        Import-Module ".\src\core\LMStudio-Client.psm1" -Force
+    if (Test-Path "pipeline\core\LMStudio-Client.psm1") {
+        Import-Module ".\pipeline\core\LMStudio-Client.psm1" -Force
         Log "  [OK] LMStudio-Client module loaded."
         
         # Verify function exists
@@ -48,12 +48,26 @@ catch {
     exit 1
 }
 
-# --- PHASE 3: PUBLISHING PIPELINE ---
-Log "`nChecking Phase 3: Publishing Pipeline..."
+# --- PHASE 3: PUBLISHING & REVENUE PIPELINE ---
+Log "`nChecking Phase 3: Publishing & Revenue Pipeline..."
 try {
+    # Revenue/Ads
+    if (Test-Path "pipeline\revenue\AdManager.psm1") {
+        Import-Module ".\pipeline\revenue\AdManager.psm1" -Force
+        if (Get-Command "Get-AdCode" -ErrorAction SilentlyContinue) {
+            Log "  [OK] AdManager loaded & command available."
+        }
+        else {
+            throw "Get-AdCode not exported."
+        }
+    }
+    else {
+        throw "Missing AdManager.psm1"
+    }
+
     # HTML Publisher
-    if (Test-Path "src\publishers\HtmlPublisher.psm1") {
-        Import-Module ".\src\publishers\HtmlPublisher.psm1" -Force
+    if (Test-Path "pipeline\publishers\HtmlPublisher.psm1") {
+        Import-Module ".\pipeline\publishers\HtmlPublisher.psm1" -Force
         if (Get-Command "Publish-ContentAsHtml" -ErrorAction SilentlyContinue) {
             Log "  [OK] HtmlPublisher loaded & command available."
         }
@@ -66,8 +80,8 @@ try {
     }
 
     # WordPress Publisher
-    if (Test-Path "src\publishers\WordPressPublisher.psm1") {
-        Import-Module ".\src\publishers\WordPressPublisher.psm1" -Force
+    if (Test-Path "pipeline\publishers\WordPressPublisher.psm1") {
+        Import-Module ".\pipeline\publishers\WordPressPublisher.psm1" -Force
         if (Get-Command "Publish-WordPressPost" -ErrorAction SilentlyContinue) {
             Log "  [OK] WordPressPublisher loaded & command available."
         }

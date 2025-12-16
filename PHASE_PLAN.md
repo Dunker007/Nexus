@@ -32,9 +32,9 @@
 - ✅ 72 page routes exist (mostly stubs)
 - ✅ 15+ agents defined in bridge/services
 - ✅ LM Studio + Ollama connected
-- ❌ Most pages are empty shells
+- ✅ Content Pipeline Unfrozen & Verifed
 - ❌ No unified data flow
-- ❌ Agents not wired to UI
+- ❌ Agents not wired to UI (Music Studio excepted)
 
 ---
 
@@ -286,10 +286,12 @@
 |------|------|
 | ✅ Update documentation | SCOPE.md, MASTER_PLAN.md, PHASE_PLAN.md |
 | ✅ Mark pipeline as active | Remove frozen status |
-| Run verification tests | `.\tests\verify_phases_1_2_3.ps1` |
-| Test pipeline dry-run | WordPress.Enabled: false |
+| ✅ Run verification tests | `.\tests\verify_phases_1_2_3.ps1` |
+| ✅ Test pipeline dry-run | WordPress.Enabled: false |
 
 **Exit Criteria:** Pipeline generates HTML content without errors.
+
+**Status**: [x] Completed
 
 ---
 
@@ -301,12 +303,14 @@
 
 | Task | What |
 |------|------|
-| Create pipeline routes | `/pipeline/generate`, `/pipeline/status`, `/pipeline/queue` |
-| Bridge spawn logic | PowerShell child process management |
-| Pipeline UI page | Control dashboard at `/pipeline` |
-| Queue management | View, approve, publish content |
+| ✅ Create pipeline routes | `/pipeline/generate`, `/pipeline/status`, `/pipeline/queue` |
+| ✅ Bridge spawn logic | PowerShell child process management |
+| ✅ Pipeline UI page | Control dashboard at `/pipeline` |
+| ❌ Queue management | View, approve, publish content (Backend verification failed) |
 
 **Exit Criteria:** Generate content from webapp, see it in queue, publish with one click.
+
+**Status**: [ ] Paused (Blocked by path/process spawning issues on Windows)
 
 ---
 

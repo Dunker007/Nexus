@@ -141,13 +141,16 @@ export default function PipelinePage() {
             });
             const data = await res.json();
             if (!data.success) {
-                setError(data.error);
+                let msg = data.error;
+                if (data.details) msg += `: ${data.details}`;
+                if (data.debug) msg += ` (Path: ${data.debug.resolvedPath})`;
+                setError(msg);
             }
             // Refresh status and queue
             await fetchStatus();
             setTimeout(fetchQueue, 2000);
         } catch (err) {
-            setError('Failed to start pipeline');
+            setError('Failed to start pipeline: Network or Server Error');
         } finally {
             setGenerating(false);
         }

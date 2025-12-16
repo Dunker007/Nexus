@@ -46,8 +46,8 @@ router.get('/status', (req, res) => {
  * Get pipeline configuration (sanitized - no credentials)
  */
 router.get('/config', async (req, res) => {
+    const configPath = path.resolve(__dirname, '../../pipeline/core/Config.json');
     try {
-        const configPath = path.resolve(__dirname, '../../pipeline/core/Config.json');
         const configRaw = await fs.readFile(configPath, 'utf-8');
         const config = JSON.parse(configRaw);
 
@@ -91,7 +91,9 @@ router.get('/config', async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Failed to read pipeline config',
-            details: error.message
+            details: error.message,
+            debugPath: configPath,
+            dirname: __dirname
         });
     }
 });
@@ -153,20 +155,45 @@ router.post('/generate', async (req, res) => {
         pipelineStatus.output = [];
         pipelineStatus.errors = [];
 
-        const orchestratorPath = path.resolve(__dirname, '../../pipeline/core/Orchestrator.ps1');
 
-        // Build PowerShell command
-        let psCommand = `& '${orchestratorPath}'`;
 
-        // If topic provided, we need to modify the approach
-        // For now, we'll pass topic via environment or temp config
+        // Dynamic Path Resolution
+        const parentDir = path.resolve(__dirname, '..');
+        const grandparentDir = path.resolve(parentDir, '..');
+
+        let orchestratorPath;
+        let cwd;
+
+        // Check for bundled structure (routes -> bridge-bundle -> pipeline is mapped to ../pipeline)
+        const bundledPipeline = path.resolve(parentDir, 'pipeline');
+
+        console.log('====== PIPELINE DEBUG ======');
+        console.log('__dirname:', __dirname);
+        console.log('Looking for bundled pipeline at:', bundledPipeline);
+
+        if (fs.existsSync(bundledPipeline)) {
+            orchestratorPath = path.resolve(bundledPipeline, 'core/Orchestrator.ps1');
+            cwd = path.resolve(bundledPipeline, 'core');
+            console.log('Found bundled pipeline.');
+        } else {
+            // Fallback to dev structure (routes -> bridge -> repo -> pipeline)
+            orchestratorPath = path.resolve(grandparentDir, 'pipeline/core/Orchestrator.ps1');
+            cwd = path.resolve(grandparentDir, 'pipeline/core');
+            console.log('Using dev structure. Grandparent:', grandparentDir);
+        }
+
+        console.log('Orchestrator Path:', orchestratorPath);
+        console.log('CWD:', cwd);
+        console.log('Script Exists:', fs.existsSync(orchestratorPath));
+        console.log('============================');
+
         const args = [
             '-ExecutionPolicy', 'Bypass',
             '-File', orchestratorPath
         ];
 
-        pipelineProcess = spawn('powershell', args, {
-            cwd: path.resolve(__dirname, '../../pipeline/core'),
+        pipelineProcess = spawn('powershell.exe', args, {
+            cwd: cwd,
             env: {
                 ...process.env,
                 PIPELINE_TOPIC: topic || ''
@@ -214,7 +241,12 @@ router.post('/generate', async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Failed to start pipeline',
-            details: error.message
+            details: error.message,
+            debug: {
+                dirname: __dirname,
+                resolvedPath: path.resolve(__dirname, '../../pipeline/core/Orchestrator.ps1'),
+                attemptedPath: error.path || 'unknown'
+            }
         });
     }
 });

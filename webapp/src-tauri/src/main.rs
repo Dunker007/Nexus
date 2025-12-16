@@ -51,7 +51,7 @@ fn start_bridge(app_handle: &tauri::AppHandle) -> Option<Child> {
         .ok()
         .map(|p| p.join("bridge-bundle"))
         .filter(|p| p.join("server.js").exists())
-        .unwrap_or_else(|| std::path::PathBuf::from(r"C:\Repos GIT\Nexus\Nexus\bridge"));
+        .unwrap_or_else(|| std::path::PathBuf::from(r"C:\Repos GIT\Nexus\bridge"));
 
     println!("Starting Bridge from: {:?}", bridge_path);
 
@@ -67,17 +67,28 @@ fn start_bridge(app_handle: &tauri::AppHandle) -> Option<Child> {
         return None;
     }
 
+    // Set up logging
+    let log_path = std::path::PathBuf::from(r"C:\Users\Public\nexus_bridge.log");
+    let stdout_file = std::fs::File::create(&log_path).expect("Failed to create log file");
+    let stderr_file = stdout_file.try_clone().expect("Failed to clone log file");
+
+    println!("Logging Bridge output to: {:?}", log_path);
+
     // Start the bridge process
     #[cfg(target_os = "windows")]
     let child = Command::new("cmd")
         .args(["/C", "node", "server.js"])
         .current_dir(&bridge_path)
+        .stdout(stdout_file)
+        .stderr(stderr_file)
         .spawn();
 
     #[cfg(not(target_os = "windows"))]
     let child = Command::new("node")
         .arg("server.js")
         .current_dir(&bridge_path)
+        .stdout(stdout_file)
+        .stderr(stderr_file)
         .spawn();
 
     match child {
