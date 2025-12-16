@@ -84,7 +84,7 @@ const DAILY_QUOTES = [
     { content: '"The only way to do great work is to love what you do."', author: 'Steve Jobs' },
 ];
 
-const QUICK_LINKS = [
+const DEFAULT_QUICK_LINKS = [
     { title: 'YouTube Studio', url: 'https://studio.youtube.com', icon: '📺' },
     { title: 'GitHub', url: 'https://github.com', icon: '🐙' },
     { title: 'Gmail', url: 'https://mail.google.com', icon: '📧' },
@@ -136,6 +136,7 @@ export default function DashboardPage() {
     const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(STATIC_CALENDAR_EVENTS as CalendarEvent[]);
     const [googleConnected, setGoogleConnected] = useState(false);
     const [quote] = useState(DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)]);
+    const [quickLinks, setQuickLinks] = useState(DEFAULT_QUICK_LINKS);
 
     // Quick AI State
     const [quickAiInput, setQuickAiInput] = useState('');
@@ -146,11 +147,15 @@ export default function DashboardPage() {
     useEffect(() => {
         const saved = localStorage.getItem('dashboard-layout');
         const savedWidgets = localStorage.getItem('dashboard-widgets');
+        const savedQuickLinks = localStorage.getItem('dashboard-quicklinks');
         if (saved) {
             try { setLayouts(JSON.parse(saved)); } catch { }
         }
         if (savedWidgets) {
             try { setWidgets(JSON.parse(savedWidgets)); } catch { }
+        }
+        if (savedQuickLinks) {
+            try { setQuickLinks(JSON.parse(savedQuickLinks)); } catch { }
         }
     }, []);
 
@@ -452,7 +457,7 @@ export default function DashboardPage() {
             case 'quicklinks':
                 return (
                     <div className="grid grid-cols-2 gap-2">
-                        {QUICK_LINKS.map((link, i) => (
+                        {quickLinks.map((link: { title: string; url: string; icon: string }, i: number) => (
                             <a key={i} href={link.url} target="_blank" className="p-2 rounded bg-white/5 hover:bg-white/10 text-center group">
                                 <div className="text-xl group-hover:scale-110 transition-transform">{link.icon}</div>
                                 <div className="text-xs text-gray-400 mt-1 truncate">{link.title}</div>
