@@ -13,13 +13,38 @@ interface TerminalLine {
 export default function TerminalPage() {
     const [input, setInput] = useState('');
     const [history, setHistory] = useState<TerminalLine[]>([
-        { type: 'success', content: '🚀 DLX Studio Terminal v1.0.1' },
+        { type: 'success', content: '🚀 DLX Studio Terminal v1.0.2' },
         { type: 'output', content: 'Connected to LuxRig Bridge at ' + LUXRIG_BRIDGE_URL },
-        { type: 'output', content: 'Type "help" for available commands.' },
+        { type: 'output', content: 'Type "help" for available commands. Use ↑/↓ for history.' },
         { type: 'output', content: '' },
     ]);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [commandHistory, setCommandHistory] = useState<string[]>([]);
+    const [historyIndex, setHistoryIndex] = useState(-1);
     const terminalEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    // Handle keyboard navigation for command history
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (commandHistory.length > 0) {
+                const newIndex = historyIndex < commandHistory.length - 1 ? historyIndex + 1 : historyIndex;
+                setHistoryIndex(newIndex);
+                setInput(commandHistory[commandHistory.length - 1 - newIndex] || '');
+            }
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (historyIndex > 0) {
+                const newIndex = historyIndex - 1;
+                setHistoryIndex(newIndex);
+                setInput(commandHistory[commandHistory.length - 1 - newIndex] || '');
+            } else if (historyIndex === 0) {
+                setHistoryIndex(-1);
+                setInput('');
+            }
+        }
+    };
 
     const commands: Record<string, (args: string) => Promise<string | string[]>> = {
         help: async () => [
@@ -127,6 +152,8 @@ export default function TerminalPage() {
         const args = rawInput.slice(cmdName.length).trim();
 
         setHistory(prev => [...prev, { type: 'input', content: `$ ${rawInput}` }]);
+        setCommandHistory(prev => [...prev, rawInput]);
+        setHistoryIndex(-1);
         setInput('');
         setIsProcessing(true);
 
@@ -196,9 +223,9 @@ export default function TerminalPage() {
                             <div
                                 key={i}
                                 className={`mb-1 ${line.type === 'input' ? 'text-cyan-400 font-bold' :
-                                        line.type === 'error' ? 'text-red-400' :
-                                            line.type === 'success' ? 'text-green-400' :
-                                                'text-gray-300'
+                                    line.type === 'error' ? 'text-red-400' :
+                                        line.type === 'success' ? 'text-green-400' :
+                                            'text-gray-300'
                                     } whitespace-pre-wrap`}
                             >
                                 {Array.isArray(line.content) ? (
@@ -216,9 +243,11 @@ export default function TerminalPage() {
                     <form onSubmit={handleSubmit} className="flex items-center gap-2 p-4 bg-black/50 border-t border-gray-700">
                         <span className="text-cyan-400 font-mono font-bold">$</span>
                         <input
+                            ref={inputRef}
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
                             className="flex-1 bg-transparent outline-none font-mono text-white placeholder-gray-600"
                             placeholder={isProcessing ? "Wait for process..." : "Enter command..."}
                             autoFocus

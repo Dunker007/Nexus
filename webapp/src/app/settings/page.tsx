@@ -20,6 +20,7 @@ export default function SettingsPage() {
     // Local form state
     const [localSettings, setLocalSettings] = useState<AppSettings>(settings);
     const [startOnBoot, setStartOnBoot] = useState(false);
+    const [connectionTest, setConnectionTest] = useState<{ status: 'idle' | 'testing' | 'success' | 'error'; message?: string }>({ status: 'idle' });
 
     // Sync local state when settings load
     useEffect(() => {
@@ -73,6 +74,24 @@ export default function SettingsPage() {
         await updateSettings(localSettings);
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
+    }
+
+    async function testConnection() {
+        setConnectionTest({ status: 'testing' });
+        try {
+            const res = await fetch(`${localSettings.bridgeUrl}/health`, { signal: AbortSignal.timeout(5000) });
+            if (res.ok) {
+                const data = await res.json();
+                setConnectionTest({
+                    status: 'success',
+                    message: `Connected! Status: ${data.status}, Uptime: ${Math.floor(data.uptime / 60)}m`
+                });
+            } else {
+                setConnectionTest({ status: 'error', message: `HTTP ${res.status}: ${res.statusText}` });
+            }
+        } catch (e: any) {
+            setConnectionTest({ status: 'error', message: e.message || 'Connection failed' });
+        }
     }
 
     function handleReset() {
@@ -458,8 +477,24 @@ export default function SettingsPage() {
                                         />
                                     </div>
 
-                                    <div className="pt-4 border-t border-gray-700">
-                                        <button className="btn-primary">Test Connection</button>
+                                    <div className="pt-4 border-t border-gray-700 space-y-3">
+                                        <button
+                                            onClick={testConnection}
+                                            disabled={connectionTest.status === 'testing'}
+                                            className="btn-primary disabled:opacity-50"
+                                        >
+                                            {connectionTest.status === 'testing' ? 'Testing...' : 'Test Connection'}
+                                        </button>
+                                        {connectionTest.status === 'success' && (
+                                            <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg text-sm text-green-400">
+                                                ✓ {connectionTest.message}
+                                            </div>
+                                        )}
+                                        {connectionTest.status === 'error' && (
+                                            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400">
+                                                ✗ {connectionTest.message}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )}

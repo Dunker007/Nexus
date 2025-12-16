@@ -30,6 +30,7 @@ export default function AgentsPage() {
     const [activeAgents, setActiveAgents] = useState<Agent[]>([]);
     const [availableAgents, setAvailableAgents] = useState<AvailableAgent[]>([]);
     const [loading, setLoading] = useState(true);
+    const [bridgeOnline, setBridgeOnline] = useState<boolean | null>(null);
 
     // Invocation State
     const [selectedAgent, setSelectedAgent] = useState<AvailableAgent | null>(null);
@@ -39,13 +40,16 @@ export default function AgentsPage() {
 
     // Fetch Agents
     const fetchAgents = async () => {
+        setLoading(true);
         try {
             const res = await fetch(`${LUXRIG_BRIDGE_URL}/agents`);
             const data: AgentResponse = await res.json();
             setActiveAgents(data.active || []);
             setAvailableAgents(data.available || []);
+            setBridgeOnline(true);
         } catch (error) {
             console.error('Failed to fetch agents:', error);
+            setBridgeOnline(false);
         } finally {
             setLoading(false);
         }
@@ -102,9 +106,32 @@ export default function AgentsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-12"
                 >
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                        <span className="text-gradient-purple">Agent</span> Registry
-                    </h1>
+                    <div className="flex justify-between items-start mb-4">
+                        <h1 className="text-4xl md:text-5xl font-bold">
+                            <span className="text-gradient-purple">Agent</span> Registry
+                        </h1>
+                        <div className="flex items-center gap-3">
+                            {/* Connection Status */}
+                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${bridgeOnline === true ? 'bg-green-500/20 text-green-400' :
+                                    bridgeOnline === false ? 'bg-red-500/20 text-red-400' :
+                                        'bg-gray-500/20 text-gray-400'
+                                }`}>
+                                <div className={`w-2 h-2 rounded-full ${bridgeOnline === true ? 'bg-green-400 animate-pulse' :
+                                        bridgeOnline === false ? 'bg-red-400' :
+                                            'bg-gray-400'
+                                    }`} />
+                                {bridgeOnline === true ? 'Bridge Online' : bridgeOnline === false ? 'Bridge Offline' : 'Checking...'}
+                            </div>
+                            {/* Refresh Button */}
+                            <button
+                                onClick={() => fetchAgents()}
+                                disabled={loading}
+                                className="px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm disabled:opacity-50"
+                            >
+                                {loading ? '↻ Loading...' : '↻ Refresh'}
+                            </button>
+                        </div>
+                    </div>
                     <p className="text-xl text-gray-400 max-w-2xl">
                         Deploy and orchestrate autonomous AI agents.
                     </p>
