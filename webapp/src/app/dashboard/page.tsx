@@ -133,7 +133,8 @@ export default function DashboardPage() {
     const [loadingNews, setLoadingNews] = useState(true);
     const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(STATIC_CALENDAR_EVENTS as CalendarEvent[]);
     const [googleConnected, setGoogleConnected] = useState(false);
-    const [quote] = useState(DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)]);
+    // Use day of year for deterministic quote selection (avoids hydration mismatch)
+    const [quote, setQuote] = useState<{ content: string; author: string } | null>(null);
     const [quickLinks, setQuickLinks] = useState(DEFAULT_QUICK_LINKS);
 
     // Scratchpad State
@@ -203,6 +204,9 @@ export default function DashboardPage() {
         if (hour < 12) setGreeting('Good morning');
         else if (hour < 17) setGreeting('Good afternoon');
         else setGreeting('Good evening');
+
+        // Set quote client-side to avoid hydration mismatch
+        setQuote(DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)]);
 
         const timer = setInterval(() => setTime(new Date()), 1000);
         fetchSystemStats();
@@ -493,8 +497,14 @@ export default function DashboardPage() {
             case 'quote':
                 return (
                     <div className="flex flex-col justify-center h-full">
-                        <p className="text-sm italic text-gray-300">{quote.content}</p>
-                        <p className="text-xs text-gray-500 mt-2">— {quote.author}</p>
+                        {quote ? (
+                            <>
+                                <p className="text-sm italic text-gray-300">{quote.content}</p>
+                                <p className="text-xs text-gray-500 mt-2">— {quote.author}</p>
+                            </>
+                        ) : (
+                            <p className="text-sm text-gray-500">Loading...</p>
+                        )}
                     </div>
                 );
 
