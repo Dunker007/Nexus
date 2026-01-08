@@ -73,6 +73,115 @@ export default function DevStudioPage() {
         }
     };
 
+
+    // --- Code Agent Widget Component ---
+    const CodeAgentWidget = () => {
+        const [prompt, setPrompt] = useState('');
+        const [action, setAction] = useState('generate');
+        const [isProcessing, setIsProcessing] = useState(false);
+        const [result, setResult] = useState<any>(null);
+
+        const handleExecute = async () => {
+            if (!prompt.trim()) return;
+            setIsProcessing(true);
+            setResult(null);
+
+            try {
+                const res = await fetch(`${LUXRIG_BRIDGE_URL}/agents/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        agentType: 'code',
+                        task: {
+                            action: action,
+                            prompt: prompt,
+                            code: prompt, // For 'review' action, the prompt is treated as code
+                            language: 'typescript'
+                        }
+                    })
+                });
+                const data = await res.json();
+                setResult(data);
+            } catch (err) {
+                console.error(err);
+                setResult({ error: 'Failed to execute code agent task.' });
+            } finally {
+                setIsProcessing(false);
+            }
+        };
+
+        return (
+            <div className="glass-card p-6 h-full flex flex-col">
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Cpu className="text-cyan-400" />
+                    Code Agent
+                </h3>
+
+                <div className="flex-1 flex flex-col gap-4">
+                    <div className="flex gap-2 p-1 bg-white/5 rounded-lg w-fit">
+                        {['generate', 'review', 'security-scan'].map(type => (
+                            <button
+                                key={type}
+                                onClick={() => setAction(type)}
+                                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${action === type
+                                        ? 'bg-cyan-500/20 text-cyan-400 shadow-sm'
+                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                    }`}
+                            >
+                                {type.charAt(0).toUpperCase() + type.slice(1)}
+                            </button>
+                        ))}
+                    </div>
+
+                    <textarea
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        placeholder={action === 'generate' ? "Describe the code you want to generate..." : "Paste code here to review/scan..."}
+                        className="flex-1 min-h-[150px] bg-black/40 border border-white/10 rounded-xl p-4 text-sm font-mono text-gray-300 focus:outline-none focus:border-cyan-500/50 resize-none placeholder-gray-600"
+                    />
+
+                    {result && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            className="bg-black/60 rounded-xl border border-white/10 overflow-hidden"
+                        >
+                            <div className="px-4 py-2 bg-white/5 border-b border-white/5 flex justify-between items-center">
+                                <span className="text-xs font-bold text-gray-500 uppercase">Output</span>
+                                {result.result?.timestamp && (
+                                    <span className="text-xs font-mono text-gray-600">
+                                        {new Date(result.result.timestamp).toLocaleTimeString()}
+                                    </span>
+                                )}
+                            </div>
+                            <pre className="p-4 text-xs font-mono text-cyan-100 overflow-x-auto whitespace-pre-wrap max-h-[300px]">
+                                {result.result?.code || JSON.stringify(result.result || result, null, 2)}
+                            </pre>
+                        </motion.div>
+                    )}
+
+                    <div className="flex justify-end">
+                        <button
+                            onClick={handleExecute}
+                            disabled={!prompt.trim() || isProcessing}
+                            className="btn-primary-cyan flex items-center gap-2 px-6"
+                        >
+                            {isProcessing ? (
+                                <>
+                                    <RefreshCw className="animate-spin" size={16} /> Processing...
+                                </>
+                            ) : (
+                                <>
+                                    <Terminal size={16} /> Execute
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="min-h-screen pt-20 pb-12">
             {/* Header */}
@@ -119,88 +228,14 @@ export default function DevStudioPage() {
             {/* Dashboard Grid */}
             <div className="container-main grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                {/* Repositories */}
-                <section className="lg:col-span-2">
-                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                        <GitBranch className="text-purple-400" />
-                        Active Repositories
-                    </h2>
-
-                    {loading ? (
-                        <div className="flex items-center justify-center h-64 glass-card">
-                            <div className="animate-spin text-4xl text-cyan-400">⚙️</div>
-                        </div>
-                    ) : error ? (
-                        <div className="glass-card p-8 text-center">
-                            <p className="text-red-400 mb-4">{error}</p>
-                            <button
-                                onClick={fetchRepos}
-                                className="btn-primary"
-                            >
-                                Retry Connection
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {repos.map((repo, i) => (
-                                <motion.a
-                                    key={repo.id}
-                                    href={repo.html_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="glass-card p-4 hover:border-cyan-500/50 transition-colors group"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: i * 0.05 }}
-                                >
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="flex items-center gap-2">
-                                            <Folder size={18} className="text-cyan-400" />
-                                            <span className="font-bold group-hover:text-cyan-400 transition-colors">
-                                                {repo.name}
-                                            </span>
-                                        </div>
-                                        {repo.visibility === 'public' ? (
-                                            <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 text-xs">
-                                                Public
-                                            </span>
-                                        ) : (
-                                            <span className="px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 text-xs">
-                                                Private
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    <p className="text-sm text-gray-400 line-clamp-2 h-10 mb-4">
-                                        {repo.description || "No description provided."}
-                                    </p>
-
-                                    <div className="flex items-center justify-between text-xs text-gray-500">
-                                        <div className="flex items-center gap-3">
-                                            {repo.language && (
-                                                <span className="flex items-center gap-1">
-                                                    <span className="w-2 h-2 rounded-full bg-purple-400"></span>
-                                                    {repo.language}
-                                                </span>
-                                            )}
-                                            <span>⭐ {repo.stargazers_count}</span>
-                                        </div>
-                                        <span>{formatRelativeTime(repo.updated_at)}</span>
-                                    </div>
-                                </motion.a>
-                            ))}
-
-                            {repos.length === 0 && !error && (
-                                <div className="col-span-2 text-center py-12 text-gray-400 glass-card">
-                                    No repositories found.
-                                </div>
-                            )}
-                        </div>
-                    )}
+                {/* Left Column: Code Agent (Takes priority) */}
+                <section className="lg:col-span-2 min-h-[500px]">
+                    <CodeAgentWidget />
                 </section>
 
-                {/* System Status & Tools */}
+                {/* Right Column: System & Status */}
                 <aside className="space-y-6">
+                    {/* System Resources */}
                     <motion.div
                         className="glass-card p-6"
                         initial={{ opacity: 0, x: 20 }}
@@ -243,7 +278,7 @@ export default function DevStudioPage() {
 
                         <div className="mt-6 pt-4 border-t border-white/10 grid grid-cols-2 gap-4">
                             <div className="text-center p-2 bg-white/5 rounded-lg">
-                                <div className="text-xs text-gray-500 mb-1">Node Version</div>
+                                <div className="text-xs text-gray-500 mb-1">Node</div>
                                 <div className="font-mono text-sm">{status?.nodeVersion || 'v18.x'}</div>
                             </div>
                             <div className="text-center p-2 bg-white/5 rounded-lg">
@@ -252,41 +287,93 @@ export default function DevStudioPage() {
                             </div>
                         </div>
                     </motion.div>
-
-                    <motion.div
-                        className="glass-card p-6"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 }}
-                    >
-                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                            <Terminal className="text-yellow-400" />
-                            Quick Actions
-                        </h3>
-
-                        <div className="space-y-2">
-                            <button className="w-full text-left px-4 py-3 bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-3">
-                                <span className="p-1.5 bg-blue-500/20 text-blue-400 rounded">
-                                    <Github size={16} />
-                                </span>
-                                <div>
-                                    <div className="font-medium text-sm">Clone Repository</div>
-                                    <div className="text-xs text-gray-500">Clone from GitHub URL</div>
-                                </div>
-                            </button>
-
-                            <button className="w-full text-left px-4 py-3 bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-3">
-                                <span className="p-1.5 bg-purple-500/20 text-purple-400 rounded">
-                                    <Terminal size={16} />
-                                </span>
-                                <div>
-                                    <div className="font-medium text-sm">New Terminal</div>
-                                    <div className="text-xs text-gray-500">Open system terminal</div>
-                                </div>
-                            </button>
-                        </div>
-                    </motion.div>
                 </aside>
+
+                {/* Bottom Full Width: Repositories */}
+                <section className="lg:col-span-3">
+                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                        <GitBranch className="text-purple-400" />
+                        Active Repositories
+                    </h2>
+
+                    {loading ? (
+                        <div className="flex items-center justify-center h-48 glass-card">
+                            <div className="animate-spin text-4xl text-cyan-400">⚙️</div>
+                        </div>
+                    ) : error ? (
+                        <div className="glass-card p-12 text-center flex flex-col items-center">
+                            <Github size={48} className="text-gray-600 mb-4" />
+                            <h3 className="text-xl font-bold text-white mb-2">GitHub Not Connected</h3>
+                            <p className="text-gray-400 mb-6 max-w-md">
+                                Connect your GitHub account to manage repositories and track deployments directly from Nexus.
+                            </p>
+                            <Link
+                                href="/integrations"
+                                className="px-6 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center gap-2"
+                            >
+                                <Github size={18} /> Connect Account
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {repos.map((repo, i) => (
+                                <motion.a
+                                    key={repo.id}
+                                    href={repo.html_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="glass-card p-4 hover:border-cyan-500/50 transition-colors group flex flex-col"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.05 }}
+                                >
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                            <Folder size={18} className="text-cyan-400 flex-shrink-0" />
+                                            <span className="font-bold group-hover:text-cyan-400 transition-colors truncate">
+                                                {repo.name}
+                                            </span>
+                                        </div>
+                                        {repo.visibility === 'public' ? (
+                                            <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 text-[10px] uppercase">
+                                                Public
+                                            </span>
+                                        ) : (
+                                            <span className="px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 text-[10px] uppercase">
+                                                Private
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <p className="text-sm text-gray-400 line-clamp-2 mb-4 flex-1">
+                                        {repo.description || "No description provided."}
+                                    </p>
+
+                                    <div className="flex items-center justify-between text-xs text-gray-500 border-t border-white/5 pt-3">
+                                        <div className="flex items-center gap-3">
+                                            {repo.language && (
+                                                <span className="flex items-center gap-1.5">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                                                    {repo.language}
+                                                </span>
+                                            )}
+                                            <span className="flex items-center gap-1">
+                                                ★ {repo.stargazers_count}
+                                            </span>
+                                        </div>
+                                        <span>{formatRelativeTime(repo.updated_at)}</span>
+                                    </div>
+                                </motion.a>
+                            ))}
+
+                            {repos.length === 0 && !error && (
+                                <div className="col-span-full py-12 text-center text-gray-500 glass-card">
+                                    No repositories found.
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </section>
             </div>
         </div>
     );

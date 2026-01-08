@@ -366,13 +366,24 @@ app.get('/github/user', async (req, res) => {
 });
 
 // List repos
+// List repos
 app.get('/github/repos', async (req, res) => {
     try {
         const accessToken = req.headers.authorization?.replace('Bearer ', '');
         const limit = parseInt(req.query.limit) || 10;
+
+        // If no token passed and no env token, return 401 (Unauthorized/Not Connected)
+        if (!accessToken && !process.env.GITHUB_ACCESS_TOKEN) {
+            return res.status(401).json({ error: 'Not connected to GitHub' });
+        }
+
         const repos = await githubService.listRepos(accessToken, limit);
         res.json(repos);
     } catch (error) {
+        // If it's a token error, return 401
+        if (error.message.includes('No access token')) {
+            return res.status(401).json({ error: 'Not connected to GitHub' });
+        }
         res.status(500).json({ error: error.message });
     }
 });
