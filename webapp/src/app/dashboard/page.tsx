@@ -510,6 +510,22 @@ export default function DashboardPage() {
 
             case 'system':
                 // /status provides: { services: { lmstudio: { online: bool }, ollama: { online: bool } }, system: { ... } }
+                // Handle case where systemStats is null (Bridge offline)
+                if (!systemStats) {
+                    return (
+                        <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                            <div className="w-3 h-3 rounded-full bg-red-500 mb-2 animate-pulse"></div>
+                            <p className="text-xs font-medium text-red-400">Bridge Disconnected</p>
+                            <button 
+                                onClick={fetchSystemStats}
+                                className="mt-2 text-[10px] px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-400"
+                            >
+                                Retry Connection
+                            </button>
+                        </div>
+                    );
+                }
+
                 const lmStudioOnline = systemStats?.services?.lmstudio?.online ?? false;
                 const ollamaOnline = systemStats?.services?.ollama?.online ?? false;
                 const gpuTemp = systemStats?.system?.gpu?.temperature ?? '--';
@@ -522,14 +538,14 @@ export default function DashboardPage() {
                                 <span className={`w-2 h-2 rounded-full ${lmStudioOnline ? 'bg-green-400' : 'bg-red-400'}`}></span>
                                 <span className="text-xs font-medium truncate">LM Studio</span>
                             </div>
-                            <p className="text-xs text-gray-500">{lmStudioOnline ? 'Online' : 'Offline'}</p>
+                            <p className={`text-xs ${lmStudioOnline ? 'text-green-400/70' : 'text-red-400/70'}`}>{lmStudioOnline ? 'Online' : 'Offline'}</p>
                         </div>
                         <div className="p-3 rounded-lg bg-white/5 flex flex-col justify-center">
                             <div className="flex items-center gap-2 mb-1">
                                 <span className={`w-2 h-2 rounded-full ${ollamaOnline ? 'bg-green-400' : 'bg-red-400'}`}></span>
                                 <span className="text-xs font-medium truncate">Ollama</span>
                             </div>
-                            <p className="text-xs text-gray-500">{ollamaOnline ? 'Online' : 'Offline'}</p>
+                            <p className={`text-xs ${ollamaOnline ? 'text-green-400/70' : 'text-red-400/70'}`}>{ollamaOnline ? 'Online' : 'Offline'}</p>
                         </div>
                         <div className="p-3 rounded-lg bg-white/5 col-span-2 flex flex-col justify-center">
                             <div className="flex justify-between items-center mb-2">
