@@ -298,7 +298,7 @@ export default function AgentsPage() {
                             </div>
                         ) : (
                             <AnimatePresence mode='popLayout'>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                     {filteredAgents.map((agent) => (
                                         <motion.div
                                             key={agent.type}
@@ -306,27 +306,27 @@ export default function AgentsPage() {
                                             initial={{ opacity: 0, scale: 0.9 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             exit={{ opacity: 0, scale: 0.9 }}
-                                            className="glass-card group hover:border-purple-500/50 cursor-pointer transition-all hover:-translate-y-1 relative"
+                                            className="glass-card group hover:border-purple-500/50 cursor-pointer transition-all hover:-translate-y-1 relative p-3 flex items-center gap-3"
                                             onClick={() => setSelectedAgent(agent)}
                                         >
-                                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
+                                            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
 
-                                            <div className="flex justify-between items-start mb-4 relative z-10">
-                                                <div className="p-3 rounded-xl bg-white/5 text-gray-300 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-colors">
-                                                    {getAgentIcon(agent.type)}
-                                                </div>
-                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <span className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 inline-flex">
-                                                        <Play size={14} className="text-white" />
-                                                    </span>
-                                                </div>
+                                            {/* Icon */}
+                                            <div className="flex-shrink-0 p-2.5 rounded-lg bg-white/5 text-gray-300 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-colors relative z-10">
+                                                {getAgentIcon(agent.type)}
                                             </div>
 
-                                            <div className="relative z-10">
-                                                <div className="text-xs font-medium text-gray-500 mb-1 uppercase tracking-wide">
-                                                    {getAgentCategory(agent.type)}
+                                            {/* Text Content */}
+                                            <div className="flex-1 min-w-0 relative z-10">
+                                                <div className="flex justify-between items-center mb-0.5">
+                                                    <div className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">
+                                                        {getAgentCategory(agent.type)}
+                                                    </div>
+                                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity -mr-1">
+                                                        <Play size={12} className="text-purple-400" />
+                                                    </div>
                                                 </div>
-                                                <h3 className="text-lg font-bold mb-2 group-hover:text-white transition-colors">
+                                                <h3 className="text-sm font-bold group-hover:text-white transition-colors truncate">
                                                     {agent.name}
                                                 </h3>
                                             </div>
