@@ -17,7 +17,7 @@ interface Lab {
     desc: string;
     content?: string; // Markdown content for plans/docs
     status: 'active' | 'preview' | 'concept';
-    category: 'Operations' | 'Intelligence' | 'Creation' | 'Capital' | 'Experimental';
+    category: 'Operations' | 'Intelligence' | 'Creation' | 'Capital' | 'Experimental' | 'System' | 'Archive';
     priority: 'High' | 'Medium' | 'Low';
     agents: string[];
     href: string | null;
@@ -55,6 +55,7 @@ export default function LabsPage() {
     const [newIdea, setNewIdea] = useState({ title: '', desc: '', category: 'Operations' });
     const [dbStatus, setDbStatus] = useState<'connected' | 'disconnected' | 'loading'>('loading');
     const [isSyncing, setIsSyncing] = useState(false);
+
 
     // Fetch projects from database
     useEffect(() => {
@@ -207,7 +208,7 @@ export default function LabsPage() {
                 {/* Filters */}
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
                     <div className="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto">
-                        {['All', 'Operations', 'Intelligence', 'Creation', 'Capital', 'Experimental'].map(cat => (
+                        {['All', 'System', 'Operations', 'Intelligence', 'Creation', 'Capital', 'Experimental', 'Archive'].map(cat => (
                             <button
                                 key={cat}
                                 onClick={() => setFilterCategory(cat)}
@@ -244,101 +245,107 @@ export default function LabsPage() {
                 {/* Content Views */}
                 <AnimatePresence mode="wait">
                     {viewMode === 'gantt' && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="glass-card p-0 overflow-hidden">
-                            {/* Gantt Header - Month Labels */}
-                            <div className="flex border-b border-white/10 bg-white/5">
-                                <div className="w-[280px] shrink-0 p-3 border-r border-white/10">
-                                    <span className="text-xs uppercase text-gray-500 font-bold">Project</span>
+                        <div className="glass-card p-0 overflow-hidden flex flex-col h-[calc(100vh-250px)]">
+                            {/* Gantt Header */}
+                            <div className="flex border-b border-white/10 bg-white/5 shrink-0">
+                                {/* Left Panel Header (Fixed) */}
+                                <div className="w-[450px] shrink-0 flex items-center divide-x divide-white/10 border-r border-white/10">
+                                    <div className="w-12 p-3 text-center text-xs font-bold text-gray-500">ID</div>
+                                    <div className="flex-1 p-3 text-xs font-bold text-gray-500">Task</div>
+                                    <div className="w-24 p-3 text-xs font-bold text-gray-500">Assignee</div>
+                                    <div className="w-20 p-3 text-xs font-bold text-gray-500 text-center">Priority</div>
+                                    <div className="w-16 p-3 text-xs font-bold text-gray-500 text-center">%</div>
                                 </div>
-                                <div className="flex-1 flex">
-                                    {MONTHS.map((m, i) => (
-                                        <div key={m} className="flex-1 text-center py-2 text-[10px] font-bold text-gray-500 border-r border-white/5 last:border-r-0">
-                                            {m}
-                                        </div>
-                                    ))}
+
+                                {/* Right Panel Header (Scrollable) */}
+                                <div className="flex-1 overflow-hidden relative">
+                                    <div className="flex w-full">
+                                        {MONTHS.map((m, i) => (
+                                            <div key={m} className="flex-1 min-w-[60px] text-center py-3 text-[10px] font-bold text-gray-500 border-r border-white/5 last:border-r-0 uppercase tracking-wider">
+                                                {m}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Gantt Rows */}
-                            <div className="divide-y divide-white/5">
+                            {/* Gantt Body */}
+                            <div className="flex-1 overflow-y-auto divide-y divide-white/5 custom-scrollbar">
                                 {filteredLabs.map((lab, idx) => (
                                     <div
                                         key={lab.id}
-                                        className="flex hover:bg-white/[0.02] transition-colors group cursor-pointer"
-                                        onClick={() => lab.href ? window.location.href = lab.href : setViewContent(lab.content || null)}
+                                        className="flex hover:bg-white/[0.02] transition-colors group h-10"
                                     >
-                                        {/* Project Info */}
-                                        <div className="w-[280px] shrink-0 p-3 border-r border-white/10 flex items-center gap-3">
-                                            <div className="text-xl w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
-                                                {lab.icon}
+                                        {/* Left Panel Rows (Fixed Width) */}
+                                        <div className="w-[450px] shrink-0 flex items-center divide-x divide-white/5 border-r border-white/10 bg-black/10">
+                                            <div className="w-12 p-2 text-center text-[10px] text-gray-500 font-mono">{idx + 1}</div>
+                                            <div className="flex-1 px-3 flex items-center gap-2 min-w-0">
+                                                <span className="text-sm opacity-50 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all">{lab.icon}</span>
+                                                <span className="text-xs font-medium truncate group-hover:text-cyan-400 transition-colors">{lab.name}</span>
+                                                <a href={lab.href || '#'} className="opacity-0 group-hover:opacity-100 transition-opacity"><ArrowUpRight size={10} className="text-cyan-500" /></a>
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="font-semibold text-sm truncate group-hover:text-cyan-400 transition-colors flex items-center gap-1.5">
-                                                    {lab.name}
-                                                    {lab.href && <ArrowUpRight size={10} className="text-gray-600 group-hover:text-cyan-400" />}
-                                                </h3>
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`text-[9px] px-1.5 py-0.5 rounded uppercase tracking-wide ${lab.status === 'active' ? 'bg-green-500/20 text-green-400' :
-                                                        lab.status === 'preview' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                            'bg-gray-500/20 text-gray-400'
-                                                        }`}>{lab.status}</span>
-                                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white ${AGENT_COLORS[lab.owner.toLowerCase()] || 'bg-gray-600'}`}>
-                                                        {lab.owner[0]}
-                                                    </div>
+                                            <div className="w-24 px-2 flex items-center gap-1.5">
+                                                <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white border border-white/10 ${AGENT_COLORS[lab.owner.toLowerCase()] || 'bg-gray-600'}`}>
+                                                    {lab.owner[0]}
                                                 </div>
+                                                <span className="text-[10px] text-gray-400 truncate">{lab.owner}</span>
+                                            </div>
+                                            <div className="w-20 px-2 flex justify-center">
+                                                <span className={`text-[9px] px-1.5 py-0.5 rounded text-center w-full font-medium ${lab.priority === 'High' ? 'bg-red-500/10 text-red-400' :
+                                                    lab.priority === 'Medium' ? 'bg-blue-500/10 text-blue-400' :
+                                                        'bg-gray-500/10 text-gray-500'
+                                                    }`}>
+                                                    {lab.priority}
+                                                </span>
+                                            </div>
+                                            <div className="w-16 px-2 flex justify-center text-[10px] font-mono text-gray-400">
+                                                {lab.timeline.progress}%
                                             </div>
                                         </div>
 
-                                        {/* Timeline Bar Area */}
-                                        <div className="flex-1 relative flex items-center py-2">
-                                            {/* Month grid lines */}
-                                            <div className="absolute inset-0 flex">
+                                        {/* Right Panel Timeline (Flexible) */}
+                                        <div className="flex-1 relative flex items-center">
+                                            {/* Grid Lines */}
+                                            <div className="absolute inset-0 flex pointer-events-none">
                                                 {MONTHS.map((_, i) => (
                                                     <div key={i} className="flex-1 border-r border-white/5 last:border-r-0" />
                                                 ))}
                                             </div>
 
                                             {/* Timeline Bar */}
-                                            <div
-                                                className="absolute h-6 rounded-full bg-gradient-to-r from-cyan-600/40 to-cyan-500/40 border border-cyan-500/50 flex items-center overflow-hidden"
-                                                style={{
-                                                    left: `${(lab.timeline.startMonth / 12) * 100}%`,
-                                                    width: `${(lab.timeline.durationMonths / 12) * 100}%`
-                                                }}
-                                            >
-                                                {/* Progress fill */}
+                                            {lab.timeline.durationMonths > 0 && (
                                                 <div
-                                                    className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 rounded-l-full"
-                                                    style={{ width: `${lab.timeline.progress}%` }}
-                                                />
-                                                {/* Progress label */}
-                                                <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-white drop-shadow-sm">
-                                                    {lab.timeline.progress}%
-                                                </span>
-                                            </div>
+                                                    className={`absolute h-5 rounded mx-1 shadow-sm border border-white/5 flex items-center overflow-hidden transition-all hover:brightness-110 ${lab.status === 'active' ? 'bg-cyan-600/60' :
+                                                        lab.status === 'preview' ? 'bg-purple-600/60' :
+                                                            'bg-gray-700/60'
+                                                        }`}
+                                                    style={{
+                                                        left: `${(lab.timeline.startMonth / 12) * 100}%`,
+                                                        width: `${(lab.timeline.durationMonths / 12) * 100}%`
+                                                    }}
+                                                >
+                                                    {/* Progress Fill inside the bar */}
+                                                    <div
+                                                        className="h-full bg-white/10"
+                                                        style={{ width: `${lab.timeline.progress}%` }}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
                             {/* Footer Legend */}
-                            <div className="p-3 border-t border-white/10 bg-white/[0.02] flex items-center justify-between">
-                                <div className="flex items-center gap-4 text-[10px] text-gray-500">
-                                    <span className="flex items-center gap-1">
-                                        <div className="w-2 h-2 bg-green-500 rounded-full" /> Active
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <div className="w-2 h-2 bg-yellow-500 rounded-full" /> Preview
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <div className="w-2 h-2 bg-gray-500 rounded-full" /> Concept
-                                    </span>
+                            <div className="p-2 border-t border-white/10 bg-white/[0.02] flex items-center justify-between text-[10px] text-gray-500 shrink-0">
+                                <div className="flex gap-4">
+                                    <span className="flex items-center gap-1.5"><div className="w-2 h-2 bg-cyan-600/60 rounded-sm" /> Active</span>
+                                    <span className="flex items-center gap-1.5"><div className="w-2 h-2 bg-purple-600/60 rounded-sm" /> Preview</span>
+                                    <span className="flex items-center gap-1.5"><div className="w-2 h-2 bg-gray-700/60 rounded-sm" /> Concept</span>
                                 </div>
-                                <span className="text-[10px] text-gray-500">
-                                    {filteredLabs.length} projects • Click to open
-                                </span>
+                                <span>{filteredLabs.length} projects loaded</span>
                             </div>
-                        </motion.div>
+                        </div>
                     )}
 
                     {(viewMode === 'grid' || viewMode === 'kanban') && (
@@ -430,7 +437,7 @@ export default function LabsPage() {
                                         value={newIdea.category}
                                         onChange={e => setNewIdea({ ...newIdea, category: e.target.value })}
                                     >
-                                        {['Operations', 'Intelligence', 'Creation', 'Capital', 'Experimental'].map(c => <option key={c} value={c}>{c}</option>)}
+                                        {['Operations', 'Intelligence', 'Creation', 'Capital', 'Experimental', 'System', 'Archive'].map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
                                 <button
@@ -444,7 +451,7 @@ export default function LabsPage() {
                     </div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     );
 }
 
