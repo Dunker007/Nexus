@@ -9,7 +9,7 @@ const KeyboardShortcuts = dynamic(() => import("@/components/KeyboardShortcuts")
 const CollaborationToolbar = dynamic(() => import("@/components/CollaborationToolbar"), { ssr: false });
 const ConsentBanner = dynamic(() => import("@/components/ConsentBanner"), { ssr: false });
 // const VibeController = dynamic(() => import("@/components/VibeController"), { ssr: false });
-const VoiceControl = dynamic(() => import("@/components/VoiceControl"), { ssr: false });
+// const VoiceControl = dynamic(() => import("@/components/VoiceControl"), { ssr: false });
 
 export default function AppOverlays() {
     return (
@@ -17,7 +17,7 @@ export default function AppOverlays() {
             <CommandPalette />
             <KeyboardShortcuts />
             {/* <VibeController /> */}
-            <VoiceControl />
+            {/* <VoiceControl /> */}
             {/* <LuxHelper /> */}
             <CollaborationToolbar />
             <ConsentBanner />
