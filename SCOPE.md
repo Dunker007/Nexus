@@ -18,9 +18,10 @@ This file is the quick reference. The Master Plan has full context.
 
 | Module | Location | Status |
 |--------|----------|--------|
-| **Chat** | webapp/src/app/chat | 🟢 Working |
+| **Chat** | webapp/src/app/chat | 🟢 Working (Polished) |
 | **News Hub** | webapp/src/app/news | 🟢 Working |
-| **Agents Hub** | webapp/src/app/agents | 🟢 Working |
+| **Agents Hub** | webapp/src/app/agents | 🟢 Working (Polished & Connected) |
+| **Dev Studio** | webapp/src/app/studios/dev | 🟢 Working (New Code Agent) |
 | **Dashboard** | webapp/src/app/dashboard | 🟢 Working |
 | **Settings** | webapp/src/app/settings | 🟢 Working |
 | **Terminal** | webapp/src/app/terminal | 🟢 Working |
