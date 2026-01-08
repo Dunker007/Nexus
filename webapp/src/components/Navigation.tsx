@@ -38,12 +38,7 @@ export default function Navigation() {
     // If in popup mode, don't render the navigation bar
     if (isPopup) return null;
 
-    const toggleTheme = () => {
-        const ids = availableThemes.map(t => t.id);
-        const currentIndex = ids.indexOf(themeId);
-        const nextIndex = (currentIndex + 1) % ids.length;
-        setTheme(ids[nextIndex]);
-    };
+
 
     return (
         <nav
@@ -87,18 +82,7 @@ export default function Navigation() {
 
                         <ThemeToggle />
 
-                        <motion.button
-                            onClick={toggleTheme}
-                            className="relative p-2 rounded-full glass-panel hover:bg-white/10 transition-colors border border-white/5"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            aria-label="Cycle vibe mode"
-                        >
-                            <Palette className={`w-5 h-5 ${mode === 'crisis' ? 'text-red-500' :
-                                mode === 'high-load' ? 'text-yellow-500' :
-                                    'text-purple-400'
-                                }`} />
-                        </motion.button>
+
 
                         <button
                             className="flex items-center gap-2 px-3 py-2 rounded-lg glass-panel hover:bg-white/10 transition-colors border border-white/5 text-gray-400 hover:text-white text-sm"
@@ -116,14 +100,7 @@ export default function Navigation() {
                     <div className="lg:hidden flex items-center gap-4">
                         <div className="flex items-center gap-2">
                             <ThemeToggle />
-                            <motion.button
-                                onClick={toggleTheme}
-                                className="p-2 rounded-full glass-panel"
-                                whileTap={{ scale: 0.95 }}
-                                aria-label="Cycle vibe mode"
-                            >
-                                <Palette className="w-5 h-5 text-purple-400" />
-                            </motion.button>
+
                         </div>
 
                         <button
