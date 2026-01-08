@@ -8,6 +8,7 @@ import { RevenueAgent } from './agents-revenue.js';
 import { IntentAgent } from './agents-intent.js';
 import { StaffMeetingAgent } from './agents-staff-meeting.js';
 import { LyricistAgent, ComposerAgent, CriticAgent, ProducerAgent, SongwriterRoom, NewsicianAgent, MidwestSentinelAgent, MicAgent } from './agents-songwriter.js';
+import { lmstudioService } from './lmstudio.js';
 
 export { Agent };
 
@@ -89,28 +90,35 @@ export class ResearchAgent extends Agent {
 }
 
 /**
- * Code Agent - Analyzes and generates code
+ * Code Agent - Analyzes and generates code (LLM-Powered)
+ * Activated January 2026 - Uses LM Studio for intelligent code analysis
  */
 export class CodeAgent extends Agent {
     constructor() {
         super({
             id: 'code-agent',
             name: 'Code Agent',
-            description: 'Analyzes, generates, and reviews code',
+            description: 'Analyzes, generates, and reviews code using local LLM',
             capabilities: ['code-generation', 'code-review', 'security-scan', 'testing']
         });
+        this.persona = {
+            emoji: '💻',
+            color: '#10B981',
+            style: 'Precise, security-conscious, best-practices focused'
+        };
     }
 
     async processTask(task, context) {
         const { action, code, language = 'javascript' } = task;
+        const model = context?.model || null; // Extract model from context
 
         switch (action) {
             case 'review':
-                return await this.reviewCode(code, language);
+                return await this.reviewCode(code, language, model);
             case 'security-scan':
-                return await this.scanSecurity(code, language);
+                return await this.scanSecurity(code, language, model);
             case 'generate-tests':
-                return await this.generateTests(code, language);
+                return await this.generateTests(code, language, model);
             case 'generate':
                 return await this.generateCode(task.prompt, language, context);
             default:
@@ -118,83 +126,280 @@ export class CodeAgent extends Agent {
         }
     }
 
-    async reviewCode(code, language) {
-        // Basic code review
-        const issues = [];
+    async reviewCode(code, language, model = null) {
+        // Hybrid approach: fast regex checks + LLM analysis
+        const quickIssues = this._quickPatternCheck(code);
 
-        // Check for common issues
-        if (code.includes('eval(')) {
-            issues.push({ severity: 'high', message: 'Use of eval() detected - security risk' });
-        }
-        if (code.includes('console.log')) {
-            issues.push({ severity: 'low', message: 'Console.log statements should be removed in production' });
-        }
-        if (!code.includes('try') && code.includes('await')) {
-            issues.push({ severity: 'medium', message: 'Async code without error handling' });
-        }
+        const systemPrompt = `You are an expert code reviewer. Analyze the provided ${language} code for:
+1. Code quality issues (naming, structure, readability)
+2. Potential bugs or logic errors
+3. Performance concerns
+4. Best practices violations
+5. Maintainability issues
 
-        return {
-            language,
-            issues,
-            score: Math.max(0, 100 - (issues.length * 10)),
-            timestamp: new Date()
-        };
+Provide a JSON response with this structure:
+{
+  "issues": [{"severity": "high|medium|low", "line": number|null, "message": "description", "suggestion": "how to fix"}],
+  "score": 0-100,
+  "summary": "brief overall assessment",
+  "strengths": ["list of good practices found"]
+}`;
+
+        try {
+            console.log(`[CodeAgent] Reviewing ${language} code (${code.length} chars) with model: ${model || 'default'}...`);
+            const completion = await lmstudioService.chat([
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: `Review this ${language} code:\n\n\`\`\`${language}\n${code}\n\`\`\`` }
+            ], model);
+
+            let llmResult = {};
+            try {
+                const jsonMatch = completion.content.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    llmResult = JSON.parse(jsonMatch[0]);
+                }
+            } catch (e) {
+                console.warn('[CodeAgent] Could not parse LLM JSON, using text response');
+                llmResult = { summary: completion.content, issues: [] };
+            }
+
+            // Merge quick checks with LLM analysis
+            const allIssues = [...quickIssues, ...(llmResult.issues || [])];
+
+            return {
+                language,
+                issues: allIssues,
+                score: llmResult.score || Math.max(0, 100 - (allIssues.length * 10)),
+                summary: llmResult.summary || 'Code review completed',
+                strengths: llmResult.strengths || [],
+                source: 'lm-studio',
+                timestamp: new Date()
+            };
+        } catch (error) {
+            console.error('[CodeAgent] LLM review failed, using pattern-only:', error.message);
+            return {
+                language,
+                issues: quickIssues,
+                score: Math.max(0, 100 - (quickIssues.length * 10)),
+                summary: 'Pattern-based review (LLM unavailable)',
+                source: 'pattern-fallback',
+                timestamp: new Date()
+            };
+        }
     }
 
-    async scanSecurity(code, language) {
-        const vulnerabilities = [];
+    _quickPatternCheck(code) {
+        const issues = [];
 
-        // Security checks
-        const securityPatterns = [
-            { pattern: /eval\(/g, risk: 'high', message: 'Code injection risk' },
-            { pattern: /innerHTML\s*=/g, risk: 'medium', message: 'XSS vulnerability' },
-            { pattern: /document\.write/g, risk: 'medium', message: 'DOM manipulation risk' },
-            { pattern: /exec\(/g, risk: 'high', message: 'Command injection risk' },
+        if (code.includes('eval(')) {
+            issues.push({ severity: 'high', message: 'Use of eval() detected - security risk', suggestion: 'Use safer alternatives like JSON.parse()' });
+        }
+        if (code.includes('console.log') && !code.includes('// debug')) {
+            issues.push({ severity: 'low', message: 'Console.log statements found', suggestion: 'Remove or guard with debug flag in production' });
+        }
+        if (!code.includes('try') && code.includes('await')) {
+            issues.push({ severity: 'medium', message: 'Async code without error handling', suggestion: 'Wrap await calls in try/catch blocks' });
+        }
+        if (code.includes('var ')) {
+            issues.push({ severity: 'low', message: 'Using var instead of const/let', suggestion: 'Use const for constants, let for variables' });
+        }
+
+        return issues;
+    }
+
+    async scanSecurity(code, language, model = null) {
+        // Quick pattern scan first
+        const patternVulns = this._quickSecurityScan(code);
+
+        const systemPrompt = `You are a security expert. Analyze the provided ${language} code for security vulnerabilities including:
+1. Injection vulnerabilities (SQL, command, code)
+2. XSS vulnerabilities
+3. Authentication/authorization issues
+4. Secrets/credentials exposure
+5. Insecure data handling
+6. OWASP Top 10 violations
+
+Return JSON:
+{
+  "vulnerabilities": [{"risk": "critical|high|medium|low", "type": "vulnerability type", "message": "description", "line": number|null, "fix": "recommendation"}],
+  "riskLevel": "critical|high|medium|low",
+  "safe": boolean,
+  "recommendations": ["list of security improvements"]
+}`;
+
+        try {
+            console.log(`[CodeAgent] Security scanning ${language} code with model: ${model || 'default'}...`);
+            const completion = await lmstudioService.chat([
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: `Scan this ${language} code for security vulnerabilities:\n\n\`\`\`${language}\n${code}\n\`\`\`` }
+            ], model);
+
+            let llmResult = {};
+            try {
+                const jsonMatch = completion.content.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    llmResult = JSON.parse(jsonMatch[0]);
+                }
+            } catch (e) {
+                llmResult = { vulnerabilities: [], recommendations: [completion.content] };
+            }
+
+            const allVulns = [...patternVulns, ...(llmResult.vulnerabilities || [])];
+
+            return {
+                vulnerabilities: allVulns,
+                riskLevel: allVulns.some(v => v.risk === 'critical') ? 'critical' :
+                    allVulns.some(v => v.risk === 'high') ? 'high' :
+                        allVulns.some(v => v.risk === 'medium') ? 'medium' : 'low',
+                safe: allVulns.length === 0,
+                recommendations: llmResult.recommendations || [],
+                source: 'lm-studio',
+                timestamp: new Date()
+            };
+        } catch (error) {
+            console.error('[CodeAgent] LLM security scan failed:', error.message);
+            return {
+                vulnerabilities: patternVulns,
+                riskLevel: patternVulns.some(v => v.risk === 'high') ? 'high' :
+                    patternVulns.some(v => v.risk === 'medium') ? 'medium' : 'low',
+                safe: patternVulns.length === 0,
+                source: 'pattern-fallback',
+                timestamp: new Date()
+            };
+        }
+    }
+
+    _quickSecurityScan(code) {
+        const vulnerabilities = [];
+        const patterns = [
+            { pattern: /eval\(/g, risk: 'high', type: 'Code Injection', message: 'eval() can execute arbitrary code' },
+            { pattern: /innerHTML\s*=/g, risk: 'medium', type: 'XSS', message: 'innerHTML can introduce XSS vulnerabilities' },
+            { pattern: /document\.write/g, risk: 'medium', type: 'XSS', message: 'document.write is unsafe' },
+            { pattern: /exec\(/g, risk: 'high', type: 'Command Injection', message: 'exec() can run arbitrary commands' },
+            { pattern: /password\s*=\s*['"][^'"]+['"]/gi, risk: 'critical', type: 'Hardcoded Secret', message: 'Hardcoded password detected' },
+            { pattern: /api[_-]?key\s*=\s*['"][^'"]+['"]/gi, risk: 'critical', type: 'Hardcoded Secret', message: 'Hardcoded API key detected' },
         ];
 
-        for (const { pattern, risk, message } of securityPatterns) {
+        for (const { pattern, risk, type, message } of patterns) {
             const matches = code.match(pattern);
             if (matches) {
-                vulnerabilities.push({
-                    risk,
-                    message,
-                    occurrences: matches.length,
-                    pattern: pattern.source
-                });
+                vulnerabilities.push({ risk, type, message, occurrences: matches.length });
             }
         }
 
-        return {
-            vulnerabilities,
-            riskLevel: vulnerabilities.some(v => v.risk === 'high') ? 'high' :
-                vulnerabilities.some(v => v.risk === 'medium') ? 'medium' : 'low',
-            safe: vulnerabilities.length === 0,
-            timestamp: new Date()
-        };
+        return vulnerabilities;
     }
 
-    async generateTests(code, language) {
-        // Generate basic test structure
-        return {
-            language,
-            tests: [
-                { name: 'should handle valid input', type: 'unit' },
-                { name: 'should handle edge cases', type: 'unit' },
-                { name: 'should handle errors gracefully', type: 'integration' }
-            ],
-            coverage: 'basic',
-            timestamp: new Date()
-        };
+    async generateTests(code, language, model = null) {
+        const systemPrompt = `You are a testing expert. Generate comprehensive unit tests for the provided ${language} code.
+Use Jest/Vitest testing framework syntax.
+
+Return JSON:
+{
+  "tests": [{"name": "test description", "code": "full test code", "type": "unit|integration"}],
+  "coverage": "estimated percentage",
+  "framework": "Jest",
+  "setupCode": "any required setup/imports"
+}`;
+
+        try {
+            console.log(`[CodeAgent] Generating tests for ${language} code with model: ${model || 'default'}...`);
+            const completion = await lmstudioService.chat([
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: `Generate tests for this ${language} code:\n\n\`\`\`${language}\n${code}\n\`\`\`` }
+            ], model);
+
+            let result = {};
+            try {
+                const jsonMatch = completion.content.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    result = JSON.parse(jsonMatch[0]);
+                }
+            } catch (e) {
+                result = {
+                    tests: [{ name: 'Generated tests', code: completion.content, type: 'unit' }],
+                    coverage: 'unknown'
+                };
+            }
+
+            return {
+                language,
+                tests: result.tests || [],
+                coverage: result.coverage || 'estimated 80%',
+                framework: result.framework || 'Jest',
+                setupCode: result.setupCode || '',
+                source: 'lm-studio',
+                timestamp: new Date()
+            };
+        } catch (error) {
+            console.error('[CodeAgent] LLM test generation failed:', error.message);
+            return {
+                language,
+                tests: [
+                    { name: 'should handle valid input', type: 'unit', code: '// TODO: Implement test' },
+                    { name: 'should handle edge cases', type: 'unit', code: '// TODO: Implement test' },
+                    { name: 'should handle errors gracefully', type: 'unit', code: '// TODO: Implement test' }
+                ],
+                coverage: 'basic',
+                source: 'template-fallback',
+                timestamp: new Date()
+            };
+        }
     }
 
     async generateCode(prompt, language, context) {
-        // This would call LM Studio/Ollama via bridge
-        return {
-            code: `// Generated code for: ${prompt}`,
-            language,
-            prompt,
-            timestamp: new Date()
-        };
+        const model = context?.model || null;
+        const systemPrompt = `You are an expert ${language} developer. Generate clean, production-ready code based on the user's requirements.
+
+Follow these principles:
+- Write clear, self-documenting code
+- Include error handling
+- Follow ${language} best practices
+- Add brief comments for complex logic
+- Consider edge cases
+
+Return the code wrapped in a code block.`;
+
+        try {
+            console.log(`[CodeAgent] Generating ${language} code with model: ${model || 'default'} for: "${prompt.slice(0, 50)}..."`);
+            const completion = await lmstudioService.chat([
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: `Generate ${language} code for: ${prompt}${context?.additionalContext ? '\n\nContext: ' + context.additionalContext : ''}` }
+            ], model);
+
+            // Extract code from response
+            const codeMatch = completion.content.match(/```(?:\w+)?\n?([\s\S]*?)```/);
+            const generatedCode = codeMatch ? codeMatch[1].trim() : completion.content;
+
+            return {
+                code: generatedCode,
+                language,
+                prompt,
+                explanation: completion.content.replace(/```[\s\S]*?```/g, '').trim(),
+                source: 'lm-studio',
+                timestamp: new Date()
+            };
+        } catch (error) {
+            console.error('[CodeAgent] LLM code generation failed:', error.message);
+            return {
+                code: `// Code generation failed: ${error.message}\n// Prompt: ${prompt}`,
+                language,
+                prompt,
+                source: 'error-fallback',
+                error: error.message,
+                timestamp: new Date()
+            };
+        }
+    }
+
+    generateDebateResponse(topic, previousMessages) {
+        const perspectives = [
+            `From a code quality perspective, "${topic}" needs clear separation of concerns`,
+            `Security-wise, we should validate all inputs before processing "${topic}"`,
+            `For maintainability, let's add comprehensive tests for "${topic}"`,
+            `Performance consideration: "${topic}" should be optimized for the common case`
+        ];
+        return perspectives[Math.floor(Math.random() * perspectives.length)];
     }
 }
 

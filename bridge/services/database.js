@@ -1,39 +1,35 @@
 /**
  * Database Service
  * Prisma client wrapper with helper functions
+ * Updated to Prisma 7.x with better-sqlite3 adapter
  */
 
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 // Get current directory for relative database path
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dbPath = path.join(__dirname, '..', 'prisma', 'dev.db');
+const dbPath = path.join(__dirname, '..', 'data', 'nexus.db');
 
-console.log('DEBUG: __dirname:', __dirname);
-console.log('DEBUG: dbPath calculated:', dbPath);
+console.log('[Database] Using database at:', dbPath);
 
-// Set DATABASE_URL if not already set, for Prisma to pick it up if needed
+// Set DATABASE_URL if not already set
 if (!process.env.DATABASE_URL) {
     process.env.DATABASE_URL = `file:${dbPath}`;
 }
 
-// Initialize Prisma Client - Standard (Stable)
+// Initialize Prisma Client with better-sqlite3 adapter (Prisma 7.x)
 let prismaInstance;
 try {
+    const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` });
     prismaInstance = new PrismaClient({
-        datasources: {
-            db: {
-                url: `file:${dbPath}`
-            }
-        },
+        adapter,
         log: ['warn', 'error']
     });
-    console.log('✅ Prisma Client initialized (v5 Stable) at:', dbPath);
+    console.log('✅ Prisma Client initialized (v7 with better-sqlite3 adapter) at:', dbPath);
 } catch (e) {
     console.error('Failed to initialize Prisma Client, falling back to mock:', e.message);
     // Create a proxy that swallows all calls or simple mock

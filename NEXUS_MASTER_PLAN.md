@@ -1,10 +1,137 @@
 # NEXUS MASTER PLAN
 
-**Version:** 1.1.0  
+**Version:** 2.0.0  
 **Created:** December 7, 2025  
-**Updated:** December 8, 2025  
-**Maintainer:** Claude (Overseer) + Human (Executive)  
-**Status:** Growth Phase (Active)
+**Updated:** January 8, 2026  
+**Maintainer:** Antigravity + Human (Executive)  
+**Status:** Focused Execution Phase
+
+---
+
+# 🚨 AI AGENTS: STOP HERE — READ THIS FIRST 🚨
+
+> **This section is the ONLY active priority list.**  
+> Everything below the horizontal rule is **historical context only** — do not treat it as a task list.  
+> If you are an AI agent, work ONLY on the 5 priorities listed here unless explicitly directed otherwise by the human.
+
+---
+
+## ACTIVE PRIORITIES (January 2026)
+
+These are the **only** active work items. Prioritize in order:
+
+### Priority 1: Prisma Version Alignment
+**Status:** ✅ Complete (Jan 8, 2026)  
+**Impact:** High — Technical Debt  
+
+Bridge upgraded from Prisma 5.21.1 to 7.1.0 with better-sqlite3 adapter. Both webapp and bridge now use identical Prisma configurations.
+
+---
+
+### Priority 2: Activate the Code Agent
+**Status:** ✅ Complete (Jan 8, 2026)  
+**Impact:** High — Strategic Value  
+
+Code Agent in `bridge/services/agents.js` upgraded from stub to fully operational. Now uses LM Studio for:
+- Intelligent code review with quality scoring
+- Security vulnerability scanning (hybrid: regex + LLM)
+- Test generation with actual test code
+- Code generation from prompts
+
+Hybrid approach: fast pattern checks for common issues + LLM for deep analysis.
+
+---
+
+### Priority 3: Bridge Auto-Launch in Tauri
+**Status:** 🟡 Path Fix Applied (Jan 8, 2026) — Needs Testing  
+**Impact:** Medium — UX Pain Point  
+
+The desktop app requires starting the Bridge in a separate terminal. Fixed:
+- Corrected hardcoded path from wrong location to `C:\Repos GIT\Nexus\Nexus\bridge`
+- Added multi-path fallback logic (relative paths first, absolute fallback)
+- Bridge now searches: `../bridge`, `./bridge`, then absolute path
+
+**Next:** Build and test Tauri app with `npm run tauri dev` to verify Bridge auto-starts.
+
+**Action:** Complete Tauri integration so Bridge spawns automatically with the app.
+
+---
+
+### Priority 4: Page Audit & Consolidation
+**Status:** � Audit Complete (Jan 8, 2026) — Consolidation Pending  
+**Impact:** Medium — Scope Creep Prevention  
+
+73 page routes audited and categorized. See `docs/PAGE_AUDIT.md` for full analysis.
+
+**Findings:**
+- **9 core pages** (400+ lines): Keep - Dashboard, News, Music, Chat, Settings, etc.
+- **23 stub pages** (< 200 lines): Candidates for removal/consolidation
+- **41 medium pages**: Review individually
+
+**Action:** Review audit, get approval, then consolidate or remove identified pages.
+
+---
+
+### Priority 5: Single Revenue Path Validation
+**Status:** � Music Path Fixed (Jan 8, 2026) — Testing  
+**Impact:** Medium — Strategic  
+
+Traced the **Music → Suno → YouTube** revenue path end-to-end:
+
+**Fixed:**
+- ✅ Added `DistributedSong` and `YouTubeMetrics` Prisma models
+- ✅ Rewrote `distribution.js` service for database persistence
+- ✅ Updated routes to async/await for proper DB operations
+- ✅ Songs now persist across restarts
+- ✅ Fixed `/music` bridge connection stability (timeout increased)
+
+**Remaining Gaps:**
+- ⚠️ Suno API integration (manual generation)
+- ⚠️ DistroKid API for automated distribution
+- ⚠️ Automatic stream count fetching
+
+**Revenue Path Status:**
+| Step | Status |
+|------|--------|
+| 1. Song creation (Music Studio) | ✅ Working (Rich UI) |
+| 2. Suno generation | ⚠️ Manual |
+| 3. Distribution tracking | ✅ Persisted |
+| 4. YouTube monetization progress | ✅ Working |
+| 5. Revenue calculation | ✅ Working |
+
+**Action:** Confirmed Music Studio UI is rich (not stub) and online. Proceed to next priority.
+
+---
+
+### Priority 6: Connect Live Chat to Bridge
+**Status:** 🔴 Not Started  
+**Impact:** Medium — Daily Driver  
+
+Chat page exists. Bridge exists. LM Studio runs. But the streaming connection may not be fully wired. This is a core daily-use feature.
+
+**Action:** Ensure `/chat` properly streams responses from Bridge → LM Studio in real-time.
+
+---
+
+## What NOT To Work On
+
+- ❌ New UI polish on working pages (already good enough)
+- ❌ New front doors (we have 59 already)
+- ❌ Full Income Dashboard expansion
+- ❌ Art Studio / POD integration
+- ❌ Any task from the historical sections below
+
+---
+
+# ═══════════════════════════════════════════════════════════════
+# HISTORICAL REFERENCE ONLY — DO NOT TREAT AS ACTIVE TASKS
+# ═══════════════════════════════════════════════════════════════
+
+*The following content is preserved for context. It documents the original vision and completed phases. AI agents should not derive tasks from this section.*
+
+---
+
+## [HISTORICAL] Original Master Plan Header
 
 ---
 

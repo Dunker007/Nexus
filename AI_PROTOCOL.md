@@ -49,21 +49,26 @@ C:\Repos GIT\Nexus\pipeline\     # PowerShell automation (frozen)
 
 Every AI agent must verify before writing code:
 
-### 1. Read the Plan
-- [ ] Read NEXUS_MASTER_PLAN.md
-- [ ] Check SCOPE.md for what's active/frozen
-- [ ] Understand where your work fits
+### 1. Read the Active Priorities (CRITICAL)
+- [ ] Read NEXUS_MASTER_PLAN.md — **ONLY the top section labeled "ACTIVE PRIORITIES"**
+- [ ] **DO NOT** derive tasks from the historical sections below the divider
+- [ ] Work only on Priorities 1-5 unless the human explicitly directs otherwise
 
-### 2. Branch Awareness
+### 2. Understand the Scope
+- [ ] Check SCOPE.md for what's active/frozen
+- [ ] Verify your work fits within the 5 active priorities
+- [ ] If asked to do something outside these priorities, confirm with the human first
+
+### 3. Branch Awareness
 ```powershell
 git branch -a                    # What branches exist?
 git log --oneline -5 main        # What's on main?
 ```
 
-### 3. Know Your Boundaries
-- [ ] Am I working in an approved area?
+### 4. Know Your Boundaries
+- [ ] Am I working on one of the 5 active priorities?
 - [ ] Is this module active or frozen?
-- [ ] Does this change need Planning Meeting approval?
+- [ ] Does this change need human approval?
 
 ---
 

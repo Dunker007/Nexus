@@ -91,6 +91,10 @@ export default function AgentsPage() {
     const [isExecuting, setIsExecuting] = useState(false);
     const [result, setResult] = useState<any>(null);
 
+    // Model State
+    const [models, setModels] = useState<{ id: string; provider: string }[]>([]);
+    const [selectedModel, setSelectedModel] = useState('');
+
     // Fetch Agents
     const fetchAgents = async () => {
         setLoading(true);
@@ -108,8 +112,23 @@ export default function AgentsPage() {
         }
     };
 
+    // Fetch Models
+    const fetchModels = async () => {
+        try {
+            const res = await fetch(`${LUXRIG_BRIDGE_URL}/llm/lmstudio/models`);
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+                setModels(data);
+                setSelectedModel(data[0].id);
+            }
+        } catch (err) {
+            console.warn('Failed to fetch models:', err);
+        }
+    };
+
     useEffect(() => {
         fetchAgents();
+        fetchModels();
     }, []);
 
     // Execute Agent Task
@@ -132,6 +151,9 @@ export default function AgentsPage() {
                         query: prompt,
                         code: prompt,
                         topic: prompt // For staff meetings
+                    },
+                    context: {
+                        model: selectedModel || undefined
                     }
                 })
             });
@@ -383,6 +405,26 @@ export default function AgentsPage() {
                             {/* Modal Body */}
                             <div className="p-6 flex-1 overflow-y-auto">
                                 <div className="space-y-6">
+                                    {/* Model Selector - Show for code-related agents */}
+                                    {['code', 'architect', 'qa', 'security'].includes(selectedAgent.type) && models.length > 0 && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-300 mb-2 uppercase tracking-wide">
+                                                Model
+                                            </label>
+                                            <select
+                                                value={selectedModel}
+                                                onChange={(e) => setSelectedModel(e.target.value)}
+                                                className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500/50 cursor-pointer"
+                                            >
+                                                {models.map((model) => (
+                                                    <option key={model.id} value={model.id} className="bg-gray-900">
+                                                        {model.id}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+
                                     <div>
                                         <label className="block text-sm font-medium text-gray-300 mb-2 uppercase tracking-wide">
                                             Mission Directive / Prompt
@@ -410,11 +452,23 @@ export default function AgentsPage() {
                                         >
                                             <div className="bg-white/5 px-4 py-2 border-b border-white/5 flex justify-between items-center">
                                                 <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Output Log</span>
-                                                {result.result?.timestamp && (
-                                                    <span className="text-xs font-mono text-gray-500">
-                                                        {new Date(result.result.timestamp).toLocaleTimeString()}
-                                                    </span>
-                                                )}
+                                                <div className="flex items-center gap-3">
+                                                    {result.result?.timestamp && (
+                                                        <span className="text-xs font-mono text-gray-500">
+                                                            {new Date(result.result.timestamp).toLocaleTimeString()}
+                                                        </span>
+                                                    )}
+                                                    <button
+                                                        onClick={() => setResult(null)}
+                                                        className="text-xs text-gray-500 hover:text-red-400 transition-colors flex items-center gap-1"
+                                                        title="Clear Output"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                                        </svg>
+                                                        Clear
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div className="bg-black/40 p-4 font-mono text-sm overflow-x-auto max-h-60">
                                                 {result.error ? (

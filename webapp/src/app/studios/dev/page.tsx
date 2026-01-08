@@ -80,6 +80,25 @@ export default function DevStudioPage() {
         const [action, setAction] = useState('generate');
         const [isProcessing, setIsProcessing] = useState(false);
         const [result, setResult] = useState<any>(null);
+        const [models, setModels] = useState<{ id: string; provider: string }[]>([]);
+        const [selectedModel, setSelectedModel] = useState('');
+
+        // Fetch available models on mount
+        useEffect(() => {
+            const fetchModels = async () => {
+                try {
+                    const res = await fetch(`${LUXRIG_BRIDGE_URL}/llm/lmstudio/models`);
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        setModels(data);
+                        setSelectedModel(data[0].id);
+                    }
+                } catch (err) {
+                    console.warn('Failed to fetch models:', err);
+                }
+            };
+            fetchModels();
+        }, []);
 
         const handleExecute = async () => {
             if (!prompt.trim()) return;
@@ -97,6 +116,9 @@ export default function DevStudioPage() {
                             prompt: prompt,
                             code: prompt, // For 'review' action, the prompt is treated as code
                             language: 'typescript'
+                        },
+                        context: {
+                            model: selectedModel
                         }
                     })
                 });
@@ -118,19 +140,40 @@ export default function DevStudioPage() {
                 </h3>
 
                 <div className="flex-1 flex flex-col gap-4">
-                    <div className="flex gap-2 p-1 bg-white/5 rounded-lg w-fit">
-                        {['generate', 'review', 'security-scan'].map(type => (
-                            <button
-                                key={type}
-                                onClick={() => setAction(type)}
-                                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${action === type
+                    {/* Action buttons + Model selector row */}
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex gap-2 p-1 bg-white/5 rounded-lg w-fit">
+                            {['generate', 'review', 'security-scan'].map(type => (
+                                <button
+                                    key={type}
+                                    onClick={() => setAction(type)}
+                                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${action === type
                                         ? 'bg-cyan-500/20 text-cyan-400 shadow-sm'
                                         : 'text-gray-400 hover:text-white hover:bg-white/5'
-                                    }`}
-                            >
-                                {type.charAt(0).toUpperCase() + type.slice(1)}
-                            </button>
-                        ))}
+                                        }`}
+                                >
+                                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Model Selector */}
+                        {models.length > 0 && (
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500">Model:</span>
+                                <select
+                                    value={selectedModel}
+                                    onChange={(e) => setSelectedModel(e.target.value)}
+                                    className="px-3 py-1.5 text-xs bg-black/40 border border-white/10 rounded-lg text-gray-300 focus:outline-none focus:border-cyan-500/50 cursor-pointer"
+                                >
+                                    {models.map((model) => (
+                                        <option key={model.id} value={model.id} className="bg-gray-900">
+                                            {model.id}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                     </div>
 
                     <textarea
@@ -147,12 +190,24 @@ export default function DevStudioPage() {
                             className="bg-black/60 rounded-xl border border-white/10 overflow-hidden"
                         >
                             <div className="px-4 py-2 bg-white/5 border-b border-white/5 flex justify-between items-center">
-                                <span className="text-xs font-bold text-gray-500 uppercase">Output</span>
-                                {result.result?.timestamp && (
-                                    <span className="text-xs font-mono text-gray-600">
-                                        {new Date(result.result.timestamp).toLocaleTimeString()}
-                                    </span>
-                                )}
+                                <span className="text-xs font-bold text-gray-500 uppercase">Output Log</span>
+                                <div className="flex items-center gap-3">
+                                    {result.result?.timestamp && (
+                                        <span className="text-xs font-mono text-gray-600">
+                                            {new Date(result.result.timestamp).toLocaleTimeString()}
+                                        </span>
+                                    )}
+                                    <button
+                                        onClick={() => setResult(null)}
+                                        className="text-xs text-gray-500 hover:text-red-400 transition-colors flex items-center gap-1"
+                                        title="Clear Output"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                        </svg>
+                                        Clear
+                                    </button>
+                                </div>
                             </div>
                             <pre className="p-4 text-xs font-mono text-cyan-100 overflow-x-auto whitespace-pre-wrap max-h-[300px]">
                                 {result.result?.code || JSON.stringify(result.result || result, null, 2)}

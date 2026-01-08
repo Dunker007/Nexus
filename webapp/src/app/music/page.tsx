@@ -81,20 +81,24 @@ export default function MusicStudioPage() {
 
   // Check bridge connection status
   const checkBridgeStatus = async () => {
+    console.log(`[Music] Checking Bridge status at: ${LUXRIG_BRIDGE_URL}/status`);
     setBridgeStatus('checking');
     try {
       const response = await fetch(`${LUXRIG_BRIDGE_URL}/status`, {
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(10000)
       });
       if (response.ok) {
+        console.log('[Music] Bridge status check: OK');
         setBridgeStatus('online');
         setBridgeError(null);
         return true;
       }
+      console.warn('[Music] Bridge returned non-OK status:', response.status);
       setBridgeStatus('offline');
-      setBridgeError('Bridge returned error');
+      setBridgeError(`Bridge Error: ${response.status}`);
       return false;
-    } catch (error) {
+    } catch (error: any) {
+      console.error('[Music] Bridge connection failed:', error);
       setBridgeStatus('offline');
       setBridgeError('Cannot connect to LuxRig Bridge');
       return false;
@@ -102,33 +106,55 @@ export default function MusicStudioPage() {
   };
 
   useEffect(() => {
-    // Check bridge status first
-    checkBridgeStatus();
+    const initMusicStudio = async () => {
+      // 1. Check bridge status (diagnostic) through checkBridgeStatus
+      // We don't await this blocking the whole UI, but we want the result to set initial color
+      await checkBridgeStatus();
 
-    // Load Agents
-    fetch(`${LUXRIG_BRIDGE_URL}/music/agents`, { signal: AbortSignal.timeout(5000) })
-      .then(res => res.json())
-      .then(data => {
+      // 2. Load Agents (critical path)
+      // If this succeeds, we override any 'offline' status from step 1 because the bridge is functionally working.
+      console.log(`[Music] Fetching agents from: ${LUXRIG_BRIDGE_URL}/music/agents`);
+      try {
+        const res = await fetch(`${LUXRIG_BRIDGE_URL}/music/agents`, { signal: AbortSignal.timeout(10000) });
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+
+        const data = await res.json();
+        console.log('[Music] Agents loaded:', data.agents?.length);
         setAgents(data.agents || []);
+
+        // FORCE OK: If we got agents, the bridge is talking to us. 
+        // Ignore any previous timeout/failure from /status.
         setBridgeStatus('online');
         setBridgeError(null);
-      })
-      .catch(() => {
+      } catch (err: any) {
+        console.error('[Music] Failed to load agents:', err);
+        // Only valid to show offline if BOTH status check failed AND agents failed.
+        // Since we are here, agents failed. If status was also offline, we remain offline.
+        // We set a specific error message for the agent failure.
         setBridgeStatus('offline');
-        setBridgeError('Bridge offline - using fallback agents');
+        setBridgeError(`Agent Load Failed: ${err.message}`);
+
+        // Fallback Agents
         setAgents([
           { id: 'lyricist', name: 'Lyricist', emoji: '✍️', style: 'Poetic', color: 'purple', description: 'Writes song lyrics' },
           { id: 'composer', name: 'Composer', emoji: '🎹', style: 'Melodic', color: 'cyan', description: 'Structures the song' },
           { id: 'producer', name: 'Producer', emoji: '🎧', style: 'Technical', color: 'pink', description: 'Refines the prompt' }
         ]);
-      });
+      }
 
-    // Load News
-    setIsLoadingNews(true);
-    fetchAllNews()
-      .then(news => setHeadlines(news))
-      .catch(err => console.error("News failed", err))
-      .finally(() => setIsLoadingNews(false));
+      // 3. Load News (independent)
+      try {
+        setIsLoadingNews(true);
+        const news = await fetchAllNews();
+        setHeadlines(news);
+      } catch (err) {
+        console.error("News failed", err);
+      } finally {
+        setIsLoadingNews(false);
+      }
+    };
+
+    initMusicStudio();
   }, []);
 
   const handleGenerate = async () => {

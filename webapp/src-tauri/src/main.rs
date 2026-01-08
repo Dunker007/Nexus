@@ -44,22 +44,39 @@ fn ensure_dependencies(bridge_path: &std::path::Path) -> bool {
 }
 
 fn start_bridge(app_handle: &tauri::AppHandle) -> Option<Child> {
-    // Try bundled resource path first (production), fall back to dev path
-    let bridge_path = app_handle
+    // Try bundled resource path first (production)
+    let resource_path = app_handle
         .path()
         .resource_dir()
         .ok()
         .map(|p| p.join("bridge-bundle"))
-        .filter(|p| p.join("server.js").exists())
-        .unwrap_or_else(|| std::path::PathBuf::from(r"C:\Repos GIT\Nexus\bridge"));
+        .filter(|p| p.join("server.js").exists());
 
-    println!("Starting Bridge from: {:?}", bridge_path);
+    // Fall back to dev path (sibling to webapp)
+    // Structure: Nexus/Nexus/bridge (sibling of Nexus/Nexus/webapp)
+    let dev_path = std::env::current_dir()
+        .ok()
+        .and_then(|cwd| {
+            // Try multiple possible locations
+            let candidates = vec![
+                cwd.join("..").join("bridge"),           // From webapp dir
+                cwd.join("bridge"),                       // From root
+                std::path::PathBuf::from(r"C:\Repos GIT\Nexus\Nexus\bridge"), // Absolute fallback
+            ];
+            
+            candidates.into_iter().find(|p| p.join("server.js").exists())
+        });
 
-    // Check if bridge directory exists
-    if !bridge_path.join("server.js").exists() {
-        eprintln!("Bridge server.js not found at {:?}", bridge_path);
+    let bridge_path = resource_path.or(dev_path);
+
+    if let Some(ref path) = bridge_path {
+        println!("Starting Bridge from: {:?}", path);
+    } else {
+        eprintln!("Bridge server.js not found in any expected location");
         return None;
     }
+
+    let bridge_path = bridge_path.unwrap();
 
     // Ensure node_modules exists (install on first run)
     if !ensure_dependencies(&bridge_path) {
