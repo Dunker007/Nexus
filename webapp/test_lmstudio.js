@@ -4,7 +4,7 @@ async function test() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: "qwen3-4b-claude-sonnet-4-reasoning-distill-safetensor",
+                model: "gemma-3n-e4b-it",
                 messages: [{ role: "user", content: "Hello" }],
                 temperature: 0.7
             })

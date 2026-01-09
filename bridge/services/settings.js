@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS = {
 
     // AI
     'ai_default_provider': 'lmstudio',
-    'ai_default_model': 'default',
+    'ai_default_model': 'gemma-3n-e4b-it',
     'ai_temperature': 0.7,
     'ai_max_tokens': 1000,
     'ai_stream': true,

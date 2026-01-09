@@ -76,7 +76,7 @@ export const lmstudioService = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: model || 'default',
+                model: model || settingsService.get('ai_default_model') || 'default',
                 messages,
                 temperature: 0.7,
                 max_tokens: 2000,
@@ -107,7 +107,7 @@ export const lmstudioService = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: model || 'default',
+                model: model || settingsService.get('ai_default_model') || 'default',
                 messages,
                 temperature: 0.7,
                 max_tokens: 2000,

@@ -39,7 +39,7 @@ const defaultSettings: AppSettings = {
     language: 'en',
     timezone: 'America/Chicago',
     defaultProvider: 'lmstudio',
-    defaultModel: 'default',
+    defaultModel: 'gemma-3n-e4b-it',
     temperature: 0.7,
     maxTokens: 1000,
     streamResponses: true,

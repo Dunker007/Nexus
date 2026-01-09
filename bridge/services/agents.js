@@ -9,6 +9,7 @@ import { IntentAgent } from './agents-intent.js';
 import { StaffMeetingAgent } from './agents-staff-meeting.js';
 import { LyricistAgent, ComposerAgent, CriticAgent, ProducerAgent, SongwriterRoom, NewsicianAgent, MidwestSentinelAgent, MicAgent } from './agents-songwriter.js';
 import { lmstudioService } from './lmstudio.js';
+import { settingsService } from './settings.js';
 
 export { Agent };
 
@@ -146,11 +147,11 @@ Provide a JSON response with this structure:
 }`;
 
         try {
-            console.log(`[CodeAgent] Reviewing ${language} code (${code.length} chars) with model: ${model || 'default'}...`);
+            console.log(`[CodeAgent] Reviewing ${language} code (${code.length} chars) with model: ${model || settingsService.get('ai_default_model')}...`);
             const completion = await lmstudioService.chat([
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: `Review this ${language} code:\n\n\`\`\`${language}\n${code}\n\`\`\`` }
-            ], model);
+            ], model || settingsService.get('ai_default_model'));
 
             let llmResult = {};
             try {
@@ -361,11 +362,11 @@ Follow these principles:
 Return the code wrapped in a code block.`;
 
         try {
-            console.log(`[CodeAgent] Generating ${language} code with model: ${model || 'default'} for: "${prompt.slice(0, 50)}..."`);
+            console.log(`[CodeAgent] Generating ${language} code with model: ${model || settingsService.get('ai_default_model')} for: "${prompt.slice(0, 50)}..."`);
             const completion = await lmstudioService.chat([
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: `Generate ${language} code for: ${prompt}${context?.additionalContext ? '\n\nContext: ' + context.additionalContext : ''}` }
-            ], model);
+            ], model || settingsService.get('ai_default_model'));
 
             // Extract code from response
             const codeMatch = completion.content.match(/```(?:\w+)?\n?([\s\S]*?)```/);

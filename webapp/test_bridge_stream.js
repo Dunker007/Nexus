@@ -3,12 +3,12 @@ async function testStream() {
     console.log("Testing Bridge Chat Stream on Port 3457...");
 
     try {
-        const response = await fetch('http://localhost:3457/llm/chat', {
+        const response = await fetch('http://localhost:3456/llm/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 // Ensure we use a model that exists or default
-                model: "default",
+                // model: "gemma-3n-e4b-it", // Testing default fallback
                 provider: "lmstudio",
                 stream: true,
                 messages: [{ role: "user", content: "Count to 5 quickly." }]

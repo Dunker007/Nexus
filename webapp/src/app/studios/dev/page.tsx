@@ -87,11 +87,17 @@ export default function DevStudioPage() {
         useEffect(() => {
             const fetchModels = async () => {
                 try {
-                    const res = await fetch(`${LUXRIG_BRIDGE_URL}/llm/lmstudio/models`);
+                    const res = await fetch(`${LUXRIG_BRIDGE_URL}/llm/models`);
                     const data = await res.json();
-                    if (Array.isArray(data) && data.length > 0) {
-                        setModels(data);
-                        setSelectedModel(data[0].id);
+
+                    const allModels = [
+                        ...(data.lmstudio || []),
+                        ...(data.ollama || [])
+                    ];
+
+                    if (allModels.length > 0) {
+                        setModels(allModels);
+                        setSelectedModel(allModels[0].id);
                     }
                 } catch (err) {
                     console.warn('Failed to fetch models:', err);
