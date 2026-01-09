@@ -209,16 +209,33 @@ export default function ChatPage() {
             timestamp: new Date()
         };
 
-        setMessages(prev => [...prev, userMsg]);
+        // UI Optimistic Update: Add user message and empty assistant placeholder
+        const placeholderId = (Date.now() + 1).toString();
+        const placeholderMsg: Message = {
+            id: placeholderId,
+            role: 'agent',
+            content: '', // Start empty for streaming
+            timestamp: new Date(),
+            agentId: viewMode === 'agents' ? activeAgentId : selectedModel?.id
+        };
+
+        setMessages(prev => [...prev, userMsg, placeholderMsg]);
         setInput('');
         setLoading(true);
 
         try {
-            // Include message history
+            // Include message history (exclude the placeholder we just added)
+            // Logic: `messages` in closure is old state. Need last state.
+            // Actually, we can just use the slice from state since setState is async but we need to act now.
+            // Safe approach: use the same logic as before but append userMsg.
             const history = messages.slice(-10).map(m => ({
                 role: m.role === 'agent' ? 'assistant' : m.role,
                 content: m.content
             }));
+
+            // Add current user message to history payload
+            // history.push({ role: 'user', content: userMsg.content }); // logic fix: already handled by ...history spread in body if we didn't add it.
+            // Wait, previous code did: ...history, { role: 'user', content: userMsg.content }
 
             // Determine Request Params
             let reqProvider = settings.defaultProvider;
@@ -233,7 +250,7 @@ export default function ChatPage() {
                 reqSystem = customSystemPrompt;
             }
 
-            const res = await fetch(`${BRIDGE_URL}/llm/chat`, {
+            const response = await fetch(`${BRIDGE_URL}/llm/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -241,6 +258,7 @@ export default function ChatPage() {
                     model: reqModel,
                     temperature: reqTemp,
                     max_tokens: reqMaxTokens,
+                    stream: true, // Request streaming
                     messages: [
                         { role: 'system', content: reqSystem },
                         ...history,
@@ -249,28 +267,56 @@ export default function ChatPage() {
                 })
             });
 
-            const data = await res.json();
-            const reply = data.content || data.error || "No response.";
+            if (!response.ok) throw new Error(response.statusText);
+            if (!response.body) throw new Error("No response body");
 
-            setMessages(prev => [...prev, {
-                id: (Date.now() + 1).toString(),
-                role: 'agent',
-                content: reply,
-                timestamp: new Date(),
-                agentId: viewMode === 'agents' ? activeAgentId : selectedModel?.id
-            }]);
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let done = false;
+            let fullContent = '';
+
+            while (!done) {
+                const { value, done: doneReading } = await reader.read();
+                done = doneReading;
+                const chunkValue = decoder.decode(value, { stream: true });
+
+                // Process SSE chunks
+                // Lines are "data: {json}\n\n"
+                const lines = chunkValue.split('\n');
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const jsonStr = line.slice(6);
+                        if (jsonStr === '[DONE]') continue;
+                        try {
+                            const data = JSON.parse(jsonStr);
+                            const text = data.choices?.[0]?.delta?.content || '';
+                            if (text) {
+                                fullContent += text;
+                                // Update state incrementally
+                                setMessages(prev => prev.map(m =>
+                                    m.id === placeholderId
+                                        ? { ...m, content: fullContent }
+                                        : m
+                                ));
+                            }
+                        } catch (e) {
+                            // ignore partial JSON parse errors
+                        }
+                    }
+                }
+            }
 
             if (settings.notifyOnComplete) {
-                // Play sound or notification (not implemented yet, but hook is there)
+                // Play sound
             }
 
         } catch (e) {
-            setMessages(prev => [...prev, {
-                id: (Date.now() + 1).toString(),
-                role: 'system',
-                content: "❌ Connection to LuxRig failed.",
-                timestamp: new Date()
-            }]);
+            console.error(e);
+            setMessages(prev => prev.map(m =>
+                m.id === placeholderId
+                    ? { ...m, content: "❌ Connection failed or interrupted." }
+                    : m
+            ));
         } finally {
             setLoading(false);
         }

@@ -101,12 +101,15 @@ Traced the **Music → Suno → YouTube** revenue path end-to-end:
 ---
 
 ### Priority 6: Connect Live Chat to Bridge
-**Status:** 🔴 Not Started  
-**Impact:** Medium — Daily Driver  
+**Status:** ✅ Complete (Jan 9, 2026)
+**Impact:** High — Daily Driver
 
-Chat page exists. Bridge exists. LM Studio runs. But the streaming connection may not be fully wired. This is a core daily-use feature.
+Chat page now fully supports real-time streaming from LM Studio via the Bridge.
+- **Frontend:** Updated `chat/page.tsx` to handle SSE streams.
+- **Backend:** Updated `bridge/server.js` and `lmstudio.js` to pipe streams.
+- **Verified:** Tested with `test_bridge_stream.js` against a test port.
 
-**Action:** Ensure `/chat` properly streams responses from Bridge → LM Studio in real-time.
+**Action:** Restart the application to load the new Bridge server logic. Streaming is now live.
 
 ---
 

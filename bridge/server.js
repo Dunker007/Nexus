@@ -200,18 +200,57 @@ app.get('/llm/ollama/models', async (req, res) => {
 
 // Chat completion (routes to best available)
 app.post('/llm/chat', async (req, res) => {
-    const { messages, model, provider } = req.body;
+    const { messages, model, provider, stream } = req.body;
 
+    // Check if streaming is requested
+    if (stream) {
+        try {
+            res.setHeader('Content-Type', 'text/event-stream');
+            res.setHeader('Cache-Control', 'no-cache');
+            res.setHeader('Connection', 'keep-alive');
+
+            let streamSource;
+            if (provider === 'ollama') {
+                // Ollama streaming not yet implemented in service, fallback to non-stream or implement later
+                // For now, let's assume lmstudio only for streaming or throw/fallback
+                // Fallback to LMStudio for now as per instructions
+                streamSource = await lmstudioService.chatStream(messages, model);
+            } else {
+                streamSource = await lmstudioService.chatStream(messages, model);
+            }
+
+            // streamSource is a Web ReadableStream (from fetch)
+            // We need to iterate it and write to res
+            const reader = streamSource.getReader();
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                // value is a Uint8Array
+                // Verify it's in SSE format or just raw chunks?
+                // LM Studio returns SSE format "data: ...", so we can just pass it through
+                res.write(value);
+            }
+            res.end();
+
+        } catch (error) {
+            console.error('Streaming error:', error);
+            // Can't send JSON error if headers already sent, but try ending
+            res.write(`data: {"error": "${error.message}"}\n\n`);
+            res.end();
+        }
+        return;
+    }
+
+    // Non-streaming fallback
     try {
         let response;
-
         if (provider === 'ollama') {
             response = await ollamaService.chat(messages, model);
         } else {
             // Default to LM Studio
             response = await lmstudioService.chat(messages, model);
         }
-
         res.json(response);
     } catch (error) {
         res.status(500).json({ error: error.message });

@@ -96,5 +96,29 @@ export const lmstudioService = {
             content: data.choices[0]?.message?.content || '',
             usage: data.usage
         };
+    },
+
+    /**
+     * Chat completion with streaming
+     * Returns a ReadableStream
+     */
+    async chatStream(messages, model = null) {
+        const response = await fetch(`${getUrl()}/v1/chat/completions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: model || 'default',
+                messages,
+                temperature: 0.7,
+                max_tokens: 2000,
+                stream: true
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`LM Studio error: ${response.status}`);
+        }
+
+        return response.body;
     }
 };
