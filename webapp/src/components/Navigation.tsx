@@ -8,11 +8,11 @@ import { Command } from 'lucide-react';
 import { useVibe } from './VibeContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NavItem } from '@/components/NavItem';
-
 import {
     LayoutDashboard, Palette, MessageSquare, Bot, Radio, Users,
-    FlaskConical, DollarSign, Settings, Workflow
+    FlaskConical, DollarSign, Settings, Workflow, Newspaper
 } from 'lucide-react';
+import { StatusAvatar } from '@/components/StatusAvatar';
 
 const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, shortcut: 'G D' },
@@ -20,6 +20,7 @@ const navItems = [
     { href: '/chat', label: 'Chat', icon: <MessageSquare size={20} />, shortcut: 'G C' },
     { href: '/agents', label: 'Agents', icon: <Bot size={20} /> },
     { href: '/news', label: 'News', icon: <Radio size={20} /> },
+    { href: '/briefing', label: 'Briefing', icon: <Newspaper size={20} /> },
     { href: '/meeting', label: 'Meeting', icon: <Users size={20} /> },
     { href: '/labs', label: 'Labs', icon: <FlaskConical size={20} />, shortcut: 'G L' },
     { href: '/pipeline', label: 'Pipeline', icon: <Workflow size={20} />, shortcut: 'G P' },
@@ -61,7 +62,7 @@ export default function Navigation() {
                     </div>
 
                     {/* Desktop Nav - Centered */}
-                    <div className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
+                    <div className="hidden lg:flex items-center gap-1 justify-center">
                         {navItems.map((item) => (
                             <NavItem
                                 key={item.href}
@@ -82,8 +83,6 @@ export default function Navigation() {
 
                         <ThemeToggle />
 
-
-
                         <button
                             className="flex items-center gap-2 px-3 py-2 rounded-lg glass-panel hover:bg-white/10 transition-colors border border-white/5 text-gray-400 hover:text-white text-sm"
                             onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
@@ -93,14 +92,14 @@ export default function Navigation() {
                             <span>Cmd+K</span>
                         </button>
 
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 border border-white/20 shadow-lg shadow-cyan-500/20" />
+                        <StatusAvatar />
                     </div>
 
-                    {/* Mobile Menu Button */}
+                    {/* Mobile Menu Button - Visible below LG */}
                     <div className="lg:hidden flex items-center gap-4">
                         <div className="flex items-center gap-2">
                             <ThemeToggle />
-
+                            <StatusAvatar />
                         </div>
 
                         <button

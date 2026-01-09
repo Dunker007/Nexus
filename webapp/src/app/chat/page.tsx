@@ -341,7 +341,7 @@ export default function ChatPage() {
                 <div className="absolute top-2/3 right-1/3 w-32 h-32 bg-blue-500/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
 
                 {/* Neural connection lines */}
-                <svg className="absolute inset-0 w-full h-full opacity-5">
+                <svg className="absolute inset-0 w-full h-full opacity-5" viewBox="0 0 100 100" preserveAspectRatio="none">
                     <defs>
                         <linearGradient id="chatLineGradient" x1="0%" y1="0%" x2="100%">
                             <stop offset="0%" stopColor="#06b6d4" stopOpacity="0" />
@@ -349,8 +349,8 @@ export default function ChatPage() {
                             <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
                         </linearGradient>
                     </defs>
-                    <path d="M0,50% Q25%,30% 50%,50% T100%,50%" stroke="url(#chatLineGradient)" strokeWidth="1" fill="none" />
-                    <path d="M0,30% Q35%,50% 70%,25% T100%,35%" stroke="url(#chatLineGradient)" strokeWidth="1" fill="none" />
+                    <path d="M0,50 Q25,30 50,50 T100,50" stroke="url(#chatLineGradient)" strokeWidth="1" fill="none" />
+                    <path d="M0,30 Q35,50 70,25 T100,35" stroke="url(#chatLineGradient)" strokeWidth="1" fill="none" />
                 </svg>
             </div>
 

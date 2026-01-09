@@ -13,38 +13,38 @@ function GitHubCallbackContent() {
     useEffect(() => {
         const code = searchParams.get('code');
 
+        async function exchangeCodeForTokens(code: string) {
+            try {
+                const response = await fetch(`${LUXRIG_BRIDGE_URL}/auth/github/callback?code=${code}`);
+                const data = await response.json();
+
+                if (data.success && data.tokens?.access_token) {
+                    // Store tokens in localStorage
+                    localStorage.setItem('github_access_token', data.tokens.access_token);
+
+                    setStatus('success');
+
+                    // Redirect to integrations after brief delay
+                    setTimeout(() => {
+                        router.push('/integrations');
+                    }, 1500);
+                } else {
+                    setStatus('error');
+                    setError(data.error || 'Failed to get tokens');
+                }
+            } catch (err: any) {
+                setStatus('error');
+                setError(err.message);
+            }
+        }
+
         if (code) {
             exchangeCodeForTokens(code);
         } else {
             setStatus('error');
             setError('No authorization code received');
         }
-    }, [searchParams]);
-
-    async function exchangeCodeForTokens(code: string) {
-        try {
-            const response = await fetch(`${LUXRIG_BRIDGE_URL}/auth/github/callback?code=${code}`);
-            const data = await response.json();
-
-            if (data.success && data.tokens?.access_token) {
-                // Store tokens in localStorage
-                localStorage.setItem('github_access_token', data.tokens.access_token);
-
-                setStatus('success');
-
-                // Redirect to integrations after brief delay
-                setTimeout(() => {
-                    router.push('/integrations');
-                }, 1500);
-            } else {
-                setStatus('error');
-                setError(data.error || 'Failed to get tokens');
-            }
-        } catch (err: any) {
-            setStatus('error');
-            setError(err.message);
-        }
-    }
+    }, [searchParams, router]);
 
     return (
         <div className="min-h-screen flex items-center justify-center">

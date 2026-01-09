@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSettings } from '@/components/SettingsContext';
 
 interface ServiceStatus {
@@ -28,7 +28,30 @@ export default function StatusPage() {
     const [lastChecked, setLastChecked] = useState<Date>(new Date());
     const [overallStatus, setOverallStatus] = useState<'operational' | 'degraded' | 'down'>('operational');
 
-    async function checkAllServices() {
+    const updateService = useCallback((name: string, status: ServiceStatus['status'], latency?: number) => {
+        setServices(prev => prev.map(s =>
+            s.name === name ? { ...s, status, latency } : s
+        ));
+    }, []);
+
+    const updateOverallStatus = useCallback(() => {
+        setServices(prev => {
+            const down = prev.filter(s => s.status === 'down').length;
+            const degraded = prev.filter(s => s.status === 'degraded').length;
+
+            if (down >= 2) {
+                setOverallStatus('down');
+            } else if (down > 0 || degraded > 0) {
+                setOverallStatus('degraded');
+            } else {
+                setOverallStatus('operational');
+            }
+            return prev;
+        });
+    }, []);
+
+
+    const checkAllServices = useCallback(async () => {
         if (!BRIDGE_URL) return;
         const startTime = Date.now();
 
@@ -83,7 +106,7 @@ export default function StatusPage() {
                 updateService('GPU Metrics', 'down');
             }
 
-        } catch (e) {
+        } catch (_e) {
             // Bridge is down
             updateService('LuxRig Bridge', 'down');
             updateService('LM Studio API', 'down');
@@ -93,7 +116,7 @@ export default function StatusPage() {
 
         setLastChecked(new Date());
         updateOverallStatus();
-    }
+    }, [BRIDGE_URL, updateService, updateOverallStatus]);
 
     useEffect(() => {
         if (settings.bridgeUrl) {
@@ -101,29 +124,7 @@ export default function StatusPage() {
             const interval = setInterval(checkAllServices, 30000); // Check every 30s
             return () => clearInterval(interval);
         }
-    }, [settings.bridgeUrl]);
-
-    function updateService(name: string, status: ServiceStatus['status'], latency?: number) {
-        setServices(prev => prev.map(s =>
-            s.name === name ? { ...s, status, latency } : s
-        ));
-    }
-
-    function updateOverallStatus() {
-        setServices(prev => {
-            const down = prev.filter(s => s.status === 'down').length;
-            const degraded = prev.filter(s => s.status === 'degraded').length;
-
-            if (down >= 2) {
-                setOverallStatus('down');
-            } else if (down > 0 || degraded > 0) {
-                setOverallStatus('degraded');
-            } else {
-                setOverallStatus('operational');
-            }
-            return prev;
-        });
-    }
+    }, [settings.bridgeUrl, checkAllServices]);
 
     const statusColors = {
         operational: { bg: 'bg-green-500', text: 'text-green-400', label: 'Operational' },

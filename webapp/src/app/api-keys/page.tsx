@@ -105,8 +105,8 @@ export default function APIKeysPage() {
                                         <div className="flex items-center gap-3">
                                             <h3 className="font-medium">{key.name}</h3>
                                             <span className={`text-xs px-2 py-0.5 rounded ${key.status === 'active'
-                                                    ? 'bg-green-500/20 text-green-400'
-                                                    : 'bg-red-500/20 text-red-400'
+                                                ? 'bg-green-500/20 text-green-400'
+                                                : 'bg-red-500/20 text-red-400'
                                                 }`}>
                                                 {key.status}
                                             </span>
@@ -164,8 +164,8 @@ export default function APIKeysPage() {
                                         <span className="text-sm">{key.name}</span>
                                     </div>
                                     <span className={`text-xs px-2 py-0.5 rounded ${key.status === 'configured'
-                                            ? 'bg-green-500/20 text-green-400'
-                                            : 'bg-gray-500/20 text-gray-400'
+                                        ? 'bg-green-500/20 text-green-400'
+                                        : 'bg-gray-500/20 text-gray-400'
                                         }`}>
                                         {key.status}
                                     </span>
@@ -203,7 +203,7 @@ export default function APIKeysPage() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
                     >
-                        <h3 className="font-bold mb-4">📊 This Month's Usage</h3>
+                        <h3 className="font-bold mb-4">📊 This Month&apos;s Usage</h3>
                         <div className="space-y-3">
                             <div>
                                 <div className="flex justify-between text-sm mb-1">
@@ -264,8 +264,8 @@ export default function APIKeysPage() {
                                                 }
                                             }}
                                             className={`px-3 py-1 rounded text-sm ${selectedPermissions.includes(perm)
-                                                    ? 'bg-cyan-500 text-black'
-                                                    : 'bg-white/10'
+                                                ? 'bg-cyan-500 text-black'
+                                                : 'bg-white/10'
                                                 }`}
                                         >
                                             {perm}

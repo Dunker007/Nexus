@@ -342,3 +342,35 @@ model YouTubeMetrics {
   
   updatedAt     DateTime @updatedAt
 }
+
+// Art Asset Factory (Stockpiling)
+model ArtProduct {
+  id          String   @id @default(uuid())
+  title       String
+  prompt      String
+  style       String   // 'photoreal', 'cyberpunk', etc.
+  localPath   String?  // Path to file on disk (Vault)
+  resolution  String?  // '1024x1024', etc.
+  
+  // Status
+  status      String   @default("draft") // draft, ready, listed, sold
+  
+  // Metadata for Shop
+  tags        String?  // JSON string
+  category    String?  // 'wallpaper', 'print', etc.
+  description String?
+  price       Float?
+  platforms   String   @default("[]") // JSON string of platforms
+  
+  // Stats
+  views       Int      @default(0)
+  sales       Int      @default(0)
+  revenue     Float    @default(0)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([status])
+  @@index([createdAt])
+}

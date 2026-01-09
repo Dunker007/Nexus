@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS = {
     'ai_stream': true,
 
     // Services
-    'lmstudio_url': 'http://127.0.0.1:1234',
+    'lmstudio_url': 'http://100.74.130.117:1234',
     'ollama_url': 'http://127.0.0.1:11434',
 
     // Privacy

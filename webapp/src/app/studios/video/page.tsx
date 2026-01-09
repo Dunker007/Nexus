@@ -29,11 +29,11 @@ const AudioVisualizer = ({ isPlaying }: { isPlaying: boolean }) => {
                     key={i}
                     className="w-4 bg-orange-500 rounded-t-md opacity-80"
                     animate={isPlaying ? {
-                        height: [40, Math.random() * 120 + 20, 40],
+                        height: [40, (Math.sin(i * 45.2) + 1.2) * 60 + 20, 40],
                     } : { height: 20 }}
                     transition={{
                         repeat: Infinity,
-                        duration: 0.5 + Math.random() * 0.5,
+                        duration: 0.8 + Math.cos(i * 12) * 0.3,
                         ease: "easeInOut"
                     }}
                 />

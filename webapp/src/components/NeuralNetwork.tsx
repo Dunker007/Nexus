@@ -12,9 +12,9 @@ function NeuralNodes({ count = 200 }) {
     const positions = useMemo(() => {
         const pos = new Float32Array(count * 3);
         for (let i = 0; i < count; i++) {
-            pos[i * 3] = (Math.random() - 0.5) * 10;
-            pos[i * 3 + 1] = (Math.random() - 0.5) * 10;
-            pos[i * 3 + 2] = (Math.random() - 0.5) * 10;
+            pos[i * 3] = Math.sin(i * 12.9898) * 5;
+            pos[i * 3 + 1] = Math.cos(i * 78.233) * 5;
+            pos[i * 3 + 2] = Math.sin(i * 43.1119) * 5;
         }
         return pos;
     }, [count]);
@@ -50,14 +50,14 @@ function ConnectionLines({ count = 50 }) {
     const geometry = useMemo(() => {
         const positions = new Float32Array(count * 6);
         for (let i = 0; i < count; i++) {
-            // Start point
-            positions[i * 6] = (Math.random() - 0.5) * 8;
-            positions[i * 6 + 1] = (Math.random() - 0.5) * 8;
-            positions[i * 6 + 2] = (Math.random() - 0.5) * 8;
+            // Start point - Deterministic pseudo-random
+            positions[i * 6] = Math.sin(i * 12.9898) * 4;
+            positions[i * 6 + 1] = Math.cos(i * 78.233) * 4;
+            positions[i * 6 + 2] = Math.sin(i * 43.1119) * 4;
             // End point
-            positions[i * 6 + 3] = (Math.random() - 0.5) * 8;
-            positions[i * 6 + 4] = (Math.random() - 0.5) * 8;
-            positions[i * 6 + 5] = (Math.random() - 0.5) * 8;
+            positions[i * 6 + 3] = Math.cos(i * 32.551) * 4;
+            positions[i * 6 + 4] = Math.sin(i * 11.223) * 4;
+            positions[i * 6 + 5] = Math.cos(i * 66.777) * 4;
         }
 
         const geo = new THREE.BufferGeometry();

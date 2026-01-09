@@ -227,7 +227,7 @@ export default function StaffMeetingPage() {
         <div className="absolute top-1/2 right-1/3 w-48 h-48 bg-pink-500/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
 
         {/* Connection lines */}
-        <svg className="absolute inset-0 w-full h-full opacity-5">
+        <svg className="absolute inset-0 w-full h-full opacity-5" viewBox="0 0 100 100" preserveAspectRatio="none">
           <defs>
             <linearGradient id="meetingLine" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#6366f1" stopOpacity="0" />
@@ -235,8 +235,8 @@ export default function StaffMeetingPage() {
               <stop offset="100%" stopColor="#a855f7" stopOpacity="0" />
             </linearGradient>
           </defs>
-          <path d="M0,40% Q30%,35% 50%,45% T100%,40%" stroke="url(#meetingLine)" strokeWidth="1" fill="none" />
-          <path d="M0,60% Q40%,55% 60%,65% T100%,55%" stroke="url(#meetingLine)" strokeWidth="1" fill="none" />
+          <path d="M0,40 Q30,35 50,45 T100,40" stroke="url(#meetingLine)" strokeWidth="1" fill="none" />
+          <path d="M0,60 Q40,55 60,65 T100,55" stroke="url(#meetingLine)" strokeWidth="1" fill="none" />
         </svg>
       </div>
 

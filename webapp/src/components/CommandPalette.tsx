@@ -370,7 +370,7 @@ export default function CommandPalette() {
                                         <div className="text-4xl mb-3">✨</div>
                                         <p className="text-gray-400 mb-2">Ask Lux anything</p>
                                         <p className="text-xs text-gray-600">
-                                            "How do I deploy an agent?" • "What's my revenue?" • "Help me with..."
+                                            &quot;How do I deploy an agent?&quot; • &quot;What&apos;s my revenue?&quot; • &quot;Help me with...&quot;
                                         </p>
                                     </div>
                                 )}

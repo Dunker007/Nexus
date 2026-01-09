@@ -4,7 +4,7 @@
  */
 
 import express from 'express';
-// import { WebSocketServer } from 'ws';
+import { WebSocketServer } from 'ws';
 import cors from 'cors';
 import { createServer } from 'http';
 import dotenv from 'dotenv';
@@ -41,7 +41,18 @@ const PORT = process.env.PORT || 3456;
 // const staffMeetingAgent = new StaffMeetingAgent();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: true, // Allow any origin to connect (reflects request origin)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Pragma', 'Expires'],
+    credentials: true,
+}));
+
+// Request Logger
+app.use((req, res, next) => {
+    console.log(`[Request] ${req.method} ${req.url} from ${req.ip}`);
+    next();
+});
 app.use(express.json());
 app.use(performanceMonitor.middleware()); // Track all request performance
 
@@ -58,12 +69,11 @@ app.use('/income', incomeRoutes);
 const server = createServer(app);
 
 // WebSocket server for real-time updates
-// const wss = new WebSocketServer({ server, path: '/stream' });
+const wss = new WebSocketServer({ server, path: '/stream' });
 
 // Track connected clients
 const clients = new Set();
 
-/*
 wss.on('connection', (ws) => {
     console.log('🔌 Client connected to stream');
     clients.add(ws);
@@ -80,27 +90,22 @@ wss.on('connection', (ws) => {
         console.log('🔌 Client disconnected');
     });
 });
-*/
 
 // Broadcast to all connected clients
 function broadcast(data) {
-    /*
     const message = JSON.stringify(data);
     clients.forEach(client => {
         if (client.readyState === 1) { // OPEN
             client.send(message);
         }
     });
-    */
 }
 
 // Send full status to a client
-/*
 async function sendStatus(ws) {
     const status = await getFullStatus();
     ws.send(JSON.stringify({ type: 'status', data: status }));
 }
-*/
 
 // Active agents registry (Moved up for scope visibility if needed, but getFullStatus needs it)
 const activeAgents = new Map();
@@ -130,7 +135,6 @@ async function getFullStatus() {
         }))
     };
 }
-
 // ============ REST API Routes ============
 
 // Health check
@@ -776,6 +780,33 @@ app.get('/monitoring/performance', async (req, res) => {
     }
 });
 
+// ============ News Routes ============
+
+// Get news headlines
+app.get('/news', async (req, res) => {
+    try {
+        const { category, region, limit } = req.query;
+        const news = await newsService.getNews({
+            category,
+            region,
+            limit: limit ? parseInt(limit) : 50
+        });
+        res.json(news);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Refresh news from RSS sources
+app.post('/news/refresh', async (req, res) => {
+    try {
+        const result = await newsService.refreshNews();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // ============ Songwriter Room (Music Pipeline) ============
 
 // Create songwriter room instance
@@ -802,6 +833,18 @@ app.post('/music/create', async (req, res) => {
         res.json(result);
     } catch (error) {
         console.error('Songwriter error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Create a sentinel track (Midwest Sentinel)
+app.post('/music/sentinel', async (req, res) => {
+    try {
+        const { headlines, focusArea = 'minnesota' } = req.body;
+        const result = await songwriterRoom.createSentinelTrack(headlines, focusArea);
+        res.json(result);
+    } catch (error) {
+        console.error('Sentinel error:', error);
         res.status(500).json({ error: error.message });
     }
 });

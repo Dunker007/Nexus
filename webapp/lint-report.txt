@@ -1,0 +1,1048 @@
+
+> website-v2@2.0.0 lint
+> eslint
+
+
+C:\Repos GIT\Nexus\Nexus\webapp\check-db.js
+  2:26  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+C:\Repos GIT\Nexus\Nexus\webapp\jest.config.js
+  1:18  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+C:\Repos GIT\Nexus\Nexus\webapp\prisma\seed.js
+  2:26  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+C:\Repos GIT\Nexus\Nexus\webapp\prisma\seed.ts
+  74:9  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  93:5  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+C:\Repos GIT\Nexus\Nexus\webapp\src-tauri\target\debug\build\nexus-94bf003c825cae42\out\__global-api-script.js
+  1:1  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+
+C:\Repos GIT\Nexus\Nexus\webapp\src-tauri\target\debug\build\nexus-d2fca1723172b64f\out\__global-api-script.js
+  1:1  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\agents\page.tsx
+   7:5   warning  'Briefcase' is defined but never used     @typescript-eslint/no-unused-vars
+  92:42  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\api-keys\page.tsx
+  206:69  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\auth\github\callback\page.tsx
+  17:13  error    Error: Cannot access variable before it is declared
+
+`exchangeCodeForTokens` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\auth\github\callback\page.tsx:17:13
+  15 |
+  16 |         if (code) {
+> 17 |             exchangeCodeForTokens(code);
+     |             ^^^^^^^^^^^^^^^^^^^^^ `exchangeCodeForTokens` accessed before it is declared
+  18 |         } else {
+  19 |             setStatus('error');
+  20 |             setError('No authorization code received');
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\auth\github\callback\page.tsx:24:5
+  22 |     }, [searchParams]);
+  23 |
+> 24 |     async function exchangeCodeForTokens(code: string) {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 25 |         try {
+     | ^^^^^^^^^^^^^
+> 26 |             const response = await fetch(`${LUXRIG_BRIDGE_URL}/auth/github/callback?code=${code}`);
+     ΓÇª
+     | ^^^^^^^^^^^^^
+> 46 |         }
+     | ^^^^^^^^^^^^^
+> 47 |     }
+     | ^^^^^^ `exchangeCodeForTokens` is declared here
+  48 |
+  49 |     return (
+  50 |         <div className="min-h-screen flex items-center justify-center">  react-hooks/immutability
+  22:8   warning  React Hook useEffect has a missing dependency: 'exchangeCodeForTokens'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/exhaustive-deps
+  43:23  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\auth\google\callback\page.tsx
+  17:13  error    Error: Cannot access variable before it is declared
+
+`exchangeCodeForTokens` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\auth\google\callback\page.tsx:17:13
+  15 |
+  16 |         if (code) {
+> 17 |             exchangeCodeForTokens(code);
+     |             ^^^^^^^^^^^^^^^^^^^^^ `exchangeCodeForTokens` accessed before it is declared
+  18 |         } else {
+  19 |             setStatus('error');
+  20 |             setError('No authorization code received');
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\auth\google\callback\page.tsx:24:5
+  22 |     }, [searchParams]);
+  23 |
+> 24 |     async function exchangeCodeForTokens(code: string) {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 25 |         try {
+     | ^^^^^^^^^^^^^
+> 26 |             const response = await fetch(`${LUXRIG_BRIDGE_URL}/auth/google/callback?code=${code}`);
+     ΓÇª
+     | ^^^^^^^^^^^^^
+> 49 |         }
+     | ^^^^^^^^^^^^^
+> 50 |     }
+     | ^^^^^^ `exchangeCodeForTokens` is declared here
+  51 |
+  52 |     return (
+  53 |         <div className="min-h-screen flex items-center justify-center">  react-hooks/immutability
+  22:8   warning  React Hook useEffect has a missing dependency: 'exchangeCodeForTokens'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/exhaustive-deps
+  46:23  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\backup\page.tsx
+   7:41  warning  'Settings' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  14:50  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  15:54  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  28:9   error    Error: Cannot access variable before it is declared
+
+`loadData` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\backup\page.tsx:28:9
+  26 |
+  27 |         // Load initial data
+> 28 |         loadData();
+     |         ^^^^^^^^ `loadData` accessed before it is declared
+  29 |
+  30 |         return unsubscribe;
+  31 |     }, []);
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\backup\page.tsx:33:5
+  31 |     }, []);
+  32 |
+> 33 |     const loadData = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 34 |         const [disk, backup, cleanup] = await Promise.all([
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 35 |             housekeeper.getDiskStatus(),
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 36 |             housekeeper.getBackupStatus(),
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 37 |             housekeeper.getCleanupSuggestions()
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 38 |         ]);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 39 |         setDiskStatus(disk);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 40 |         setBackupStatus(backup);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 41 |         setCleanupSuggestions(cleanup);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 42 |     };
+     | ^^^^^^^ `loadData` is declared here
+  43 |
+  44 |     const handleSync = async () => {
+  45 |         setLoading('sync');  react-hooks/immutability
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\briefing\page.tsx
+   54:8   warning  React Hook useEffect has a missing dependency: 'fetchNews'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  200:56  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                               react/no-unescaped-entities
+  200:67  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                               react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\changelog\page.tsx
+  99:33  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  99:45  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  99:63  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\chat\page.tsx
+    4:8   warning  'Link' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
+   10:5   warning  'Cpu' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+   10:28  warning  'Search' is defined but never used                                                                                  @typescript-eslint/no-unused-vars
+   11:15  warning  'Lock' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
+   15:7   warning  'BRIDGE_URL' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
+   30:11  error    Unexpected any. Specify a different type                                                                            @typescript-eslint/no-explicit-any
+  167:8   warning  React Hook useEffect has a missing dependency: 'fetchAllModels'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
+  186:8   warning  React Hook useEffect has a missing dependency: 'messages.length'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  244:17  error    'reqTemp' is never reassigned. Use 'const' instead                                                                  prefer-const
+  245:17  error    'reqMaxTokens' is never reassigned. Use 'const' instead                                                             prefer-const
+  302:34  warning  'e' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  671:76  error    Unexpected any. Specify a different type                                                                            @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\compare\page.tsx
+    5:20  warning  'useEffect' is defined but never used              @typescript-eslint/no-unused-vars
+  100:12  warning  'showLocal' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  100:23  warning  'setShowLocal' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\dashboard\page.tsx
+  147:12  warning  'isPlaying' is assigned a value but never used                                                                                                     @typescript-eslint/no-unused-vars
+  147:23  warning  'setIsPlaying' is assigned a value but never used                                                                                                  @typescript-eslint/no-unused-vars
+  221:8   warning  React Hook useEffect has missing dependencies: 'fetchDashboardNews' and 'fetchGoogleCalendar'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  299:18  warning  'error' is defined but never used                                                                                                                  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\github\page.tsx
+  110:28  warning  'action' is defined but never used                               @typescript-eslint/no-unused-vars
+  173:31  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  173:79  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\home\page.tsx
+  73:12  warning  'selectedDevice' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  73:28  warning  'setSelectedDevice' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\idle\page.tsx
+  258:69  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\IncomeDashboard.tsx
+   19:59  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   21:16  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   24:16  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   29:56  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   50:35  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   60:11  warning  'selectedStream' is assigned a value but never used              @typescript-eslint/no-unused-vars
+  112:17  error    'cleanJson' is never reassigned. Use 'const' instead             prefer-const
+  230:40  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  230:55  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  256:86  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  439:86  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\art\page.tsx
+    8:5   warning  'TrendingUp' is defined but never used                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+   16:5   warning  'Clock' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  294:53  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\ideas\page.tsx
+  304:79  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\music\page.tsx
+  10:5  warning  'Play' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\opportunities\page.tsx
+  249:61  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  249:94  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\tracker\page.tsx
+  42:12  warning  'timeRange' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  42:23  warning  'setTimeRange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\integrations\page.tsx
+  169:22  warning  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  178:8   warning  React Hook useEffect has a missing dependency: 'statuses'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+  185:35  error    Error: This value cannot be modified
+
+Modifying a variable defined outside a component or hook is not allowed. Consider using an effect.
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\integrations\page.tsx:185:35
+  183 |                 const res = await fetch(`${LUXRIG_BRIDGE_URL}/auth/github`);
+  184 |                 const data = await res.json();
+> 185 |                 if (data.authUrl) window.location.href = data.authUrl;
+      |                                   ^^^^^^^^^^^^^^^ value cannot be modified
+  186 |             } else if (id === 'google') {
+  187 |                 const res = await fetch(`${LUXRIG_BRIDGE_URL}/auth/google`);
+  188 |                 const data = await res.json();  react-hooks/immutability
+  189:35  error    Error: This value cannot be modified
+
+Modifying a variable defined outside a component or hook is not allowed. Consider using an effect.
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\integrations\page.tsx:189:35
+  187 |                 const res = await fetch(`${LUXRIG_BRIDGE_URL}/auth/google`);
+  188 |                 const data = await res.json();
+> 189 |                 if (data.authUrl) window.location.href = data.authUrl;
+      |                                   ^^^^^^^^^^^^^^^ value cannot be modified
+  190 |             }
+  191 |         } catch (error) {
+  192 |             console.error('Connection error:', error);                                                                         react-hooks/immutability
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\labs\page.tsx
+    5:18   warning  'Filter' is defined but never used                    @typescript-eslint/no-unused-vars
+    5:69   warning  'Users' is defined but never used                     @typescript-eslint/no-unused-vars
+    5:106  warning  'MessageSquare' is defined but never used             @typescript-eslint/no-unused-vars
+    5:121  warning  'Calendar' is defined but never used                  @typescript-eslint/no-unused-vars
+    5:131  warning  'ChevronRight' is defined but never used              @typescript-eslint/no-unused-vars
+    5:145  warning  'ChevronDown' is defined but never used               @typescript-eslint/no-unused-vars
+    5:192  warning  'Wifi' is defined but never used                      @typescript-eslint/no-unused-vars
+    8:8    warning  'StaffMeetingPanel' is defined but never used         @typescript-eslint/no-unused-vars
+   51:12   warning  'expandedRows' is assigned a value but never used     @typescript-eslint/no-unused-vars
+   52:12   warning  'selectedLabId' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  124:43   error    Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  141:11   warning  'handleUpdateLab' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  141:51   error    Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  145:30   warning  'labId' is defined but never used                     @typescript-eslint/no-unused-vars
+  156:11   warning  'toggleRow' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  263:57   warning  'i' is defined but never used                         @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\learn\page.tsx
+  425:76  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\meeting\page.tsx
+  109:14  warning  'error' is defined but never used                                @typescript-eslint/no-unused-vars
+  261:59  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  261:96  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\models\page.tsx
+  195:20  warning  'setSortBy' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\monitoring\page.tsx
+  58:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\monitoring\page.tsx:58:9
+  56 |
+  57 |     useEffect(() => {
+> 58 |         loadData();
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  59 |         const interval = setInterval(loadData, refreshInterval);
+  60 |         return () => clearInterval(interval);
+  61 |     }, [refreshInterval]);  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\music\page.tsx
+    3:18  warning  'AnimatePresence' is defined but never used         @typescript-eslint/no-unused-vars
+    7:22  warning  'Play' is defined but never used                    @typescript-eslint/no-unused-vars
+    7:28  warning  'Pause' is defined but never used                   @typescript-eslint/no-unused-vars
+    7:35  warning  'Video' is defined but never used                   @typescript-eslint/no-unused-vars
+    8:3   warning  'Volume2' is defined but never used                 @typescript-eslint/no-unused-vars
+    8:12  warning  'Heart' is defined but never used                   @typescript-eslint/no-unused-vars
+    8:27  warning  'Download' is defined but never used                @typescript-eslint/no-unused-vars
+   10:3   warning  'FileVideo' is defined but never used               @typescript-eslint/no-unused-vars
+   10:28  warning  'Upload' is defined but never used                  @typescript-eslint/no-unused-vars
+   41:9   error    Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  100:21  error    Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  129:21  error    Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  166:9   error    'topic' is never reassigned. Use 'const' instead    prefer-const
+  167:9   error    'context' is never reassigned. Use 'const' instead  prefer-const
+  171:17  error    Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\news\page.tsx
+    5:8    warning  'Link' is defined but never used                                 @typescript-eslint/no-unused-vars
+   14:5    warning  'MN_KEYWORDS' is defined but never used                          @typescript-eslint/no-unused-vars
+   19:17   warning  'Youtube' is defined but never used                              @typescript-eslint/no-unused-vars
+   19:26   warning  'Radio' is defined but never used                                @typescript-eslint/no-unused-vars
+  136:60   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  204:56   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  326:12   warning  'tickerIndex' is assigned a value but never used                 @typescript-eslint/no-unused-vars
+  606:66   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  697:87   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  697:111  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  704:87   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  759:83   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\notes\page.tsx
+  77:19  warning  'setNotes' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\notifications\page.tsx
+  113:57  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\page.tsx
+  102:33  warning  'i' is defined but never used                                    @typescript-eslint/no-unused-vars
+  246:56  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\pipeline\page.tsx
+  152:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  164:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  178:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  191:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  205:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\playground\page.tsx
+   49:12  warning  'response' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   64:54  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   69:58  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   77:22  warning  'e' is defined but never used                  @typescript-eslint/no-unused-vars
+  127:18  warning  'e' is defined but never used                  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\portfolio\page.tsx
+  5:20  warning  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\settings\page.tsx
+  36:22  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  92:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\setup\page.tsx
+   68:50  error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
+   73:8   warning  React Hook useEffect has a missing dependency: 'checkAllTools'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   82:18  warning  'e' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+  141:74  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                   react/no-unescaped-entities
+  141:92  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                   react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\status\page.tsx
+   27:50  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+   41:17  error    Error: Cannot access variable before it is declared
+
+`updateService` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\status\page.tsx:41:17
+  39 |
+  40 |             if (bridgeRes.ok) {
+> 41 |                 updateService('LuxRig Bridge', 'operational', bridgeLatency);
+     |                 ^^^^^^^^^^^^^ `updateService` accessed before it is declared
+  42 |             } else {
+  43 |                 updateService('LuxRig Bridge', 'down');
+  44 |             }
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\status\page.tsx:106:5
+  104 |     }, [settings.bridgeUrl]);
+  105 |
+> 106 |     function updateService(name: string, status: ServiceStatus['status'], latency?: number) {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 107 |         setServices(prev => prev.map(s =>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 108 |             s.name === name ? { ...s, status, latency } : s
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 109 |         ));
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 110 |     }
+      | ^^^^^^ `updateService` is declared here
+  111 |
+  112 |     function updateOverallStatus() {
+  113 |         setServices(prev => {  react-hooks/immutability
+   86:18  warning  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   95:9   error    Error: Cannot access variable before it is declared
+
+`updateOverallStatus` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\status\page.tsx:95:9
+  93 |
+  94 |         setLastChecked(new Date());
+> 95 |         updateOverallStatus();
+     |         ^^^^^^^^^^^^^^^^^^^ `updateOverallStatus` accessed before it is declared
+  96 |     }
+  97 |
+  98 |     useEffect(() => {
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\status\page.tsx:112:5
+  110 |     }
+  111 |
+> 112 |     function updateOverallStatus() {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 113 |         setServices(prev => {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 114 |             const down = prev.filter(s => s.status === 'down').length;
+      ΓÇª
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 125 |         });
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 126 |     }
+      | ^^^^^^ `updateOverallStatus` is declared here
+  127 |
+  128 |     const statusColors = {
+  129 |         operational: { bg: 'bg-green-500', text: 'text-green-400', label: 'Operational' },                                                                                                                                                                                                                 react-hooks/immutability
+  104:8   warning  React Hook useEffect has a missing dependency: 'checkAllServices'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\studio\page.tsx
+  17:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\studios\art\page.tsx
+    5:30  warning  'Download' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+    5:40  warning  'Share2' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+    5:55  warning  'Settings' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+    5:73  warning  'Maximize' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+   29:42  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   30:40  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   31:50  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   38:8   warning  React Hook useEffect has missing dependencies: 'fetchAssets' and 'fetchStats'. Either include them or remove the dependency array                                                                                                                                                        react-hooks/exhaustive-deps
+  230:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  311:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  311:33  warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images                                                                                                                                                                                jsx-a11y/alt-text
+  327:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  327:37  warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images                                                                                                                                                                                jsx-a11y/alt-text
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\studios\blog\page.tsx
+   4:18  warning  'AnimatePresence' is defined but never used       @typescript-eslint/no-unused-vars
+   5:96  warning  'Layout' is defined but never used                @typescript-eslint/no-unused-vars
+  30:22  warning  'setSeoScore' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\studios\dev\page.tsx
+   6:44  warning  'ExternalLink' is defined but never used  @typescript-eslint/no-unused-vars
+  29:42  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  71:18  warning  'err' is defined but never used           @typescript-eslint/no-unused-vars
+  82:46  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\studios\video\page.tsx
+    3:20   warning  'useEffect' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+    5:112  warning  'AlertCircle' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   32:38   error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\studios\video\page.tsx:32:38
+  30 |                     className="w-4 bg-orange-500 rounded-t-md opacity-80"
+  31 |                     animate={isPlaying ? {
+> 32 |                         height: [40, Math.random() * 120 + 20, 40],
+     |                                      ^^^^^^^^^^^^^ Cannot call impure function
+  33 |                     } : { height: 20 }}
+  34 |                     transition={{
+  35 |                         repeat: Infinity,  react-hooks/purity
+   36:41   error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\studios\video\page.tsx:36:41
+  34 |                     transition={{
+  35 |                         repeat: Infinity,
+> 36 |                         duration: 0.5 + Math.random() * 0.5,
+     |                                         ^^^^^^^^^^^^^ Cannot call impure function
+  37 |                         ease: "easeInOut"
+  38 |                     }}
+  39 |                 />                                                                               react-hooks/purity
+  405:42   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  405:59   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\team\page.tsx
+  4:35  warning  'Shield' is defined but never used    @typescript-eslint/no-unused-vars
+  4:43  warning  'Zap' is defined but never used       @typescript-eslint/no-unused-vars
+  4:48  warning  'Terminal' is defined but never used  @typescript-eslint/no-unused-vars
+  4:58  warning  'Cpu' is defined but never used       @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\terminal\page.tsx
+   83:25  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  102:25  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  114:47  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  117:45  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  122:25  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  136:25  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  165:27  warning  'content' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  174:25  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\trading\page.tsx
+  121:12  warning  'selectedBot' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  121:25  warning  'setSelectedBot' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\trends\page.tsx
+  171:33  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  203:68  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\vision\page.tsx
+  133:57  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  163:49  warning  'catIndex' is defined but never used                             @typescript-eslint/no-unused-vars
+  173:64  warning  'itemIndex' is defined but never used                            @typescript-eslint/no-unused-vars
+  216:56  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  219:35  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  219:55  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  240:31  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  240:65  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\voice\page.tsx
+   45:1   warning  Unused eslint-disable directive (no problems were reported)
+  126:17  error    Error: Cannot access variable before it is declared
+
+`processCommand` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\voice\page.tsx:126:17
+  124 |             if (final) {
+  125 |                 setTranscript(prev => prev + ' ' + final);
+> 126 |                 processCommand(final.trim(), event.results[event.resultIndex][0].confidence);
+      |                 ^^^^^^^^^^^^^^ `processCommand` accessed before it is declared
+  127 |             }
+  128 |         };
+  129 |
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\voice\page.tsx:229:5
+  227 |
+  228 |     // Process recognized command
+> 229 |     const processCommand = async (text: string, confidence: number) => {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 230 |         setStatus('processing');
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 231 |
+      ΓÇª
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 293 |         setStatus('listening');
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 294 |     };
+      | ^^^^^^^ `processCommand` is declared here
+  295 |
+  296 |     // Text-to-speech response
+  297 |     const speakResponse = (text: string) => {  react-hooks/immutability
+  155:8   warning  React Hook useEffect has a missing dependency: 'processCommand'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+  339:39  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react/no-unescaped-entities
+  456:61  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\voice\page.tsx:456:61
+  454 |                                     className="w-1.5 bg-gradient-to-t from-purple-500 to-cyan-400 rounded-full"
+  455 |                                     animate={{
+> 456 |                                         height: Math.max(8, Math.random() * voiceVisualization * 1.5)
+      |                                                             ^^^^^^^^^^^^^ Cannot call impure function
+  457 |                                     }}
+  458 |                                     transition={{ duration: 0.1 }}
+  459 |                                 />                                                                                                                                                                                                                                                                                                                   react-hooks/purity
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\BridgeStatus.tsx
+  11:12  warning  'lastSync' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  41:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\BridgeStatus.tsx:41:9
+  39 |     // Check on mount and when URL changes
+  40 |     useEffect(() => {
+> 41 |         checkStatus();
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  42 |
+  43 |         // Auto-check periodically
+  44 |         const interval = setInterval(checkStatus, 30000);  react-hooks/set-state-in-effect
+  46:8   warning  React Hook useEffect has a missing dependency: 'checkStatus'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-hooks/exhaustive-deps
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\CommandPalette.tsx
+    6:10   warning  'Search' is defined but never used                                                                                                          @typescript-eslint/no-unused-vars
+    6:56   warning  'Mic' is defined but never used                                                                                                             @typescript-eslint/no-unused-vars
+  196:8    warning  React Hook useEffect has missing dependencies: 'handleAiQuery' and 'saveRecentCommand'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  325:87   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                             react/no-unescaped-entities
+  325:89   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                             react/no-unescaped-entities
+  373:45   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                             react/no-unescaped-entities
+  373:71   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                             react/no-unescaped-entities
+  373:75   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                             react/no-unescaped-entities
+  373:80   error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                             react/no-unescaped-entities
+  373:94   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                             react/no-unescaped-entities
+  373:98   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                             react/no-unescaped-entities
+  373:114  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                             react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\ConsentBanner.tsx
+   5:23  warning  'X' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  13:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\ConsentBanner.tsx:13:13
+  11 |         const consent = localStorage.getItem('dlx-ai-consent');
+  12 |         if (!consent) {
+> 13 |             setIsVisible(true);
+     |             ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  14 |         }
+  15 |     }, []);
+  16 |  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\CreativePrompt.tsx
+  40:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\HolographicBrain.tsx
+   13:7   warning  'WS_URL' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+   50:11  warning  'wsRef' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+  103:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\HolographicBrain.tsx:103:9
+  101 |
+  102 |     useEffect(() => {
+> 103 |         setMounted(true);
+      |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  104 |
+  105 |         // Initial static nodes
+  106 |         const initialNodes: GraphNode[] = [  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\LLMModels.tsx
+  35:22  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\LuxHelper.tsx
+  136:18  warning  'e' is defined but never used                                    @typescript-eslint/no-unused-vars
+  174:45  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\MultimodalViewer.tsx
+  12:52  warning  'src' is defined but never used                                                                              @typescript-eslint/no-unused-vars
+  12:57  warning  'alt' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
+  16:38  warning  Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\Navigation.tsx
+  37:13  warning  'themeId' is assigned a value but never used          @typescript-eslint/no-unused-vars
+  37:22  warning  'setTheme' is assigned a value but never used         @typescript-eslint/no-unused-vars
+  37:32  warning  'availableThemes' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  37:49  warning  'mode' is assigned a value but never used             @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\NeuralNetwork.tsx
+  15:27  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\NeuralNetwork.tsx:15:27
+  13 |         const pos = new Float32Array(count * 3);
+  14 |         for (let i = 0; i < count; i++) {
+> 15 |             pos[i * 3] = (Math.random() - 0.5) * 10;
+     |                           ^^^^^^^^^^^^^ Cannot call impure function
+  16 |             pos[i * 3 + 1] = (Math.random() - 0.5) * 10;
+  17 |             pos[i * 3 + 2] = (Math.random() - 0.5) * 10;
+  18 |         }                                                                           react-hooks/purity
+  16:31  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\NeuralNetwork.tsx:16:31
+  14 |         for (let i = 0; i < count; i++) {
+  15 |             pos[i * 3] = (Math.random() - 0.5) * 10;
+> 16 |             pos[i * 3 + 1] = (Math.random() - 0.5) * 10;
+     |                               ^^^^^^^^^^^^^ Cannot call impure function
+  17 |             pos[i * 3 + 2] = (Math.random() - 0.5) * 10;
+  18 |         }
+  19 |         return pos;                                                                                                    react-hooks/purity
+  17:31  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\NeuralNetwork.tsx:17:31
+  15 |             pos[i * 3] = (Math.random() - 0.5) * 10;
+  16 |             pos[i * 3 + 1] = (Math.random() - 0.5) * 10;
+> 17 |             pos[i * 3 + 2] = (Math.random() - 0.5) * 10;
+     |                               ^^^^^^^^^^^^^ Cannot call impure function
+  18 |         }
+  19 |         return pos;
+  20 |     }, [count]);                                                                                                                             react-hooks/purity
+  54:33  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\NeuralNetwork.tsx:54:33
+  52 |         for (let i = 0; i < count; i++) {
+  53 |             // Start point
+> 54 |             positions[i * 6] = (Math.random() - 0.5) * 8;
+     |                                 ^^^^^^^^^^^^^ Cannot call impure function
+  55 |             positions[i * 6 + 1] = (Math.random() - 0.5) * 8;
+  56 |             positions[i * 6 + 2] = (Math.random() - 0.5) * 8;
+  57 |             // End point                                                             react-hooks/purity
+  55:37  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\NeuralNetwork.tsx:55:37
+  53 |             // Start point
+  54 |             positions[i * 6] = (Math.random() - 0.5) * 8;
+> 55 |             positions[i * 6 + 1] = (Math.random() - 0.5) * 8;
+     |                                     ^^^^^^^^^^^^^ Cannot call impure function
+  56 |             positions[i * 6 + 2] = (Math.random() - 0.5) * 8;
+  57 |             // End point
+  58 |             positions[i * 6 + 3] = (Math.random() - 0.5) * 8;                                     react-hooks/purity
+  56:37  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\NeuralNetwork.tsx:56:37
+  54 |             positions[i * 6] = (Math.random() - 0.5) * 8;
+  55 |             positions[i * 6 + 1] = (Math.random() - 0.5) * 8;
+> 56 |             positions[i * 6 + 2] = (Math.random() - 0.5) * 8;
+     |                                     ^^^^^^^^^^^^^ Cannot call impure function
+  57 |             // End point
+  58 |             positions[i * 6 + 3] = (Math.random() - 0.5) * 8;
+  59 |             positions[i * 6 + 4] = (Math.random() - 0.5) * 8;  react-hooks/purity
+  58:37  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\NeuralNetwork.tsx:58:37
+  56 |             positions[i * 6 + 2] = (Math.random() - 0.5) * 8;
+  57 |             // End point
+> 58 |             positions[i * 6 + 3] = (Math.random() - 0.5) * 8;
+     |                                     ^^^^^^^^^^^^^ Cannot call impure function
+  59 |             positions[i * 6 + 4] = (Math.random() - 0.5) * 8;
+  60 |             positions[i * 6 + 5] = (Math.random() - 0.5) * 8;
+  61 |         }                                                  react-hooks/purity
+  59:37  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\NeuralNetwork.tsx:59:37
+  57 |             // End point
+  58 |             positions[i * 6 + 3] = (Math.random() - 0.5) * 8;
+> 59 |             positions[i * 6 + 4] = (Math.random() - 0.5) * 8;
+     |                                     ^^^^^^^^^^^^^ Cannot call impure function
+  60 |             positions[i * 6 + 5] = (Math.random() - 0.5) * 8;
+  61 |         }
+  62 |                                                                                                                react-hooks/purity
+  60:37  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\NeuralNetwork.tsx:60:37
+  58 |             positions[i * 6 + 3] = (Math.random() - 0.5) * 8;
+  59 |             positions[i * 6 + 4] = (Math.random() - 0.5) * 8;
+> 60 |             positions[i * 6 + 5] = (Math.random() - 0.5) * 8;
+     |                                     ^^^^^^^^^^^^^ Cannot call impure function
+  61 |         }
+  62 |
+  63 |         const geo = new THREE.BufferGeometry();                                                                                         react-hooks/purity
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\PageLayout.tsx
+  73:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\ResearchPanel.tsx
+    9:5    warning  'BookOpen' is defined but never used                             @typescript-eslint/no-unused-vars
+   10:15   warning  'Copy' is defined but never used                                 @typescript-eslint/no-unused-vars
+   11:5    warning  'Cpu' is defined but never used                                  @typescript-eslint/no-unused-vars
+   11:20   warning  'Zap' is defined but never used                                  @typescript-eslint/no-unused-vars
+   59:12   warning  'copied' is assigned a value but never used                      @typescript-eslint/no-unused-vars
+  198:11   warning  'copyArticleUrls' is assigned a value but never used             @typescript-eslint/no-unused-vars
+  448:87   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  448:103  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\RevenueAgentWidget.tsx
+  18:12  warning  'loading' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  18:21  warning  'setLoading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\RevenueTracker.tsx
+  123:75  warning  'i' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\SafetyGuard.tsx
+   7:43  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  39:56  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  51:18  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\SettingsContext.tsx
+  75:8  warning  React Hook useEffect has a missing dependency: 'loadSettings'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\StaffMeetingPanel.tsx
+    4:18   warning  'AnimatePresence' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+    5:66   warning  'AlertTriangle' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+    5:105  warning  'ChevronLeft' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   21:20   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+   26:15   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+   27:40   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+   41:13   error    Error: Cannot access variable before it is declared
+
+`runAudit` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\StaffMeetingPanel.tsx:41:13
+  39 |     useEffect(() => {
+  40 |         if (messages.length === 0) {
+> 41 |             runAudit();
+     |             ^^^^^^^^ `runAudit` accessed before it is declared
+  42 |         }
+  43 |     }, [messages.length]);
+  44 |
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\StaffMeetingPanel.tsx:74:5
+  72 |     };
+  73 |
+> 74 |     const runAudit = () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^
+> 75 |         addMessage('architect', "Initializing system audit. Reviewing active initiatives...");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 76 |
+     ΓÇª
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 91 |         }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 92 |     };
+     | ^^^^^^^ `runAudit` is declared here
+  93 |
+  94 |     const discussLab = (lab: any) => {
+  95 |         // Clear previous context if too old? Nah, just append  react-hooks/immutability
+   43:8    warning  React Hook useEffect has a missing dependency: 'runAudit'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react-hooks/exhaustive-deps
+   50:17   error    Error: Cannot access variable before it is declared
+
+`discussLab` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\StaffMeetingPanel.tsx:50:17
+  48 |             const lab = labsData.find(l => l.id === selectedLabId);
+  49 |             if (lab) {
+> 50 |                 discussLab(lab);
+     |                 ^^^^^^^^^^ `discussLab` accessed before it is declared
+  51 |             }
+  52 |         }
+  53 |     }, [selectedLabId]);
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\StaffMeetingPanel.tsx:94:5
+   92 |     };
+   93 |
+>  94 |     const discussLab = (lab: any) => {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  95 |         // Clear previous context if too old? Nah, just append.
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  96 |
+      ΓÇª
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 112 |         }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 113 |     };
+      | ^^^^^^^ `discussLab` is declared here
+  114 |
+  115 |     const handleSendMessage = () => {
+  116 |         if (!inputValue.trim()) return;                                                 react-hooks/immutability
+   53:8    warning  React Hook useEffect has missing dependencies: 'discussLab' and 'labsData'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/exhaustive-deps
+   55:117  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+   71:19   error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\StaffMeetingPanel.tsx:71:19
+  69 |                 if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  70 |             }, 100);
+> 71 |         }, 1000 + Math.random() * 1000);
+     |                   ^^^^^^^^^^^^^ Cannot call impure function
+  72 |     };
+  73 |
+  74 |     const runAudit = () => {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/purity
+   94:30   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+  108:13   error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\StaffMeetingPanel.tsx:108:13
+  106 |
+  107 |         // Random Proposal Simulation
+> 108 |         if (Math.random() > 0.7 && lab.status !== 'active') {
+      |             ^^^^^^^^^^^^^ Cannot call impure function
+  109 |             setTimeout(() => {
+  110 |                 addMessage('bytebot', `I can accelerate ${lab.name} deployment. Move to Active?`, 'proposal', { labId: lab.id, updates: { status: 'active' } });
+  111 |             }, 3000);                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/purity
+  118:40   error    Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\StaffMeetingPanel.tsx:118:40
+  116 |         if (!inputValue.trim()) return;
+  117 |
+> 118 |         const userMsg: Message = { id: Date.now().toString(), agentId: 'user', text: inputValue, type: 'chat', timestamp: Date.now() };
+      |                                        ^^^^^^^^^^ Cannot call impure function
+  119 |         setMessages(prev => [...prev, userMsg]);
+  120 |         setInputValue('');
+  121 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react-hooks/purity
+  118:123  error    Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\StaffMeetingPanel.tsx:118:123
+  116 |         if (!inputValue.trim()) return;
+  117 |
+> 118 |         const userMsg: Message = { id: Date.now().toString(), agentId: 'user', text: inputValue, type: 'chat', timestamp: Date.now() };
+      |                                                                                                                           ^^^^^^^^^^ Cannot call impure function
+  119 |         setMessages(prev => [...prev, userMsg]);
+  120 |         setInputValue('');
+  121 |                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/purity
+  135:56   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\StatusAvatar.tsx
+  12:12  warning  'lastSync' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+  32:25  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+  43:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\StatusAvatar.tsx:43:9
+  41 |     // Check on mount and when settings URL changes
+  42 |     useEffect(() => {
+> 43 |         checkStatus();
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  44 |         const interval = setInterval(checkStatus, 60000); // Check every minute
+  45 |         return () => clearInterval(interval);
+  46 |     }, [settings.bridgeUrl]);  react-hooks/set-state-in-effect
+  46:8   warning  React Hook useEffect has a missing dependency: 'checkStatus'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/exhaustive-deps
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\SystemStatus.tsx
+  51:12  warning  'connected' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\UnderConstruction.tsx
+  4:10  warning  'Hammer' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\VibeContext.tsx
+  47:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\VibeContext.tsx:47:9
+  45 |     useEffect(() => {
+  46 |         const savedTheme = loadSavedTheme();
+> 47 |         setThemeId(savedTheme);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  48 |         const themeConfig = getTheme(savedTheme);
+  49 |         setThemeState(themeConfig);
+  50 |         applyTheme(themeConfig);  react-hooks/set-state-in-effect
+  93:22  warning  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+  98:23  warning  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\__tests__\MeetingRoom.test.tsx
+  6:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  7:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  9:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\__tests__\PageTransition.test.tsx
+  7:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  9:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\__tests__\ThemeToggle.test.tsx
+   3:10  warning  'ThemeProvider' is defined but never used  @typescript-eslint/no-unused-vars
+  19:30  warning  'whileHover' is defined but never used     @typescript-eslint/no-unused-vars
+  19:42  warning  'whileTap' is defined but never used       @typescript-eslint/no-unused-vars
+  19:64  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  20:27  warning  'initial' is defined but never used        @typescript-eslint/no-unused-vars
+  20:36  warning  'animate' is defined but never used        @typescript-eslint/no-unused-vars
+  20:45  warning  'transition' is defined but never used     @typescript-eslint/no-unused-vars
+  20:69  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  22:37  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\ui\FocusTrap.tsx
+  54:68  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  55:84  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\hooks\useSpeechRecognition.ts
+  19:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\lib\agents\housekeeper-agent.ts
+   40:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  213:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  236:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\lib\income-templates.ts
+  2:5   warning  'Zap' is defined but never used          @typescript-eslint/no-unused-vars
+  2:10  warning  'Target' is defined but never used       @typescript-eslint/no-unused-vars
+  2:18  warning  'BookOpen' is defined but never used     @typescript-eslint/no-unused-vars
+  3:5   warning  'CheckCircle' is defined but never used  @typescript-eslint/no-unused-vars
+  3:18  warning  'Circle' is defined but never used       @typescript-eslint/no-unused-vars
+  3:26  warning  'AlertCircle' is defined but never used  @typescript-eslint/no-unused-vars
+  4:5   warning  'Music' is defined but never used        @typescript-eslint/no-unused-vars
+  4:12  warning  'Video' is defined but never used        @typescript-eslint/no-unused-vars
+  4:19  warning  'ShoppingBag' is defined but never used  @typescript-eslint/no-unused-vars
+  4:32  warning  'Mic' is defined but never used          @typescript-eslint/no-unused-vars
+  4:37  warning  'Printer' is defined but never used      @typescript-eslint/no-unused-vars
+  4:46  warning  'TrendingUp' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\lib\music-agents.ts
+  69:41  warning  'context' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\lib\news-service.ts
+  181:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  223:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  237:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  264:75  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  275:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  278:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  301:79  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\lib\task-agent.ts
+  64:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  86:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\types\speech.d.ts
+  5:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  6:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\verify-prisma.ts
+  1:10  warning  'PrismaClient' is defined but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 340 problems (173 errors, 167 warnings)
+  5 errors and 1 warning potentially fixable with the `--fix` option.
+

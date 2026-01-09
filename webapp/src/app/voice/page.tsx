@@ -89,6 +89,104 @@ export default function VoiceControlPage() {
     const analyserRef = useRef<AnalyserNode | null>(null);
     const animationRef = useRef<number | null>(null);
 
+    // Text-to-speech response - Moved up to avoid use-before-define
+    const speakResponse = useCallback((text: string) => {
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            utterance.volume = 0.8;
+            window.speechSynthesis.speak(utterance);
+        }
+    }, []);
+
+    // Parse command intent - Moved up
+    const parseIntent = useCallback((text: string): { intent: string; params: Record<string, string> } | null => {
+        for (const [intent, pattern] of Object.entries(COMMAND_INTENTS)) {
+            const match = text.match(pattern);
+            if (match) {
+                const params: Record<string, string> = {};
+
+                switch (intent) {
+                    case 'go_to':
+                        params.destination = match[2];
+                        break;
+                    case 'execute_agent':
+                        params.agentType = match[2].toLowerCase();
+                        params.task = match[3] || '';
+                        break;
+                    case 'meeting':
+                        params.topic = match[4] || '';
+                        break;
+                    case 'chat':
+                        params.message = match[2];
+                        break;
+                }
+
+                return { intent, params };
+            }
+        }
+        return null;
+    }, []);
+
+    // Process recognized command - Moved up
+    const processCommand = useCallback(async (text: string, confidence: number) => {
+        setStatus('processing');
+
+        const parsed = parseIntent(text);
+
+        const command: VoiceCommand = {
+            intent: parsed?.intent || 'unknown',
+            params: parsed?.params || {},
+            raw: text,
+            confidence,
+            timestamp: new Date()
+        };
+
+        setCommands(prev => [command, ...prev].slice(0, 10));
+
+        // Execute command
+        try {
+            let result = '';
+
+            if (parsed) {
+                switch (parsed.intent) {
+                    case 'go_to':
+                        result = `Navigating to ${parsed.params.destination}...`;
+                        break;
+                    case 'execute_agent':
+                        result = `Running ${parsed.params.agentType} agent...`;
+                        break;
+                    case 'meeting':
+                        result = `Starting staff meeting about "${parsed.params.topic}"...`;
+                        break;
+                    case 'status':
+                        result = 'Fetching system status...';
+                        break;
+                    case 'help':
+                        result = 'Available commands: Go to [page], Ask [agent] [task], Start meeting about [topic], Show status';
+                        break;
+                    case 'chat':
+                        result = `Processing: "${parsed.params.message}"`;
+                        break;
+                    default:
+                        result = `Command not recognized: "${text}"`;
+                }
+            } else {
+                result = `I heard: "${text}" - Try saying "help" for available commands`;
+            }
+
+            setLastResult(result);
+            speakResponse(result);
+
+        } catch (error) {
+            console.error('Command execution error:', error);
+            setLastResult('Error executing command');
+        }
+
+        setStatus('listening');
+    }, [parseIntent, speakResponse]);
+
     // Check for Web Speech API support
     useEffect(() => {
         const SpeechRecognition = getSpeechRecognition();
@@ -196,113 +294,7 @@ export default function VoiceControlPage() {
         setVoiceVisualization(0);
     };
 
-    // Parse command intent
-    const parseIntent = (text: string): { intent: string; params: Record<string, string> } | null => {
-        for (const [intent, pattern] of Object.entries(COMMAND_INTENTS)) {
-            const match = text.match(pattern);
-            if (match) {
-                const params: Record<string, string> = {};
 
-                switch (intent) {
-                    case 'go_to':
-                        params.destination = match[2];
-                        break;
-                    case 'execute_agent':
-                        params.agentType = match[2].toLowerCase();
-                        params.task = match[3] || '';
-                        break;
-                    case 'meeting':
-                        params.topic = match[4] || '';
-                        break;
-                    case 'chat':
-                        params.message = match[2];
-                        break;
-                }
-
-                return { intent, params };
-            }
-        }
-        return null;
-    };
-
-    // Process recognized command
-    const processCommand = async (text: string, confidence: number) => {
-        setStatus('processing');
-
-        const parsed = parseIntent(text);
-
-        const command: VoiceCommand = {
-            intent: parsed?.intent || 'unknown',
-            params: parsed?.params || {},
-            raw: text,
-            confidence,
-            timestamp: new Date()
-        };
-
-        setCommands(prev => [command, ...prev].slice(0, 10));
-
-        // Execute command
-        try {
-            let result = '';
-
-            if (parsed) {
-                switch (parsed.intent) {
-                    case 'go_to':
-                        result = `Navigating to ${parsed.params.destination}...`;
-                        // In real implementation: router.push(`/${parsed.params.destination}`);
-                        break;
-
-                    case 'execute_agent':
-                        result = `Running ${parsed.params.agentType} agent...`;
-                        // Call agent API
-                        break;
-
-                    case 'meeting':
-                        result = `Starting staff meeting about "${parsed.params.topic}"...`;
-                        break;
-
-                    case 'status':
-                        result = 'Fetching system status...';
-                        break;
-
-                    case 'help':
-                        result = 'Available commands: Go to [page], Ask [agent] [task], Start meeting about [topic], Show status';
-                        break;
-
-                    case 'chat':
-                        result = `Processing: "${parsed.params.message}"`;
-                        break;
-
-                    default:
-                        result = `Command not recognized: "${text}"`;
-                }
-            } else {
-                result = `I heard: "${text}" - Try saying "help" for available commands`;
-            }
-
-            setLastResult(result);
-
-            // Speak response
-            speakResponse(result);
-
-        } catch (error) {
-            console.error('Command execution error:', error);
-            setLastResult('Error executing command');
-        }
-
-        setStatus('listening');
-    };
-
-    // Text-to-speech response
-    const speakResponse = (text: string) => {
-        if ('speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 1;
-            utterance.pitch = 1;
-            utterance.volume = 0.8;
-            window.speechSynthesis.speak(utterance);
-        }
-    };
 
     // Toggle listening
     const toggleListening = useCallback(() => {
@@ -453,7 +445,7 @@ export default function VoiceControlPage() {
                                     key={i}
                                     className="w-1.5 bg-gradient-to-t from-purple-500 to-cyan-400 rounded-full"
                                     animate={{
-                                        height: Math.max(8, Math.random() * voiceVisualization * 1.5)
+                                        height: Math.max(8, (Math.sin(i * 0.5) + 1.2) * (voiceVisualization || 5))
                                     }}
                                     transition={{ duration: 0.1 }}
                                 />
@@ -573,6 +565,6 @@ export default function VoiceControlPage() {
                     </motion.div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

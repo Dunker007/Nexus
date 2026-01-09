@@ -264,6 +264,7 @@ export default function NewsPage() {
 
     // Filter articles
     const filteredArticles = articles.filter(article => {
+        if (!article || !article.source) return false;
         // Tab filter
         if (activeTab === 'local' && article.category !== 'local') return false;
         if (activeTab === 'national' && !['national', 'center', 'left'].includes(article.category)) return false;
@@ -771,7 +772,7 @@ export default function NewsPage() {
             < section className="container-main pb-16" >
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredArticles.map((article, i) => {
-                        const biasStyle = BIAS_COLORS[article.source.bias as keyof typeof BIAS_COLORS];
+                        const biasStyle = BIAS_COLORS[article.source?.bias as keyof typeof BIAS_COLORS] || BIAS_COLORS['center'];
                         const factStyle = FACT_CHECK_STYLES[article.factCheck?.status || 'unverified'];
                         const isSaved = savedArticles.has(article.id);
 

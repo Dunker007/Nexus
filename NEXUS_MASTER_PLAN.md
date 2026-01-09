@@ -1,10 +1,10 @@
 # NEXUS MASTER PLAN
 
-**Version:** 2.0.0  
+**Version:** 2.1.0  
 **Created:** December 7, 2025  
-**Updated:** January 8, 2026  
+**Updated:** January 9, 2026  
 **Maintainer:** Antigravity + Human (Executive)  
-**Status:** Focused Execution Phase
+**Status:** Growth Phase Execution
 
 ---
 
@@ -16,100 +16,54 @@
 
 ---
 
-## ACTIVE PRIORITIES (January 2026)
+## ACTIVE PRIORITIES (Growth Phase Execution)
 
-These are the **only** active work items. Prioritize in order:
+**Goal:** Revenue & Audience Generation.
+**Current Focus:** Phase 1 (Social Intelligence).
 
-### Priority 1: Prisma Version Alignment
-**Status:** ✅ Complete (Jan 8, 2026)  
-**Impact:** High — Technical Debt  
+### Phase 1: Social Intelligence & Content (X Priority)
+**Status:** 🚀 Active
+**Target:** Feed **@CrossCheckFraud** (Project CrossCheck Fraud Watch) with high-quality, human-reviewed content.
+**Constraint:** **NO AUTO POSTING.** All tools generate drafts for manual review.
+- **Actions:**
+    - [ ] Revive `MidwestSentinel` (or similar) agent to scan for "fraud/govt waste" news.
+    - [ ] Update `pipeline/` to generate X threads/shorts.
+    - [ ] Create "Daily Briefing" UI for one-click draft generation.
 
-Bridge upgraded from Prisma 5.21.1 to 7.1.0 with better-sqlite3 adapter. Both webapp and bridge now use identical Prisma configurations.
+### Phase 2: Art Asset Factory (Stockpiling)
+**Status:** 📋 Pending
+**Target:** Build an inventory of 50+ shop-ready assets before opening a shop.
+- **Actions:**
+    - [ ] Build `ArtStudio` interface for generation & tagging.
+    - [ ] Create "Mockup Generator" (local preview).
+    - [ ] Organize assets into "Vault".
 
----
+### Phase 3: Music & Media (Newsician Shorts)
+**Status:** 📋 Pending
+**Target:** Create video shorts for X/YouTube to drive engagement.
+- **Actions:**
+    - [ ] Automate "News Item -> Lyricist -> Suno Prompt".
+    - [ ] Build "Shorts Assembler" (ffmpeg wrapper) for fast video creation.
 
-### Priority 2: Activate the Code Agent
-**Status:** ✅ Complete (Jan 8, 2026)  
-**Impact:** High — Strategic Value  
+### Phase 4: Agents Hub Activation
+**Status:** 📋 Pending
+**Target:** Visualize and utilize the 15+ existing agents.
+- **Actions:**
+    - [ ] Build `AgentsHub` UI.
+    - [ ] Connect `CodeAgent` and `LegalAdvisor` to UI.
 
-Code Agent in `bridge/services/agents.js` upgraded from stub to fully operational. Now uses LM Studio for:
-- Intelligent code review with quality scoring
-- Security vulnerability scanning (hybrid: regex + LLM)
-- Test generation with actual test code
-- Code generation from prompts
-
-Hybrid approach: fast pattern checks for common issues + LLM for deep analysis.
-
----
-
-### Priority 3: Bridge Auto-Launch in Tauri
-**Status:** ✅ Complete (Jan 9, 2026)
-**Impact:** Medium — UX Pain Point
-
-The desktop app now automatically manages the Bridge process:
-- Verified `main.rs` logic correctly finds `C:\Repos GIT\Nexus\Nexus\bridge`.
-- Verified `npm run tauri dev` spawns `nexus.exe`, which spawns `node server.js`.
-- Bridge output logged to `C:\Users\Public\nexus_bridge.log`.
-
-**Action:** Confirmed auto-launch works. Bridge API is reachable on port 3456 when desktop app starts.
-
----
-
-### Priority 4: Page Audit & Consolidation
-**Status:** ✅ Complete (Jan 9, 2026)
-**Impact:** Medium — Scope Creep Prevention
-
-Performed audit and consolidation of unused stub pages:
-- Deleted `studios/3dprint`, `studios/laser`, `studios/podcast` (Coming Soon stubs).
-- Deleted `google-test` (Temporary test page).
-- Updated `studios/page.tsx` and `data.ts` to remove references.
-- `notifications` logic kept as mocked UI for future dev.
-
-**Action:** Confirmed pages deleted and references cleaned. Hygiene improved.
+### Phase 5: Engagement Dashboard
+**Status:** 📋 Pending
+**Target:** Track reach (Views/Likes) and Production (Inventory count).
+- **Actions:**
+    - [ ] Track X/YouTube stats manually or via simple scraper.
+    - [ ] Track Inventory counts (Songs/Art).
 
 ---
 
-### Priority 5: Single Revenue Path Validation
-**Status:**  Music Path Fixed (Jan 8, 2026) — Testing  
-**Impact:** Medium — Strategic  
-
-Traced the **Music → Suno → YouTube** revenue path end-to-end:
-
-**Fixed:**
-- ✅ Added `DistributedSong` and `YouTubeMetrics` Prisma models
-- ✅ Rewrote `distribution.js` service for database persistence
-- ✅ Updated routes to async/await for proper DB operations
-- ✅ Songs now persist across restarts
-- ✅ Fixed `/music` bridge connection stability (timeout increased)
-
-**Remaining Gaps:**
-- ⚠️ Suno API integration (manual generation)
-- ⚠️ DistroKid API for automated distribution
-- ⚠️ Automatic stream count fetching
-
-**Revenue Path Status:**
-| Step | Status |
-|------|--------|
-| 1. Song creation (Music Studio) | ✅ Working (Rich UI) |
-| 2. Suno generation | ⚠️ Manual |
-| 3. Distribution tracking | ✅ Persisted |
-| 4. YouTube monetization progress | ✅ Working |
-| 5. Revenue calculation | ✅ Working |
-
-**Action:** Confirmed Music Studio UI is rich (not stub) and online. Proceed to next priority.
-
----
-
-### Priority 6: Connect Live Chat to Bridge
-**Status:** ✅ Complete (Jan 9, 2026)
-**Impact:** High — Daily Driver
-
-Chat page now fully supports real-time streaming from LM Studio via the Bridge.
-- **Frontend:** Updated `chat/page.tsx` to handle SSE streams.
-- **Backend:** Updated `bridge/server.js` and `lmstudio.js` to pipe streams.
-- **Verified:** Tested with `test_bridge_stream.js` against a test port.
-
-**Action:** Restart the application to load the new Bridge server logic. Streaming is now live.
+## Completed Priorities (Foundation Phase)
+- ✅ **P1-P7:** Tech stack hardened, Chat/Stream working, Music Studio tracking fixed, Dev Studio active.
+- **Archive Date:** Jan 9, 2026.
 
 ---
 
@@ -117,8 +71,6 @@ Chat page now fully supports real-time streaming from LM Studio via the Bridge.
 
 - ❌ New UI polish on working pages (already good enough)
 - ❌ New front doors (we have 59 already)
-- ❌ Full Income Dashboard expansion
-- ❌ Art Studio / POD integration
 - ❌ Any task from the historical sections below
 
 ---
@@ -216,7 +168,7 @@ Track friction here. Fix later, don't slow down now.
 | Frontend | Next.js + React + TypeScript | ✅ From Fresh-Start |
 | Backend | Express (Bridge) on port 3456 | ✅ From Fresh-Start |
 | Database | SQLite via Prisma | ✅ Working |
-| Local AI | LM Studio @ localhost:1234 | ✅ Running qwen2.5-vl-7b |
+| Local AI | LM Studio @ localhost:1234 | ✅ Running gemma-3n-e4b-it |
 | Automation | PowerShell (Content Pipeline) | ✅ Frozen but complete |
 | Version Control | Git (source of truth) | ✅ Active |
 | Remote Access | Tailscale | ✅ Configured |
@@ -236,7 +188,7 @@ Every module that exists or could exist. Honest status only.
 | Module | Status | Inside Reality | Notes |
 |--------|--------|----------------|-------|
 | **Music Studio** | 🟡 Stub | Songwriter agents (Lyricist, Composer, Critic, Producer), Suno prompt generation | Primary focus. Real pipeline to YouTube/Spotify. |
-| **Dev Studio** | 🟡 Stub | Code agent, basic scaffolding | Rises with the tide as we build Nexus itself |
+| **Dev Studio** | 🟠 Building | Code agent, basic scaffolding, GitHub integration | Rises with the tide as we build Nexus itself |
 | **Agents Hub** | 🟡 Stub | 15+ agents defined in bridge/services/ | Core infrastructure, enables everything else |
 
 ### Supporting Cast (Functional)
@@ -245,8 +197,8 @@ Every module that exists or could exist. Honest status only.
 |--------|--------|----------------|-------|
 | **News Hub** | 🟢 Built | RSS aggregation, conservative + MN sources | Feeds Newsician/Sentinel. Scratches desktop itch. |
 | **Dashboard** | 🟡 Stub | System status widgets, quick actions | Landing page, needs cleanup |
-| **Chat** | 🟢 Built | LM Studio integration, streaming | Core utility, working |
-| **Settings** | 🟡 Stub | Config management | Needs work |
+| **Chat** | 🟢 Built | LM Studio/Ollama integration, streaming | Core utility, working |
+| **Settings** | 🟢 Functional| Config management, default model persistence | Backend connected |
 | **Terminal** | 🟢 Built | Command interface | Working |
 
 ### Active Revenue (Growth Phase)
@@ -509,7 +461,7 @@ Nexus/
 │
 ├── pipeline/               # Content Pipeline (frozen)
 │   ├── core/              # PowerShell modules
-│   └── publishers/        # HTML, WordPress
+│   ├── publishers/        # HTML, WordPress
 │
 ├── docs/                   # Documentation
 │   ├── sessions/          # Work logs

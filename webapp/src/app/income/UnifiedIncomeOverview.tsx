@@ -133,10 +133,10 @@ export default function UnifiedIncomeOverview() {
                         </div>
                         <span className="text-gray-300">Total Revenue</span>
                     </div>
-                    <p className="text-4xl font-bold text-white">${summary.totalRevenue.toFixed(2)}</p>
+                    <p className="text-4xl font-bold text-white">${(summary.totalRevenue || 0).toFixed(2)}</p>
                     <p className="text-sm text-emerald-400 mt-2 flex items-center gap-1">
                         <TrendingUp className="w-4 h-4" />
-                        Projected: ${summary.projectedMonthly.toFixed(2)}/mo
+                        Projected: ${(summary.projectedMonthly || 0).toFixed(2)}/mo
                     </p>
                 </div>
 
@@ -152,7 +152,7 @@ export default function UnifiedIncomeOverview() {
                     <div className="mt-3">
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
                             <span>Progress</span>
-                            <span>{Math.min(100, summary.goals.monthlyProgress).toFixed(1)}%</span>
+                            <span>{Math.min(100, summary.goals.monthlyProgress || 0).toFixed(1)}%</span>
                         </div>
                         <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
                             <motion.div
@@ -206,7 +206,7 @@ export default function UnifiedIncomeOverview() {
                                 </div>
                                 <ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-gray-300 transition-colors" />
                             </div>
-                            <p className="text-2xl font-bold text-white">${stream.revenue.toFixed(2)}</p>
+                            <p className="text-2xl font-bold text-white">${(stream.revenue || 0).toFixed(2)}</p>
                             <p className="text-xs text-gray-500 mt-1">
                                 {stream.items !== undefined && `${stream.items} items`}
                                 {stream.streams !== undefined && ` • ${stream.streams.toLocaleString()} streams`}
@@ -234,7 +234,7 @@ export default function UnifiedIncomeOverview() {
                                 {summary.platforms.youtube.status}
                             </span>
                         </div>
-                        <p className="text-xl font-bold text-white">${summary.platforms.youtube.revenue.toFixed(2)}</p>
+                        <p className="text-xl font-bold text-white">${(summary.platforms.youtube.revenue || 0).toFixed(2)}</p>
                         {summary.platforms.youtube.progress !== undefined && summary.platforms.youtube.progress < 100 && (
                             <div className="mt-2">
                                 <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
@@ -243,7 +243,7 @@ export default function UnifiedIncomeOverview() {
                                         style={{ width: `${summary.platforms.youtube.progress}%` }}
                                     />
                                 </div>
-                                <p className="text-xs text-gray-500 mt-1">{summary.platforms.youtube.progress.toFixed(0)}% to monetization</p>
+                                <p className="text-xs text-gray-500 mt-1">{(summary.platforms.youtube.progress || 0).toFixed(0)}% to monetization</p>
                             </div>
                         )}
                     </div>
@@ -254,7 +254,7 @@ export default function UnifiedIncomeOverview() {
                             <Disc3 className="w-5 h-5 text-green-500" />
                             <span className="font-medium text-white">Spotify</span>
                         </div>
-                        <p className="text-xl font-bold text-white">${summary.platforms.spotify.revenue.toFixed(2)}</p>
+                        <p className="text-xl font-bold text-white">${(summary.platforms.spotify.revenue || 0).toFixed(2)}</p>
                         <p className="text-xs text-gray-500 mt-1">{summary.platforms.spotify.streams?.toLocaleString() || 0} streams</p>
                     </div>
 
@@ -264,7 +264,7 @@ export default function UnifiedIncomeOverview() {
                             <ShoppingCart className="w-5 h-5 text-orange-500" />
                             <span className="font-medium text-white">Etsy</span>
                         </div>
-                        <p className="text-xl font-bold text-white">${summary.platforms.etsy.revenue.toFixed(2)}</p>
+                        <p className="text-xl font-bold text-white">${(summary.platforms.etsy.revenue || 0).toFixed(2)}</p>
                         <p className="text-xs text-gray-500 mt-1">{summary.platforms.etsy.sales || 0} sales</p>
                     </div>
                 </div>

@@ -12,6 +12,7 @@
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
   },
   "dependencies": {
+    "@lmstudio/sdk": "^1.5.0",
     "@prisma/adapter-better-sqlite3": "^7.1.0",
     "@prisma/client": "^7.1.0",
     "better-sqlite3": "^12.5.0",

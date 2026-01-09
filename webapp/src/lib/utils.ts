@@ -3,7 +3,7 @@
 // ========================================
 
 // LuxRig Bridge Configuration
-export const LUXRIG_BRIDGE_URL = process.env.NEXT_PUBLIC_BRIDGE_URL || 'http://localhost:3456';
+export const LUXRIG_BRIDGE_URL = process.env.NEXT_PUBLIC_BRIDGE_URL || 'http://127.0.0.1:3456';
 
 // App Configuration
 export const APP_CONFIG = {

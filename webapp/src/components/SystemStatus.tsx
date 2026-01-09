@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
+import { useSettings } from '@/components/SettingsContext';
 
 interface ServiceStatus {
     online: boolean;
@@ -44,18 +44,19 @@ interface BridgeStatus {
     system: SystemMetrics;
 }
 
-// Derive WebSocket URL from bridge URL
-const WS_URL = LUXRIG_BRIDGE_URL.replace('http://', 'ws://').replace('https://', 'wss://');
-
 export default function SystemStatus() {
+    const { settings } = useSettings();
     const [status, setStatus] = useState<BridgeStatus | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [connected, setConnected] = useState(false);
 
     useEffect(() => {
+        // Derive WebSocket URL from bridge URL
+        const WS_URL = settings.bridgeUrl.replace('http://', 'ws://').replace('https://', 'wss://');
+
         async function fetchStatus() {
             try {
-                const res = await fetch(`${LUXRIG_BRIDGE_URL}/status`);
+                const res = await fetch(`${settings.bridgeUrl}/status`);
                 const data = await res.json();
                 setStatus(data);
                 setError(null);
@@ -93,7 +94,7 @@ export default function SystemStatus() {
         };
 
         return () => ws.close();
-    }, []);
+    }, [settings.bridgeUrl]);
 
     if (error && !status) {
         return (

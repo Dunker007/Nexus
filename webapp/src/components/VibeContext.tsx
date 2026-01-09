@@ -26,10 +26,12 @@ interface VibeState {
 
 export const VibeContext = createContext<VibeState | undefined>(undefined);
 
-const LUXRIG_BRIDGE_URL = process.env.NEXT_PUBLIC_BRIDGE_URL || 'http://localhost:3456';
-const WS_URL = LUXRIG_BRIDGE_URL.replace('http', 'ws') + '/stream';
+import { useSettings } from './SettingsContext';
+
+// ...
 
 export function VibeProvider({ children }: { children: ReactNode }) {
+    const { settings } = useSettings(); // Use global settings
     const [mode, setMode] = useState<VibeMode>('normal');
     const [metrics, setMetrics] = useState({ gpuUsage: 0, cpuUsage: 0, errorRate: 0 });
     const [manualOverride, setManualOverride] = useState(false);
@@ -58,7 +60,11 @@ export function VibeProvider({ children }: { children: ReactNode }) {
     };
 
     useEffect(() => {
-        const ws = new WebSocket(WS_URL);
+        if (!settings.bridgeUrl) return;
+
+        // Construct WS URL from HTTP URL
+        const wsUrl = settings.bridgeUrl.replace('http', 'ws') + '/stream';
+        const ws = new WebSocket(wsUrl);
 
         ws.onmessage = (event) => {
             try {
@@ -89,10 +95,14 @@ export function VibeProvider({ children }: { children: ReactNode }) {
             }
         };
 
+        ws.onerror = (e) => {
+            // Silently verify or log only if critical
+        };
+
         return () => {
             ws.close();
         };
-    }, [manualOverride]);
+    }, [manualOverride, settings.bridgeUrl]);
 
     // Apply global classes to body based on mode
     useEffect(() => {

@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 
 export default function MonitoringPage() {
@@ -38,7 +38,7 @@ export default function MonitoringPage() {
     const [errors, setErrors] = useState<ErrorStats>({ errors: [], stats: { last24Hours: 0, lastHour: 0 } });
     const [refreshInterval, setRefreshInterval] = useState(5000);
 
-    async function loadData() {
+    const loadData = useCallback(async () => {
         try {
             const [healthRes, metricsRes, errorsRes] = await Promise.all([
                 fetch(`${LUXRIG_BRIDGE_URL}/health`),
@@ -52,13 +52,13 @@ export default function MonitoringPage() {
         } catch (error) {
             console.error('Failed to load monitoring data:', error);
         }
-    }
+    }, []);
 
     useEffect(() => {
         loadData();
         const interval = setInterval(loadData, refreshInterval);
         return () => clearInterval(interval);
-    }, [refreshInterval]);
+    }, [refreshInterval, loadData]);
 
     async function clearErrors() {
         try {

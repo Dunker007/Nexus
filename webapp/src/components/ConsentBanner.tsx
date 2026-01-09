@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, X } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 
 export default function ConsentBanner() {
     const [isVisible, setIsVisible] = useState(false);
@@ -10,7 +10,9 @@ export default function ConsentBanner() {
     useEffect(() => {
         const consent = localStorage.getItem('dlx-ai-consent');
         if (!consent) {
-            setIsVisible(true);
+            // Delay slightly to avoid sync state update during render cycle
+            const timer = setTimeout(() => setIsVisible(true), 500);
+            return () => clearTimeout(timer);
         }
     }, []);
 

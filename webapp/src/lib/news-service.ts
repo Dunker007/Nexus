@@ -209,7 +209,34 @@ export async function fetchAllNews(filters: { category?: string; region?: string
         if (!response.ok) throw new Error('Failed to fetch news from Bridge');
 
         const articles = await response.json();
-        return articles;
+
+        // Flatten sources for easy lookup
+        const allSources = [
+            ...NEWS_SOURCES.national,
+            ...NEWS_SOURCES.local,
+            ...NEWS_SOURCES.alternative,
+            ...NEWS_SOURCES.center,
+            ...NEWS_SOURCES.left
+        ];
+
+        // Hydrate articles with local source metadata
+        return articles.map((a: any) => {
+            const sourceDef = allSources.find(s => s.id === a.sourceId);
+            if (!sourceDef) return a; // Return as is, UI will filter or default
+
+            return {
+                ...a,
+                source: {
+                    id: sourceDef.id,
+                    name: sourceDef.name,
+                    logo: sourceDef.logo,
+                    bias: sourceDef.bias
+                },
+                // Ensure category matches source if missing
+                category: a.category || sourceDef.category,
+                region: a.region || (sourceDef as any).region
+            };
+        });
     } catch (error) {
         console.error("News fetch error:", error);
         return [];
