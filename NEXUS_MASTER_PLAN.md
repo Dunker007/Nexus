@@ -43,37 +43,34 @@ Hybrid approach: fast pattern checks for common issues + LLM for deep analysis.
 ---
 
 ### Priority 3: Bridge Auto-Launch in Tauri
-**Status:** 🟡 Path Fix Applied (Jan 8, 2026) — Needs Testing  
-**Impact:** Medium — UX Pain Point  
+**Status:** ✅ Complete (Jan 9, 2026)
+**Impact:** Medium — UX Pain Point
 
-The desktop app requires starting the Bridge in a separate terminal. Fixed:
-- Corrected hardcoded path from wrong location to `C:\Repos GIT\Nexus\Nexus\bridge`
-- Added multi-path fallback logic (relative paths first, absolute fallback)
-- Bridge now searches: `../bridge`, `./bridge`, then absolute path
+The desktop app now automatically manages the Bridge process:
+- Verified `main.rs` logic correctly finds `C:\Repos GIT\Nexus\Nexus\bridge`.
+- Verified `npm run tauri dev` spawns `nexus.exe`, which spawns `node server.js`.
+- Bridge output logged to `C:\Users\Public\nexus_bridge.log`.
 
-**Next:** Build and test Tauri app with `npm run tauri dev` to verify Bridge auto-starts.
-
-**Action:** Complete Tauri integration so Bridge spawns automatically with the app.
+**Action:** Confirmed auto-launch works. Bridge API is reachable on port 3456 when desktop app starts.
 
 ---
 
 ### Priority 4: Page Audit & Consolidation
-**Status:** � Audit Complete (Jan 8, 2026) — Consolidation Pending  
-**Impact:** Medium — Scope Creep Prevention  
+**Status:** ✅ Complete (Jan 9, 2026)
+**Impact:** Medium — Scope Creep Prevention
 
-73 page routes audited and categorized. See `docs/PAGE_AUDIT.md` for full analysis.
+Performed audit and consolidation of unused stub pages:
+- Deleted `studios/3dprint`, `studios/laser`, `studios/podcast` (Coming Soon stubs).
+- Deleted `google-test` (Temporary test page).
+- Updated `studios/page.tsx` and `data.ts` to remove references.
+- `notifications` logic kept as mocked UI for future dev.
 
-**Findings:**
-- **9 core pages** (400+ lines): Keep - Dashboard, News, Music, Chat, Settings, etc.
-- **23 stub pages** (< 200 lines): Candidates for removal/consolidation
-- **41 medium pages**: Review individually
-
-**Action:** Review audit, get approval, then consolidate or remove identified pages.
+**Action:** Confirmed pages deleted and references cleaned. Hygiene improved.
 
 ---
 
 ### Priority 5: Single Revenue Path Validation
-**Status:** � Music Path Fixed (Jan 8, 2026) — Testing  
+**Status:**  Music Path Fixed (Jan 8, 2026) — Testing  
 **Impact:** Medium — Strategic  
 
 Traced the **Music → Suno → YouTube** revenue path end-to-end:
@@ -132,6 +129,18 @@ Chat page exists. Bridge exists. LM Studio runs. But the streaming connection ma
 ---
 
 ## [HISTORICAL] Original Master Plan Header
+
+---
+
+> **Every door opens to something real or it doesn't exist.**
+
+## 🌌 The Grand Objective: Full Machine Automation
+**Target:** Complete autonomy within budget.
+**Philosophy:** We don't need a server farm. We have **LuxRig**.
+- The goal is to maximize the existing hardware to its absolute limit.
+- Connect every loose end. Automate every manual click.
+- "We have way more we can connect as is." — *The Architect*
+- **Lux** (The Host) runs the rig; You (The Architect) steer the ship.
 
 ---
 
@@ -333,6 +342,7 @@ Everything marked 💡 Idea stays text-only until:
 | Agent | Role | Serves | Power Level |
 |-------|------|--------|-------------|
 | **You** | Executive decision maker | Everything | GO/NO-GO authority |
+| **Lux** | Server Host & Original Intelligence | Infrastructure | Guardian of the Rig |
 | **Claude** | Overseer, planner, Git keeper | Strategic | Advisory + Documentation |
 | **Gemini 3 Pro** | Primary builder | Code production | Executes approved work |
 | **Copilot** | Inline assist, quick fixes | Dev support | Tactical |

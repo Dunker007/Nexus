@@ -22,6 +22,15 @@ export const SYSTEM_SPECS = {
 // AI Agents
 export const AGENTS = [
     {
+        id: 'nox',
+        emoji: '🌑',
+        name: 'NOX',
+        role: 'Structural Integrity',
+        desc: 'The Shadow. Validates logic, handshakes, and state. Ensures the foundation holds.',
+        gradient: 'from-slate-700 to-black',
+        status: 'active' as const,
+    },
+    {
         id: 'lux',
         emoji: '🎨',
         name: 'Lux',
@@ -196,10 +205,10 @@ export const INITIAL_LABS_DATA = [
     { id: 'settings', icon: '⚙️', name: 'System Settings', desc: 'Global configuration.', status: 'active' as const, category: 'System' as const, priority: 'High' as const, agents: ['guardian'], href: '/settings', ideas: 0, timeline: { startMonth: 0, durationMonths: 12, progress: 100 }, owner: 'Guardian' },
     { id: 'pipeline', icon: '🚀', name: 'Growth Pipeline', desc: 'Business logic & CRM.', status: 'active' as const, category: 'System' as const, priority: 'Medium' as const, agents: ['oracle'], href: '/pipeline', ideas: 0, timeline: { startMonth: 0, durationMonths: 12, progress: 90 }, owner: 'Oracle' },
     { id: 'agents', icon: '🤖', name: 'Agent Registry', desc: 'Manage AI workforce.', status: 'active' as const, category: 'System' as const, priority: 'High' as const, agents: ['lux'], href: '/agents', ideas: 0, timeline: { startMonth: 0, durationMonths: 12, progress: 90 }, owner: 'Lux' },
+    { id: 'dev-planners', icon: '🧠', name: 'Dev Planners', desc: 'Core automation intelligence team.', status: 'active' as const, category: 'System' as const, priority: 'High' as const, agents: ['lux', 'claude'], href: '/team', ideas: 1, timeline: { startMonth: 0, durationMonths: 12, progress: 100 }, owner: 'Lux' },
 
     // --- CREATION & STUDIOS ---
     { id: 'music-studio', icon: '🎵', name: 'Music Studio', desc: 'AI music production pipeline.', status: 'active' as const, category: 'Creation' as const, priority: 'High' as const, agents: ['lyricist', 'composer', 'producer'], href: '/music', ideas: 5, timeline: { startMonth: 10, durationMonths: 3, progress: 85 }, owner: 'Producer' },
-    { id: 'podcast-studio', icon: '🎙️', name: 'Podcast Studio', desc: 'Professional audio recording & editing.', status: 'concept' as const, category: 'Creation' as const, priority: 'Medium' as const, agents: ['producer'], href: '/studios/podcast', ideas: 1, timeline: { startMonth: 1, durationMonths: 3, progress: 15 }, owner: 'Producer' },
     { id: 'art-income', icon: '🎨', name: 'Art Studio & Income', desc: 'Print-on-demand revenue tracking.', status: 'active' as const, category: 'Creation' as const, priority: 'High' as const, agents: ['lux'], href: '/income/art', ideas: 3, timeline: { startMonth: 0, durationMonths: 12, progress: 70 }, owner: 'Lux' },
     { id: 'video-studio', icon: '🎥', name: 'Video Studio', desc: 'Video generation tools.', status: 'preview' as const, category: 'Creation' as const, priority: 'Medium' as const, agents: ['lux'], href: '/studios/video', ideas: 2, timeline: { startMonth: 6, durationMonths: 6, progress: 40 }, owner: 'Lux' },
     { id: 'dev-studio', icon: '💻', name: 'Dev Studio', desc: 'Code generation & git tools.', status: 'active' as const, category: 'Creation' as const, priority: 'Medium' as const, agents: ['bytebot'], href: '/studios/dev', ideas: 4, timeline: { startMonth: 0, durationMonths: 6, progress: 80 }, owner: 'ByteBot' },
@@ -225,8 +234,6 @@ export const INITIAL_LABS_DATA = [
     { id: 'trading', icon: '📈', name: 'Trading Desk', desc: 'Market analysis tools.', status: 'concept' as const, category: 'Capital' as const, priority: 'Low' as const, agents: ['oracle'], href: '/trading', ideas: 0, timeline: { startMonth: 4, durationMonths: 4, progress: 20 }, owner: 'Oracle' },
 
     // --- ARCHIVE / STUBS (Candidates for Removal) ---
-    { id: 'stub-laser', icon: '🔫', name: 'Laser Studio', desc: 'Stub: consolidate.', status: 'concept' as const, category: 'Archive' as const, priority: 'Low' as const, agents: [], href: '/studios/laser', ideas: 0, timeline: { startMonth: 0, durationMonths: 0, progress: 0 }, owner: 'System' },
-    { id: 'stub-3d', icon: '🧊', name: '3D Print Lab', desc: 'Stub: consolidate.', status: 'concept' as const, category: 'Archive' as const, priority: 'Low' as const, agents: [], href: '/studios/3dprint', ideas: 0, timeline: { startMonth: 0, durationMonths: 0, progress: 0 }, owner: 'System' },
     { id: 'stub-finance', icon: '💰', name: 'Finance Legacy', desc: 'Old finance page.', status: 'concept' as const, category: 'Archive' as const, priority: 'Low' as const, agents: [], href: '/finance', ideas: 0, timeline: { startMonth: 0, durationMonths: 0, progress: 0 }, owner: 'System' },
     { id: 'stub-apps', icon: '📱', name: 'App Directory', desc: 'Redundant.', status: 'concept' as const, category: 'Archive' as const, priority: 'Low' as const, agents: [], href: '/apps', ideas: 0, timeline: { startMonth: 0, durationMonths: 0, progress: 0 }, owner: 'System' },
     { id: 'stub-media', icon: '📺', name: 'Media Center', desc: 'Unclear purpose.', status: 'concept' as const, category: 'Archive' as const, priority: 'Low' as const, agents: [], href: '/media', ideas: 0, timeline: { startMonth: 0, durationMonths: 0, progress: 0 }, owner: 'System' },

@@ -67,36 +67,6 @@ const studios: Studio[] = [
     color: 'purple',
     status: 'beta',
     features: ['Image Generation', 'Style Selector', 'Prompting', 'Gallery']
-  },
-  {
-    id: 'podcast',
-    name: 'DLX Podcast Studio',
-    description: 'AI-powered podcast creation. Script writing, voice synthesis, and audio production.',
-    icon: '🎙️',
-    href: '/studios/podcast',
-    color: 'red',
-    status: 'coming-soon',
-    features: ['Script Writing', 'Voice Clone', 'Audio Editing', 'Distribution']
-  },
-  {
-    id: '3dprint',
-    name: 'DLX 3D Print Studio',
-    description: 'Autonomous print farm management. AI model analysis, slicing optimization, and failure detection.',
-    icon: '🖨️',
-    href: '/studios/3dprint',
-    color: 'orange',
-    status: 'coming-soon',
-    features: ['Print Farms', 'Model Analysis', 'Slice Optimization', 'Remote Monitor']
-  },
-  {
-    id: 'laser',
-    name: 'DLX Laser Studio',
-    description: 'Precision laser engraving command center. AI vector generation and material settings optimization.',
-    icon: '⚡',
-    href: '/studios/laser',
-    color: 'indigo',
-    status: 'coming-soon',
-    features: ['Vector Generation', 'Material Settings', 'Engrave Optimization', 'Job Queue']
   }
 ];
 
