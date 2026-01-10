@@ -149,7 +149,7 @@ export default function PipelinePage() {
             // Refresh status and queue
             await fetchStatus();
             setTimeout(fetchQueue, 2000);
-        } catch (err) {
+        } catch {
             setError('Failed to start pipeline: Network or Server Error');
         } finally {
             setGenerating(false);
@@ -161,7 +161,7 @@ export default function PipelinePage() {
         try {
             await fetch(`${LUXRIG_BRIDGE_URL}/pipeline/stop`, { method: 'POST' });
             await fetchStatus();
-        } catch (err) {
+        } catch {
             setError('Failed to stop pipeline');
         }
     };
@@ -175,7 +175,7 @@ export default function PipelinePage() {
                 body: JSON.stringify({ status: newStatus })
             });
             await fetchQueue();
-        } catch (err) {
+        } catch {
             setError('Failed to update content');
         }
     };
@@ -188,7 +188,7 @@ export default function PipelinePage() {
             if (selectedItem?.id === id) {
                 setSelectedItem(null);
             }
-        } catch (err) {
+        } catch {
             setError('Failed to delete content');
         }
     };
@@ -202,7 +202,7 @@ export default function PipelinePage() {
                 setError(data.error);
             }
             await fetchQueue();
-        } catch (err) {
+        } catch {
             setError('Failed to publish content');
         }
     };

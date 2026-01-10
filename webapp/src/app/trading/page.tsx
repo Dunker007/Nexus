@@ -118,7 +118,6 @@ const statusColors = {
 };
 
 export default function TradingPage() {
-    const [selectedBot, setSelectedBot] = useState<string | null>(null);
 
     const totalProfit = bots.reduce((sum, b) => sum + b.profit, 0);
     const totalTrades = bots.reduce((sum, b) => sum + b.trades, 0);

@@ -42,7 +42,7 @@ interface ISpeechRecognition extends EventTarget {
 }
 
 // Type casting helper for browser compatibility
-// eslint-disable-next-line
+
 const getSpeechRecognition = (): (new () => ISpeechRecognition) | undefined => {
     // eslint-disable-next-line
     return (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -191,7 +191,7 @@ export default function VoiceControlPage() {
     useEffect(() => {
         const SpeechRecognition = getSpeechRecognition();
         if (!SpeechRecognition) {
-            setIsSupported(false);
+            setTimeout(() => setIsSupported(false), 0);
             return;
         }
 
@@ -250,7 +250,7 @@ export default function VoiceControlPage() {
                 cancelAnimationFrame(animationRef.current);
             }
         };
-    }, [isListening]);
+    }, [isListening, processCommand]);
 
     // Voice visualization using Web Audio API
     const startVisualization = async () => {
@@ -328,7 +328,7 @@ export default function VoiceControlPage() {
             <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0f0f1a] to-[#1a1a2e] text-gray-200 text-center p-8">
                 <h1 className="text-red-500 text-2xl font-bold mb-4">🎤 Voice Control Unavailable</h1>
                 <p className="text-gray-500 max-w-md">
-                    Your browser doesn't support the Web Speech API, or microphone access was denied.
+                    Your browser doesn&apos;t support the Web Speech API, or microphone access was denied.
                     Please try Chrome, Edge, or Safari and ensure microphone permissions are granted.
                 </p>
             </div>

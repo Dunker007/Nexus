@@ -106,7 +106,7 @@ export default function StaffMeetingPage() {
       const data = await response.json();
       await playTranscript(data);
 
-    } catch (error) {
+    } catch {
       console.log('Bridge unreachable, running simulation...');
       await runSimulation();
     } finally {
@@ -258,7 +258,7 @@ export default function StaffMeetingPage() {
               <h1 className="text-3xl font-bold">
                 AI Staff<span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"> Meeting</span>
               </h1>
-              <p className="text-sm text-gray-500 italic">"None of us is as smart as all of us."</p>
+              <p className="text-sm text-gray-500 italic">&quot;None of us is as smart as all of us.&quot;</p>
             </div>
           </div>
 

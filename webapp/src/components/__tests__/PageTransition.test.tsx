@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import PageTransition from '@/components/PageTransition'
 
 // Mock framer-motion to avoid animation issues in tests

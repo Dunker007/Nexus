@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Film, Music, Upload, Play, Pause, Settings, Share2, Monitor, ExternalLink, Video, Clock, CheckCircle, AlertCircle, RefreshCw, Wand2 } from 'lucide-react';
+import { Film, Music, Upload, Play, Pause, Settings, Share2, Monitor, ExternalLink, Video, Clock, CheckCircle, RefreshCw, Wand2 } from 'lucide-react';
 import Link from 'next/link';
 
 const projects = [
@@ -402,7 +402,7 @@ export default function VideoStudioPage() {
                         <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border border-indigo-500/20">
                             <h3 className="font-bold text-sm mb-2 text-indigo-300">Pro Tip</h3>
                             <p className="text-xs text-indigo-200/70 leading-relaxed">
-                                Use high "Audio Reactivity" (&gt;80%) for bass-heavy tracks to generate more intense visual pulse effects.
+                                Use high &quot;Audio Reactivity&quot; (&gt;80%) for bass-heavy tracks to generate more intense visual pulse effects.
                             </p>
                         </div>
                     </div>

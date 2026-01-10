@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Command, Sparkles, Clock, ArrowRight, Mic } from 'lucide-react';
+import { Command, Sparkles, Clock, ArrowRight } from 'lucide-react';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 import FocusTrap from '@/components/ui/FocusTrap';
 
@@ -322,7 +322,7 @@ export default function CommandPalette() {
 
                                         {Object.entries(groupedCommands).length === 0 ? (
                                             <div className="p-8 text-center text-gray-500">
-                                                No commands found. Try asking AI with "?"
+                                                No commands found. Try asking AI with &quot;?&quot;
                                             </div>
                                         ) : (
                                             Object.entries(groupedCommands).map(([category, cmds]) => (

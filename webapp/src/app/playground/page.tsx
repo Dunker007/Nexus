@@ -61,12 +61,12 @@ export default function PlaygroundPage() {
 
                 if (lmRes.ok) {
                     const lmData = await (lmRes as Response).json();
-                    allModels.push(...lmData.map((m: any) => ({ ...m, provider: 'lmstudio' as const, name: m.id })));
+                    allModels.push(...lmData.map((m: { id: string;[key: string]: unknown }) => ({ ...m, provider: 'lmstudio' as const, name: m.id })));
                 }
 
                 if (ollamaRes.ok) {
                     const ollamaData = await (ollamaRes as Response).json();
-                    allModels.push(...ollamaData.map((m: any) => ({ ...m, provider: 'ollama' as const, name: m.id })));
+                    allModels.push(...ollamaData.map((m: { id: string;[key: string]: unknown }) => ({ ...m, provider: 'ollama' as const, name: m.id })));
                 }
 
                 setModels(allModels);
@@ -74,8 +74,8 @@ export default function PlaygroundPage() {
                     setSelectedModel(allModels[0].id);
                     setSelectedProvider(allModels[0].provider);
                 }
-            } catch (e) {
-                console.error('Failed to fetch models');
+            } catch (error) {
+                console.error('Failed to fetch models', error);
             }
         }
 
@@ -124,7 +124,7 @@ export default function PlaygroundPage() {
             } else {
                 setResponse('Error: Failed to get response');
             }
-        } catch (e) {
+        } catch {
             setResponse('Error: Connection failed. Is LuxRig Bridge running?');
         }
 

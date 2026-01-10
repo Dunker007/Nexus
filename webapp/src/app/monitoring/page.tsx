@@ -48,6 +48,7 @@ export default function MonitoringPage() {
 
             if (healthRes.ok) setHealth(await healthRes.json());
             if (metricsRes.ok) setMetrics(await metricsRes.json());
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if (errorsRes.ok) setErrors(await errorsRes.json());
         } catch (error) {
             console.error('Failed to load monitoring data:', error);
@@ -55,7 +56,7 @@ export default function MonitoringPage() {
     }, []);
 
     useEffect(() => {
-        loadData();
+        setTimeout(() => loadData(), 0);
         const interval = setInterval(loadData, refreshInterval);
         return () => clearInterval(interval);
     }, [refreshInterval, loadData]);

@@ -246,7 +246,7 @@ export default function OpportunitiesPage() {
                         viewport={{ once: true }}
                     >
                         <h2 className="text-2xl font-bold mb-4 text-red-400">🚫 Time Wasters to Avoid</h2>
-                        <p className="text-gray-400 mb-6">We've filtered these out so you don't have to</p>
+                        <p className="text-gray-400 mb-6">We&apos;ve filtered these out so you don&apos;t have to</p>
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {timeWasters.map((tw, i) => (
                                 <div key={i} className="glass-card bg-red-500/5 border border-red-500/20">

@@ -224,8 +224,8 @@ export default function IdeasPage() {
                                     <div className="flex gap-2 mt-1">
                                         <span className="text-xs px-2 py-0.5 bg-white/10 rounded">{idea.category}</span>
                                         <span className={`text-xs px-2 py-0.5 rounded ${idea.difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
-                                                idea.difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                    'bg-red-500/20 text-red-400'
+                                            idea.difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                                                'bg-red-500/20 text-red-400'
                                             }`}>{idea.difficulty}</span>
                                     </div>
                                 </div>
@@ -301,7 +301,7 @@ export default function IdeasPage() {
                         viewport={{ once: true }}
                     >
                         <h2 className="text-2xl font-bold mb-4">🤖 Want More Ideas?</h2>
-                        <p className="text-gray-400 mb-6">Tell the AI what you're looking for</p>
+                        <p className="text-gray-400 mb-6">Tell the AI what you&apos;re looking for</p>
                         <div className="max-w-md mx-auto">
                             <textarea
                                 placeholder="e.g., I have 2 hours/week, $0 budget, and I'm good at writing..."

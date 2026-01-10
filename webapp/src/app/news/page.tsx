@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import PageBackground from '@/components/PageBackground';
 // Lazy load ResearchPanel (heavy component with Markdown/Animation)
@@ -11,12 +10,11 @@ import {
     NEWS_SOURCES,
     BIAS_COLORS,
     type NewsArticle,
-    MN_KEYWORDS,
     fetchAllNews,
     type SubjectTracker,
     countTrackerMatches
 } from '@/lib/news-service';
-import { Radar, Youtube, Radio, PlayCircle, Plus, Trash2, Target } from 'lucide-react';
+import { Radar, PlayCircle, Plus, Trash2, Target } from 'lucide-react';
 
 // Breaking news ticker headlines
 const BREAKING_NEWS = [
@@ -133,7 +131,7 @@ export default function NewsPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [showFactChecker, setShowFactChecker] = useState(false);
     const [factCheckQuery, setFactCheckQuery] = useState('');
-    const [factCheckResult, setFactCheckResult] = useState<any>(null);
+    const [factCheckResult, setFactCheckResult] = useState<{ query: string; status: string; findings: unknown[]; aiAnalysis: string } | null>(null);
 
     // Subject Radar State
     const [showRadar, setShowRadar] = useState(false);
@@ -201,7 +199,7 @@ export default function NewsPage() {
 
     // Source Management
     const [showSourceManager, setShowSourceManager] = useState(false);
-    const [customSources, setCustomSources] = useState<any[]>(() => {
+    const [customSources, setCustomSources] = useState<{ id: string; name: string; rss: string; logo?: string; bias?: string; category?: string; custom?: boolean }[]>(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('customNewsSources');
             return saved ? JSON.parse(saved) : [];
@@ -603,6 +601,7 @@ export default function NewsPage() {
                                 <div>
                                     <h4 className="font-medium mb-3">📋 All Sources</h4>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto">
+                                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                         {allSources.map((source: any) => {
                                             const isDisabled = disabledSources.has(source.id);
                                             const biasStyle = BIAS_COLORS[source.bias as keyof typeof BIAS_COLORS];
@@ -694,14 +693,14 @@ export default function NewsPage() {
                                         className="bg-black/20 rounded-lg p-4"
                                     >
                                         <p className="text-sm text-gray-400 mb-3">
-                                            Results for: <span className="text-white">"{factCheckResult.query}"</span>
+                                            Results for: <span className="text-white">&quot;{factCheckResult.query}&quot;</span>
                                         </p>
 
                                         {factCheckResult.findings?.length > 0 && (
                                             <div className="mb-4">
                                                 <p className="text-sm font-medium mb-2">External Fact-Checks:</p>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {factCheckResult.findings.map((f: any, i: number) => (
+                                                    {(factCheckResult.findings as { source: string; rating: string }[]).map((f, i) => (
                                                         <span key={i} className="px-3 py-1 bg-white/5 rounded text-sm">
                                                             {f.source}: <span className="text-yellow-400">{f.rating}</span>
                                                         </span>
@@ -756,7 +755,7 @@ export default function NewsPage() {
             < section className="container-main pb-6" >
                 <div className="flex items-center gap-4 overflow-x-auto pb-2">
                     <span className="text-sm text-gray-500 whitespace-nowrap">🔥 Priority:</span>
-                    {[...NEWS_SOURCES.local, ...NEWS_SOURCES.national].filter((s: any) => s.priority).map((source) => (
+                    {[...NEWS_SOURCES.local, ...NEWS_SOURCES.national].filter((s) => s.priority).map((source) => (
                         <button
                             key={source.id}
                             className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full text-sm whitespace-nowrap hover:bg-white/10 transition-colors border border-white/10"

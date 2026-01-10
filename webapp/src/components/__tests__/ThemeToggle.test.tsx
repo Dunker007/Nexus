@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen, fireEvent } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { ThemeProvider } from '@/components/ThemeProvider'
 

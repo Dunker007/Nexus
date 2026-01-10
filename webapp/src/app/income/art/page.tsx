@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Palette,
     Plus,
-    TrendingUp,
     DollarSign,
     Eye,
     ShoppingCart,
@@ -13,7 +12,6 @@ import {
     Trash2,
     RefreshCw,
     Check,
-    Clock,
     FileText,
     Tag,
     Copy,

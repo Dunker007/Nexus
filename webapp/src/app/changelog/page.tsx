@@ -96,7 +96,7 @@ export default function ChangelogPage() {
                             <span className="text-gradient">Changelog</span>
                         </h1>
                         <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                            What's new, what's fixed, and what's coming. Track the evolution of DLX Studio.
+                            What&apos;s new, what&apos;s fixed, and what&apos;s coming. Track the evolution of DLX Studio.
                         </p>
                     </motion.div>
                 </div>

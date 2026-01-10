@@ -37,7 +37,7 @@ export interface BackupStatus {
 class HousekeeperAgent {
     private static instance: HousekeeperAgent;
     private syncConfig: SyncConfig;
-    private listeners: Set<(status: any) => void> = new Set();
+    private listeners: Set<(status: { syncConfig: SyncConfig }) => void> = new Set();
 
     private constructor() {
         // Load config from localStorage if available
@@ -125,9 +125,9 @@ class HousekeeperAgent {
             });
 
             return { success: true, message: `Synced ${this.syncConfig.folders.length} folders to Google Drive` };
-        } catch (error: any) {
+        } catch (error) {
             this.updateSyncConfig({ syncStatus: 'error' });
-            return { success: false, message: error.message };
+            return { success: false, message: error instanceof Error ? error.message : String(error) };
         }
     }
 
@@ -210,10 +210,10 @@ class HousekeeperAgent {
                 success: true,
                 message: 'Backup completed successfully'
             };
-        } catch (error: any) {
+        } catch (error) {
             return {
                 success: false,
-                message: error.message
+                message: error instanceof Error ? error.message : String(error)
             };
         }
     }
@@ -233,7 +233,7 @@ class HousekeeperAgent {
 
     // === LISTENERS ===
 
-    public subscribe(callback: (status: any) => void): () => void {
+    public subscribe(callback: (status: { syncConfig: SyncConfig }) => void): () => void {
         this.listeners.add(callback);
         return () => this.listeners.delete(callback);
     }

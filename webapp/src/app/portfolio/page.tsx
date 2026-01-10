@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 // Simulated portfolio data (would come from API)
 const mockPortfolio = [
@@ -106,8 +106,8 @@ export default function PortfolioPage() {
                                     key={tf}
                                     onClick={() => setTimeframe(tf)}
                                     className={`px-3 py-1 rounded text-sm ${timeframe === tf
-                                            ? 'bg-cyan-500 text-black'
-                                            : 'bg-white/10 hover:bg-white/20'
+                                        ? 'bg-cyan-500 text-black'
+                                        : 'bg-white/10 hover:bg-white/20'
                                         }`}
                                 >
                                     {tf}
@@ -128,8 +128,8 @@ export default function PortfolioPage() {
                                 key={f}
                                 onClick={() => setFilter(f)}
                                 className={`px-4 py-2 rounded-lg text-sm ${filter === f
-                                        ? 'bg-cyan-500 text-black font-medium'
-                                        : 'bg-white/10 hover:bg-white/20'
+                                    ? 'bg-cyan-500 text-black font-medium'
+                                    : 'bg-white/10 hover:bg-white/20'
                                     }`}
                             >
                                 {f === 'all' ? '📊 All' : f === 'crypto' ? '₿ Crypto' : '📈 Stocks'}

@@ -1,8 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 
 interface Agent {
@@ -14,13 +14,14 @@ interface Agent {
 interface Result {
     id: number;
     agent: string;
-    task: any;
-    result: any;
+    task: Record<string, unknown>;
+    result: unknown;
     timestamp: Date;
 }
 
 export default function AIStudioPage() {
     const [agents, setAgents] = useState<Agent[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [systemStatus, setSystemStatus] = useState<any>(null);
     const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
     const [taskInput, setTaskInput] = useState('');
@@ -54,7 +55,7 @@ export default function AIStudioPage() {
         }
     }
 
-    async function executeTask(agentType: string, task: any) {
+    async function executeTask(agentType: string, task: Record<string, unknown>) {
         setExecuting(true);
         try {
             const response = await fetch(`${LUXRIG_BRIDGE_URL}/agents/execute`, {

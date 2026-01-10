@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Send, Bot, Shield, Zap, Brain, Sparkles, AlertTriangle, Check, X, ChevronRight, ChevronLeft } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback, useId } from 'react';
+import { motion } from 'framer-motion';
+import { MessageSquare, Send, Bot, Shield, Zap, Brain, Sparkles, Check, X, ChevronRight } from 'lucide-react';
 
 // Agent Definitions
 const AGENTS = [
@@ -13,18 +13,26 @@ const AGENTS = [
     { id: 'bytebot', name: 'ByteBot', role: 'Automation', color: 'orange', icon: <Bot size={16} /> },
 ];
 
+interface LabData {
+    id: string;
+    name: string;
+    category: string;
+    status: string;
+    priority: string;
+}
+
 interface Message {
     id: string;
     agentId: string;
     text: string;
     type: 'chat' | 'proposal' | 'alert';
-    proposalData?: any; // If it's a proposal to change state
+    proposalData?: { labId: string; updates: Record<string, string> };
     timestamp: number;
 }
 
 interface StaffMeetingPanelProps {
-    labsData: any[];
-    onUpdateLab: (id: string, updates: any) => void;
+    labsData: LabData[];
+    onUpdateLab: (id: string, updates: Record<string, string>) => void;
     selectedLabId: string | null;
 }
 
@@ -34,44 +42,44 @@ export default function StaffMeetingPanel({ labsData, onUpdateLab, selectedLabId
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState<string | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const instanceId = useId();
+    const messageCounterRef = useRef(0);
 
-    // Initial Audit Simulation
-    useEffect(() => {
-        if (messages.length === 0) {
-            runAudit();
-        }
-    }, [messages.length]);
+    // Memoized function to generate unique message IDs
+    const generateMessageId = useCallback(() => {
+        messageCounterRef.current += 1;
+        return `${instanceId}-msg-${messageCounterRef.current}`;
+    }, [instanceId]);
 
-    // Reactive: When selectedLabId changes
-    useEffect(() => {
-        if (selectedLabId) {
-            const lab = labsData.find(l => l.id === selectedLabId);
-            if (lab) {
-                discussLab(lab);
-            }
-        }
-    }, [selectedLabId]);
-
-    const addMessage = (agentId: string, text: string, type: 'chat' | 'proposal' | 'alert' = 'chat', proposalData?: any) => {
+    // Helper to add a message with typing simulation
+    const addMessage = useCallback((
+        agentId: string,
+        text: string,
+        type: 'chat' | 'proposal' | 'alert' = 'chat',
+        proposalData?: { labId: string; updates: Record<string, string> }
+    ) => {
         setIsTyping(agentId);
+        const typingDelay = 1000 + (messageCounterRef.current % 10) * 100; // Deterministic delay
+
         setTimeout(() => {
             setMessages(prev => [...prev, {
-                id: Date.now().toString(),
+                id: generateMessageId(),
                 agentId,
                 text,
                 type,
                 proposalData,
-                timestamp: Date.now()
+                timestamp: Date.now() // Allowed inside event handler/timeout
             }]);
             setIsTyping(null);
             // Auto scroll
             setTimeout(() => {
                 if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
             }, 100);
-        }, 1000 + Math.random() * 1000);
-    };
+        }, typingDelay);
+    }, [generateMessageId]);
 
-    const runAudit = () => {
+    // Run audit function - declared before useEffect
+    const runAudit = useCallback(() => {
         addMessage('architect', "Initializing system audit. Reviewing active initiatives...");
 
         // Heuristic: Check High Priority Count
@@ -89,11 +97,10 @@ export default function StaffMeetingPanel({ labsData, onUpdateLab, selectedLabId
                 addMessage('lux', "We're stagnating! We need more wild concepts in the pipeline.", 'chat');
             }, 3500);
         }
-    };
+    }, [addMessage, labsData]);
 
-    const discussLab = (lab: any) => {
-        // Clear previous context if too old? Nah, just append.
-
+    // Discuss lab function - declared before useEffect
+    const discussLab = useCallback((lab: LabData) => {
         if (lab.category === 'Operations') {
             addMessage('guardian', `Reviewing ${lab.name}. Operational security is paramount here.`);
         } else if (lab.category === 'Creation') {
@@ -104,18 +111,42 @@ export default function StaffMeetingPanel({ labsData, onUpdateLab, selectedLabId
             addMessage('architect', `Let's discuss the architecture for ${lab.name}.`);
         }
 
-        // Random Proposal Simulation
-        if (Math.random() > 0.7 && lab.status !== 'active') {
+        // Deterministic proposal based on lab id hash instead of Math.random
+        const shouldPropose = lab.id.charCodeAt(0) % 3 === 0;
+        if (shouldPropose && lab.status !== 'active') {
             setTimeout(() => {
                 addMessage('bytebot', `I can accelerate ${lab.name} deployment. Move to Active?`, 'proposal', { labId: lab.id, updates: { status: 'active' } });
             }, 3000);
         }
-    };
+    }, [addMessage]);
 
-    const handleSendMessage = () => {
+    // Initial Audit Simulation
+    useEffect(() => {
+        if (messages.length === 0) {
+            setTimeout(() => runAudit(), 0);
+        }
+    }, [messages.length, runAudit]);
+
+    // Reactive: When selectedLabId changes
+    useEffect(() => {
+        if (selectedLabId) {
+            const lab = labsData.find(l => l.id === selectedLabId);
+            if (lab) {
+                setTimeout(() => discussLab(lab), 0);
+            }
+        }
+    }, [selectedLabId, labsData, discussLab]);
+
+    const handleSendMessage = useCallback(() => {
         if (!inputValue.trim()) return;
 
-        const userMsg: Message = { id: Date.now().toString(), agentId: 'user', text: inputValue, type: 'chat', timestamp: Date.now() };
+        const userMsg: Message = {
+            id: generateMessageId(),
+            agentId: 'user',
+            text: inputValue,
+            type: 'chat',
+            timestamp: Date.now() // Allowed in event handler
+        };
         setMessages(prev => [...prev, userMsg]);
         setInputValue('');
 
@@ -130,13 +161,13 @@ export default function StaffMeetingPanel({ labsData, onUpdateLab, selectedLabId
         } else {
             addMessage('architect', "Acknowledged. Updating system parameters.");
         }
-    };
+    }, [inputValue, generateMessageId, addMessage]);
 
-    const handleAcceptProposal = (msgId: string, data: any) => {
+    const handleAcceptProposal = useCallback((msgId: string, data: { labId: string; updates: Record<string, string> }) => {
         onUpdateLab(data.labId, data.updates);
-        setMessages(prev => prev.map(m => m.id === msgId ? { ...m, type: 'chat', text: `${m.text} [ACCEPTED]` } : m));
+        setMessages(prev => prev.map(m => m.id === msgId ? { ...m, type: 'chat' as const, text: `${m.text} [ACCEPTED]` } : m));
         addMessage('architect', `Changes applied to roadmap.`);
-    };
+    }, [onUpdateLab, addMessage]);
 
     if (!isOpen) {
         return (
@@ -193,10 +224,10 @@ export default function StaffMeetingPanel({ labsData, onUpdateLab, selectedLabId
 
                             <div className={`space-y-2 max-w-[80%]`}>
                                 <div className={`p-3 rounded-2xl text-sm ${isUser
-                                        ? 'bg-indigo-600 text-white rounded-tr-none'
-                                        : msg.type === 'alert'
-                                            ? 'bg-red-900/20 border border-red-500/30 text-red-200 rounded-tl-none'
-                                            : 'bg-white/5 border border-white/10 text-gray-200 rounded-tl-none'
+                                    ? 'bg-indigo-600 text-white rounded-tr-none'
+                                    : msg.type === 'alert'
+                                        ? 'bg-red-900/20 border border-red-500/30 text-red-200 rounded-tl-none'
+                                        : 'bg-white/5 border border-white/10 text-gray-200 rounded-tl-none'
                                     }`}>
                                     {!isUser && <div className={`text-xs font-bold mb-1 text-${agent?.color}-400`}>{agent?.name}</div>}
                                     {msg.text}
@@ -205,7 +236,7 @@ export default function StaffMeetingPanel({ labsData, onUpdateLab, selectedLabId
                                 {msg.type === 'proposal' && (
                                     <div className="flex gap-2">
                                         <button
-                                            onClick={() => handleAcceptProposal(msg.id, msg.proposalData)}
+                                            onClick={() => msg.proposalData && handleAcceptProposal(msg.id, msg.proposalData)}
                                             className="flex-1 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-400 text-xs font-bold rounded flex items-center justify-center gap-1 border border-green-500/30 transition-colors"
                                         >
                                             <Check size={14} /> Accept

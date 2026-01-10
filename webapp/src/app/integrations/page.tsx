@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 
 const integrations = [
@@ -148,12 +149,13 @@ const statusConfig = {
 };
 
 export default function IntegrationsPage() {
+    const router = useRouter();
     const [filter, setFilter] = useState('all');
     const [statuses, setStatuses] = useState<Record<string, string>>({});
 
     useEffect(() => {
         const checkStatus = async () => {
-            const newStatuses: Record<string, string> = { ...statuses };
+            const newStatuses: Record<string, string> = {};
 
             // Check client-side tokens
             if (typeof window !== 'undefined') {
@@ -166,32 +168,32 @@ export default function IntegrationsPage() {
                 const res = await fetch(`${LUXRIG_BRIDGE_URL}/auth/github/status`);
                 const data = await res.json();
                 if (data.connected) newStatuses.github = 'connected';
-            } catch (error) {
+            } catch {
                 // Ignore errors if backend is down
                 console.warn('Failed to check backend GitHub status');
             }
 
-            setStatuses(newStatuses);
+            setStatuses(prev => ({ ...prev, ...newStatuses }));
         };
 
         checkStatus();
     }, []);
 
-    const handleConnect = async (id: string) => {
+    const handleConnect = useCallback(async (id: string) => {
         try {
             if (id === 'github') {
                 const res = await fetch(`${LUXRIG_BRIDGE_URL}/auth/github`);
                 const data = await res.json();
-                if (data.authUrl) window.location.href = data.authUrl;
+                if (data.authUrl) router.push(data.authUrl);
             } else if (id === 'google') {
                 const res = await fetch(`${LUXRIG_BRIDGE_URL}/auth/google`);
                 const data = await res.json();
-                if (data.authUrl) window.location.href = data.authUrl;
+                if (data.authUrl) router.push(data.authUrl);
             }
-        } catch (error) {
-            console.error('Connection error:', error);
+        } catch (err) {
+            console.error('Connection error:', err);
         }
-    };
+    }, [router]);
 
     const handleDisconnect = (id: string) => {
         if (id === 'github') localStorage.removeItem('github_access_token');

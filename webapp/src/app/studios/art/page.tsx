@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Image as ImageIcon, Download, Share2, Wand2, Settings, Layers, Maximize, ShoppingBag, Tag } from 'lucide-react';
+import { Image as ImageIcon, Wand2, Layers, ShoppingBag, Tag } from 'lucide-react';
 import Link from 'next/link';
 import { useSettings } from '@/components/SettingsContext';
 
@@ -26,9 +26,9 @@ export default function ArtStudioPage() {
     const [prompt, setPrompt] = useState('');
     const [selectedStyle, setSelectedStyle] = useState('photoreal');
     const [isGenerating, setIsGenerating] = useState(false);
-    const [assets, setAssets] = useState<any[]>([]);
-    const [stats, setStats] = useState<any>(null);
-    const [mockupMode, setMockupMode] = useState<any | null>(null); // Asset being mocked
+    const [assets, setAssets] = useState<{ id: string; localPath?: string; imageUrl?: string; prompt?: string; style?: string }[]>([]);
+    const [stats, setStats] = useState<{ totalProducts: number; totalRevenue: number } | null>(null);
+    const [mockupMode, setMockupMode] = useState<{ localPath?: string; imageUrl?: string } | null>(null); // Asset being mocked
     const [selectedTemplate, setSelectedTemplate] = useState(MOCKUP_TEMPLATES[0]);
 
     // Fetch Vault
@@ -283,8 +283,8 @@ export default function ArtStudioPage() {
                                         key={t.id}
                                         onClick={() => setSelectedTemplate(t)}
                                         className={`w-full p-3 rounded-lg text-left text-sm transition-all ${selectedTemplate.id === t.id
-                                                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                                                : 'hover:bg-white/5 text-gray-400'
+                                            ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                            : 'hover:bg-white/5 text-gray-400'
                                             }`}
                                     >
                                         {t.name}

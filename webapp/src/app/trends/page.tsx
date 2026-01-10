@@ -168,7 +168,7 @@ export default function TrendsPage() {
                             AI <span className="text-gradient">Trends</span>
                         </h1>
                         <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                            What's hot in AI right now. Model releases, research breakthroughs,
+                            What&apos;s hot in AI right now. Model releases, research breakthroughs,
                             and industry buzz — curated for builders.
                         </p>
                     </motion.div>
@@ -189,7 +189,7 @@ export default function TrendsPage() {
                             <div className="font-bold text-cyan-400">{item.term}</div>
                             <div className="text-sm text-gray-400">{item.mentions.toLocaleString()} mentions</div>
                             <div className={`text-xs mt-1 ${item.trend === 'up' ? 'text-green-400' :
-                                    item.trend === 'down' ? 'text-red-400' : 'text-yellow-400'
+                                item.trend === 'down' ? 'text-red-400' : 'text-yellow-400'
                                 }`}>
                                 {item.trend === 'up' ? '↗ Trending' : item.trend === 'down' ? '↘ Cooling' : '→ Stable'}
                             </div>
@@ -200,7 +200,7 @@ export default function TrendsPage() {
 
             {/* Weekly Picks */}
             <section className="container-main pb-12">
-                <h2 className="text-xl font-bold mb-4">🎯 This Week's Picks</h2>
+                <h2 className="text-xl font-bold mb-4">🎯 This Week&apos;s Picks</h2>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {weeklyPicks.map((pick) => (
                         <motion.div
@@ -226,8 +226,8 @@ export default function TrendsPage() {
                             key={cat}
                             onClick={() => setFilter(cat)}
                             className={`px-4 py-2 rounded-lg text-sm transition-all ${filter === cat
-                                    ? 'bg-cyan-500 text-black font-medium'
-                                    : 'bg-white/10 text-white hover:bg-white/20'
+                                ? 'bg-cyan-500 text-black font-medium'
+                                : 'bg-white/10 text-white hover:bg-white/20'
                                 }`}
                         >
                             {cat === 'all' ? 'All' : cat}

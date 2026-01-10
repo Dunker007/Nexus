@@ -8,7 +8,6 @@ import { useSettings } from '@/components/SettingsContext';
 export function BridgeStatus() {
     const { settings } = useSettings();
     const [status, setStatus] = useState<'online' | 'offline' | 'checking'>('checking');
-    const [lastSync, setLastSync] = useState<Date | null>(null);
 
     const checkStatus = useCallback(async () => {
         setStatus('checking');
@@ -26,7 +25,6 @@ export function BridgeStatus() {
 
             if (res.ok) {
                 setStatus('online');
-                setLastSync(new Date());
             } else {
                 setStatus('offline');
             }
@@ -38,7 +36,7 @@ export function BridgeStatus() {
 
     // Check on mount and when URL changes
     useEffect(() => {
-        checkStatus();
+        setTimeout(() => checkStatus(), 0);
 
         // Auto-check periodically
         const interval = setInterval(checkStatus, 30000);

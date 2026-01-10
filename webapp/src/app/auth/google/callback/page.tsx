@@ -13,9 +13,24 @@ function GoogleCallbackContent() {
     useEffect(() => {
         const code = searchParams.get('code');
 
-        async function exchangeCodeForTokens(code: string) {
+        // Early exit check - no code means error
+        if (!code) {
+            queueMicrotask(() => {
+                setStatus('error');
+                setError('No authorization code received');
+            });
+            return;
+        }
+
+        // Token exchange in async handler
+        const controller = new AbortController();
+
+        (async () => {
             try {
-                const response = await fetch(`${LUXRIG_BRIDGE_URL}/auth/google/callback?code=${code}`);
+                const response = await fetch(
+                    `${LUXRIG_BRIDGE_URL}/auth/google/callback?code=${code}`,
+                    { signal: controller.signal }
+                );
                 const data = await response.json();
 
                 if (data.success && data.tokens?.access_token) {
@@ -24,7 +39,6 @@ function GoogleCallbackContent() {
                     if (data.tokens.refresh_token) {
                         localStorage.setItem('google_refresh_token', data.tokens.refresh_token);
                     }
-
                     setStatus('success');
 
                     // Redirect to dashboard after brief delay
@@ -35,18 +49,15 @@ function GoogleCallbackContent() {
                     setStatus('error');
                     setError(data.error || 'Failed to get tokens');
                 }
-            } catch (err: any) {
-                setStatus('error');
-                setError(err.message);
+            } catch (err) {
+                if (!controller.signal.aborted) {
+                    setStatus('error');
+                    setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+                }
             }
-        }
+        })();
 
-        if (code) {
-            exchangeCodeForTokens(code);
-        } else {
-            setStatus('error');
-            setError('No authorization code received');
-        }
+        return () => controller.abort();
     }, [searchParams, router]);
 
     return (

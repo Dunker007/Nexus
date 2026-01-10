@@ -10,7 +10,6 @@ const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), {
 });
 
 const LUXRIG_BRIDGE_URL = process.env.NEXT_PUBLIC_BRIDGE_URL || 'http://localhost:3456';
-const WS_URL = LUXRIG_BRIDGE_URL.replace('http', 'ws') + '/stream';
 
 interface GraphNode {
     id: string;
@@ -47,7 +46,6 @@ interface StatusMessage {
 export default function HolographicBrain() {
     const [graphData, setGraphData] = useState<GraphData>({ nodes: [], links: [] });
     const [mounted, setMounted] = useState(false);
-    const wsRef = useRef<WebSocket | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
 

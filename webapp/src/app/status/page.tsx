@@ -24,7 +24,10 @@ export default function StatusPage() {
         { name: 'GPU Metrics', status: 'checking', icon: '🎮' },
     ]);
 
-    const [systemInfo, setSystemInfo] = useState<any>(null);
+    const [systemInfo, setSystemInfo] = useState<{
+        gpu?: { utilization?: number; temp?: number; power?: number };
+        memory?: { used?: number };
+    } | null>(null);
     const [lastChecked, setLastChecked] = useState<Date>(new Date());
     const [overallStatus, setOverallStatus] = useState<'operational' | 'degraded' | 'down'>('operational');
 
@@ -120,7 +123,7 @@ export default function StatusPage() {
 
     useEffect(() => {
         if (settings.bridgeUrl) {
-            checkAllServices();
+            setTimeout(() => checkAllServices(), 0);
             const interval = setInterval(checkAllServices, 30000); // Check every 30s
             return () => clearInterval(interval);
         }

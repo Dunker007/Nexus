@@ -170,7 +170,7 @@ export default function GitHubPage() {
                         )}
                     </div>
                     <div className="ml-auto text-sm text-gray-500">
-                        Last: "{repoStatus.lastCommit.message.slice(0, 40)}..." • {repoStatus.lastCommit.time}
+                        Last: &quot;{repoStatus.lastCommit.message.slice(0, 40)}...&quot; • {repoStatus.lastCommit.time}
                     </div>
                 </motion.div>
             </section>
@@ -227,15 +227,15 @@ export default function GitHubPage() {
                                 >
                                     <div className="flex items-center gap-3">
                                         <span className={`w-2 h-2 rounded-full ${file.status === 'staged' ? 'bg-green-500' :
-                                                file.status === 'modified' ? 'bg-yellow-500' : 'bg-gray-500'
+                                            file.status === 'modified' ? 'bg-yellow-500' : 'bg-gray-500'
                                             }`}></span>
                                         <span className="font-mono text-sm">{file.file}</span>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <span className="text-xs text-gray-500">{file.lines}</span>
                                         <span className={`text-xs px-2 py-0.5 rounded ${file.status === 'staged' ? 'bg-green-500/20 text-green-400' :
-                                                file.status === 'modified' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                    'bg-gray-500/20 text-gray-400'
+                                            file.status === 'modified' ? 'bg-yellow-500/20 text-yellow-400' :
+                                                'bg-gray-500/20 text-gray-400'
                                             }`}>
                                             {file.status}
                                         </span>
@@ -293,8 +293,8 @@ export default function GitHubPage() {
                                     key={action.id}
                                     onClick={() => handleQuickAction(action)}
                                     className={`w-full p-3 rounded-lg text-left transition-colors ${action.danger
-                                            ? 'bg-red-500/10 hover:bg-red-500/20 border border-red-500/30'
-                                            : 'bg-white/5 hover:bg-white/10'
+                                        ? 'bg-red-500/10 hover:bg-red-500/20 border border-red-500/30'
+                                        : 'bg-white/5 hover:bg-white/10'
                                         }`}
                                 >
                                     <div className="flex items-center gap-2 mb-1">

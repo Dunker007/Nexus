@@ -130,7 +130,7 @@ export default function VisionPage() {
 
                         <p className="text-xl text-gray-400 mb-8">
                             The industry is asking for reliable AI, multi-agent workflows, context awareness,
-                            and life-like companions. We're building it now.
+                            and life-like companions. We&apos;re building it now.
                         </p>
 
                         <div className="flex justify-center gap-6 text-sm">
@@ -160,7 +160,7 @@ export default function VisionPage() {
                         initial="initial"
                         animate="animate"
                     >
-                        {visions.map((category, catIndex) => (
+                        {visions.map((category) => (
                             <motion.div key={category.category} variants={fadeInUp}>
                                 {/* Category Header */}
                                 <div className="flex items-center gap-3 mb-8">
@@ -170,7 +170,7 @@ export default function VisionPage() {
 
                                 {/* Items Grid */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    {category.items.map((item, itemIndex) => {
+                                    {category.items.map((item) => {
                                         const status = statusConfig[item.status as keyof typeof statusConfig];
                                         return (
                                             <motion.div
@@ -213,10 +213,10 @@ export default function VisionPage() {
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
                     >
-                        <div className="text-6xl mb-6">"</div>
+                        <div className="text-6xl mb-6">&quot;</div>
                         <blockquote className="text-2xl md:text-3xl font-light text-gray-300 mb-6 leading-relaxed">
                             The industry learned from the <span className="text-cyan-400">vibe coding hangover</span> of 2025.
-                            Now we're building AI that's reliable, accountable, and truly helpful —
+                            Now we&apos;re building AI that&apos;s reliable, accountable, and truly helpful —
                             not just impressive demos.
                         </blockquote>
                         <p className="text-gray-500">— The 2026 Vision</p>
@@ -237,7 +237,7 @@ export default function VisionPage() {
                             Why <span className="text-gradient">DLX Studio</span>?
                         </h2>
                         <p className="text-gray-400 text-lg">
-                            We're not just following trends — we're building the foundation
+                            We&apos;re not just following trends — we&apos;re building the foundation
                         </p>
                     </motion.div>
 

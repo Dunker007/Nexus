@@ -44,6 +44,7 @@ export function VibeProvider({ children }: { children: ReactNode }) {
     // Load saved theme on mount
     useEffect(() => {
         const savedTheme = loadSavedTheme();
+        // eslint-disable-next-line
         setThemeId(savedTheme);
         const themeConfig = getTheme(savedTheme);
         setThemeState(themeConfig);

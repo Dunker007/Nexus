@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettings } from '@/components/SettingsContext';
@@ -9,9 +9,8 @@ import { useSettings } from '@/components/SettingsContext';
 export function StatusAvatar() {
     const { settings } = useSettings();
     const [status, setStatus] = useState<'online' | 'offline' | 'checking'>('checking');
-    const [lastSync, setLastSync] = useState<Date | null>(null);
 
-    const checkStatus = async () => {
+    const checkStatus = useCallback(async () => {
         setStatus('checking');
         try {
             const controller = new AbortController();
@@ -25,25 +24,24 @@ export function StatusAvatar() {
 
             if (res.ok) {
                 setStatus('online');
-                setLastSync(new Date());
             } else {
                 setStatus('offline');
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             // Ignore AbortError (timeout) and TypeError (network fail/offline)
-            if (error.name !== 'AbortError' && error.message !== 'Failed to fetch') {
+            if (error instanceof Error && error.name !== 'AbortError' && error.message !== 'Failed to fetch') {
                 console.error('Bridge check failed:', error);
             }
             setStatus('offline');
         }
-    };
+    }, [settings.bridgeUrl]);
 
     // Check on mount and when settings URL changes
     useEffect(() => {
-        checkStatus();
+        setTimeout(() => checkStatus(), 0);
         const interval = setInterval(checkStatus, 60000); // Check every minute
         return () => clearInterval(interval);
-    }, [settings.bridgeUrl]);
+    }, [checkStatus]);
 
     // Status colors
     const getStatusColor = () => {

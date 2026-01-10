@@ -65,6 +65,7 @@ const statusConfig = {
 export default function SetupPage() {
     const [toolsState, setToolsState] = useState<Tool[]>(tools);
     const [checking, setChecking] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [systemInfo, setSystemInfo] = useState<any>(null);
 
     useEffect(() => {
@@ -138,7 +139,7 @@ export default function SetupPage() {
                             Dev <span className="text-gradient">Setup</span>
                         </h1>
                         <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                            Check your development environment. Find what's installed, what's missing,
+                            Check your development environment. Find what&apos;s installed, what&apos;s missing,
                             and get one-click install links.
                         </p>
                     </motion.div>

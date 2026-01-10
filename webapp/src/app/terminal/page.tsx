@@ -80,8 +80,9 @@ export default function TerminalPage() {
                     `║ Active Agents    ● ${data.agents?.length || 0}                 ║`,
                     '╚══════════════════════════════════════╝',
                 ];
-            } catch (e: any) {
-                throw new Error(`Failed to fetch status: ${e.message}`);
+            } catch (e) {
+                const message = e instanceof Error ? e.message : 'Unknown error';
+                throw new Error(`Failed to fetch status: ${message}`);
             }
         },
         gpu: async () => {
@@ -99,9 +100,10 @@ export default function TerminalPage() {
                     `   Temp: ${data.temperature}°C`,
                     `   Fan: ${data.fanSpeed || 'N/A'}%`
                 ];
-            } catch (e: any) {
+            } catch (e) {
                 // Fallback / Error
-                return `Error fetching GPU info: ${e.message}. Is LuxRig running?`;
+                const message = e instanceof Error ? e.message : 'Unknown error';
+                return `Error fetching GPU info: ${message}. Is LuxRig running?`;
             }
         },
         models: async () => {
@@ -111,16 +113,17 @@ export default function TerminalPage() {
                 const lines = ['📦 Available Models:'];
 
                 if (data.lmstudio) {
-                    data.lmstudio.forEach((m: any) => lines.push(`  [lmstudio] ${m.id}`));
+                    data.lmstudio.forEach((m: { id: string }) => lines.push(`  [lmstudio] ${m.id}`));
                 }
                 if (data.ollama) {
-                    data.ollama.forEach((m: any) => lines.push(`  [ollama]   ${m.name}`));
+                    data.ollama.forEach((m: { name: string }) => lines.push(`  [ollama]   ${m.name}`));
                 }
                 if (lines.length === 1) lines.push('  No models found.');
 
                 return lines;
-            } catch (e: any) {
-                return `Error listing models: ${e.message}`;
+            } catch (e) {
+                const message = e instanceof Error ? e.message : 'Unknown error';
+                return `Error listing models: ${message}`;
             }
         },
         health: async () => {
@@ -133,8 +136,9 @@ export default function TerminalPage() {
                     `   Memory: ${data.memory.used}MB / ${data.memory.total}MB`,
                     `   Services: ${JSON.stringify(data.services)}`
                 ];
-            } catch (e: any) {
-                return `Health check failed: ${e.message}`;
+            } catch (e) {
+                const message = e instanceof Error ? e.message : 'Unknown error';
+                return `Health check failed: ${message}`;
             }
         },
         agent: async (args) => {
@@ -171,8 +175,9 @@ export default function TerminalPage() {
             } else {
                 setHistory(prev => [...prev, { type: 'error', content: `Command not found: ${cmdName}` }]);
             }
-        } catch (error: any) {
-            setHistory(prev => [...prev, { type: 'error', content: `Error: ${error.message}` }]);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            setHistory(prev => [...prev, { type: 'error', content: `Error: ${message}` }]);
         } finally {
             setIsProcessing(false);
         }

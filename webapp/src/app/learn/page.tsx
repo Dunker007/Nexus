@@ -298,8 +298,8 @@ export default function LearnPage() {
                                 key={cat}
                                 onClick={() => setFilter(cat)}
                                 className={`px-3 py-1 rounded-full text-sm ${filter === cat
-                                        ? 'bg-cyan-500 text-black'
-                                        : 'bg-white/10 hover:bg-white/20'
+                                    ? 'bg-cyan-500 text-black'
+                                    : 'bg-white/10 hover:bg-white/20'
                                     }`}
                             >
                                 {cat}
@@ -315,8 +315,8 @@ export default function LearnPage() {
                                     key={d}
                                     onClick={() => setDifficultyFilter(d)}
                                     className={`px-3 py-1 rounded text-sm ${difficultyFilter === d
-                                            ? 'bg-purple-500 text-white'
-                                            : 'bg-white/10 hover:bg-white/20'
+                                        ? 'bg-purple-500 text-white'
+                                        : 'bg-white/10 hover:bg-white/20'
                                         }`}
                                 >
                                     {d === 'all' ? 'All Levels' : d.charAt(0).toUpperCase() + d.slice(1)}
@@ -365,8 +365,8 @@ export default function LearnPage() {
                                     <h3 className="font-bold">{lesson.title}</h3>
                                     <div className="flex items-center gap-2 mt-1">
                                         <span className={`text-xs px-2 py-0.5 rounded ${lesson.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
-                                                lesson.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                    'bg-red-500/20 text-red-400'
+                                            lesson.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
+                                                'bg-red-500/20 text-red-400'
                                             }`}>
                                             {lesson.difficulty}
                                         </span>
@@ -402,8 +402,8 @@ export default function LearnPage() {
 
                             {/* Action */}
                             <button className={`w-full py-2 rounded-lg text-sm ${lesson.completed
-                                    ? 'bg-green-500/20 text-green-400'
-                                    : 'bg-cyan-500 text-black font-medium hover:bg-cyan-400'
+                                ? 'bg-green-500/20 text-green-400'
+                                : 'bg-cyan-500 text-black font-medium hover:bg-cyan-400'
                                 }`}>
                                 {lesson.completed ? '✓ Completed - Review' : 'Start Lesson'}
                             </button>
@@ -422,7 +422,7 @@ export default function LearnPage() {
                         viewport={{ once: true }}
                     >
                         <h2 className="text-2xl font-bold mb-2">🎯 Recommended Learning Path</h2>
-                        <p className="text-gray-400 mb-6">Start here if you're new to the stack</p>
+                        <p className="text-gray-400 mb-6">Start here if you&apos;re new to the stack</p>
                         <div className="flex flex-wrap justify-center gap-3">
                             <span className="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg">1. Git Basics</span>
                             <span className="text-gray-500">→</span>

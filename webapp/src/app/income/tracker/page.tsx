@@ -39,8 +39,6 @@ const incomeData = {
 };
 
 export default function TrackerPage() {
-    const [timeRange, setTimeRange] = useState<'month' | 'quarter' | 'year'>('month');
-
     const goalProgress = (incomeData.goals.currentMonthly / incomeData.goals.monthly) * 100;
     const maxAmount = Math.max(...incomeData.history.map(h => h.amount));
 
@@ -134,7 +132,7 @@ export default function TrackerPage() {
                                     <span>{source.source}</span>
                                     <div className="flex items-center gap-3">
                                         <span className={`text-xs ${source.change.startsWith('+') ? 'text-green-400' :
-                                                source.change.startsWith('-') ? 'text-red-400' : 'text-gray-400'
+                                            source.change.startsWith('-') ? 'text-red-400' : 'text-gray-400'
                                             }`}>{source.change}</span>
                                         <span className="font-bold text-green-400">${source.amount}</span>
                                     </div>
@@ -181,8 +179,8 @@ export default function TrackerPage() {
                         >
                             <div className="flex items-center gap-4">
                                 <div className={`w-3 h-3 rounded-full ${stream.status === 'active' ? 'bg-green-500' :
-                                        stream.status === 'pending' ? 'bg-yellow-500' :
-                                            'bg-blue-500'
+                                    stream.status === 'pending' ? 'bg-yellow-500' :
+                                        'bg-blue-500'
                                     }`}></div>
                                 <div>
                                     <h4 className="font-medium">{stream.name}</h4>

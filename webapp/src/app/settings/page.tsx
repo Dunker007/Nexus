@@ -33,7 +33,7 @@ export default function SettingsPage() {
             try {
                 const active = await isEnabled();
                 setStartOnBoot(active);
-            } catch (e) {
+            } catch {
                 // Plugin likely not available (web mode)
             }
         };
@@ -89,8 +89,9 @@ export default function SettingsPage() {
             } else {
                 setConnectionTest({ status: 'error', message: `HTTP ${res.status}: ${res.statusText}` });
             }
-        } catch (e: any) {
-            setConnectionTest({ status: 'error', message: e.message || 'Connection failed' });
+        } catch (e) {
+            const message = e instanceof Error ? e.message : 'Connection failed';
+            setConnectionTest({ status: 'error', message });
         }
     }
 

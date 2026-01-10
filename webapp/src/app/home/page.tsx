@@ -70,7 +70,6 @@ const automations = [
 
 export default function SmartHomePage() {
     const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
-    const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
 
     const filteredDevices = selectedRoom
         ? devices.filter(d => d.room === selectedRoom)
@@ -177,8 +176,8 @@ export default function SmartHomePage() {
 
                                     {device.type === 'camera' && (
                                         <span className={`px-2 py-1 rounded text-xs ${device.status === 'recording'
-                                                ? 'bg-red-500/20 text-red-400'
-                                                : 'bg-gray-500/20 text-gray-400'
+                                            ? 'bg-red-500/20 text-red-400'
+                                            : 'bg-gray-500/20 text-gray-400'
                                             }`}>
                                             {device.status === 'recording' ? '🔴 REC' : 'Offline'}
                                         </span>

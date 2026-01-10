@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState } from 'react';
 
 interface SafetyContextType {
     validateContent: (text: string) => { safe: boolean; reason?: string };
-    logAction: (action: string, metadata: any) => void;
+    logAction: (action: string, metadata: Record<string, unknown>) => void;
     safetyLevel: 'standard' | 'strict' | 'relaxed';
     setSafetyLevel: (level: 'standard' | 'strict' | 'relaxed') => void;
 }
@@ -36,7 +36,7 @@ export function SafetyProvider({ children }: { children: React.ReactNode }) {
         return { safe: true };
     };
 
-    const logAction = async (action: string, metadata: any) => {
+    const logAction = async (action: string, metadata: Record<string, unknown>) => {
         // Asynchronously log to audit endpoint
         try {
             await fetch('/api/audit', {

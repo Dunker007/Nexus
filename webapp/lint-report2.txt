@@ -44,13 +44,27 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\app\backup\page.tsx:54:9
   56 |         return unsubscribe;
   57 |     }, [loadData]);  react-hooks/set-state-in-effect
 
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\briefing\page.tsx
+   54:8   warning  React Hook useEffect has a missing dependency: 'fetchNews'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  200:56  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                               react/no-unescaped-entities
+  200:67  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                               react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\changelog\page.tsx
+  99:33  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  99:45  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  99:63  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\chat\page.tsx
-   14:7   warning  'BRIDGE_URL' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
-   29:11  error    Unexpected any. Specify a different type                                                                            @typescript-eslint/no-explicit-any
-  166:8   warning  React Hook useEffect has a missing dependency: 'fetchAllModels'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
-  185:8   warning  React Hook useEffect has a missing dependency: 'messages.length'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-  301:34  warning  'e' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
-  670:76  error    Unexpected any. Specify a different type                                                                            @typescript-eslint/no-explicit-any
+    4:8   warning  'Link' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
+   10:5   warning  'Cpu' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+   10:28  warning  'Search' is defined but never used                                                                                  @typescript-eslint/no-unused-vars
+   11:15  warning  'Lock' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
+   15:7   warning  'BRIDGE_URL' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
+   30:11  error    Unexpected any. Specify a different type                                                                            @typescript-eslint/no-explicit-any
+  167:8   warning  React Hook useEffect has a missing dependency: 'fetchAllModels'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
+  186:8   warning  React Hook useEffect has a missing dependency: 'messages.length'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  302:34  warning  'e' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+  671:76  error    Unexpected any. Specify a different type                                                                            @typescript-eslint/no-explicit-any
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\compare\page.tsx
     5:20  warning  'useEffect' is defined but never used              @typescript-eslint/no-unused-vars
@@ -64,32 +78,73 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\app\dashboard\page.tsx
   299:18  warning  'error' is defined but never used                                                                                                                  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\github\page.tsx
-  110:28  warning  'action' is defined but never used  @typescript-eslint/no-unused-vars
+  110:28  warning  'action' is defined but never used                               @typescript-eslint/no-unused-vars
+  173:31  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  173:79  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\home\page.tsx
   73:12  warning  'selectedDevice' is assigned a value but never used     @typescript-eslint/no-unused-vars
   73:28  warning  'setSelectedDevice' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\idle\page.tsx
+  258:69  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\IncomeDashboard.tsx
-   74:35  error    Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
-   84:11  warning  'selectedStream' is assigned a value but never used  @typescript-eslint/no-unused-vars
-  280:86  error    Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
-  463:86  error    Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+   19:59  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   21:16  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   24:16  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   29:56  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   50:35  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   60:11  warning  'selectedStream' is assigned a value but never used              @typescript-eslint/no-unused-vars
+  230:40  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  230:55  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  256:86  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  439:86  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\art\page.tsx
     8:5   warning  'TrendingUp' is defined but never used                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
    16:5   warning  'Clock' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
   294:53  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\ideas\page.tsx
+  304:79  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\music\page.tsx
   10:5  warning  'Play' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\opportunities\page.tsx
+  249:61  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  249:94  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\tracker\page.tsx
   42:12  warning  'timeRange' is assigned a value but never used     @typescript-eslint/no-unused-vars
   42:23  warning  'setTimeRange' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\labs\page.tsx
-  138:30  warning  '_labId' is defined but never used  @typescript-eslint/no-unused-vars
+    5:18   warning  'Filter' is defined but never used                    @typescript-eslint/no-unused-vars
+    5:69   warning  'Users' is defined but never used                     @typescript-eslint/no-unused-vars
+    5:106  warning  'MessageSquare' is defined but never used             @typescript-eslint/no-unused-vars
+    5:121  warning  'Calendar' is defined but never used                  @typescript-eslint/no-unused-vars
+    5:131  warning  'ChevronRight' is defined but never used              @typescript-eslint/no-unused-vars
+    5:145  warning  'ChevronDown' is defined but never used               @typescript-eslint/no-unused-vars
+    5:192  warning  'Wifi' is defined but never used                      @typescript-eslint/no-unused-vars
+    8:8    warning  'StaffMeetingPanel' is defined but never used         @typescript-eslint/no-unused-vars
+   51:12   warning  'expandedRows' is assigned a value but never used     @typescript-eslint/no-unused-vars
+   52:12   warning  'selectedLabId' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  124:43   error    Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  141:11   warning  'handleUpdateLab' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  141:51   error    Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  145:30   warning  'labId' is defined but never used                     @typescript-eslint/no-unused-vars
+  156:11   warning  'toggleRow' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  263:57   warning  'i' is defined but never used                         @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\learn\page.tsx
+  425:76  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\meeting\page.tsx
+  109:14  warning  'error' is defined but never used                                @typescript-eslint/no-unused-vars
+  261:59  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  261:96  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\models\page.tsx
   195:20  warning  'setSortBy' is assigned a value but never used  @typescript-eslint/no-unused-vars
@@ -113,22 +168,50 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\app\monitoring\page.tsx:58:9
   61 |     }, [refreshInterval, loadData]);  react-hooks/set-state-in-effect
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\music\page.tsx
-  3:18  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+    3:18  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+    7:22  warning  'Play' is defined but never used             @typescript-eslint/no-unused-vars
+    7:28  warning  'Pause' is defined but never used            @typescript-eslint/no-unused-vars
+    7:35  warning  'Video' is defined but never used            @typescript-eslint/no-unused-vars
+    8:3   warning  'Volume2' is defined but never used          @typescript-eslint/no-unused-vars
+    8:12  warning  'Heart' is defined but never used            @typescript-eslint/no-unused-vars
+    8:27  warning  'Download' is defined but never used         @typescript-eslint/no-unused-vars
+   10:3   warning  'FileVideo' is defined but never used        @typescript-eslint/no-unused-vars
+   10:28  warning  'Upload' is defined but never used           @typescript-eslint/no-unused-vars
+   41:9   error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  100:21  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  129:21  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  171:17  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\news\page.tsx
-    5:8   warning  'Link' is defined but never used                  @typescript-eslint/no-unused-vars
-   14:5   warning  'MN_KEYWORDS' is defined but never used           @typescript-eslint/no-unused-vars
-   19:17  warning  'Youtube' is defined but never used               @typescript-eslint/no-unused-vars
-   19:26  warning  'Radio' is defined but never used                 @typescript-eslint/no-unused-vars
-  136:60  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-  204:56  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-  326:12  warning  'tickerIndex' is assigned a value but never used  @typescript-eslint/no-unused-vars
-  606:66  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-  704:87  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-  759:83  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+    5:8    warning  'Link' is defined but never used                                 @typescript-eslint/no-unused-vars
+   14:5    warning  'MN_KEYWORDS' is defined but never used                          @typescript-eslint/no-unused-vars
+   19:17   warning  'Youtube' is defined but never used                              @typescript-eslint/no-unused-vars
+   19:26   warning  'Radio' is defined but never used                                @typescript-eslint/no-unused-vars
+  136:60   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  204:56   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  326:12   warning  'tickerIndex' is assigned a value but never used                 @typescript-eslint/no-unused-vars
+  606:66   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  697:87   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  697:111  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  704:87   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  759:83   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\notes\page.tsx
   77:19  warning  'setNotes' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\notifications\page.tsx
+  113:57  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\page.tsx
+  102:33  warning  'i' is defined but never used                                    @typescript-eslint/no-unused-vars
+  246:56  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\pipeline\page.tsx
+  152:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  164:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  178:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  191:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  205:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\playground\page.tsx
    49:12  warning  'response' is assigned a value but never used  @typescript-eslint/no-unused-vars
@@ -145,9 +228,11 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\app\settings\page.tsx
   92:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\setup\page.tsx
-  68:50  error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
-  73:8   warning  React Hook useEffect has a missing dependency: 'checkAllTools'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-  82:18  warning  'e' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+   68:50  error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
+   73:8   warning  React Hook useEffect has a missing dependency: 'checkAllTools'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   82:18  warning  'e' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+  141:74  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                   react/no-unescaped-entities
+  141:92  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                   react/no-unescaped-entities
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\status\page.tsx
   112:18  warning  '_e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
@@ -201,6 +286,12 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\app\studios\dev\page.tsx
   71:18  warning  'err' is defined but never used           @typescript-eslint/no-unused-vars
   82:46  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\studios\video\page.tsx
+    3:20   warning  'useEffect' is defined but never used                            @typescript-eslint/no-unused-vars
+    5:112  warning  'AlertCircle' is defined but never used                          @typescript-eslint/no-unused-vars
+  405:42   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  405:59   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\team\page.tsx
   4:35  warning  'Shield' is defined but never used    @typescript-eslint/no-unused-vars
   4:43  warning  'Zap' is defined but never used       @typescript-eslint/no-unused-vars
@@ -225,8 +316,18 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\app\trends\page.tsx
   171:33  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
   203:68  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
 
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\vision\page.tsx
+  133:57  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  163:49  warning  'catIndex' is defined but never used                             @typescript-eslint/no-unused-vars
+  173:64  warning  'itemIndex' is defined but never used                            @typescript-eslint/no-unused-vars
+  216:56  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  219:35  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  219:55  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  240:31  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  240:65  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\voice\page.tsx
-  194:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+  194:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
 
 Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
 * Update external systems with the latest state from React.
@@ -242,6 +343,8 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\app\voice\page.tsx:194:13
   195 |             return;
   196 |         }
   197 |  react-hooks/set-state-in-effect
+  253:8   warning  React Hook useEffect has a missing dependency: 'processCommand'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    react-hooks/exhaustive-deps
+  331:39  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\components\BridgeStatus.tsx
   39:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
@@ -262,7 +365,11 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\components\BridgeStatus.tsx:39:9
   42 |         const interval = setInterval(checkStatus, 30000);  react-hooks/set-state-in-effect
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\components\CommandPalette.tsx
-  196:8  warning  React Hook useEffect has missing dependencies: 'handleAiQuery' and 'saveRecentCommand'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+    6:10  warning  'Search' is defined but never used                                                                                                          @typescript-eslint/no-unused-vars
+    6:56  warning  'Mic' is defined but never used                                                                                                             @typescript-eslint/no-unused-vars
+  196:8   warning  React Hook useEffect has missing dependencies: 'handleAiQuery' and 'saveRecentCommand'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  325:87  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                             react/no-unescaped-entities
+  325:89  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                             react/no-unescaped-entities
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\components\CreativePrompt.tsx
   40:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
@@ -481,5 +588,5 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\types\speech.d.ts
 C:\Repos GIT\Nexus\Nexus\webapp\verify-prisma.ts
   1:10  warning  'PrismaClient' is defined but never used  @typescript-eslint/no-unused-vars
 
-Γ£û 192 problems (83 errors, 109 warnings)
+Γ£û 275 problems (126 errors, 149 warnings)
 

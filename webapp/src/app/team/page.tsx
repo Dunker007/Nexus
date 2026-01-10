@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Hexagon, Globe, Monitor, Shield, Zap, Terminal, Cpu } from 'lucide-react';
+import { Hexagon, Globe, Monitor } from 'lucide-react';
 import PageBackground from '@/components/PageBackground';
 
 // --- Data ---

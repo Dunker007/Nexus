@@ -255,7 +255,7 @@ export default function IdlePage() {
                         <div className="grid md:grid-cols-2 gap-4 text-sm">
                             <div className="flex gap-2">
                                 <span className="text-cyan-400">•</span>
-                                <span>Stack multiple apps - they don't conflict</span>
+                                <span>Stack multiple apps - they don&apos;t conflict</span>
                             </div>
                             <div className="flex gap-2">
                                 <span className="text-cyan-400">•</span>

@@ -90,8 +90,8 @@ export default function NotificationsPage() {
                             key={f}
                             onClick={() => setFilter(f)}
                             className={`px-4 py-2 rounded-lg text-sm ${filter === f
-                                    ? 'bg-cyan-500 text-black font-medium'
-                                    : 'bg-white/10 hover:bg-white/20'
+                                ? 'bg-cyan-500 text-black font-medium'
+                                : 'bg-white/10 hover:bg-white/20'
                                 }`}
                         >
                             {f === 'all' ? 'All' : `Unread (${unreadCount})`}
@@ -110,7 +110,7 @@ export default function NotificationsPage() {
                     >
                         <span className="text-6xl">🔔</span>
                         <h2 className="text-xl font-bold mt-4">No notifications</h2>
-                        <p className="text-gray-400">You're all caught up!</p>
+                        <p className="text-gray-400">You&apos;re all caught up!</p>
                     </motion.div>
                 ) : (
                     <motion.div

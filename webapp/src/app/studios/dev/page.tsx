@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
-import { Terminal, Cpu, GitBranch, Github, ExternalLink, RefreshCw, Folder } from 'lucide-react';
+import { Terminal, Cpu, GitBranch, Github, RefreshCw, Folder } from 'lucide-react';
 import Link from 'next/link';
 import { formatRelativeTime } from '@/lib/utils';
 
@@ -26,7 +26,12 @@ export default function DevStudioPage() {
     const [repos, setRepos] = useState<Repo[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [status, setStatus] = useState<any>(null);
+    const [status, setStatus] = useState<{
+        memory?: { used: number };
+        gpu?: { load: number };
+        nodeVersion?: string;
+        platform?: string;
+    } | null>(null);
 
     useEffect(() => {
         fetchRepos();
@@ -54,9 +59,10 @@ export default function DevStudioPage() {
             } else if (data.error) {
                 throw new Error(data.error);
             }
-        } catch (err: any) {
+        } catch (err) {
+            const errMessage = err instanceof Error ? err.message : 'Failed to load repositories';
             console.error(err);
-            setError(err.message || 'Failed to load repositories');
+            setError(errMessage);
             setRepos([]);
         } finally {
             setLoading(false);
@@ -79,7 +85,7 @@ export default function DevStudioPage() {
         const [prompt, setPrompt] = useState('');
         const [action, setAction] = useState('generate');
         const [isProcessing, setIsProcessing] = useState(false);
-        const [result, setResult] = useState<any>(null);
+        const [result, setResult] = useState<{ result?: { timestamp?: string; code?: string }; error?: string } | null>(null);
         const [models, setModels] = useState<{ id: string; provider: string }[]>([]);
         const [selectedModel, setSelectedModel] = useState('');
 

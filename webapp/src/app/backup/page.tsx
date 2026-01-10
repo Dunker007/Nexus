@@ -1,22 +1,48 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
     HardDrive, Cloud, RefreshCw, Trash2, FolderSync,
-    Check, AlertCircle, Clock, Plus, X, Settings
+    Check, AlertCircle, Clock, Plus, X
 } from 'lucide-react';
 import PageBackground from '@/components/PageBackground';
 import { housekeeper } from '@/lib/agents/housekeeper-agent';
 
+interface DiskStatus {
+    percentUsed: number;
+    usedGB: number;
+    freeGB: number;
+    totalGB: number;
+}
+
+interface BackupStatus {
+    lastCommit: string | null;
+    lastPush: string | null;
+    uncommittedChanges: number;
+    needsBackup: boolean;
+}
+
 export default function BackupPage() {
     const [syncConfig, setSyncConfig] = useState(housekeeper.getSyncConfig());
-    const [diskStatus, setDiskStatus] = useState<any>(null);
-    const [backupStatus, setBackupStatus] = useState<any>(null);
+    const [diskStatus, setDiskStatus] = useState<DiskStatus | null>(null);
+    const [backupStatus, setBackupStatus] = useState<BackupStatus | null>(null);
     const [cleanupSuggestions, setCleanupSuggestions] = useState<string[]>([]);
     const [loading, setLoading] = useState<string | null>(null);
     const [newFolder, setNewFolder] = useState('');
     const [showAddFolder, setShowAddFolder] = useState(false);
+
+    // Define loadData as useCallback before useEffect
+    const loadData = useCallback(async () => {
+        const [disk, backup, cleanup] = await Promise.all([
+            housekeeper.getDiskStatus(),
+            housekeeper.getBackupStatus(),
+            housekeeper.getCleanupSuggestions()
+        ]);
+        setDiskStatus(disk as DiskStatus);
+        setBackupStatus(backup as BackupStatus);
+        setCleanupSuggestions(cleanup);
+    }, []);
 
     useEffect(() => {
         // Subscribe to housekeeper updates
@@ -25,21 +51,11 @@ export default function BackupPage() {
         });
 
         // Load initial data
-        loadData();
+        // Defer initial load to avoid synchronous state update warning
+        setTimeout(() => loadData(), 0);
 
         return unsubscribe;
-    }, []);
-
-    const loadData = async () => {
-        const [disk, backup, cleanup] = await Promise.all([
-            housekeeper.getDiskStatus(),
-            housekeeper.getBackupStatus(),
-            housekeeper.getCleanupSuggestions()
-        ]);
-        setDiskStatus(disk);
-        setBackupStatus(backup);
-        setCleanupSuggestions(cleanup);
-    };
+    }, [loadData]);
 
     const handleSync = async () => {
         setLoading('sync');
@@ -182,9 +198,9 @@ export default function BackupPage() {
                             <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
                                 <span className="text-gray-400">Status</span>
                                 <span className={`flex items-center gap-2 ${syncConfig.syncStatus === 'success' ? 'text-green-400' :
-                                        syncConfig.syncStatus === 'syncing' ? 'text-blue-400' :
-                                            syncConfig.syncStatus === 'error' ? 'text-red-400' :
-                                                'text-gray-400'
+                                    syncConfig.syncStatus === 'syncing' ? 'text-blue-400' :
+                                        syncConfig.syncStatus === 'error' ? 'text-red-400' :
+                                            'text-gray-400'
                                     }`}>
                                     {syncConfig.syncStatus === 'syncing' && <RefreshCw className="animate-spin" size={14} />}
                                     {syncConfig.syncStatus === 'success' && <Check size={14} />}
@@ -284,8 +300,8 @@ export default function BackupPage() {
                                 <div className="relative h-4 bg-white/10 rounded-full overflow-hidden">
                                     <div
                                         className={`absolute inset-y-0 left-0 rounded-full transition-all ${diskStatus.percentUsed > 80 ? 'bg-red-500' :
-                                                diskStatus.percentUsed > 60 ? 'bg-yellow-500' :
-                                                    'bg-green-500'
+                                            diskStatus.percentUsed > 60 ? 'bg-yellow-500' :
+                                                'bg-green-500'
                                             }`}
                                         style={{ width: `${diskStatus.percentUsed}%` }}
                                     />

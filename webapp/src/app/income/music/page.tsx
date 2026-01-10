@@ -7,7 +7,6 @@ import {
     Plus,
     TrendingUp,
     DollarSign,
-    Play,
     ExternalLink,
     Trash2,
     RefreshCw,

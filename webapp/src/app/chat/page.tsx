@@ -1,18 +1,16 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
-import { LUXRIG_BRIDGE_URL, storage } from '@/lib/utils';
+import { storage } from '@/lib/utils';
 import { useSettings } from '@/components/SettingsContext';
 import PageBackground from '@/components/PageBackground';
 import {
-    Cpu, Shield, Terminal, Search, Layout,
-    Activity, Lock, GitBranch, Zap, MessageSquare,
+    Shield, Terminal, Layout,
+    Activity, GitBranch, Zap, MessageSquare,
     Database, Server, Box, Settings, RefreshCw, Trash2
 } from 'lucide-react';
 
-const BRIDGE_URL = LUXRIG_BRIDGE_URL;
 
 // --- Types ---
 interface Message {
@@ -27,7 +25,7 @@ interface AgentProfile {
     id: string;
     name: string;
     role: string;
-    icon: any;
+    icon: React.ComponentType<{ size?: number; className?: string }>;
     color: string;
     description: string;
     systemPrompt: string;
@@ -241,8 +239,8 @@ export default function ChatPage() {
             let reqProvider = settings.defaultProvider;
             let reqModel = settings.defaultModel;
             let reqSystem = activeAgent.systemPrompt;
-            let reqTemp = settings.temperature;
-            let reqMaxTokens = settings.maxTokens;
+            const reqTemp = settings.temperature;
+            const reqMaxTokens = settings.maxTokens;
 
             if (viewMode === 'models' && selectedModel) {
                 reqProvider = selectedModel.provider;
@@ -668,6 +666,7 @@ export default function ChatPage() {
                                 ? AGENTS.find(a => a.id === msg.agentId) || AGENTS[0]
                                 : { name: selectedModel?.id || 'Model', color: 'text-purple-400', icon: Database };
 
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             const Icon = viewMode === 'agents' ? (agent as any).icon : Database;
 
                             return (

@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, LayoutGrid, List, Kanban, Plus, Lightbulb, Users, ArrowUpRight, MoreHorizontal, MessageSquare, Calendar, ChevronRight, ChevronDown, X, FileText, Database, RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { Search, LayoutGrid, List, Kanban, Plus, Lightbulb, ArrowUpRight, MoreHorizontal, X, FileText, Database, RefreshCw, WifiOff } from 'lucide-react';
 import Link from 'next/link';
 import PageBackground from '@/components/PageBackground';
-import StaffMeetingPanel from '@/components/StaffMeetingPanel';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 import { INITIAL_LABS_DATA } from '@/lib/data';
 
@@ -48,8 +47,6 @@ export default function LabsPage() {
     const [viewMode, setViewMode] = useState<'grid' | 'kanban' | 'gantt'>('gantt');
     const [filterCategory, setFilterCategory] = useState<string>('All');
     const [searchQuery, setSearchQuery] = useState('');
-    const [expandedRows, setExpandedRows] = useState<string[]>([]);
-    const [selectedLabId, setSelectedLabId] = useState<string | null>(null);
     const [isIdeaModalOpen, setIsIdeaModalOpen] = useState(false);
     const [viewContent, setViewContent] = useState<string | null>(null);
     const [newIdea, setNewIdea] = useState({ title: '', desc: '', category: 'Operations' });
@@ -121,7 +118,7 @@ export default function LabsPage() {
             name: newIdea.title,
             desc: newIdea.desc,
             status: 'concept',
-            category: newIdea.category as any,
+            category: newIdea.category as Lab['category'],
             priority: 'Medium',
             agents: ['architect'],
             href: null,
@@ -138,11 +135,7 @@ export default function LabsPage() {
         }, 500);
     };
 
-    const handleUpdateLab = (id: string, updates: any) => {
-        setLabsData(prev => prev.map(l => l.id === id ? { ...l, ...updates } : l));
-    };
-
-    const handleQuickIdea = (labId: string) => {
+    const handleQuickIdea = (_labId: string) => {
         // Placeholder for quick idea
     };
 
@@ -152,11 +145,6 @@ export default function LabsPage() {
             lab.desc.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
     });
-
-    const toggleRow = (id: string) => {
-        setExpandedRows(prev => prev.includes(id) ? prev.filter(r => r !== id) : [...prev, id]);
-        setSelectedLabId(id);
-    };
 
     return (
         <div className="min-h-screen relative overflow-hidden text-white pb-20">
@@ -260,7 +248,7 @@ export default function LabsPage() {
                                 {/* Right Panel Header (Scrollable) */}
                                 <div className="flex-1 overflow-hidden relative">
                                     <div className="flex w-full">
-                                        {MONTHS.map((m, i) => (
+                                        {MONTHS.map((m) => (
                                             <div key={m} className="flex-1 min-w-[60px] text-center py-3 text-[10px] font-bold text-gray-500 border-r border-white/5 last:border-r-0 uppercase tracking-wider">
                                                 {m}
                                             </div>

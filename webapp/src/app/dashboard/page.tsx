@@ -144,7 +144,6 @@ export default function DashboardPage() {
     const [musicMode, setMusicMode] = useState<'youtube' | 'local'>('youtube');
     const [youtubeUrl, setYoutubeUrl] = useState('');
     const [localAudioFile, setLocalAudioFile] = useState<string | null>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
 
     // Tasks State (editable)
     const [tasks, setTasks] = useState([
@@ -218,7 +217,7 @@ export default function DashboardPage() {
             clearInterval(timer);
             clearInterval(statsTimer);
         };
-    }, []);
+    }, [fetchDashboardNews, fetchGoogleCalendar]);
 
     async function fetchSystemStats() {
         try {
@@ -296,7 +295,7 @@ export default function DashboardPage() {
             } else {
                 setQuickAiResponse('Error: Failed to get response from AI.');
             }
-        } catch (error) {
+        } catch {
             setQuickAiResponse('Error: Could not connect to Bridge.');
         } finally {
             setIsAiThinking(false);
@@ -516,7 +515,7 @@ export default function DashboardPage() {
                         <div className="flex flex-col items-center justify-center h-full text-center p-4">
                             <div className="w-3 h-3 rounded-full bg-red-500 mb-2 animate-pulse"></div>
                             <p className="text-xs font-medium text-red-400">Bridge Disconnected</p>
-                            <button 
+                            <button
                                 onClick={fetchSystemStats}
                                 className="mt-2 text-[10px] px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-gray-400"
                             >

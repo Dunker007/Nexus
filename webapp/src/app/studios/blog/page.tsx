@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, PenTool, Search, Send, FileText, Check, RefreshCw, Globe, ArrowRight, Save, Layout, Settings } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { BookOpen, PenTool, Search, Send, FileText, Check, RefreshCw, Globe, ArrowRight, Save, Settings } from 'lucide-react';
 import Link from 'next/link';
 
 // Mock Data
@@ -27,7 +27,7 @@ export default function BlogStudioPage() {
     const [generatedIdeas, setGeneratedIdeas] = useState<string[]>([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [currentPost, setCurrentPost] = useState({ title: '', content: '' });
-    const [seoScore, setSeoScore] = useState(85);
+    const [seoScore] = useState(85);
 
     // AI Agents State
     const [activeAgent, setActiveAgent] = useState<string | null>(null);

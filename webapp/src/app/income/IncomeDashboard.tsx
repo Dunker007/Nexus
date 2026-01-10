@@ -16,17 +16,41 @@ import { STREAM_TEMPLATES_DATA } from '@/lib/income-templates';
 // Stub functions to replace server actions (will use bridge API later)
 const toggleStreamStep = async (streamId: string, stepIndex: number) => { console.log('toggleStreamStep', streamId, stepIndex); };
 const activateStream = async (streamId: string) => { console.log('activateStream', streamId); };
-const saveContentProject = async (streamId: string, data: any) => { console.log('saveContentProject', streamId, data); return { path: '/stub/path' }; };
+const saveContentProject = async (streamId: string, data: Record<string, unknown>) => { console.log('saveContentProject', streamId, data); return { path: '/stub/path' }; };
 
-const IconMap: any = { Music, Video, ShoppingBag, Mic, Printer, Zap, TrendingUp };
+interface StreamIcon {
+    (props: { size?: number; className?: string }): React.ReactNode;
+}
+
+const IconMap: Record<string, StreamIcon> = { Music, Video, ShoppingBag, Mic, Printer, Zap, TrendingUp };
+
+interface StreamStep {
+    text: string;
+    completed: boolean;
+}
+
+interface DBStream {
+    id: string;
+    templateId: string;
+    status: string;
+    steps: string | StreamStep[];
+    currentMonthly?: number;
+}
 
 interface IncomeDashboardProps {
-    dbStreams: any[];
+    dbStreams: DBStream[];
 }
 
 export default function IncomeDashboard({ dbStreams }: IncomeDashboardProps) {
     const [selectedStreamId, setSelectedStreamId] = useState<string | null>(null);
-    const [generatorData, setGeneratorData] = useState<any>(null);
+    const [generatorData, setGeneratorData] = useState<{
+        type: string;
+        titles?: string[];
+        description?: string;
+        tags?: string;
+        prompts?: string[];
+        thumbnail_prompts?: string[];
+    } | null>(null);
     const [nicheInput, setNicheInput] = useState('');
     const [isGeneratingAsset, setIsGeneratingAsset] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -44,10 +68,10 @@ export default function IncomeDashboard({ dbStreams }: IncomeDashboardProps) {
         return {
             ...t,
             ...db, // Overwrite status, id, etc from DB
-            steps,
+            steps: steps as StreamStep[],
             icon: IconMap[t.iconName] || Zap
         };
-    }).filter(s => s !== null) as any[];
+    }).filter((s): s is NonNullable<typeof s> => s !== null);
 
     // Stats
     const activeStreams = streams.filter(s => s.status === 'active');
@@ -109,7 +133,7 @@ export default function IncomeDashboard({ dbStreams }: IncomeDashboardProps) {
                 })
             });
             const data = await response.json();
-            let cleanJson = data.content.replace(/```json/g, '').replace(/```/g, '').trim();
+            const cleanJson = data.content.replace(/```json/g, '').replace(/```/g, '').trim();
             setGeneratorData({ type, ...JSON.parse(cleanJson) });
         } catch (error) {
             console.error('Generation failed:', error);
@@ -227,7 +251,7 @@ export default function IncomeDashboard({ dbStreams }: IncomeDashboardProps) {
                             <ul className="space-y-3 text-sm text-gray-400">
                                 <li className="flex gap-2">
                                     <CheckCircle size={16} className="text-green-500 shrink-0" />
-                                    No "Get Rich Quick" schemes
+                                    No &quot;Get Rich Quick&quot; schemes
                                 </li>
                                 <li className="flex gap-2">
                                     <CheckCircle size={16} className="text-green-500 shrink-0" />
@@ -253,7 +277,7 @@ export default function IncomeDashboard({ dbStreams }: IncomeDashboardProps) {
                         <div className="space-y-6">
                             {streams.map((stream) => {
                                 const isSelected = selectedStreamId === stream.id || (!selectedStreamId && stream.id === streams[0]?.id);
-                                const progress = Math.round((stream.steps.filter((s: any) => s.completed).length / stream.steps.length) * 100);
+                                const progress = Math.round((stream.steps.filter((s) => s.completed).length / stream.steps.length) * 100);
 
                                 return (
                                     <motion.div
@@ -390,7 +414,7 @@ export default function IncomeDashboard({ dbStreams }: IncomeDashboardProps) {
                                                                     <div>
                                                                         <div className="text-xs font-bold text-gray-500 uppercase mb-1">Optimized Tags (Copy All)</div>
                                                                         <div
-                                                                            onClick={() => navigator.clipboard.writeText(generatorData.tags)}
+                                                                            onClick={() => navigator.clipboard.writeText(generatorData.tags ?? '')}
                                                                             className="p-3 bg-black/30 border border-white/10 rounded text-xs text-gray-400 font-mono cursor-pointer hover:border-cyan-500/50 transition-colors break-words"
                                                                         >
                                                                             {generatorData.tags}
@@ -436,7 +460,7 @@ export default function IncomeDashboard({ dbStreams }: IncomeDashboardProps) {
 
                                                         <h4 className="text-sm font-bold text-gray-300 mb-3 uppercase tracking-wider">Launch Checklist</h4>
                                                         <div className="space-y-3">
-                                                            {stream.steps.map((step: any, idx: number) => (
+                                                            {stream.steps.map((step: StreamStep, idx: number) => (
                                                                 <div
                                                                     key={idx}
                                                                     className={`flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer ${step.completed ? 'bg-green-500/10 text-green-200' : 'bg-black/20 text-gray-400 hover:bg-black/40'

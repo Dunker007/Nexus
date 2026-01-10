@@ -1,4 +1,6 @@
 
+/// <reference types="node" />
+
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -71,7 +73,6 @@ async function main() {
 
     // Seed Standard Labs
     for (const lab of INITIAL_LABS_DATA) {
-        // @ts-ignore - Types might be out of sync temporarily
         await prisma.project.create({
             data: {
                 title: lab.title,
@@ -90,7 +91,6 @@ async function main() {
     }
 
     // Seed Nexus Plan
-    // @ts-ignore - Types might be out of sync temporarily
     await prisma.project.create({
         data: {
             title: 'Nexus Implementation Plan',

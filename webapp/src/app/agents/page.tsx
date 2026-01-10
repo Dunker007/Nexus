@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Loader2, Play, Terminal, Cpu, Shield, DollarSign,
-    Briefcase, Code, Database, Search, Layers, Mic, FileText,
+    Code, Database, Search, Layers, Mic, FileText,
     Music, Users, Bot
 } from 'lucide-react';
 import PageBackground from '@/components/PageBackground';
@@ -89,7 +89,7 @@ export default function AgentsPage() {
     const [selectedAgent, setSelectedAgent] = useState<AvailableAgent | null>(null);
     const [prompt, setPrompt] = useState('');
     const [isExecuting, setIsExecuting] = useState(false);
-    const [result, setResult] = useState<any>(null);
+    const [result, setResult] = useState<{ result?: { timestamp?: string }; error?: string } | null>(null);
 
     // Model State
     const [models, setModels] = useState<{ id: string; provider: string }[]>([]);

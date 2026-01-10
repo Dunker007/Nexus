@@ -178,7 +178,7 @@ export interface NewsArticle {
 /**
  * Parse RSS feed to JSON
  */
-export async function parseRSSFeed(url: string): Promise<any[]> {
+export async function parseRSSFeed(url: string): Promise<unknown[]> {
     try {
         // Use a CORS proxy for client-side fetching
         const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`;
@@ -220,7 +220,7 @@ export async function fetchAllNews(filters: { category?: string; region?: string
         ];
 
         // Hydrate articles with local source metadata
-        return articles.map((a: any) => {
+        return articles.map((a: Partial<NewsArticle> & { sourceId?: string }) => {
             const sourceDef = allSources.find(s => s.id === a.sourceId);
             if (!sourceDef) return a; // Return as is, UI will filter or default
 
@@ -234,7 +234,7 @@ export async function fetchAllNews(filters: { category?: string; region?: string
                 },
                 // Ensure category matches source if missing
                 category: a.category || sourceDef.category,
-                region: a.region || (sourceDef as any).region
+                region: a.region || (sourceDef as { region?: string }).region
             };
         });
     } catch (error) {
@@ -261,7 +261,7 @@ export async function refreshNewsSources(): Promise<{ count: number }> {
  * Check claims against Google Fact Check API
  * Note: Requires API key
  */
-export async function checkClaim(claim: string, apiKey?: string): Promise<any> {
+export async function checkClaim(claim: string, apiKey?: string): Promise<unknown> {
     if (!apiKey) {
         return { status: 'unverified', message: 'No API key configured' };
     }
@@ -272,9 +272,11 @@ export async function checkClaim(claim: string, apiKey?: string): Promise<any> {
         const data = await response.json();
 
         if (data.claims && data.claims.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const reviews = data.claims.map((c: any) => ({
                 claim: c.text,
                 claimant: c.claimant,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 reviews: c.claimReview?.map((r: any) => ({
                     publisher: r.publisher?.name,
                     rating: r.textualRating,
@@ -298,7 +300,7 @@ export async function checkClaim(claim: string, apiKey?: string): Promise<any> {
 /**
  * Local LLM-based fact check using your models
  */
-export async function localFactCheck(title: string, content: string): Promise<any> {
+export async function localFactCheck(title: string, content: string): Promise<unknown> {
     // This would call your local LLM endpoint
     const prompt = `Analyze this news headline for potential bias, misleading claims, or factual concerns:
 

@@ -142,8 +142,8 @@ export default function NotesPage() {
                             key={cat}
                             onClick={() => setFilter(cat)}
                             className={`px-3 py-1 rounded-full text-sm ${filter === cat
-                                    ? 'bg-cyan-500 text-black'
-                                    : 'bg-white/10 hover:bg-white/20'
+                                ? 'bg-cyan-500 text-black'
+                                : 'bg-white/10 hover:bg-white/20'
                                 }`}
                         >
                             {cat}

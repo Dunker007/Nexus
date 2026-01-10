@@ -16,7 +16,8 @@ export function useSpeechRecognition({
 }: UseSpeechRecognitionProps = {}) {
     const [isListening, setIsListening] = useState(false);
     const [transcript, setTranscript] = useState('');
-    const recognitionRef = useRef<any>(null); // Keeping any for now to avoid compilation blocks
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recognitionRef = useRef<any>(null);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -29,6 +30,7 @@ export function useSpeechRecognition({
             recognition.interimResults = true;
             recognition.lang = lang;
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             recognition.onresult = (event: any) => {
                 const current = event.resultIndex;
                 const transcriptText = event.results[current][0].transcript;

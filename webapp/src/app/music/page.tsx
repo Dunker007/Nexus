@@ -1,13 +1,13 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 import {
-  Music, Mic, Radio, Play, Pause, Video, Film,
-  Volume2, Heart, Share2, Download, Disc, Activity,
+  Music, Mic, Radio, Film,
+  Disc, Activity, Share2,
   ExternalLink, Copy, Check, ChevronRight, Sparkles,
-  FileVideo, Clapperboard, Upload, Youtube, Newspaper, RefreshCw, Smartphone,
+  Clapperboard, Youtube, Newspaper, RefreshCw, Smartphone,
   Wifi, WifiOff, AlertCircle, UserCog
 } from 'lucide-react';
 import { fetchAllNews, refreshNewsSources, type NewsArticle } from '@/lib/news-service';
@@ -38,7 +38,7 @@ interface SongResult {
 interface PipelineStep {
   id: string;
   name: string;
-  icon: any;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
   status: 'pending' | 'active' | 'complete';
   link?: string;
   description: string;
@@ -97,7 +97,7 @@ export default function MusicStudioPage() {
       setBridgeStatus('offline');
       setBridgeError(`Bridge Error: ${response.status}`);
       return false;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('[Music] Bridge connection failed:', error);
       setBridgeStatus('offline');
       setBridgeError('Cannot connect to LuxRig Bridge');
@@ -126,13 +126,14 @@ export default function MusicStudioPage() {
         // Ignore any previous timeout/failure from /status.
         setBridgeStatus('online');
         setBridgeError(null);
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
         console.error('[Music] Failed to load agents:', err);
         // Only valid to show offline if BOTH status check failed AND agents failed.
         // Since we are here, agents failed. If status was also offline, we remain offline.
         // We set a specific error message for the agent failure.
         setBridgeStatus('offline');
-        setBridgeError(`Agent Load Failed: ${err.message}`);
+        setBridgeError(`Agent Load Failed: ${message}`);
 
         // Fallback Agents
         setAgents([
@@ -163,12 +164,12 @@ export default function MusicStudioPage() {
     setResult(null);
 
     // Context
-    let topic = selectedHeadline ? selectedHeadline.title : theme;
-    let context = selectedHeadline ? selectedHeadline.description : '';
+    const topic = selectedHeadline ? selectedHeadline.title : theme;
+    const context = selectedHeadline ? selectedHeadline.description : '';
 
     try {
       let agentType = 'lyricist'; // Default
-      let task: any = { action: 'write-lyrics', theme: topic, mood, genre };
+      let task: Record<string, unknown> = { action: 'write-lyrics', theme: topic, mood, genre };
 
       if (mode === 'political') {
         agentType = 'newsician';

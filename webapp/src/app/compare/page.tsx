@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 // AI service comparisons
 const services = [
@@ -97,7 +97,6 @@ const useCases = [
 
 export default function ComparePage() {
     const [selectedUseCase, setSelectedUseCase] = useState(1);
-    const [showLocal, setShowLocal] = useState(true);
 
     const dailyTokens = useCases[selectedUseCase].dailyTokens;
     const monthlyTokens = dailyTokens * 30;
@@ -148,8 +147,8 @@ export default function ComparePage() {
                                     key={uc.name}
                                     onClick={() => setSelectedUseCase(i)}
                                     className={`px-4 py-2 rounded-lg text-sm transition-all ${selectedUseCase === i
-                                            ? 'bg-cyan-500 text-black font-medium'
-                                            : 'bg-white/10 hover:bg-white/20'
+                                        ? 'bg-cyan-500 text-black font-medium'
+                                        : 'bg-white/10 hover:bg-white/20'
                                         }`}
                                 >
                                     {uc.name}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
     Newspaper,
@@ -48,12 +48,7 @@ export default function BriefingPage() {
     const [briefing, setBriefing] = useState<SentinelResult | null>(null);
     const [copied, setCopied] = useState(false);
 
-    // Fetch news on load
-    useEffect(() => {
-        fetchNews();
-    }, [settings.bridgeUrl]);
-
-    const fetchNews = async () => {
+    const fetchNews = useCallback(async () => {
         try {
             const res = await fetch(`${settings.bridgeUrl}/news?limit=20`);
             const data = await res.json();
@@ -61,7 +56,12 @@ export default function BriefingPage() {
         } catch (error) {
             console.error('Failed to fetch news:', error);
         }
-    };
+    }, [settings.bridgeUrl]);
+
+    // Fetch news on load
+    useEffect(() => {
+        fetchNews();
+    }, [fetchNews]);
 
     const refreshHeadlines = async () => {
         setRefreshing(true);
@@ -144,8 +144,8 @@ export default function BriefingPage() {
                         onClick={generateBriefing}
                         disabled={loading || selectedNews.length === 0}
                         className={`flex items-center gap-2 px-6 py-2 rounded-lg font-bold transition-all transform hover:scale-105 ${loading || selectedNews.length === 0
-                                ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                                : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20'
+                            ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                            : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20'
                             }`}
                     >
                         {loading ? (
@@ -153,7 +153,7 @@ export default function BriefingPage() {
                         ) : (
                             <Mic2 className="w-4 h-4" />
                         )}
-                        {loading ? 'Generatin\'' : 'Generate Briefing'}
+                        {loading ? 'Generating...' : 'Generate Briefing'}
                     </button>
                 </div>
             </header>
@@ -178,8 +178,8 @@ export default function BriefingPage() {
                                 layoutId={`news-${item.id}`}
                                 onClick={() => toggleSelect(item.id)}
                                 className={`p-4 rounded-lg border cursor-pointer transition-all ${selectedNews.includes(item.id)
-                                        ? 'bg-blue-900/30 border-blue-500/50'
-                                        : 'bg-gray-800 border-gray-700 hover:border-gray-600'
+                                    ? 'bg-blue-900/30 border-blue-500/50'
+                                    : 'bg-gray-800 border-gray-700 hover:border-gray-600'
                                     }`}
                             >
                                 <div className="flex justify-between items-start mb-2">
@@ -197,7 +197,7 @@ export default function BriefingPage() {
                         ))}
                         {news.length === 0 && !refreshing && (
                             <div className="text-center py-20 text-gray-500">
-                                No active wires. Click "Scan Wires" to update.
+                                No active wires. Click &quot;Scan Wires&quot; to update.
                             </div>
                         )}
                     </div>

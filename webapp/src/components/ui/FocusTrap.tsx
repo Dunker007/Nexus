@@ -51,8 +51,8 @@ export default function FocusTrap({ children, isActive = true, onEscape }: Focus
             setTimeout(() => first.focus(), 50);
         }
 
-        root.addEventListener('keydown', (e) => handleKeyDown(e as any));
-        return () => root.removeEventListener('keydown', (e) => handleKeyDown(e as any));
+        root.addEventListener('keydown', (e) => handleKeyDown(e as KeyboardEvent));
+        return () => root.removeEventListener('keydown', (e) => handleKeyDown(e as KeyboardEvent));
     }, [isActive, onEscape]);
 
     return (

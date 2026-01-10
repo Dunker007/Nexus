@@ -99,7 +99,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
             >
-              {stats.map((stat, i) => (
+              {stats.map((stat) => (
                 <motion.div
                   key={stat.label}
                   className="text-center p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm"
@@ -243,7 +243,7 @@ export default function Home() {
                 Ready to <span className="text-gradient">Start Building</span>?
               </h2>
               <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
-                Jump into the dashboard or explore what's possible.
+                Jump into the dashboard or explore what&apos;s possible.
               </p>
               <div className="flex gap-4 justify-center flex-wrap">
                 <Link href="/dashboard" className="btn-primary text-lg px-8 py-4">

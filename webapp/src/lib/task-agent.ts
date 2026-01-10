@@ -61,13 +61,13 @@ export class TaskAgent {
                     result: JSON.stringify(result)
                 }
             });
-        } catch (error: any) {
+        } catch (error) {
             console.error('[TaskAgent] Execution Error:', error);
             await prisma.agentTask.update({
                 where: { id: taskId },
                 data: {
                     status: 'failed',
-                    result: JSON.stringify({ error: error.message })
+                    result: JSON.stringify({ error: error instanceof Error ? error.message : String(error) })
                 }
             });
         }
@@ -83,8 +83,8 @@ export class TaskAgent {
                 })
             });
             return await res.json();
-        } catch (e: any) {
-            return { error: 'Bridge unreachable', details: e.message };
+        } catch (e) {
+            return { error: 'Bridge unreachable', details: e instanceof Error ? e.message : String(e) };
         }
     }
 
