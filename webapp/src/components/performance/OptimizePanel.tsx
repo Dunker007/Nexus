@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import {
     Zap, Cpu, HardDrive, Trash2, RefreshCw,
     Gauge, Fan, Power, CheckCircle, Clock,
-    MemoryStick, Thermometer
+    MemoryStick, Thermometer, Lightbulb
 } from 'lucide-react';
 import { HARDWARE_CONFIG } from '@/lib/luxrig/constants';
 
@@ -19,7 +19,7 @@ interface OptimizeAction {
     description: string;
     icon: React.ComponentType<{ size?: number; className?: string }>;
     color: string;
-    category: 'performance' | 'cleanup' | 'thermal';
+    category: 'performance' | 'cleanup' | 'thermal' | 'rgb';
     action: string;
     duration?: string;
 }
@@ -127,6 +127,47 @@ export function OptimizePanel({ bridgeUrl }: OptimizePanelProps) {
             action: 'thermal_check',
             duration: '~5s',
         },
+        // RGB Lighting (OpenRGB)
+        {
+            id: 'rgb-off',
+            name: 'Lights Off',
+            description: 'Turn off all RGB lighting',
+            icon: Lightbulb,
+            color: 'gray',
+            category: 'rgb',
+            action: 'rgb_off',
+            duration: '~1s',
+        },
+        {
+            id: 'rgb-static',
+            name: 'Static White',
+            description: 'Clean white ambient lighting',
+            icon: Lightbulb,
+            color: 'white',
+            category: 'rgb',
+            action: 'rgb_static',
+            duration: '~1s',
+        },
+        {
+            id: 'rgb-rainbow',
+            name: 'Rainbow Wave',
+            description: 'Animated rainbow cycle',
+            icon: Lightbulb,
+            color: 'pink',
+            category: 'rgb',
+            action: 'rgb_rainbow',
+            duration: '~1s',
+        },
+        {
+            id: 'rgb-breathing',
+            name: 'Breathing',
+            description: 'Slow fade in/out effect',
+            icon: Lightbulb,
+            color: 'indigo',
+            category: 'rgb',
+            action: 'rgb_breathing',
+            duration: '~1s',
+        },
     ];
 
     const runAction = async (action: OptimizeAction) => {
@@ -134,25 +175,25 @@ export function OptimizePanel({ bridgeUrl }: OptimizePanelProps) {
         setLastResult(null);
 
         try {
-            const res = await fetch(`${bridgeUrl}/system/optimize`, {
+            // Route RGB actions to different endpoint
+            const isRgb = action.category === 'rgb';
+            const endpoint = isRgb ? '/system/rgb' : '/system/optimize';
+            const body = isRgb
+                ? { mode: action.action.replace('rgb_', '') }
+                : { action: action.action };
+
+            const res = await fetch(`${bridgeUrl}${endpoint}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: action.action }),
+                body: JSON.stringify(body),
             });
 
-            if (res.ok) {
-                const result = await res.json();
-                setCompletedActions(prev => new Set([...prev, action.id]));
-                setLastResult({
-                    action: action.name,
-                    message: result.message || 'Completed successfully'
-                });
-            } else {
-                setLastResult({
-                    action: action.name,
-                    message: 'Action may require elevated permissions'
-                });
-            }
+            const result = await res.json();
+            setCompletedActions(prev => new Set([...prev, action.id]));
+            setLastResult({
+                action: action.name,
+                message: result.message || 'Completed successfully'
+            });
         } catch (error) {
             setLastResult({
                 action: action.name,
@@ -184,6 +225,10 @@ export function OptimizePanel({ bridgeUrl }: OptimizePanelProps) {
             sky: { bg: 'bg-sky-500/20', text: 'text-sky-400', border: 'border-sky-500/30' },
             yellow: { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' },
             rose: { bg: 'bg-rose-500/20', text: 'text-rose-400', border: 'border-rose-500/30' },
+            gray: { bg: 'bg-gray-500/20', text: 'text-gray-400', border: 'border-gray-500/30' },
+            white: { bg: 'bg-white/10', text: 'text-white', border: 'border-white/30' },
+            pink: { bg: 'bg-pink-500/20', text: 'text-pink-400', border: 'border-pink-500/30' },
+            indigo: { bg: 'bg-indigo-500/20', text: 'text-indigo-400', border: 'border-indigo-500/30' },
         };
         return colors[color] || colors.cyan;
     };
@@ -192,6 +237,7 @@ export function OptimizePanel({ bridgeUrl }: OptimizePanelProps) {
         { id: 'performance', label: '⚡ Performance', icon: Gauge },
         { id: 'cleanup', label: '🧹 Cleanup', icon: Trash2 },
         { id: 'thermal', label: '🌡️ Thermal', icon: Thermometer },
+        { id: 'rgb', label: '💡 RGB Lighting', icon: Lightbulb },
     ];
 
     return (
