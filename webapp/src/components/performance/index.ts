@@ -13,3 +13,4 @@ export { AgentsPanel } from './AgentsPanel';
 export { StoragePanel } from './StoragePanel';
 export { AlertsPanel } from './AlertsPanel';
 export { DevToolsPanel } from './DevToolsPanel';
+export { SystemOverview } from './SystemOverview';

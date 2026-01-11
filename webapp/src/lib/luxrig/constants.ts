@@ -171,3 +171,27 @@ export const STORAGE_KEYS = {
     ALERT_HISTORY: 'luxrig_alert_history',
     PANEL_EXPANDED: 'luxrig_panel_expanded',
 } as const;
+
+// ============= HARDWARE CONFIG =============
+export const HARDWARE_CONFIG = {
+    MOTHERBOARD: {
+        name: 'ASRock B550M-C',
+        chipset: 'AMD B550',
+        formFactor: 'Micro ATX',
+        socket: 'AM4',
+    },
+    GPU: {
+        name: 'NVIDIA RTX 4070',
+        vram: '12GB GDDR6X',
+        tdp: 200, // watts
+    },
+    CPU: {
+        model: 'AMD Ryzen',
+        socket: 'AM4',
+    },
+    RAM: {
+        type: 'DDR4',
+        slots: 4,
+    },
+} as const;
+

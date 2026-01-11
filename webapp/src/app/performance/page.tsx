@@ -14,6 +14,7 @@ import { AgentsPanel } from '@/components/performance/AgentsPanel';
 import { StoragePanel } from '@/components/performance/StoragePanel';
 import { AlertsPanel } from '@/components/performance/AlertsPanel';
 import { DevToolsPanel } from '@/components/performance/DevToolsPanel';
+import { SystemOverview } from '@/components/performance/SystemOverview';
 
 // ============= TYPES =============
 interface ServiceStatus {
@@ -203,75 +204,39 @@ export default function PerformancePage() {
 
     return (
         <div className="min-h-screen pt-8">
-            {/* Header */}
-            <section className="section-padding pb-8">
-                <div className="container-main">
-                    <motion.div
-                        className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                    >
-                        <div>
-                            <h1 className="text-4xl md:text-5xl font-bold mb-2">
-                                <span className="text-gradient">LuxRig</span> Performance
-                            </h1>
-                            <p className="text-gray-400">
-                                System health, GPU metrics, and service status
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <select
-                                value={refreshInterval}
-                                onChange={(e) => setRefreshInterval(Number(e.target.value))}
-                                className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm"
-                            >
-                                <option value={1000}>1s</option>
-                                <option value={5000}>5s</option>
-                                <option value={10000}>10s</option>
-                                <option value={30000}>30s</option>
-                            </select>
-                            <button
-                                onClick={loadAllData}
-                                disabled={isRefreshing}
-                                className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-colors"
-                            >
-                                <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
-                                Refresh
-                            </button>
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* Overall Status Banner */}
+            {/* System Overview Header */}
             <section className="container-main pb-8">
-                <motion.div
-                    className={`glass-card flex items-center justify-between border-2 ${overallStatus === 'operational' ? 'border-green-500/30' :
-                        overallStatus === 'degraded' ? 'border-yellow-500/30' : 'border-red-500/30'
-                        }`}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                >
-                    <div className="flex items-center gap-4">
-                        <div className={`w-4 h-4 rounded-full ${statusColors[overallStatus].bg} animate-pulse`}></div>
-                        <div>
-                            <span className={`text-xl font-bold ${statusColors[overallStatus].text}`}>
-                                {overallStatus === 'operational' ? 'All Systems Operational' :
-                                    overallStatus === 'degraded' ? 'Some Services Degraded' : 'Services Offline'}
-                            </span>
-                            <p className="text-sm text-gray-500">
-                                {operationalCount}/{services.length} services online
-                            </p>
-                        </div>
-                    </div>
-                    <div className="text-right text-sm text-gray-500">
-                        <div className="flex items-center gap-1">
-                            <Clock size={14} />
-                            Last checked: {lastChecked.toLocaleTimeString()}
-                        </div>
-                        {health && <div>Uptime: {formatUptime(health.uptime)}</div>}
-                    </div>
-                </motion.div>
+                <SystemOverview
+                    health={health}
+                    systemInfo={systemInfo}
+                    servicesOnline={operationalCount}
+                    servicesTotal={services.length}
+                />
+
+                {/* Refresh Controls */}
+                <div className="flex items-center justify-end gap-4 mt-4">
+                    <span className="text-xs text-gray-500">
+                        Last: {lastChecked.toLocaleTimeString()}
+                    </span>
+                    <select
+                        value={refreshInterval}
+                        onChange={(e) => setRefreshInterval(Number(e.target.value))}
+                        className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs"
+                    >
+                        <option value={1000}>1s</option>
+                        <option value={5000}>5s</option>
+                        <option value={10000}>10s</option>
+                        <option value={30000}>30s</option>
+                    </select>
+                    <button
+                        onClick={loadAllData}
+                        disabled={isRefreshing}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-colors text-sm"
+                    >
+                        <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+                        Refresh
+                    </button>
+                </div>
             </section>
 
             {/* Quick Stats Grid */}
