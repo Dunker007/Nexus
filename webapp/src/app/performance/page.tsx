@@ -10,6 +10,7 @@ import { GpuMonitor } from '@/components/performance/GpuMonitor';
 import { MetricCard } from '@/components/performance/MetricCard';
 import { NetworkPanel } from '@/components/performance/NetworkPanel';
 import { ModelsPanel } from '@/components/performance/ModelsPanel';
+import { AgentsPanel } from '@/components/performance/AgentsPanel';
 
 // ============= TYPES =============
 interface ServiceStatus {
@@ -455,6 +456,11 @@ export default function PerformancePage() {
             {/* AI Models Panel */}
             <section className="container-main pb-8">
                 <ModelsPanel bridgeUrl={BRIDGE_URL} refreshInterval={30000} />
+            </section>
+
+            {/* Agent Console */}
+            <section className="container-main pb-8">
+                <AgentsPanel bridgeUrl={BRIDGE_URL} refreshInterval={10000} />
             </section>
 
             {/* Back link */}
