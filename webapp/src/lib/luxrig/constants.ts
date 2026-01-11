@@ -186,7 +186,12 @@ export const HARDWARE_CONFIG = {
         tdp: 200, // watts
     },
     CPU: {
-        model: 'AMD Ryzen',
+        model: 'AMD Ryzen 7 3700X',
+        cores: 8,
+        threads: 16,
+        baseClock: '3.6 GHz',
+        boostClock: '4.4 GHz',
+        tdp: 65, // watts
         socket: 'AM4',
     },
     RAM: {

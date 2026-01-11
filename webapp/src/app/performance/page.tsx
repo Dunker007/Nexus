@@ -15,6 +15,7 @@ import { StoragePanel } from '@/components/performance/StoragePanel';
 import { AlertsPanel } from '@/components/performance/AlertsPanel';
 import { DevToolsPanel } from '@/components/performance/DevToolsPanel';
 import { SystemOverview } from '@/components/performance/SystemOverview';
+import { OptimizePanel } from '@/components/performance/OptimizePanel';
 
 // ============= TYPES =============
 interface ServiceStatus {
@@ -444,6 +445,11 @@ export default function PerformancePage() {
             {/* Developer Tools */}
             <section className="container-main pb-8">
                 <DevToolsPanel bridgeUrl={BRIDGE_URL} />
+            </section>
+
+            {/* Optimization Tools */}
+            <section className="container-main pb-8">
+                <OptimizePanel bridgeUrl={BRIDGE_URL} />
             </section>
 
             {/* Back link */}

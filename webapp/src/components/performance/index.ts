@@ -14,3 +14,4 @@ export { StoragePanel } from './StoragePanel';
 export { AlertsPanel } from './AlertsPanel';
 export { DevToolsPanel } from './DevToolsPanel';
 export { SystemOverview } from './SystemOverview';
+export { OptimizePanel } from './OptimizePanel';
