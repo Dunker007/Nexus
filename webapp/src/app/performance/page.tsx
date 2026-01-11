@@ -11,6 +11,7 @@ import { MetricCard } from '@/components/performance/MetricCard';
 import { NetworkPanel } from '@/components/performance/NetworkPanel';
 import { ModelsPanel } from '@/components/performance/ModelsPanel';
 import { AgentsPanel } from '@/components/performance/AgentsPanel';
+import { StoragePanel } from '@/components/performance/StoragePanel';
 
 // ============= TYPES =============
 interface ServiceStatus {
@@ -461,6 +462,11 @@ export default function PerformancePage() {
             {/* Agent Console */}
             <section className="container-main pb-8">
                 <AgentsPanel bridgeUrl={BRIDGE_URL} refreshInterval={10000} />
+            </section>
+
+            {/* Storage & Resources */}
+            <section className="container-main pb-8">
+                <StoragePanel bridgeUrl={BRIDGE_URL} refreshInterval={60000} />
             </section>
 
             {/* Back link */}
