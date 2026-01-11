@@ -13,6 +13,7 @@ import { ModelsPanel } from '@/components/performance/ModelsPanel';
 import { AgentsPanel } from '@/components/performance/AgentsPanel';
 import { StoragePanel } from '@/components/performance/StoragePanel';
 import { AlertsPanel } from '@/components/performance/AlertsPanel';
+import { DevToolsPanel } from '@/components/performance/DevToolsPanel';
 
 // ============= TYPES =============
 interface ServiceStatus {
@@ -473,6 +474,11 @@ export default function PerformancePage() {
             {/* Alerts & Notifications */}
             <section className="container-main pb-8">
                 <AlertsPanel bridgeUrl={BRIDGE_URL} systemData={systemInfo} />
+            </section>
+
+            {/* Developer Tools */}
+            <section className="container-main pb-8">
+                <DevToolsPanel bridgeUrl={BRIDGE_URL} />
             </section>
 
             {/* Back link */}
