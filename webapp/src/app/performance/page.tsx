@@ -2,10 +2,12 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSettings } from '@/components/SettingsContext';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 import { RefreshCw, Cpu, HardDrive, Thermometer, Zap, Activity, Server, AlertTriangle, CheckCircle, Clock, Wifi, Globe, Router, Network } from 'lucide-react';
+import { GpuMonitor } from '@/components/performance/GpuMonitor';
+import { MetricCard } from '@/components/performance/MetricCard';
 
 // ============= TYPES =============
 interface ServiceStatus {
@@ -67,6 +69,11 @@ export default function PerformancePage() {
     const [refreshInterval, setRefreshInterval] = useState(5000);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
+    // History for sparklines
+    const [gpuHistory, setGpuHistory] = useState<number[]>([]);
+    const [ramHistory, setRamHistory] = useState<number[]>([]);
+    const maxHistoryPoints = 30;
+
     // Helpers
     const formatUptime = (seconds: number) => {
         const hours = Math.floor(seconds / 3600);
@@ -123,6 +130,15 @@ export default function PerformancePage() {
                 const data = await systemRes.json();
                 setSystemInfo(data);
                 updateService('GPU Metrics', 'operational');
+
+                // Track history for sparklines
+                if (data.gpu?.utilization !== undefined) {
+                    setGpuHistory(prev => [...prev.slice(-maxHistoryPoints + 1), data.gpu.utilization]);
+                }
+                if (data.memory?.used !== undefined) {
+                    const ramPercent = data.memory.total ? (data.memory.used / data.memory.total) * 100 : 0;
+                    setRamHistory(prev => [...prev.slice(-maxHistoryPoints + 1), ramPercent]);
+                }
             } else {
                 updateService('GPU Metrics', 'down');
             }
@@ -344,41 +360,29 @@ export default function PerformancePage() {
                         </div>
                     </motion.div>
 
-                    {/* GPU Card */}
-                    <motion.div className="glass-card" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                            <Cpu size={20} className="text-purple-400" />
-                            GPU Information
-                        </h2>
-                        {systemInfo?.gpu ? (
-                            <div className="space-y-4">
-                                <div className="p-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-lg border border-cyan-500/20">
-                                    <div className="text-lg font-bold text-cyan-400">{systemInfo.gpu.name || 'Unknown GPU'}</div>
-                                    <div className="text-sm text-gray-400">{systemInfo.gpu.vram || 'N/A'} VRAM</div>
-                                </div>
-                                <div className="grid grid-cols-3 gap-3">
-                                    <div className="p-3 bg-white/5 rounded-lg text-center">
-                                        <div className="text-lg font-bold text-cyan-400">{systemInfo.gpu.utilization ?? '--'}%</div>
-                                        <div className="text-xs text-gray-500">Utilization</div>
-                                    </div>
-                                    <div className="p-3 bg-white/5 rounded-lg text-center">
-                                        <div className="text-lg font-bold text-yellow-400">{systemInfo.gpu.temp ?? '--'}°C</div>
-                                        <div className="text-xs text-gray-500">Temperature</div>
-                                    </div>
-                                    <div className="p-3 bg-white/5 rounded-lg text-center">
-                                        <div className="text-lg font-bold text-green-400">{systemInfo.gpu.power ?? '--'}W</div>
-                                        <div className="text-xs text-gray-500">Power Draw</div>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
+                    {/* GPU Card - Now with real-time monitoring */}
+                    {systemInfo?.gpu ? (
+                        <GpuMonitor
+                            utilization={systemInfo.gpu.utilization ?? 0}
+                            temperature={systemInfo.gpu.temp ?? 0}
+                            vramUsed={parseFloat(systemInfo.gpu.vram?.replace(/[^\d.]/g, '') || '0') || 0}
+                            vramTotal={24} // RTX 4090 has 24GB - adjust as needed
+                            power={systemInfo.gpu.power ?? 0}
+                            gpuName={systemInfo.gpu.name || 'GPU'}
+                        />
+                    ) : (
+                        <motion.div className="glass-card" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <Cpu size={20} className="text-purple-400" />
+                                GPU Information
+                            </h2>
                             <div className="text-center py-8 text-gray-500">
                                 <Cpu size={48} className="mx-auto mb-4 opacity-30" />
                                 <p>GPU data unavailable</p>
                                 <p className="text-sm">Bridge may be offline</p>
                             </div>
-                        )}
-                    </motion.div>
+                        </motion.div>
+                    )}
                 </div>
             </section>
 
