@@ -12,6 +12,7 @@ import { NetworkPanel } from '@/components/performance/NetworkPanel';
 import { ModelsPanel } from '@/components/performance/ModelsPanel';
 import { AgentsPanel } from '@/components/performance/AgentsPanel';
 import { StoragePanel } from '@/components/performance/StoragePanel';
+import { AlertsPanel } from '@/components/performance/AlertsPanel';
 
 // ============= TYPES =============
 interface ServiceStatus {
@@ -467,6 +468,11 @@ export default function PerformancePage() {
             {/* Storage & Resources */}
             <section className="container-main pb-8">
                 <StoragePanel bridgeUrl={BRIDGE_URL} refreshInterval={60000} />
+            </section>
+
+            {/* Alerts & Notifications */}
+            <section className="container-main pb-8">
+                <AlertsPanel bridgeUrl={BRIDGE_URL} systemData={systemInfo} />
             </section>
 
             {/* Back link */}
