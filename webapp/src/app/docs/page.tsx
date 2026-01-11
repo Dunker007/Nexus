@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useState } from 'react';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
+import { NEXUS_PLAN_MD } from '@/lib/data';
 
 const endpoints = [
     {
@@ -116,8 +117,8 @@ const endpoints = [
         path: '/pipeline/generate',
         description: 'Trigger content generation',
         body: `{ "topic": "AI productivity tips", "count": 3 }`,
-        response: `{ "success": true, "message": "Generation started", "jobId": "..." }`,
-        category: 'Pipeline'
+        category: 'Pipeline',
+        response: `{ "success": true, "message": "Generation started", "jobId": "..." }`
     },
     {
         method: 'GET',
@@ -233,6 +234,7 @@ const methodColors: Record<string, string> = {
 };
 
 export default function DocsPage() {
+    const [activeTab, setActiveTab] = useState<'api' | 'plan'>('api');
     const [selectedSdk, setSelectedSdk] = useState(0);
     const [expandedEndpoint, setExpandedEndpoint] = useState<string | null>(null);
 
@@ -241,7 +243,7 @@ export default function DocsPage() {
     return (
         <div className="min-h-screen pt-8">
             {/* Header */}
-            <section className="section-padding pb-12">
+            <section className="section-padding pb-8">
                 <div className="container-main">
                     <motion.div
                         className="text-center"
@@ -249,157 +251,166 @@ export default function DocsPage() {
                         animate={{ opacity: 1, y: 0 }}
                     >
                         <h1 className="text-5xl md:text-6xl font-bold mb-4">
-                            API <span className="text-gradient">Documentation</span>
+                            System <span className="text-gradient">Documentation</span>
                         </h1>
-                        <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                            The LuxRig Bridge API. Connect your apps to local LLMs.
+                        <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
+                            Technical references and project roadmap.
                         </p>
-                        <div className="mt-6 flex justify-center gap-4">
-                            <code className="px-4 py-2 bg-white/10 rounded-lg font-mono">
-                                Base URL: <span className="text-cyan-400">http://localhost:3456</span>
-                            </code>
+
+                        {/* Tabs */}
+                        <div className="flex justify-center gap-4 mb-4">
+                            <button
+                                onClick={() => setActiveTab('api')}
+                                className={`px-6 py-3 rounded-full font-medium transition-all ${activeTab === 'api'
+                                        ? 'bg-cyan-500 text-black'
+                                        : 'bg-white/10 hover:bg-white/20 text-gray-300'
+                                    }`}
+                            >
+                                API Reference
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('plan')}
+                                className={`px-6 py-3 rounded-full font-medium transition-all ${activeTab === 'plan'
+                                        ? 'bg-purple-500 text-white'
+                                        : 'bg-white/10 hover:bg-white/20 text-gray-300'
+                                    }`}
+                            >
+                                Master Plan
+                            </button>
                         </div>
                     </motion.div>
                 </div>
             </section>
 
-            {/* Quick Start */}
-            <section className="container-main pb-12">
-                <h2 className="text-2xl font-bold mb-6">🚀 Quick Start</h2>
-
-                {/* SDK Tabs */}
-                <div className="flex gap-2 mb-4">
-                    {sdks.map((sdk, i) => (
-                        <button
-                            key={sdk.lang}
-                            onClick={() => setSelectedSdk(i)}
-                            className={`px-4 py-2 rounded-lg transition-all ${selectedSdk === i
-                                ? 'bg-cyan-500 text-black font-medium'
-                                : 'bg-white/10 hover:bg-white/20'
-                                }`}
-                        >
-                            {sdk.icon} {sdk.lang}
-                        </button>
-                    ))}
-                </div>
-
-                <motion.div
-                    className="glass-card p-0 overflow-hidden"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                >
-                    <pre className="p-6 overflow-x-auto">
-                        <code className="text-sm text-cyan-400 font-mono whitespace-pre">
-                            {sdks[selectedSdk].code}
+            {/* API Content */}
+            {activeTab === 'api' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <div className="container-main mb-8 flex justify-center">
+                        <code className="px-4 py-2 bg-white/10 rounded-lg font-mono">
+                            Base URL: <span className="text-cyan-400">http://localhost:3456</span>
                         </code>
-                    </pre>
-                </motion.div>
-            </section>
+                    </div>
 
-            {/* Endpoints */}
-            <section className="container-main pb-16">
-                <h2 className="text-2xl font-bold mb-6">📡 Endpoints</h2>
+                    {/* Quick Start */}
+                    <section className="container-main pb-12">
+                        <h2 className="text-2xl font-bold mb-6">🚀 Quick Start</h2>
 
-                {categories.map(category => (
-                    <div key={category} className="mb-8">
-                        <h3 className="text-xl font-bold mb-4 text-gray-400">{category}</h3>
-                        <div className="space-y-4">
-                            {endpoints.filter(e => e.category === category).map((endpoint) => (
-                                <motion.div
-                                    key={endpoint.path}
-                                    className="glass-card cursor-pointer"
-                                    onClick={() => setExpandedEndpoint(
-                                        expandedEndpoint === endpoint.path ? null : endpoint.path
-                                    )}
-                                    layout
+                        {/* SDK Tabs */}
+                        <div className="flex gap-2 mb-4">
+                            {sdks.map((sdk, i) => (
+                                <button
+                                    key={sdk.lang}
+                                    onClick={() => setSelectedSdk(i)}
+                                    className={`px-4 py-2 rounded-lg transition-all ${selectedSdk === i
+                                        ? 'bg-cyan-500 text-black font-medium'
+                                        : 'bg-white/10 hover:bg-white/20'
+                                        }`}
                                 >
-                                    <div className="flex items-center gap-4">
-                                        <span className={`px-3 py-1 rounded text-xs font-mono font-bold ${methodColors[endpoint.method]}`}>
-                                            {endpoint.method}
-                                        </span>
-                                        <code className="font-mono text-cyan-400">{endpoint.path}</code>
-                                        <span className="text-gray-400 text-sm flex-1">{endpoint.description}</span>
-                                        <span className="text-gray-500">
-                                            {expandedEndpoint === endpoint.path ? '▲' : '▼'}
-                                        </span>
-                                    </div>
-
-                                    {expandedEndpoint === endpoint.path && (
-                                        <motion.div
-                                            className="mt-4 pt-4 border-t border-gray-700"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                        >
-                                            {endpoint.body && (
-                                                <div className="mb-4">
-                                                    <h4 className="text-sm font-bold text-gray-400 mb-2">Request Body</h4>
-                                                    <pre className="p-4 bg-[#0a0e1a] rounded-lg overflow-x-auto">
-                                                        <code className="text-sm text-yellow-400 font-mono">{endpoint.body}</code>
-                                                    </pre>
-                                                </div>
-                                            )}
-                                            <div>
-                                                <h4 className="text-sm font-bold text-gray-400 mb-2">Response</h4>
-                                                <pre className="p-4 bg-[#0a0e1a] rounded-lg overflow-x-auto">
-                                                    <code className="text-sm text-green-400 font-mono">{endpoint.response}</code>
-                                                </pre>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </motion.div>
+                                    {sdk.icon} {sdk.lang}
+                                </button>
                             ))}
                         </div>
-                    </div>
-                ))}
-            </section>
 
-            {/* WebSocket */}
-            <section className="section-padding bg-[#050508]">
-                <div className="container-main">
-                    <h2 className="text-2xl font-bold mb-6">🔌 WebSocket (Real-time)</h2>
-                    <div className="glass-card">
-                        <p className="text-gray-400 mb-4">
-                            Connect to <code className="text-cyan-400">{LUXRIG_BRIDGE_URL.replace('http', 'ws')}</code> for real-time updates.
-                        </p>
-                        <pre className="p-4 bg-[#0a0e1a] rounded-lg overflow-x-auto">
-                            <code className="text-sm text-cyan-400 font-mono">{`const ws = new WebSocket('${LUXRIG_BRIDGE_URL.replace('http', 'ws')}');
+                        <div className="glass-card p-0 overflow-hidden">
+                            <pre className="p-6 overflow-x-auto">
+                                <code className="text-sm text-cyan-400 font-mono whitespace-pre">
+                                    {sdks[selectedSdk].code}
+                                </code>
+                            </pre>
+                        </div>
+                    </section>
 
-ws.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  // data.type: 'system_metrics' | 'model_status' | 'chat_update'
-  console.log(data);
-};`}</code>
-                        </pre>
-                    </div>
-                </div>
-            </section>
+                    {/* Endpoints */}
+                    <section className="container-main pb-16">
+                        <h2 className="text-2xl font-bold mb-6">📡 Endpoints</h2>
 
-            {/* Rate Limits */}
-            <section className="section-padding">
-                <div className="container-main">
-                    <h2 className="text-2xl font-bold mb-6">⚡ Rate Limits</h2>
-                    <div className="glass-card">
-                        <p className="text-gray-400 mb-4">
-                            Since this runs locally, there are <span className="text-green-400 font-bold">no rate limits</span>!
-                            Go as fast as your hardware allows.
-                        </p>
-                        <div className="grid grid-cols-3 gap-4 text-center">
-                            <div className="p-4 bg-green-500/10 rounded-xl">
-                                <div className="text-2xl font-bold text-green-400">∞</div>
-                                <div className="text-sm text-gray-500">Requests/min</div>
+                        {categories.map(category => (
+                            <div key={category} className="mb-8">
+                                <h3 className="text-xl font-bold mb-4 text-gray-400">{category}</h3>
+                                <div className="space-y-4">
+                                    {endpoints.filter(e => e.category === category).map((endpoint) => (
+                                        <div
+                                            key={endpoint.path}
+                                            className="glass-card cursor-pointer"
+                                            onClick={() => setExpandedEndpoint(
+                                                expandedEndpoint === endpoint.path ? null : endpoint.path
+                                            )}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <span className={`px-3 py-1 rounded text-xs font-mono font-bold ${methodColors[endpoint.method]}`}>
+                                                    {endpoint.method}
+                                                </span>
+                                                <code className="font-mono text-cyan-400">{endpoint.path}</code>
+                                                <span className="text-gray-400 text-sm flex-1">{endpoint.description}</span>
+                                                <span className="text-gray-500">
+                                                    {expandedEndpoint === endpoint.path ? '▲' : '▼'}
+                                                </span>
+                                            </div>
+
+                                            {expandedEndpoint === endpoint.path && (
+                                                <div className="mt-4 pt-4 border-t border-gray-700">
+                                                    {endpoint.body && (
+                                                        <div className="mb-4">
+                                                            <h4 className="text-sm font-bold text-gray-400 mb-2">Request Body</h4>
+                                                            <pre className="p-4 bg-[#0a0e1a] rounded-lg overflow-x-auto">
+                                                                <code className="text-sm text-yellow-400 font-mono">{endpoint.body}</code>
+                                                            </pre>
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <h4 className="text-sm font-bold text-gray-400 mb-2">Response</h4>
+                                                        <pre className="p-4 bg-[#0a0e1a] rounded-lg overflow-x-auto">
+                                                            <code className="text-sm text-green-400 font-mono">{endpoint.response}</code>
+                                                        </pre>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                            <div className="p-4 bg-green-500/10 rounded-xl">
-                                <div className="text-2xl font-bold text-green-400">∞</div>
-                                <div className="text-sm text-gray-500">Tokens/day</div>
-                            </div>
-                            <div className="p-4 bg-green-500/10 rounded-xl">
-                                <div className="text-2xl font-bold text-green-400">$0</div>
-                                <div className="text-sm text-gray-500">Cost</div>
+                        ))}
+                    </section>
+
+                    {/* WebSocket */}
+                    <section className="section-padding bg-[#050508]">
+                        <div className="container-main">
+                            <h2 className="text-2xl font-bold mb-6">🔌 WebSocket (Real-time)</h2>
+                            <div className="glass-card">
+                                <p className="text-gray-400 mb-4">
+                                    Connect to <code className="text-cyan-400">{LUXRIG_BRIDGE_URL.replace('http', 'ws')}</code> for real-time updates.
+                                </p>
+                                <pre className="p-4 bg-[#0a0e1a] rounded-lg overflow-x-auto">
+                                    <code className="text-sm text-cyan-400 font-mono">{`const ws = new WebSocket('${LUXRIG_BRIDGE_URL.replace('http', 'ws')}');
+
+    ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    // data.type: 'system_metrics' | 'model_status' | 'chat_update'
+    console.log(data);
+    };`}</code>
+                                </pre>
                             </div>
                         </div>
+                    </section>
+                </motion.div>
+            )}
+
+            {/* Master Plan Content */}
+            {activeTab === 'plan' && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="container-main pb-16"
+                >
+                    <div className="glass-card p-8 md:p-12 bg-black/40 backdrop-blur-xl border-purple-500/20">
+                        <div className="prose prose-invert prose-lg max-w-none">
+                            <pre className="whitespace-pre-wrap font-sans text-gray-300 leading-relaxed">
+                                {NEXUS_PLAN_MD}
+                            </pre>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </motion.div>
+            )}
 
             {/* Back link */}
             <div className="container-main py-8">

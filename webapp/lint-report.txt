@@ -3,185 +3,87 @@
 > eslint
 
 
-C:\Repos GIT\Nexus\Nexus\webapp\check-db.js
-  2:26  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
-
-C:\Repos GIT\Nexus\Nexus\webapp\jest.config.js
-  1:18  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
-
-C:\Repos GIT\Nexus\Nexus\webapp\prisma\seed.js
-  2:26  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
-
-C:\Repos GIT\Nexus\Nexus\webapp\prisma\seed.ts
-  74:9  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
-  93:5  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
-
 C:\Repos GIT\Nexus\Nexus\webapp\src-tauri\target\debug\build\nexus-94bf003c825cae42\out\__global-api-script.js
   1:1  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
 
 C:\Repos GIT\Nexus\Nexus\webapp\src-tauri\target\debug\build\nexus-d2fca1723172b64f\out\__global-api-script.js
   1:1  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\agents\page.tsx
-   7:5   warning  'Briefcase' is defined but never used     @typescript-eslint/no-unused-vars
-  92:42  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\analytics\page.tsx
+  62:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\backup\page.tsx
-  54:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\backup\page.tsx:54:9
-  52 |
-  53 |         // Load initial data
-> 54 |         loadData();
-     |         ^^^^^^^^ Avoid calling setState() directly within an effect
-  55 |
-  56 |         return unsubscribe;
-  57 |     }, [loadData]);  react-hooks/set-state-in-effect
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\automation\page.tsx
+    4:18  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+    8:5   warning  'Save' is defined but never used             @typescript-eslint/no-unused-vars
+   16:5   warning  'AlertCircle' is defined but never used      @typescript-eslint/no-unused-vars
+   17:5   warning  'CheckCircle2' is defined but never used     @typescript-eslint/no-unused-vars
+   28:28  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  158:33  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  173:18  warning  'error' is defined but never used            @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\chat\page.tsx
-   14:7   warning  'BRIDGE_URL' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
-   29:11  error    Unexpected any. Specify a different type                                                                            @typescript-eslint/no-explicit-any
-  166:8   warning  React Hook useEffect has a missing dependency: 'fetchAllModels'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
-  185:8   warning  React Hook useEffect has a missing dependency: 'messages.length'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-  301:34  warning  'e' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
-  670:76  error    Unexpected any. Specify a different type                                                                            @typescript-eslint/no-explicit-any
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\compare\page.tsx
-    5:20  warning  'useEffect' is defined but never used              @typescript-eslint/no-unused-vars
-  100:12  warning  'showLocal' is assigned a value but never used     @typescript-eslint/no-unused-vars
-  100:23  warning  'setShowLocal' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  168:8  warning  React Hook useEffect has a missing dependency: 'fetchAllModels'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
+  187:8  warning  React Hook useEffect has a missing dependency: 'messages.length'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\dashboard\page.tsx
-  147:12  warning  'isPlaying' is assigned a value but never used                                                                                                     @typescript-eslint/no-unused-vars
-  147:23  warning  'setIsPlaying' is assigned a value but never used                                                                                                  @typescript-eslint/no-unused-vars
-  221:8   warning  React Hook useEffect has missing dependencies: 'fetchDashboardNews' and 'fetchGoogleCalendar'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
-  299:18  warning  'error' is defined but never used                                                                                                                  @typescript-eslint/no-unused-vars
+  230:5    warning  The 'fetchDashboardNews' function makes the dependencies of useEffect Hook (at line 220) change on every render. Move it inside the useEffect callback. Alternatively, wrap the definition of 'fetchDashboardNews' in its own useCallback() Hook    react-hooks/exhaustive-deps
+  232:119  error    Unexpected any. Specify a different type                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  233:117  error    Unexpected any. Specify a different type                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  234:13   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  236:38   error    Unexpected any. Specify a different type                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  237:34   error    Unexpected any. Specify a different type                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  250:5    warning  The 'fetchGoogleCalendar' function makes the dependencies of useEffect Hook (at line 220) change on every render. Move it inside the useEffect callback. Alternatively, wrap the definition of 'fetchGoogleCalendar' in its own useCallback() Hook  react-hooks/exhaustive-deps
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\github\page.tsx
   110:28  warning  'action' is defined but never used  @typescript-eslint/no-unused-vars
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\home\page.tsx
-  73:12  warning  'selectedDevice' is assigned a value but never used     @typescript-eslint/no-unused-vars
-  73:28  warning  'setSelectedDevice' is assigned a value but never used  @typescript-eslint/no-unused-vars
-
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\IncomeDashboard.tsx
-   74:35  error    Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
-   84:11  warning  'selectedStream' is assigned a value but never used  @typescript-eslint/no-unused-vars
-  280:86  error    Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
-  463:86  error    Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+  84:11  warning  'selectedStream' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\art\page.tsx
-    8:5   warning  'TrendingUp' is defined but never used                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
-   16:5   warning  'Clock' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
-  294:53  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\music\page.tsx
-  10:5  warning  'Play' is defined but never used  @typescript-eslint/no-unused-vars
+  292:53  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\income\tracker\page.tsx
-  42:12  warning  'timeRange' is assigned a value but never used     @typescript-eslint/no-unused-vars
-  42:23  warning  'setTimeRange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  5:10  warning  'useState' is defined but never used  @typescript-eslint/no-unused-vars
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\labs\page.tsx
-  138:30  warning  '_labId' is defined but never used  @typescript-eslint/no-unused-vars
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\knowledge\page.tsx
+  179:61  warning  'i' is defined but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\models\page.tsx
   195:20  warning  'setSortBy' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\monitoring\page.tsx
-  58:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\monitoring\page.tsx:58:9
-  56 |
-  57 |     useEffect(() => {
-> 58 |         loadData();
-     |         ^^^^^^^^ Avoid calling setState() directly within an effect
-  59 |         const interval = setInterval(loadData, refreshInterval);
-  60 |         return () => clearInterval(interval);
-  61 |     }, [refreshInterval, loadData]);  react-hooks/set-state-in-effect
+  51:13  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\music\page.tsx
-  3:18  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+  83:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  93:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\news\page.tsx
-    5:8   warning  'Link' is defined but never used                  @typescript-eslint/no-unused-vars
-   14:5   warning  'MN_KEYWORDS' is defined but never used           @typescript-eslint/no-unused-vars
-   19:17  warning  'Youtube' is defined but never used               @typescript-eslint/no-unused-vars
-   19:26  warning  'Radio' is defined but never used                 @typescript-eslint/no-unused-vars
-  136:60  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-  204:56  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-  326:12  warning  'tickerIndex' is assigned a value but never used  @typescript-eslint/no-unused-vars
-  606:66  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-  704:87  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-  759:83  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  324:12  warning  'tickerIndex' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\notes\page.tsx
   77:19  warning  'setNotes' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\performance\page.tsx
+  103:12  warning  'gpuHistory' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  104:12  warning  'ramHistory' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\playground\page.tsx
-   49:12  warning  'response' is assigned a value but never used  @typescript-eslint/no-unused-vars
-   64:54  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
-   69:58  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
-   77:22  warning  'e' is defined but never used                  @typescript-eslint/no-unused-vars
-  127:18  warning  'e' is defined but never used                  @typescript-eslint/no-unused-vars
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\portfolio\page.tsx
-  5:20  warning  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\settings\page.tsx
-  36:22  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
-  92:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:12  warning  'response' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\setup\page.tsx
-  68:50  error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
-  73:8   warning  React Hook useEffect has a missing dependency: 'checkAllTools'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-  82:18  warning  'e' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+  74:8   warning  React Hook useEffect has a missing dependency: 'checkAllTools'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  83:18  warning  'e' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\app\smarthome\page.tsx
+  14:5   warning  'Power' is defined but never used         @typescript-eslint/no-unused-vars
+  29:12  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\status\page.tsx
-  112:18  warning  '_e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
-  126:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\status\page.tsx:126:13
-  124 |     useEffect(() => {
-  125 |         if (settings.bridgeUrl) {
-> 126 |             checkAllServices();
-      |             ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
-  127 |             const interval = setInterval(checkAllServices, 30000); // Check every 30s
-  128 |             return () => clearInterval(interval);
-  129 |         }  react-hooks/set-state-in-effect
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\studio\page.tsx
-  17:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  18:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  24:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  57:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  112:18  warning  '_e' is defined but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\studios\art\page.tsx
-    5:30  warning  'Download' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
-    5:40  warning  'Share2' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
-    5:55  warning  'Settings' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
-    5:73  warning  'Maximize' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
-   29:42  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
-   30:40  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
-   31:50  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
    38:8   warning  React Hook useEffect has missing dependencies: 'fetchAssets' and 'fetchStats'. Either include them or remove the dependency array                                                                                                                                                        react-hooks/exhaustive-deps
   230:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
   311:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
@@ -189,77 +91,14 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\app\studios\art\page.tsx
   327:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
   327:37  warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images                                                                                                                                                                                jsx-a11y/alt-text
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\studios\blog\page.tsx
-   4:18  warning  'AnimatePresence' is defined but never used       @typescript-eslint/no-unused-vars
-   5:96  warning  'Layout' is defined but never used                @typescript-eslint/no-unused-vars
-  30:22  warning  'setSeoScore' is assigned a value but never used  @typescript-eslint/no-unused-vars
-
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\studios\dev\page.tsx
-   6:44  warning  'ExternalLink' is defined but never used  @typescript-eslint/no-unused-vars
-  29:42  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  57:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  71:18  warning  'err' is defined but never used           @typescript-eslint/no-unused-vars
-  82:46  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\team\page.tsx
-  4:35  warning  'Shield' is defined but never used    @typescript-eslint/no-unused-vars
-  4:43  warning  'Zap' is defined but never used       @typescript-eslint/no-unused-vars
-  4:48  warning  'Terminal' is defined but never used  @typescript-eslint/no-unused-vars
-  4:58  warning  'Cpu' is defined but never used       @typescript-eslint/no-unused-vars
+  77:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\terminal\page.tsx
-   83:25  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
-  102:25  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
-  114:47  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
-  117:45  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
-  122:25  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
-  136:25  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
-  165:27  warning  'content' is assigned a value but never used  @typescript-eslint/no-unused-vars
-  174:25  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  169:27  warning  'content' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\app\trading\page.tsx
-  121:12  warning  'selectedBot' is assigned a value but never used     @typescript-eslint/no-unused-vars
-  121:25  warning  'setSelectedBot' is assigned a value but never used  @typescript-eslint/no-unused-vars
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\trends\page.tsx
-  171:33  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
-  203:68  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\voice\page.tsx
-  194:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\app\voice\page.tsx:194:13
-  192 |         const SpeechRecognition = getSpeechRecognition();
-  193 |         if (!SpeechRecognition) {
-> 194 |             setIsSupported(false);
-      |             ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
-  195 |             return;
-  196 |         }
-  197 |  react-hooks/set-state-in-effect
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\components\BridgeStatus.tsx
-  39:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\components\BridgeStatus.tsx:39:9
-  37 |     // Check on mount and when URL changes
-  38 |     useEffect(() => {
-> 39 |         checkStatus();
-     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
-  40 |
-  41 |         // Auto-check periodically
-  42 |         const interval = setInterval(checkStatus, 30000);  react-hooks/set-state-in-effect
+  5:10  warning  'useState' is defined but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\components\CommandPalette.tsx
   196:8  warning  React Hook useEffect has missing dependencies: 'handleAiQuery' and 'saveRecentCommand'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
@@ -286,6 +125,9 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\components\HolographicBrain.tsx:101:9
   103 |         // Initial static nodes
   104 |         const initialNodes: GraphNode[] = [  react-hooks/set-state-in-effect
 
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\KeyboardManager.tsx
+  7:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
 C:\Repos GIT\Nexus\Nexus\webapp\src\components\LLMModels.tsx
   35:22  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
 
@@ -299,10 +141,10 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\components\MultimodalViewer.tsx
   16:38  warning  Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\components\Navigation.tsx
-  37:13  warning  'themeId' is assigned a value but never used          @typescript-eslint/no-unused-vars
-  37:22  warning  'setTheme' is assigned a value but never used         @typescript-eslint/no-unused-vars
-  37:32  warning  'availableThemes' is assigned a value but never used  @typescript-eslint/no-unused-vars
-  37:49  warning  'mode' is assigned a value but never used             @typescript-eslint/no-unused-vars
+  38:13  warning  'themeId' is assigned a value but never used          @typescript-eslint/no-unused-vars
+  38:22  warning  'setTheme' is assigned a value but never used         @typescript-eslint/no-unused-vars
+  38:32  warning  'availableThemes' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  38:49  warning  'mode' is assigned a value but never used             @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\components\PageLayout.tsx
   73:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
@@ -325,64 +167,10 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\components\RevenueTracker.tsx
   123:75  warning  'i' is defined but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\components\SafetyGuard.tsx
-   7:43  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  39:56  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  51:18  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  51:18  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\components\SettingsContext.tsx
   75:8  warning  React Hook useEffect has a missing dependency: 'loadSettings'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\components\StaffMeetingPanel.tsx
-  126:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\components\StaffMeetingPanel.tsx:126:13
-  124 |     useEffect(() => {
-  125 |         if (messages.length === 0) {
-> 126 |             runAudit();
-      |             ^^^^^^^^ Avoid calling setState() directly within an effect
-  127 |         }
-  128 |     }, [messages.length, runAudit]);
-  129 |                                                                         react-hooks/set-state-in-effect
-  135:17  error  Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\components\StaffMeetingPanel.tsx:135:17
-  133 |             const lab = labsData.find(l => l.id === selectedLabId);
-  134 |             if (lab) {
-> 135 |                 discussLab(lab);
-      |                 ^^^^^^^^^^ Avoid calling setState() directly within an effect
-  136 |             }
-  137 |         }
-  138 |     }, [selectedLabId, labsData, discussLab]);  react-hooks/set-state-in-effect
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\components\StatusAvatar.tsx
-  41:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\components\StatusAvatar.tsx:41:9
-  39 |     // Check on mount and when settings URL changes
-  40 |     useEffect(() => {
-> 41 |         checkStatus();
-     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
-  42 |         const interval = setInterval(checkStatus, 60000); // Check every minute
-  43 |         return () => clearInterval(interval);
-  44 |     }, [checkStatus]);  react-hooks/set-state-in-effect
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\components\SystemStatus.tsx
   51:12  warning  'connected' is assigned a value but never used  @typescript-eslint/no-unused-vars
@@ -391,7 +179,26 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\components\UnderConstruction.tsx
   4:10  warning  'Hammer' is defined but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\components\VibeContext.tsx
-  47:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+  94:22  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  99:23  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\__tests__\ThemeToggle.test.tsx
+   5:10  warning  'ThemeProvider' is defined but never used  @typescript-eslint/no-unused-vars
+  21:30  warning  'whileHover' is defined but never used     @typescript-eslint/no-unused-vars
+  21:42  warning  'whileTap' is defined but never used       @typescript-eslint/no-unused-vars
+  22:27  warning  'initial' is defined but never used        @typescript-eslint/no-unused-vars
+  22:36  warning  'animate' is defined but never used        @typescript-eslint/no-unused-vars
+  22:45  warning  'transition' is defined but never used     @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\AIOptimizerAgent.tsx
+  10:15  warning  'Zap' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  10:20  warning  'Brain' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  10:43  warning  'Pause' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  12:5   warning  'Gauge' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  12:47  warning  'ShieldCheck' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+  12:60  warning  'Info' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+  14:64  warning  'MEMORY_SDK' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+  69:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
 
 Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
 * Update external systems with the latest state from React.
@@ -399,50 +206,120 @@ Effects are intended to synchronize state between React and external systems suc
 
 Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\components\VibeContext.tsx:47:9
-  45 |     useEffect(() => {
-  46 |         const savedTheme = loadSavedTheme();
-> 47 |         setThemeId(savedTheme);
-     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
-  48 |         const themeConfig = getTheme(savedTheme);
-  49 |         setThemeState(themeConfig);
-  50 |         applyTheme(themeConfig);  react-hooks/set-state-in-effect
-  93:22  warning  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
-  98:23  warning  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\AIOptimizerAgent.tsx:69:9
+  67 |
+  68 |     useEffect(() => {
+> 69 |         fetchGpuStats();
+     |         ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  70 |         const interval = setInterval(fetchGpuStats, 5000);
+  71 |         return () => clearInterval(interval);
+  72 |     }, [fetchGpuStats]);  react-hooks/set-state-in-effect
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\components\__tests__\MeetingRoom.test.tsx
-  6:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  7:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  9:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\AgentsPanel.tsx
+  10:23  warning  'Square' is defined but never used           @typescript-eslint/no-unused-vars
+  11:35  warning  'AlertTriangle' is defined but never used    @typescript-eslint/no-unused-vars
+  12:24  warning  'Settings' is defined but never used         @typescript-eslint/no-unused-vars
+  91:23  warning  'result' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\components\__tests__\PageTransition.test.tsx
-  7:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  9:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\AlertsPanel.tsx
+   11:44  warning  'RefreshCw' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   41:31  warning  'bridgeUrl' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   99:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\components\__tests__\ThemeToggle.test.tsx
-   3:10  warning  'ThemeProvider' is defined but never used  @typescript-eslint/no-unused-vars
-  19:30  warning  'whileHover' is defined but never used     @typescript-eslint/no-unused-vars
-  19:42  warning  'whileTap' is defined but never used       @typescript-eslint/no-unused-vars
-  19:64  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
-  20:27  warning  'initial' is defined but never used        @typescript-eslint/no-unused-vars
-  20:36  warning  'animate' is defined but never used        @typescript-eslint/no-unused-vars
-  20:45  warning  'transition' is defined but never used     @typescript-eslint/no-unused-vars
-  20:69  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
-  22:37  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\components\ui\FocusTrap.tsx
-  54:68  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  55:84  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\hooks\useSpeechRecognition.ts
-  19:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  32:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\AlertsPanel.tsx:99:9
+   97 |
+   98 |     useEffect(() => {
+>  99 |         checkThresholds();
+      |         ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  100 |     }, [checkThresholds]);
+  101 |
+  102 |     // Simulated initial alerts                                react-hooks/set-state-in-effect
+  104:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\lib\agents\housekeeper-agent.ts
-   40:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  128:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  213:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  236:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\AlertsPanel.tsx:104:9
+  102 |     // Simulated initial alerts
+  103 |     useEffect(() => {
+> 104 |         setAlerts([
+      |         ^^^^^^^^^ Avoid calling setState() directly within an effect
+  105 |             {
+  106 |                 id: '1',
+  107 |                 type: 'info',  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\DevToolsPanel.tsx
+  12:5  warning  'Play' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\GpuMonitor.tsx
+   32:45  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\GpuMonitor.tsx:32:45
+  30 |     const strokeColor = color === 'cyan' ? '#22d3ee' : color === 'yellow' ? '#facc15' : color === 'green' ? '#4ade80' : '#a855f7';
+  31 |     // Unique ID to avoid conflicts
+> 32 |     const gradientId = `gradient-${color}-${Math.random().toString(36).substr(2, 9)}`;
+     |                                             ^^^^^^^^^^^^^ Cannot call impure function
+  33 |
+  34 |     return (
+  35 |         <div className="absolute bottom-0 left-0 right-0 opacity-20 pointer-events-none overflow-hidden rounded-b-xl" style={{ height: `${height}px` }}>                                                                                                                                                                                 react-hooks/purity
+   56:11  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-explicit-any
+  156:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\GpuMonitor.tsx:156:13
+  154 |             const vramPercent = vramTotal > 0 ? (vramUsed / vramTotal) * 100 : 0;
+  155 |
+> 156 |             setHistory(prev => {
+      |             ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  157 |                 const newHistory = [...prev, {
+  158 |                     time: timeStr,
+  159 |                     utilization,  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\ModelsPanel.tsx
+   10:45  warning  'Settings' is defined but never used  @typescript-eslint/no-unused-vars
+   12:18  warning  'Clock' is defined but never used     @typescript-eslint/no-unused-vars
+  145:9   warning  'color' is defined but never used     @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\NetworkPanel.tsx
+   11:42  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+   12:14  warning  'setLoading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   13:60  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+   29:18  warning  'error' is defined but never used                @typescript-eslint/no-unused-vars
+  135:53  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\OptimizePanel.tsx
+  197:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\StoragePanel.tsx
+  11:38  warning  'Zap' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\components\performance\SystemOverview.tsx
+  6:5   warning  'Server' is defined but never used  @typescript-eslint/no-unused-vars
+  6:13  warning  'Wifi' is defined but never used    @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\hooks\useDeviceAlerts.ts
+  43:30  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\Nexus\webapp\src\hooks\useLuxRigData.ts
+  14:5  warning  'ServiceStatus' is defined but never used  @typescript-eslint/no-unused-vars
+  17:5  warning  'BridgeHealth' is defined but never used   @typescript-eslint/no-unused-vars
+  18:5  warning  'BridgeMetrics' is defined but never used  @typescript-eslint/no-unused-vars
 
 C:\Repos GIT\Nexus\Nexus\webapp\src\lib\income-templates.ts
   2:5   warning  'Zap' is defined but never used          @typescript-eslint/no-unused-vars
@@ -461,25 +338,9 @@ C:\Repos GIT\Nexus\Nexus\webapp\src\lib\income-templates.ts
 C:\Repos GIT\Nexus\Nexus\webapp\src\lib\music-agents.ts
   69:41  warning  'context' is defined but never used  @typescript-eslint/no-unused-vars
 
-C:\Repos GIT\Nexus\Nexus\webapp\src\lib\news-service.ts
-  181:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  223:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  237:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  264:75  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  275:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  278:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  301:79  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\lib\task-agent.ts
-  64:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  86:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-
-C:\Repos GIT\Nexus\Nexus\webapp\src\types\speech.d.ts
-  5:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  6:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-
 C:\Repos GIT\Nexus\Nexus\webapp\verify-prisma.ts
   1:10  warning  'PrismaClient' is defined but never used  @typescript-eslint/no-unused-vars
 
-Γ£û 192 problems (83 errors, 109 warnings)
+Γ£û 136 problems (25 errors, 111 warnings)
+  0 errors and 2 warnings potentially fixable with the `--fix` option.
 

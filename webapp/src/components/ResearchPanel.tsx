@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 import {
     FolderPlus, Folder, FolderOpen, X, ExternalLink,
-    BookOpen, Trash2, ChevronRight, Search, FileText,
-    Sparkles, Copy, Check, HardDrive, BrainCircuit,
-    Cpu, Activity, Zap
+    Trash2, ChevronRight, Search, FileText,
+    Sparkles, Check, HardDrive, BrainCircuit,
+    Activity
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -56,7 +56,7 @@ export default function ResearchPanel({ isOpen, onClose, articleToAdd, onArticle
     const [newFolderName, setNewFolderName] = useState('');
     const [newFolderColor, setNewFolderColor] = useState('blue');
     const [searchQuery, setSearchQuery] = useState('');
-    const [copied, setCopied] = useState<string | null>(null);
+    const [_copied, setCopied] = useState<string | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [showAnalysis, setShowAnalysis] = useState(false);
 
@@ -195,7 +195,7 @@ Format as Markdown with:
         }
     };
 
-    const copyArticleUrls = (folder: ResearchFolder) => {
+    const _copyArticleUrls = (folder: ResearchFolder) => {
         const urls = folder.articles.map(a => a.url).join('\n');
         navigator.clipboard.writeText(urls);
         setCopied(`urls-${folder.id}`);
@@ -445,7 +445,7 @@ Format as Markdown with:
                                                 <div className="text-center py-8 text-gray-500">
                                                     <FileText size={40} className="mx-auto mb-3 opacity-50" />
                                                     <p>No articles yet</p>
-                                                    <p className="text-xs mt-1">Click "Add to Research" on any news article</p>
+                                                    <p className="text-xs mt-1">Click &quot;Add to Research&quot; on any news article</p>
                                                 </div>
                                             ) : (
                                                 <div className="space-y-2">

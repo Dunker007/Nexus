@@ -133,8 +133,8 @@ export default function LuxHelper({ initialOpen = false }: LuxHelperProps) {
             const reply = data.content || data.error || "I'm having trouble connecting to my brain (LuxRig).";
 
             setMessages(prev => [...prev, { role: 'lux', content: reply }]);
-        } catch (e) {
-            setMessages(prev => [...prev, { role: 'lux', content: "I can't reach LuxRig right now. Is it running?" }]);
+        } catch (_e) {
+            setMessages(prev => [...prev, { role: 'lux', content: "I can&apos;t reach LuxRig right now. Is it running?" }]);
         } finally {
             setIsTyping(false);
         }

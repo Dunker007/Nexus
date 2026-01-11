@@ -147,6 +147,8 @@ export default function ChatPage() {
         }
     }
 
+    const [isLoaded, setIsLoaded] = useState(false);
+
     // --- Effects ---
     useEffect(() => {
         // Load history
@@ -155,6 +157,7 @@ export default function ChatPage() {
             // Restore Date objects from JSON strings
             setMessages(savedMessages.map(m => ({ ...m, timestamp: new Date(m.timestamp) })));
         }
+        setIsLoaded(true);
     }, []);
 
     // Refetch models when bridge URL changes
@@ -166,13 +169,13 @@ export default function ChatPage() {
 
     // Persist messages
     useEffect(() => {
-        if (messages.length > 0) {
+        if (isLoaded) {
             storage.set('DLX-chat-messages', messages);
         }
-    }, [messages]);
+    }, [messages, isLoaded]);
 
     useEffect(() => {
-        if (messages.length === 0 && viewMode === 'agents') {
+        if (isLoaded && messages.length === 0 && viewMode === 'agents') {
             setMessages([{
                 id: '0',
                 role: 'assistant',
@@ -181,7 +184,7 @@ export default function ChatPage() {
                 agentId: 'lux'
             }]);
         }
-    }, [viewMode]);
+    }, [viewMode, isLoaded]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -287,6 +290,12 @@ export default function ChatPage() {
                         if (jsonStr === '[DONE]') continue;
                         try {
                             const data = JSON.parse(jsonStr);
+
+                            // Check for error in stream
+                            if (data.error) {
+                                throw new Error(data.error);
+                            }
+
                             const text = data.choices?.[0]?.delta?.content || '';
                             if (text) {
                                 fullContent += text;
@@ -298,7 +307,10 @@ export default function ChatPage() {
                                 ));
                             }
                         } catch (e) {
-                            // ignore partial JSON parse errors
+                            if (e instanceof Error && e.message !== "Unexpected end of JSON input") {
+                                // If it's a real error (like data.error throw), rethrow it to catch block
+                                if (jsonStr.includes('"error"')) throw e;
+                            }
                         }
                     }
                 }
@@ -312,7 +324,7 @@ export default function ChatPage() {
             console.error(e);
             setMessages(prev => prev.map(m =>
                 m.id === placeholderId
-                    ? { ...m, content: "❌ Connection failed or interrupted." }
+                    ? { ...m, content: `❌ Error: ${e instanceof Error ? e.message : 'Connection failed'}` }
                     : m
             ));
         } finally {

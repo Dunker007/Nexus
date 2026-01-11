@@ -20,6 +20,8 @@ import { VibeProvider } from "@/components/VibeContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SafetyProvider } from "@/components/SafetyGuard";
 
+import KeyboardManager from "@/components/KeyboardManager";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,6 +34,7 @@ export default function RootLayout({
           <SettingsProvider>
             <VibeProvider>
               <SafetyProvider>
+                <KeyboardManager />
                 <Suspense fallback={null}>
                   <Navigation />
                 </Suspense>

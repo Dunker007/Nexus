@@ -110,7 +110,7 @@ export default function LabsPage() {
         }
     };
 
-    const handleAddIdea = () => {
+    const handleAddIdea = async () => {
         if (!newIdea.title) return;
         const newLab: Lab = {
             id: Date.now().toString(),
@@ -126,17 +126,45 @@ export default function LabsPage() {
             timeline: { startMonth: new Date().getMonth(), durationMonths: 3, progress: 0 },
             owner: 'Architect'
         };
+
+        // Optimistic update
         setLabsData(prev => [...prev, newLab]);
         setIsIdeaModalOpen(false);
         setNewIdea({ title: '', desc: '', category: 'Operations' });
+
+        // Persist
+        try {
+            await fetch(`${LUXRIG_BRIDGE_URL}/projects`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newLab)
+            });
+        } catch (e) {
+            console.error('Failed to create project', e);
+        }
+
         setTimeout(() => {
             const event = new CustomEvent('new-lab-idea', { detail: newLab });
             window.dispatchEvent(event);
         }, 500);
     };
 
-    const handleQuickIdea = (_labId: string) => {
-        // Placeholder for quick idea
+    const handleQuickIdea = async (labId: string) => {
+        // Optimistic update
+        setLabsData(prev => prev.map(l => l.id === labId ? { ...l, ideas: l.ideas + 1 } : l));
+
+        try {
+            const lab = labsData.find(l => l.id === labId);
+            if (lab) {
+                await fetch(`${LUXRIG_BRIDGE_URL}/projects/${labId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ideas: lab.ideas + 1 })
+                });
+            }
+        } catch (error) {
+            console.error('Failed to update idea count:', error);
+        }
     };
 
     const filteredLabs = labsData.filter(lab => {

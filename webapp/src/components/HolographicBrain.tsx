@@ -9,7 +9,8 @@ const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), {
     loading: () => <div className="flex items-center justify-center h-full text-cyan-400 animate-pulse">Initializing Neural Interface...</div>
 });
 
-const LUXRIG_BRIDGE_URL = process.env.NEXT_PUBLIC_BRIDGE_URL || 'http://localhost:3456';
+// Bridge URL - used when WebSocket is re-enabled
+// const LUXRIG_BRIDGE_URL = process.env.NEXT_PUBLIC_BRIDGE_URL || 'http://localhost:3456';
 
 interface GraphNode {
     id: string;
@@ -97,8 +98,8 @@ export default function HolographicBrain() {
         });
     }, []);
 
+    // Initialize component
     useEffect(() => {
-        setMounted(true);
 
         // Initial static nodes
         const initialNodes: GraphNode[] = [
@@ -113,6 +114,8 @@ export default function HolographicBrain() {
         ];
 
         setGraphData({ nodes: initialNodes, links: initialLinks });
+        // Set mounted after initial data is ready
+        setMounted(true);
 
         // WebSocket disabled - showing static visualization
         // TODO: Re-enable when bridge WebSocket is active

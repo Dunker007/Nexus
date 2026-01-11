@@ -231,7 +231,7 @@ export default function DashboardPage() {
         try {
             const alphaNews = (await parseRSSFeed(NEWS_SOURCES.local.find(s => s.id === 'alpha-news')?.rss || '')) as any[];
             const blaze = (await parseRSSFeed(NEWS_SOURCES.national.find(s => s.id === 'the-blaze')?.rss || '')) as any[];
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             const combined = [
                 ...alphaNews.map((i: any) => ({ ...i, source: 'Alpha News' })),
                 ...blaze.map((i: any) => ({ ...i, source: 'The Blaze' }))

@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const usageStats = {
     today: {
@@ -57,8 +57,45 @@ const recentSessions = [
     { time: 'Yesterday', model: 'mistral', tokens: 3400, type: 'Research' },
 ];
 
+interface SystemMetrics {
+    metrics: {
+        cpu?: { usage: number };
+        gpu?: { temp: number };
+        memory?: { used: number };
+    };
+    performance: Record<string, unknown>;
+    timestamp: Date;
+}
+
 export default function AnalyticsPage() {
     const [timeframe, setTimeframe] = useState<'today' | 'week' | 'month' | 'allTime'>('week');
+    const [systemMetrics, setSystemMetrics] = useState<SystemMetrics | null>(null);
+
+    useEffect(() => {
+        const fetchSystemData = async () => {
+            try {
+                // Fetch basic system metrics
+                const res = await fetch('http://localhost:3456/system');
+                const data = await res.json();
+
+                // Fetch detailed monitoring performance if available
+                const perfRes = await fetch('http://localhost:3456/monitoring/performance');
+                const perfData = await perfRes.json();
+
+                setSystemMetrics({
+                    metrics: data,
+                    performance: perfData,
+                    timestamp: new Date()
+                });
+            } catch (e) {
+                console.error('Failed to fetch analytics:', e);
+            }
+        };
+
+        fetchSystemData();
+        const interval = setInterval(fetchSystemData, 5000); // Live updates
+        return () => clearInterval(interval);
+    }, []);
 
     const maxTokens = Math.max(...dailyUsage.map(d => d.tokens));
 
@@ -87,8 +124,8 @@ export default function AnalyticsPage() {
                             key={tf}
                             onClick={() => setTimeframe(tf)}
                             className={`px-4 py-2 rounded-lg text-sm ${timeframe === tf
-                                    ? 'bg-cyan-500 text-black font-medium'
-                                    : 'bg-white/10 hover:bg-white/20'
+                                ? 'bg-cyan-500 text-black font-medium'
+                                : 'bg-white/10 hover:bg-white/20'
                                 }`}
                         >
                             {tf === 'allTime' ? 'All Time' : tf.charAt(0).toUpperCase() + tf.slice(1)}
@@ -105,13 +142,14 @@ export default function AnalyticsPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <p className="text-gray-500 text-sm mb-1">Chats</p>
+                        <p className="text-gray-500 text-sm mb-1">System Load</p>
                         <p className="text-3xl font-bold text-cyan-400">
-                            {timeframe === 'today' ? usageStats.today.chats :
-                                timeframe === 'week' ? usageStats.week.chats :
-                                    timeframe === 'month' ? usageStats.month.chats :
-                                        usageStats.allTime.totalChats}
+                            {systemMetrics?.metrics?.cpu?.usage ? `${systemMetrics.metrics.cpu.usage}%` : '...'}
                         </p>
+                        <div className="flex gap-2 mt-2 text-xs">
+                            <span className="text-gray-400">GPU: {systemMetrics?.metrics?.gpu?.temp || '0'}°C</span>
+                            <span className="text-gray-400">RAM: {systemMetrics?.metrics?.memory?.used ? (systemMetrics.metrics.memory.used / 1024).toFixed(1) : 0}GB</span>
+                        </div>
                     </motion.div>
                     <motion.div
                         className="glass-card"
@@ -267,14 +305,36 @@ export default function AnalyticsPage() {
                     >
                         <h3 className="font-bold mb-4">📤 Export Data</h3>
                         <div className="space-y-2">
-                            <button className="w-full py-2 bg-white/10 rounded-lg text-sm hover:bg-white/20">
+                            <button
+                                onClick={() => {
+                                    const csv = 'Day,Tokens,Chats\n' + dailyUsage.map(d => `${d.day},${d.tokens},${d.chats}`).join('\n');
+                                    const blob = new Blob([csv], { type: 'text/csv' });
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = 'nexus_analytics.csv';
+                                    a.click();
+                                }}
+                                className="w-full py-2 bg-white/10 rounded-lg text-sm hover:bg-white/20"
+                            >
                                 Export as CSV
                             </button>
-                            <button className="w-full py-2 bg-white/10 rounded-lg text-sm hover:bg-white/20">
+                            <button
+                                onClick={() => {
+                                    const data = { dailyUsage, modelUsage, usageStats, systemMetrics };
+                                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = 'nexus_analytics.json';
+                                    a.click();
+                                }}
+                                className="w-full py-2 bg-white/10 rounded-lg text-sm hover:bg-white/20"
+                            >
                                 Export as JSON
                             </button>
-                            <button className="w-full py-2 bg-white/10 rounded-lg text-sm hover:bg-white/20">
-                                Generate Report
+                            <button className="w-full py-2 bg-white/10 rounded-lg text-sm hover:bg-white/20 opacity-50 cursor-not-allowed">
+                                Generate Report (Coming Soon)
                             </button>
                         </div>
                     </motion.div>

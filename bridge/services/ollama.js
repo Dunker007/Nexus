@@ -110,6 +110,28 @@ export const ollamaService = {
     },
 
     /**
+     * Chat completion with streaming
+     * Returns a ReadableStream of NDJSON
+     */
+    async chatStream(messages, model = 'llama3.2') {
+        const response = await fetch(`${getUrl()}/api/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model,
+                messages,
+                stream: true
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ollama error: ${response.status}`);
+        }
+
+        return response.body;
+    },
+
+    /**
      * Generate (non-chat) completion
      */
     async generate(prompt, model = 'llama3.2') {

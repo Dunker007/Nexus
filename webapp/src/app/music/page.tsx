@@ -79,6 +79,38 @@ export default function MusicStudioPage() {
     { id: 'tiktok', name: 'TikTok', icon: Smartphone, status: 'pending', link: 'https://www.tiktok.com/creator', description: 'Music Shorts & viral clips' }
   ]);
 
+  // Queue State
+  const [queue, setQueue] = useState<any[]>([]);
+  const [loadingQueue, setLoadingQueue] = useState(false);
+
+  const fetchQueue = async () => {
+    setLoadingQueue(true);
+    try {
+      const res = await fetch(`${LUXRIG_BRIDGE_URL}/content/queue?type=song`);
+      if (res.ok) {
+        const data = await res.json();
+        // Parse JSON strings in data/result
+        const parsed = data.map((item: any) => ({
+          ...item,
+          data: typeof item.data === 'string' ? JSON.parse(item.data) : item.data,
+          result: typeof item.result === 'string' ? JSON.parse(item.result) : item.result
+        }));
+        setQueue(parsed);
+      }
+    } catch (e) {
+      console.error('Failed to load queue', e);
+    } finally {
+      setLoadingQueue(false);
+    }
+  };
+
+  // Check queue on tab switch
+  useEffect(() => {
+    if (activeTab === 'pipeline' || activeTab === 'library') {
+      fetchQueue();
+    }
+  }, [activeTab]);
+
   // Check bridge connection status
   const checkBridgeStatus = async () => {
     console.log(`[Music] Checking Bridge status at: ${LUXRIG_BRIDGE_URL}/status`);
@@ -253,6 +285,9 @@ export default function MusicStudioPage() {
       } catch (qErr) {
         console.error("Failed to save to queue:", qErr);
       }
+
+      // Refresh queue if active
+      fetchQueue();
 
       // Activate pipeline
       setPipelineSteps(steps => steps.map((s, i) => i === 0 ? { ...s, status: 'active' } : s));
@@ -759,21 +794,110 @@ export default function MusicStudioPage() {
         </div>
       )}
 
-      {/* Pipeline Tab Placeholder */}
+      {/* Pipeline Tab */}
       {activeTab === 'pipeline' && (
-        <div className="flex flex-col items-center justify-center h-[400px] text-gray-500">
-          <Film size={48} className="mb-4 opacity-50" />
-          <h3 className="text-lg font-medium">Production Pipeline</h3>
-          <p>Task kanban and status tracking coming soon.</p>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Film className="text-cyan-400" />
+              Production Pipeline
+            </h2>
+            <button onClick={fetchQueue} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+              <RefreshCw size={16} className={loadingQueue ? "animate-spin" : ""} />
+            </button>
+          </div>
+
+          {loadingQueue ? (
+            <div className="text-center py-12 text-gray-500">Loading pipeline...</div>
+          ) : queue.filter(i => i.status !== 'complete').length === 0 ? (
+            <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/10 border-dashed">
+              <Film size={48} className="mx-auto mb-4 opacity-20" />
+              <h3 className="text-lg font-medium text-gray-400">Pipeline Empty</h3>
+              <p className="text-sm text-gray-600">Generate a song track to see it here.</p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {queue.filter(i => i.status !== 'complete').map(item => (
+                <div key={item.id} className="glass-card p-4 flex items-center gap-4 group hover:border-purple-500/30 transition-all">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center font-bold text-lg text-white">
+                    {item.data?.genre?.slice(0, 2).toUpperCase() || 'SO'}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-white">{item.data?.theme || 'Untitled Track'}</h4>
+                    <div className="text-xs text-gray-400 flex gap-2">
+                      <span className="bg-white/10 px-1.5 py-0.5 rounded">{item.data?.genre || 'Unknown'}</span>
+                      <span className="bg-white/10 px-1.5 py-0.5 rounded">{item.data?.mood || 'Unknown'}</span>
+                      <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 capitalize">
+                      {item.status}
+                    </span>
+                    <button className="text-xs text-cyan-400 hover:underline">
+                      Continue →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Library Tab Placeholder */}
+      {/* Library Tab */}
       {activeTab === 'library' && (
-        <div className="flex flex-col items-center justify-center h-[400px] text-gray-500">
-          <Music size={48} className="mb-4 opacity-50" />
-          <h3 className="text-lg font-medium">Concept Library</h3>
-          <p>History of generated concepts coming soon.</p>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Music className="text-purple-400" />
+              Song Library
+            </h2>
+            <button onClick={fetchQueue} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+              <RefreshCw size={16} className={loadingQueue ? "animate-spin" : ""} />
+            </button>
+          </div>
+
+          {loadingQueue ? (
+            <div className="text-center py-12 text-gray-500">Loading library...</div>
+          ) : queue.filter(i => i.status === 'complete').length === 0 ? (
+            <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/10 border-dashed">
+              <Music size={48} className="mx-auto mb-4 opacity-20" />
+              <h3 className="text-lg font-medium text-gray-400">Library Empty</h3>
+              <p className="text-sm text-gray-600">Completed tracks will appear here.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-4">
+              {queue.filter(i => i.status === 'complete').map(item => (
+                <div key={item.id} className="glass-card p-4 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button className="p-2 bg-black/50 hover:bg-black/80 rounded-lg text-white">
+                      <ExternalLink size={16} />
+                    </button>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-purple-900 to-indigo-900 flex items-center justify-center shrink-0">
+                      <Disc size={32} className="text-white/50" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-lg leading-tight mb-1">{item.data?.theme || 'Untitled'}</h4>
+                      <p className="text-sm text-gray-400 mb-2">{item.data?.agentType} • {item.data?.genre}</p>
+                      <div className="flex gap-2 text-xs">
+                        <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded border border-green-500/30">Complete</span>
+                        <span className="px-2 py-1 bg-white/5 text-gray-500 rounded">{new Date(item.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Lyrics Preview if available */}
+                  {item.data?.sunoPrompt?.copyToSuno && (
+                    <div className="mt-4 p-3 bg-black/30 rounded-lg text-xs font-mono text-gray-500 line-clamp-3">
+                      {item.data.sunoPrompt.copyToSuno}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

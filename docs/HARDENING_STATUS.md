@@ -2,7 +2,7 @@
 
 **Objective:** Top-down hardening with Music Studio operational first. Creative but grounded.
 
-**Last Verified:** 2025-12-07 @ 22:33 CST
+**Last Verified:** 2026-01-11 @ 11:30 CST
 
 ---
 
@@ -29,10 +29,14 @@
   - Copy button shows "Copied!" with checkmark
   - Clipboard populated with [Style] + [Lyrics] format
   - Pipeline step activates after generation
+- [x] ✅ Content Queue Integration
+  - **Pipeline Tab**: Fetches active 'song' queue from bridge
+  - **Library Tab**: Displays completed songs with history
+  - **Data Parsing**: JSON strings parsed for display
 
 ---
 
-## Phase 2: Labs Hub → Project Board Operational ✅ 95%
+## Phase 2: Labs Hub → Project Board Operational ✅ 100%
 *Priority: Enable "build from within"*
 
 - [x] ✅ Verify Gantt/Grid/Kanban views work correctly
@@ -52,9 +56,13 @@
   - `/agents/meeting/status` - Get transcript and personas ✅
   - `/agents/meeting/stop` - End meeting ✅
   - Multi-agent debate with Architect, Security, QA personas working
+  - **Export Transcript**: Added download button for meeting minutes ✅
 - [x] ✅ Link projects to their respective "front door" pages
   - Projects with href navigate correctly
   - Updated `INITIAL_LABS_DATA` with correct paths (e.g. `/docs`, `/meeting`, `/dashboard`)
+- [x] ✅ Project Persistence
+  - **New Idea**: Persists to backend DB via `/projects` POST
+  - **Quick Idea**: Increments idea count via `/projects/:id` PUT with optimistic UI
 
 ---
 
@@ -90,7 +98,7 @@
 
 ---
 
-## Phase 4: Supporting Cast → Hardening ✅ 85%
+## Phase 4: Supporting Cast → Hardening ✅ 90%
 *Priority: Make daily-driver functional*
 
 - [x] ✅ Dashboard cleanup and system status display
@@ -116,6 +124,9 @@
   - Bridge URL and auto-connect settings
   - Notifications preferences
   - Google OAuth connection
+- [x] ✅ Keyboard Shortcuts
+  - **Global F5/Ctrl+R**: Reloads window (for Tauri resilience)
+  - **Global Escape**: Dispatches 'app-escape' event
 
 ---
 
@@ -126,6 +137,8 @@
   - Validated `cargo clean` and rebuild process
   - Confirmed compilation of 300+ crates including `windows` and `tauri`
   - Fixed `src-tauri/src/main.rs` to look for correct `bridge-bundle` resource path
+- [x] ✅ Backend Alignment
+  - Prisma client versions aligned (v7.1.0) in both `webapp` and `bridge`
 - [ ] Test unified launch (webapp + bridge)
   - `npm run tauri:dev` triggers build
   - Bridge auto-launch logic exists in `main.rs`
@@ -133,21 +146,22 @@
 
 ---
 
-## Final Verification Results (2025-12-07 @ 22:45 CST)
+## Final Verification Results (2026-01-11 @ 11:30 CST)
 
 ### API Endpoint Tests
 | Endpoint | Status | Details |
 |----------|--------|---------|
 | `/music/agents` | ✅ Working | 4 agents returned (Lyricist, Composer, Critic, Producer) |
-| `/projects` | ✅ Working | Database connected, `source: "database"` |
+| `/projects` | ✅ Working | Database CRUD operational |
 | `/agents/meeting/status` | ✅ Working | Meeting system ready with 3 personas |
 | `/system` | ✅ Working | GPU temp, LM Studio online, Ollama online |
 | `/status` | ✅ Working | Bridge operational |
+| `/content/queue` | ✅ Working | Song writing queue fully integrated |
 
 ### Visual Verification
 All 4 phase pages verified via browser:
-- **Phase 1 (Music):** Mode tabs, pipeline, status indicator ✅
-- **Phase 2 (Labs):** Gantt view, "DB Connected" indicator ✅
+- **Phase 1 (Music):** Mode tabs, pipeline, status indicator, **Queues** ✅
+- **Phase 2 (Labs):** Gantt view, "DB Connected", **Persisted Projects** ✅
 - **Phase 3 (Agents):** Agent tiles, status indicators ✅
 - **Phase 4 (Dashboard):** Widgets, system stats, greeting ✅
 
@@ -156,14 +170,13 @@ All 4 phase pages verified via browser:
 ## Known Gaps / Next Steps
 
 1. **Phase 5 Build:** Tauri build environment verified, integration in progress.
-2. **Labs Database:** Seeding operational (currently using in-memory fallback), data available in UI.
-3. **Project Front Door:** Links updated and functional in Labs Hub.
-4. **LM Studio Model:** Chat needs a loaded model to function.
+2. **LM Studio Model:** Chat needs a loaded model to function.
+3. **Docs:** Need to finalize ReadMe for v2.0 release.
 
 ---
 
 ## Known Pain Points (From Master Plan)
-- App restart is cumbersome
+- App restart is cumbersome (Mitigated by F5 shortcut)
 - Backend must start separately (Tauri integration aims to fix this)
 - NODE_ENV warning spam
-- Prisma CommonJS warnings
+

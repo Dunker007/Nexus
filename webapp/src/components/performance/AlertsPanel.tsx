@@ -8,7 +8,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Bell, AlertTriangle, AlertCircle, CheckCircle, Info,
-    X, Settings, Volume2, VolumeX, Trash2, RefreshCw
+    X, Settings, Volume2, VolumeX, Trash2
 } from 'lucide-react';
 import { THRESHOLDS } from '@/lib/luxrig/constants';
 
@@ -38,8 +38,18 @@ interface AlertsPanelProps {
     systemData?: any;
 }
 
-export function AlertsPanel({ bridgeUrl, systemData }: AlertsPanelProps) {
-    const [alerts, setAlerts] = useState<Alert[]>([]);
+export function AlertsPanel({ systemData }: AlertsPanelProps) {
+    const [alerts, setAlerts] = useState<Alert[]>(() => [
+        {
+            id: '1',
+            type: 'info',
+            title: 'System Started',
+            message: 'LuxRig Command Center is now monitoring your system.',
+            source: 'System',
+            timestamp: new Date().toISOString(),
+            acknowledged: true,
+        },
+    ]);
     const [showSettings, setShowSettings] = useState(false);
     const [soundEnabled, setSoundEnabled] = useState(true);
     const [thresholds, setThresholds] = useState<AlertThreshold[]>([
@@ -95,24 +105,12 @@ export function AlertsPanel({ bridgeUrl, systemData }: AlertsPanelProps) {
         }
     }, [systemData]);
 
+    // Monitor thresholds when system data changes
     useEffect(() => {
+        if (!systemData) return;
         checkThresholds();
-    }, [checkThresholds]);
+    }, [systemData, checkThresholds]);
 
-    // Simulated initial alerts
-    useEffect(() => {
-        setAlerts([
-            {
-                id: '1',
-                type: 'info',
-                title: 'System Started',
-                message: 'LuxRig Command Center is now monitoring your system.',
-                source: 'System',
-                timestamp: new Date().toISOString(),
-                acknowledged: true,
-            },
-        ]);
-    }, []);
 
     const acknowledgeAlert = (id: string) => {
         setAlerts(prev => prev.map(a =>

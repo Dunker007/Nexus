@@ -445,8 +445,25 @@ export default function StaffMeetingPage() {
 
         {result && (
           <div className="glass-card p-6 mt-6 max-w-4xl mx-auto">
-            <div className="text-xl font-bold mb-4 flex items-center gap-2">
-              📋 Meeting Minutes
+            <div className="text-xl font-bold mb-4 flex items-center justify-between">
+              <span className="flex items-center gap-2">📋 Meeting Minutes</span>
+              <button
+                onClick={() => {
+                  if (!result) return;
+                  const text = `Meeting: ${result.topic}\nDate: ${new Date().toLocaleString()}\nParticipants: ${result.participants.join(', ')}\n\nTRANSCRIPT:\n\n${result.transcript.map(m => `${m.agent} (${m.type}): ${m.message}`).join('\n\n')}\n\nCONSENSUS:\n${result.consensus}\n\nACTION ITEMS:\n${result.actionItems.map(a => `- ${a}`).join('\n')}`;
+
+                  const blob = new Blob([text], { type: 'text/plain' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `meeting-transcript-${Date.now()}.txt`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-sm text-cyan-400 border border-white/10 transition-colors flex items-center gap-2"
+              >
+                <span>📥 Export</span>
+              </button>
             </div>
 
             <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-lg mb-4">

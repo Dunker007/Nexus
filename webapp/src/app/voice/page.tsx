@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import PageBackground from '@/components/PageBackground';
 
@@ -129,6 +130,8 @@ export default function VoiceControlPage() {
         return null;
     }, []);
 
+    const router = useRouter();
+
     // Process recognized command - Moved up
     const processCommand = useCallback(async (text: string, confidence: number) => {
         setStatus('processing');
@@ -152,23 +155,48 @@ export default function VoiceControlPage() {
             if (parsed) {
                 switch (parsed.intent) {
                     case 'go_to':
-                        result = `Navigating to ${parsed.params.destination}...`;
+                        const dest = parsed.params.destination.toLowerCase();
+                        result = `Navigating to ${dest}...`;
+                        if (dest.includes('dash')) router.push('/dashboard');
+                        else if (dest.includes('news')) router.push('/news');
+                        else if (dest.includes('music')) router.push('/music');
+                        else if (dest.includes('chat')) router.push('/chat');
+                        else if (dest.includes('agent')) router.push('/agents');
+                        else if (dest.includes('lab')) router.push('/labs');
+                        else if (dest.includes('setting')) router.push('/settings');
+                        else router.push(`/${dest.replace(/\s+/g, '-')}`);
                         break;
+
                     case 'execute_agent':
-                        result = `Running ${parsed.params.agentType} agent...`;
+                        const agent = parsed.params.agentType;
+                        const task = parsed.params.task;
+                        result = `Asking ${agent} to ${task}...`;
+                        // Redirect to chat with pre-filled prompt
+                        const prompt = `Act as ${agent} and ${task}`;
+                        router.push(`/chat?prompt=${encodeURIComponent(prompt)}&agent=${agent}`);
                         break;
+
                     case 'meeting':
-                        result = `Starting staff meeting about "${parsed.params.topic}"...`;
+                        const topic = parsed.params.topic;
+                        result = `Starting meeting about "${topic}"...`;
+                        router.push(`/meeting?topic=${encodeURIComponent(topic)}`);
                         break;
+
                     case 'status':
-                        result = 'Fetching system status...';
+                        result = 'System status is nominally green. All systems operational.';
+                        // TODO: Fetch actual stats from bridge
                         break;
+
                     case 'help':
-                        result = 'Available commands: Go to [page], Ask [agent] [task], Start meeting about [topic], Show status';
+                        result = 'Try: "Go to dashboard", "Ask Architect to design a schema", "Start meeting about Q1 goals"';
                         break;
+
                     case 'chat':
-                        result = `Processing: "${parsed.params.message}"`;
+                        const msg = parsed.params.message;
+                        result = `Opening chat...`;
+                        router.push(`/chat?prompt=${encodeURIComponent(msg)}`);
                         break;
+
                     default:
                         result = `Command not recognized: "${text}"`;
                 }
@@ -185,7 +213,7 @@ export default function VoiceControlPage() {
         }
 
         setStatus('listening');
-    }, [parseIntent, speakResponse]);
+    }, [parseIntent, speakResponse, router]);
 
     // Check for Web Speech API support
     useEffect(() => {

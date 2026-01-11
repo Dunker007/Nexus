@@ -1,7 +1,7 @@
 # AI Agent Protocol
 
-**Version:** 2.0.0  
-**Last Updated:** December 7, 2025  
+**Version:** 2.1.0  
+**Last Updated:** January 11, 2026  
 **Maintainer:** Claude (Overseer)
 
 ---

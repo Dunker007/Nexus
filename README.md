@@ -62,3 +62,8 @@ Nexus v0.4.1+ supports remote access via Tailscale.
 ## 📝 License
 
 Private project. All rights reserved.
+
+---
+
+**Version**: 2.1.0 (Hardening Phase)
+**Docs**: See `AI_WORKPLAN.md` for current status.

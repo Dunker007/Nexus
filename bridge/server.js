@@ -39,6 +39,8 @@ import pipelineRoutes from './routes/pipeline.js';
 import distributionRoutes from './routes/distribution.js';
 import artProductsRoutes from './routes/art-products.js';
 import incomeRoutes from './routes/income.js';
+import knowledgeRoutes from './routes/knowledge.js';
+import dataweaveRoutes from './routes/dataweave.js';
 const app = express();
 const PORT = process.env.PORT || 3456;
 
@@ -69,6 +71,10 @@ app.use('/pipeline', pipelineRoutes);
 app.use('/distribution', distributionRoutes);
 app.use('/art', artProductsRoutes);
 app.use('/income', incomeRoutes);
+
+// Intelligence Phase Routes
+app.use('/knowledge', knowledgeRoutes);
+app.use('/dataweave', dataweaveRoutes);
 
 // Create HTTP server for both Express and WebSocket
 const server = createServer(app);
@@ -249,35 +255,67 @@ app.post('/llm/chat', async (req, res) => {
             res.setHeader('Cache-Control', 'no-cache');
             res.setHeader('Connection', 'keep-alive');
 
-            let streamSource;
             if (provider === 'ollama') {
-                // Ollama streaming not yet implemented in service, fallback to non-stream or implement later
-                // For now, let's assume lmstudio only for streaming or throw/fallback
-                // Fallback to LMStudio for now as per instructions
-                streamSource = await lmstudioService.chatStream(messages, model);
+                const stream = await ollamaService.chatStream(messages, model);
+                const reader = stream.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        res.write('data: [DONE]\n\n');
+                        break;
+                    }
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    buffer += chunk;
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (!line.trim()) continue;
+                        try {
+                            const json = JSON.parse(line);
+                            if (json.done) continue;
+
+                            const content = json.message?.content;
+                            if (content) {
+                                const sse = {
+                                    choices: [{
+                                        delta: { content }
+                                    }]
+                                };
+                                res.write(`data: ${JSON.stringify(sse)}\n\n`);
+                            }
+                        } catch (e) {
+                            // Ignore parse errors on partial lines
+                        }
+                    }
+                }
+                res.end();
             } else {
-                streamSource = await lmstudioService.chatStream(messages, model);
-            }
+                // LM Studio (already OpenAI format)
+                const streamSource = await lmstudioService.chatStream(messages, model);
+                const reader = streamSource.getReader();
 
-            // streamSource is a Web ReadableStream (from fetch)
-            // We need to iterate it and write to res
-            const reader = streamSource.getReader();
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                // value is a Uint8Array
-                // Verify it's in SSE format or just raw chunks?
-                // LM Studio returns SSE format "data: ...", so we can just pass it through
-                res.write(value);
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    res.write(value);
+                }
+                res.end();
             }
-            res.end();
 
         } catch (error) {
             console.error('Streaming error:', error);
             // Can't send JSON error if headers already sent, but try ending
-            res.write(`data: {"error": "${error.message}"}\n\n`);
-            res.end();
+            if (!res.headersSent) {
+                res.status(500).json({ error: error.message });
+            } else {
+                res.write(`data: {"error": "${error.message}"}\n\n`);
+                res.end();
+            }
         }
         return;
     }
@@ -366,6 +404,34 @@ app.post('/agents/:type/reset', async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+// Execute a task with an agent
+app.post('/agents/:type/task', async (req, res) => {
+    const { type } = req.params;
+    const { task, context = {} } = req.body;
+    const agentId = `${type}-agent`;
+
+    try {
+        let agent = activeAgents.get(agentId);
+
+        // If not active, try to create it
+        if (!agent) {
+            try {
+                agent = createAgent(type);
+                activeAgents.set(agent.id, agent);
+            } catch (e) {
+                return res.status(400).json({ error: `Unknown or unavailable agent type: ${type}` });
+            }
+        }
+
+        console.log(`[Agents] Executing task with ${type}:`, task.action || task.type);
+        const result = await agent.processTask(task, context);
+        res.json({ success: true, result });
+    } catch (error) {
+        console.error(`[Agents] Task execution failed:`, error);
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 
@@ -1623,6 +1689,61 @@ app.post('/settings', async (req, res) => {
         const updates = req.body;
         await settingsService.updateMany(updates);
         res.json({ success: true, settings: settingsService.getAll() });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============ Google Integration Routes ============
+
+// Get auth URL
+app.get('/google/auth-url', (req, res) => {
+    try {
+        const url = googleService.getAuthUrl();
+        res.json({ url });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Exchange code for tokens
+app.post('/google/auth/callback', async (req, res) => {
+    try {
+        const { code } = req.body;
+        const result = await googleService.getTokens(code);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get user profile
+app.get('/google/me', async (req, res) => {
+    try {
+        const result = await googleService.getUserProfile();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// List calendar events
+app.get('/google/calendar', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const events = await googleService.listEvents(limit);
+        res.json(events);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// List drive files
+app.get('/google/drive', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const files = await googleService.listFiles(limit);
+        res.json(files);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

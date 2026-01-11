@@ -28,8 +28,8 @@ const Sparkline = ({ data, color, height = 40 }: { data: number[]; color: string
     }).join(' ');
 
     const strokeColor = color === 'cyan' ? '#22d3ee' : color === 'yellow' ? '#facc15' : color === 'green' ? '#4ade80' : '#a855f7';
-    // Unique ID to avoid conflicts
-    const gradientId = `gradient-${color}-${Math.random().toString(36).substr(2, 9)}`;
+    // Stable ID based on props to avoid hydration mismatch
+    const gradientId = `gradient-${color}-sparkline`;
 
     return (
         <div className="absolute bottom-0 left-0 right-0 opacity-20 pointer-events-none overflow-hidden rounded-b-xl" style={{ height: `${height}px` }}>
@@ -53,7 +53,7 @@ const DisplayCard = ({ label, value, unit, max, color, icon: Icon, history }: {
     unit: string,
     max?: number,
     color: string,
-    icon: any,
+    icon: typeof Cpu,
     history?: number[]
 }) => {
     const percentage = max ? (value / max) * 100 : value; // Default to assuming value is % if no max
