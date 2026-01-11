@@ -4,6 +4,7 @@
  */
 
 import { exec } from 'child_process';
+import FastSpeedtest from 'fast-speedtest-api';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
@@ -153,37 +154,64 @@ export const networkService = {
      * Run a speed test (uses fast.com CLI or falls back to ping latency)
      * Note: For full speed test, install speedtest-cli: npm install speedtest-net
      */
+    /**
+     * Run a speed test using fast-speedtest-api
+     */
     async runSpeedTest() {
         try {
-            // Try to use speedtest-cli if installed
-            const { stdout } = await execAsync('speedtest-cli --json', { timeout: 60000 });
-            const result = JSON.parse(stdout);
+            console.log('🚀 Starting Fast.com speed test...');
+            // Token is required. Use env var or default public token (often used in examples).
+            const token = process.env.FAST_TOKEN || "YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm";
+
+            // Run latency check in parallel with speedtest init
+            // Fast.com check takes time, so we ping google for a quick latency "feel"
+            const latencyPromise = this.ping('8.8.8.8', 2);
+
+            const speedtest = new FastSpeedtest({
+                token,
+                verbose: false,
+                timeout: 10000,
+                https: true,
+                urlCount: 5,
+                bufferSize: 8,
+                unit: FastSpeedtest.UNITS.Mbps
+            });
+
+            const download = await speedtest.getDownloadSpeed();
+
+            // Try upload (might fail)
+            let upload = null;
+            try {
+                upload = await speedtest.getUploadSpeed();
+            } catch (e) {
+                // Ignore upload error
+            }
+
+            // Resolve latency
+            const latencyResult = await latencyPromise;
 
             return {
                 success: true,
-                download: (result.download / 1000000).toFixed(2), // Mbps
-                upload: (result.upload / 1000000).toFixed(2),     // Mbps
-                ping: result.ping,
-                server: result.server?.name,
+                download: (download).toFixed(1),
+                upload: upload ? (upload).toFixed(1) : null,
+                ping: latencyResult.latency || null,
+                server: 'Fast.com',
                 timestamp: new Date().toISOString(),
             };
-        } catch {
-            // Fallback: just return latency to major DNS servers
-            const [google, cloudflare] = await Promise.all([
-                this.ping('8.8.8.8', 4),
-                this.ping('1.1.1.1', 4),
+        } catch (error) {
+            console.error('Speedtest error:', error.message);
+            // Fallback to ping latency check
+            const [google] = await Promise.all([
+                this.ping('8.8.8.8', 4)
             ]);
 
             return {
                 success: false,
-                message: 'speedtest-cli not installed. Showing latency only.',
+                message: 'Fast.com test failed. Showing latency only.',
                 latency: {
-                    google: google.latency,
-                    cloudflare: cloudflare.latency,
-                    average: google.latency && cloudflare.latency
-                        ? Math.round((google.latency + cloudflare.latency) / 2)
-                        : null,
+                    google: google.latency
                 },
+                ping: google.latency, // Fallback ping
                 timestamp: new Date().toISOString(),
             };
         }

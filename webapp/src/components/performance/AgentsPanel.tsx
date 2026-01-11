@@ -34,9 +34,11 @@ interface AgentLog {
 interface AgentsPanelProps {
     bridgeUrl: string;
     refreshInterval?: number;
+    isOpen: boolean;
+    onToggle: () => void;
 }
 
-export function AgentsPanel({ bridgeUrl, refreshInterval = 10000 }: AgentsPanelProps) {
+export function AgentsPanel({ bridgeUrl, refreshInterval = 10000, isOpen, onToggle }: AgentsPanelProps) {
     const [agents, setAgents] = useState<{ active: AgentInfo[]; available: { type: string; name: string }[] }>({
         active: [],
         available: [],
@@ -180,254 +182,280 @@ export function AgentsPanel({ bridgeUrl, refreshInterval = 10000 }: AgentsPanelP
     ];
 
     return (
-        <motion.div
-            className="glass-card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-        >
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold flex items-center gap-2">
-                    <Bot size={20} className="text-green-400" />
-                    Agent Console
-                </h2>
+        <div className="glass-card overflow-hidden">
+            {/* Header Toggle Button */}
+            <button
+                onClick={onToggle}
+                className="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-colors text-left"
+            >
                 <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-400">
-                        <span className="text-green-400 font-bold">{agents.active.length}</span> active
-                    </span>
-                    <button
-                        onClick={() => setShowLogs(!showLogs)}
-                        className={`p-2 rounded-lg transition-colors ${showLogs ? 'bg-purple-500/20 text-purple-400' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
-                        title="Toggle logs"
-                    >
-                        <Terminal size={14} />
-                    </button>
-                    <button
-                        onClick={fetchAgents}
-                        disabled={isRefreshing}
-                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-                    >
-                        <RefreshCw
-                            size={14}
-                            className={`text-gray-400 ${isRefreshing ? 'animate-spin' : ''}`}
-                        />
-                    </button>
+                    <Bot size={20} className="text-green-400" />
+                    <h2 className="text-xl font-bold text-white">
+                        Agent Console
+                    </h2>
                 </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="grid grid-cols-4 gap-2 mb-6">
-                {quickActions.map(action => (
-                    <button
-                        key={action.type}
-                        onClick={() => executeAgent(action.type, action.task)}
-                        disabled={actionLoading === action.type}
-                        className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all text-center group"
-                    >
-                        <div className="text-2xl mb-1 group-hover:scale-110 transition-transform">
-                            {actionLoading === action.type ? (
-                                <RefreshCw size={24} className="mx-auto animate-spin text-green-400" />
-                            ) : (
-                                action.icon
-                            )}
-                        </div>
-                        <div className="text-xs text-gray-400">{action.label}</div>
-                    </button>
-                ))}
-            </div>
-
-            {/* Loading State */}
-            {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                    <RefreshCw size={24} className="animate-spin text-green-400" />
+                <div className="flex items-center gap-3">
+                    {!isOpen && agents.active.length > 0 && (
+                        <span className="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded-full font-mono font-bold">
+                            {agents.active.length} Active
+                        </span>
+                    )}
+                    <ChevronDown
+                        size={20}
+                        className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                    />
                 </div>
-            ) : (
-                <>
-                    {/* Active Agents */}
-                    {agents.active.length > 0 && (
-                        <div className="space-y-3 mb-6">
-                            <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2">
-                                <Activity size={14} />
-                                Active Agents
-                            </h3>
-                            {agents.active.map((agent) => (
-                                <div
-                                    key={agent.id}
-                                    className="border border-white/10 rounded-xl overflow-hidden"
-                                >
-                                    {/* Agent Header */}
-                                    <button
-                                        onClick={() => setExpandedAgent(expandedAgent === agent.id ? null : agent.id)}
-                                        className="w-full flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 transition-colors"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-                                                <Bot size={20} className="text-green-400" />
-                                            </div>
-                                            <div className="text-left">
-                                                <div className="font-medium text-white">{agent.name}</div>
-                                                <div className="text-xs text-gray-500">
-                                                    {agent.description || `Agent: ${agent.id}`}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <span className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs border ${getStatusColor(agent.status)}`}>
-                                                {getStatusIcon(agent.status)}
-                                                <span className="capitalize">{agent.status}</span>
-                                            </span>
-                                            {expandedAgent === agent.id
-                                                ? <ChevronDown size={16} className="text-gray-400" />
-                                                : <ChevronRight size={16} className="text-gray-400" />
-                                            }
-                                        </div>
-                                    </button>
+            </button>
 
-                                    {/* Expanded Details */}
-                                    <AnimatePresence>
-                                        {expandedAgent === agent.id && (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: 'auto', opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                className="overflow-hidden"
-                                            >
-                                                <div className="p-4 border-t border-white/10 space-y-3">
-                                                    {/* Current Task */}
-                                                    {agent.currentTask && (
-                                                        <div className="p-3 bg-white/5 rounded-lg">
-                                                            <div className="text-xs text-gray-500 mb-1">Current Task</div>
-                                                            <div className="text-sm text-white">{agent.currentTask}</div>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Stats */}
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        <div className="p-3 bg-white/5 rounded-lg">
-                                                            <div className="text-xs text-gray-500">Memory</div>
-                                                            <div className="font-bold text-cyan-400">
-                                                                {agent.memorySize || 0} items
-                                                            </div>
-                                                        </div>
-                                                        <div className="p-3 bg-white/5 rounded-lg">
-                                                            <div className="text-xs text-gray-500">Last Run</div>
-                                                            <div className="font-bold text-green-400">
-                                                                {formatTime(agent.lastRun)}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Actions */}
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => resetAgent(agent.id.split('-')[0])}
-                                                            disabled={actionLoading === agent.id}
-                                                            className="flex-1 flex items-center justify-center gap-2 p-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500/30 transition-colors"
-                                                        >
-                                                            <RefreshCw size={14} />
-                                                            Reset
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Available Agent Types */}
-                    {agents.available.length > 0 && (
-                        <div className="space-y-3">
-                            <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2">
-                                <Zap size={14} />
-                                Available Agents
-                            </h3>
-                            <div className="grid grid-cols-2 gap-2">
-                                {agents.available.map((agent) => (
-                                    <div
-                                        key={agent.type}
-                                        className="p-3 bg-white/5 rounded-lg flex items-center justify-between"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <Bot size={16} className="text-gray-400" />
-                                            <span className="text-sm text-gray-300">{agent.name}</span>
-                                        </div>
-                                        <button
-                                            onClick={() => executeAgent(agent.type, `Initialize ${agent.type}`)}
-                                            disabled={actionLoading === agent.type}
-                                            className="p-1.5 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors"
-                                        >
-                                            {actionLoading === agent.type ? (
-                                                <RefreshCw size={12} className="animate-spin" />
-                                            ) : (
-                                                <Play size={12} />
-                                            )}
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Empty State */}
-                    {agents.active.length === 0 && agents.available.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                            <Bot size={48} className="mx-auto mb-4 opacity-30" />
-                            <p>No agents configured</p>
-                            <p className="text-sm mt-2">
-                                Agents will appear when tasks are executed
-                            </p>
-                        </div>
-                    )}
-                </>
-            )}
-
-            {/* Logs Panel */}
             <AnimatePresence>
-                {showLogs && (
+                {isOpen && (
                     <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
+                        transition={{ duration: 0.3 }}
                     >
-                        <div className="mt-6 border-t border-white/10 pt-4">
-                            <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2 mb-3">
-                                <History size={14} />
-                                Recent Activity
-                            </h3>
+                        <div className="p-6 pt-0">
 
-                            {logs.length === 0 ? (
-                                <div className="text-center py-6 text-gray-500 text-sm">
-                                    No activity logs yet
+                            {/* Header Stats Logic */}
+                            <div className="flex items-center justify-end mb-6 gap-3">
+                                <span className="text-sm text-gray-400">
+                                    <span className="text-green-400 font-bold">{agents.active.length}</span> active
+                                </span>
+                                <button
+                                    onClick={() => setShowLogs(!showLogs)}
+                                    className={`p-2 rounded-lg transition-colors ${showLogs ? 'bg-purple-500/20 text-purple-400' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                                    title="Toggle logs"
+                                >
+                                    <Terminal size={14} />
+                                </button>
+                                <button
+                                    onClick={fetchAgents}
+                                    disabled={isRefreshing}
+                                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                                >
+                                    <RefreshCw size={14} className={`text-gray-400 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                </button>
+                            </div>
+
+                            {/* Quick Actions */}
+                            <div className="grid grid-cols-4 gap-2 mb-6">
+                                {quickActions.map(action => (
+                                    <button
+                                        key={action.type}
+                                        onClick={() => executeAgent(action.type, action.task)}
+                                        disabled={actionLoading === action.type}
+                                        className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all text-center group"
+                                    >
+                                        <div className="text-2xl mb-1 group-hover:scale-110 transition-transform">
+                                            {actionLoading === action.type ? (
+                                                <RefreshCw size={24} className="mx-auto animate-spin text-green-400" />
+                                            ) : (
+                                                action.icon
+                                            )}
+                                        </div>
+                                        <div className="text-xs text-gray-400">{action.label}</div>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Loading State */}
+                            {isLoading ? (
+                                <div className="flex items-center justify-center py-12">
+                                    <RefreshCw size={24} className="animate-spin text-green-400" />
                                 </div>
                             ) : (
-                                <div className="space-y-2 max-h-48 overflow-y-auto">
-                                    {logs.map((log) => (
-                                        <div
-                                            key={log.id}
-                                            className={`p-2 rounded-lg text-xs flex items-start gap-2 ${log.type === 'error' ? 'bg-red-500/10 text-red-400' :
-                                                    log.type === 'success' ? 'bg-green-500/10 text-green-400' :
-                                                        log.type === 'warning' ? 'bg-yellow-500/10 text-yellow-400' :
-                                                            'bg-white/5 text-gray-400'
-                                                }`}
-                                        >
-                                            <span className="text-gray-600 whitespace-nowrap">
-                                                {formatTime(log.timestamp)}
-                                            </span>
-                                            <span className="font-medium">[{log.agent}]</span>
-                                            <span className="flex-1">{log.message}</span>
+                                <>
+                                    {/* Active Agents */}
+                                    {agents.active.length > 0 && (
+                                        <div className="space-y-3 mb-6">
+                                            <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                                                <Activity size={14} />
+                                                Active Agents
+                                            </h3>
+                                            {agents.active.map((agent) => (
+                                                <div
+                                                    key={agent.id}
+                                                    className="border border-white/10 rounded-xl overflow-hidden"
+                                                >
+                                                    {/* Agent Header */}
+                                                    <button
+                                                        onClick={() => setExpandedAgent(expandedAgent === agent.id ? null : agent.id)}
+                                                        className="w-full flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 transition-colors"
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                                                                <Bot size={20} className="text-green-400" />
+                                                            </div>
+                                                            <div className="text-left">
+                                                                <div className="font-medium text-white">{agent.name}</div>
+                                                                <div className="text-xs text-gray-500">
+                                                                    {agent.description || `Agent: ${agent.id}`}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-3">
+                                                            <span className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs border ${getStatusColor(agent.status)}`}>
+                                                                {getStatusIcon(agent.status)}
+                                                                <span className="capitalize">{agent.status}</span>
+                                                            </span>
+                                                            {expandedAgent === agent.id
+                                                                ? <ChevronDown size={16} className="text-gray-400" />
+                                                                : <ChevronRight size={16} className="text-gray-400" />
+                                                            }
+                                                        </div>
+                                                    </button>
+
+                                                    {/* Expanded Details */}
+                                                    <AnimatePresence>
+                                                        {expandedAgent === agent.id && (
+                                                            <motion.div
+                                                                initial={{ height: 0, opacity: 0 }}
+                                                                animate={{ height: 'auto', opacity: 1 }}
+                                                                exit={{ height: 0, opacity: 0 }}
+                                                                className="overflow-hidden"
+                                                            >
+                                                                <div className="p-4 border-t border-white/10 space-y-3">
+                                                                    {/* Current Task */}
+                                                                    {agent.currentTask && (
+                                                                        <div className="p-3 bg-white/5 rounded-lg">
+                                                                            <div className="text-xs text-gray-500 mb-1">Current Task</div>
+                                                                            <div className="text-sm text-white">{agent.currentTask}</div>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {/* Stats */}
+                                                                    <div className="grid grid-cols-2 gap-3">
+                                                                        <div className="p-3 bg-white/5 rounded-lg">
+                                                                            <div className="text-xs text-gray-500">Memory</div>
+                                                                            <div className="font-bold text-cyan-400">
+                                                                                {agent.memorySize || 0} items
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="p-3 bg-white/5 rounded-lg">
+                                                                            <div className="text-xs text-gray-500">Last Run</div>
+                                                                            <div className="font-bold text-green-400">
+                                                                                {formatTime(agent.lastRun)}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Actions */}
+                                                                    <div className="flex gap-2">
+                                                                        <button
+                                                                            onClick={() => resetAgent(agent.id.split('-')[0])}
+                                                                            disabled={actionLoading === agent.id}
+                                                                            className="flex-1 flex items-center justify-center gap-2 p-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500/30 transition-colors"
+                                                                        >
+                                                                            <RefreshCw size={14} />
+                                                                            Reset
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
-                                </div>
+                                    )}
+
+                                    {/* Available Agent Types */}
+                                    {agents.available.length > 0 && (
+                                        <div className="space-y-3">
+                                            <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                                                <Zap size={14} />
+                                                Available Agents
+                                            </h3>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {agents.available.map((agent) => (
+                                                    <div
+                                                        key={agent.type}
+                                                        className="p-3 bg-white/5 rounded-lg flex items-center justify-between"
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <Bot size={16} className="text-gray-400" />
+                                                            <span className="text-sm text-gray-300">{agent.name}</span>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => executeAgent(agent.type, `Initialize ${agent.type}`)}
+                                                            disabled={actionLoading === agent.type}
+                                                            className="p-1.5 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors"
+                                                        >
+                                                            {actionLoading === agent.type ? (
+                                                                <RefreshCw size={12} className="animate-spin" />
+                                                            ) : (
+                                                                <Play size={12} />
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Empty State */}
+                                    {agents.active.length === 0 && agents.available.length === 0 && (
+                                        <div className="text-center py-8 text-gray-500">
+                                            <Bot size={48} className="mx-auto mb-4 opacity-30" />
+                                            <p>No agents configured</p>
+                                            <p className="text-sm mt-2">
+                                                Agents will appear when tasks are executed
+                                            </p>
+                                        </div>
+                                    )}
+                                </>
                             )}
+
+                            {/* Logs Panel */}
+                            <AnimatePresence>
+                                {showLogs && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        className="overflow-hidden"
+                                    >
+                                        <div className="mt-6 border-t border-white/10 pt-4">
+                                            <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2 mb-3">
+                                                <History size={14} />
+                                                Recent Activity
+                                            </h3>
+
+                                            {logs.length === 0 ? (
+                                                <div className="text-center py-6 text-gray-500 text-sm">
+                                                    No activity logs yet
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2 max-h-48 overflow-y-auto">
+                                                    {logs.map((log) => (
+                                                        <div
+                                                            key={log.id}
+                                                            className={`p-2 rounded-lg text-xs flex items-start gap-2 ${log.type === 'error' ? 'bg-red-500/10 text-red-400' :
+                                                                log.type === 'success' ? 'bg-green-500/10 text-green-400' :
+                                                                    log.type === 'warning' ? 'bg-yellow-500/10 text-yellow-400' :
+                                                                        'bg-white/5 text-gray-400'
+                                                                }`}
+                                                        >
+                                                            <span className="text-gray-600 whitespace-nowrap">
+                                                                {formatTime(log.timestamp)}
+                                                            </span>
+                                                            <span className="font-medium">[{log.agent}]</span>
+                                                            <span className="flex-1">{log.message}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-        </motion.div>
+        </div>
     );
 }
 

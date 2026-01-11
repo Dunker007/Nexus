@@ -33,7 +33,7 @@ interface AlertThreshold {
 }
 
 interface AlertsPanelProps {
-    bridgeUrl: string;
+    bridgeUrl?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     systemData?: any;
 }

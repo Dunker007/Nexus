@@ -26,9 +26,11 @@ interface LLMModel {
 interface ModelsPanelProps {
     bridgeUrl: string;
     refreshInterval?: number;
+    isOpen: boolean;
+    onToggle: () => void;
 }
 
-export function ModelsPanel({ bridgeUrl, refreshInterval = 30000 }: ModelsPanelProps) {
+export function ModelsPanel({ bridgeUrl, refreshInterval = 30000, isOpen, onToggle }: ModelsPanelProps) {
     const [lmstudioModels, setLMStudioModels] = useState<LLMModel[]>([]);
     const [ollamaModels, setOllamaModels] = useState<LLMModel[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -274,101 +276,128 @@ export function ModelsPanel({ bridgeUrl, refreshInterval = 30000 }: ModelsPanelP
     };
 
     return (
-        <motion.div
-            className="glass-card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-        >
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold flex items-center gap-2">
-                    <Brain size={20} className="text-purple-400" />
-                    AI Models
-                </h2>
+        <div className="glass-card overflow-hidden">
+            {/* Header / Toggle */}
+            <button
+                onClick={onToggle}
+                className="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-colors text-left"
+            >
                 <div className="flex items-center gap-3">
-                    <div className="text-sm text-gray-400">
-                        <span className="text-purple-400 font-bold">{loadedModels}</span>
-                        <span className="mx-1">/</span>
-                        <span>{totalModels}</span>
-                        <span className="ml-1">loaded</span>
-                    </div>
-                    <button
-                        onClick={fetchModels}
-                        disabled={isRefreshing}
-                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                    <Brain size={20} className="text-purple-400" />
+                    <h2 className="text-xl font-bold text-white">
+                        AI Models
+                    </h2>
+                </div>
+                <div className="flex items-center gap-3">
+                    {!isOpen && loadedModels > 0 && (
+                        <span className="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded-full font-mono font-bold">
+                            {loadedModels} Loaded
+                        </span>
+                    )}
+                    <ChevronDown
+                        size={20}
+                        className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                    />
+                </div>
+            </button>
+
+            {/* Content - only shown when open */}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
                     >
-                        <RefreshCw
-                            size={14}
-                            className={`text-gray-400 ${isRefreshing ? 'animate-spin' : ''}`}
-                        />
-                    </button>
-                </div>
-            </div>
+                        <div className="p-6 pt-0">
 
-            {/* Error State */}
-            {error && (
-                <div className="flex items-center gap-2 p-3 mb-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
-                    <AlertTriangle size={16} />
-                    {error}
-                </div>
-            )}
+                            <div className="flex items-center justify-end mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="text-sm text-gray-400">
+                                        <span className="text-purple-400 font-bold">{loadedModels}</span>
+                                        <span className="mx-1">/</span>
+                                        <span>{totalModels}</span>
+                                        <span className="ml-1">loaded</span>
+                                    </div>
+                                    <button
+                                        onClick={fetchModels}
+                                        disabled={isRefreshing}
+                                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                                    >
+                                        <RefreshCw size={14} className={`text-gray-400 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                    </button>
+                                </div>
+                            </div>
 
-            {/* Loading State */}
-            {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                    <RefreshCw size={24} className="animate-spin text-purple-400" />
-                </div>
-            ) : (
-                <div className="space-y-4">
-                    {/* LM Studio */}
-                    <ProviderSection
-                        provider="lmstudio"
-                        models={lmstudioModels}
-                        icon={Server}
-                        color="#06B6D4"
-                    />
+                            {/* Error State */}
+                            {error && (
+                                <div className="flex items-center gap-2 p-3 mb-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                                    <AlertTriangle size={16} />
+                                    {error}
+                                </div>
+                            )}
 
-                    {/* Ollama */}
-                    <ProviderSection
-                        provider="ollama"
-                        models={ollamaModels}
-                        icon={Brain}
-                        color="#A855F7"
-                    />
-                </div>
-            )}
+                            {/* Loading State */}
+                            {isLoading ? (
+                                <div className="flex items-center justify-center py-12">
+                                    <RefreshCw size={24} className="animate-spin text-purple-400" />
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {/* LM Studio */}
+                                    <ProviderSection
+                                        provider="lmstudio"
+                                        models={lmstudioModels}
+                                        icon={Server}
+                                        color="#06B6D4"
+                                    />
 
-            {/* Quick Stats */}
-            {!isLoading && totalModels > 0 && (
-                <div className="mt-6 p-4 bg-white/5 rounded-xl">
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                        <div>
-                            <div className="text-2xl font-bold text-cyan-400">{lmstudioModels.length}</div>
-                            <div className="text-xs text-gray-500">LM Studio</div>
+                                    {/* Ollama */}
+                                    <ProviderSection
+                                        provider="ollama"
+                                        models={ollamaModels}
+                                        icon={Brain}
+                                        color="#A855F7"
+                                    />
+                                </div>
+                            )}
+
+                            {/* Quick Stats */}
+                            {!isLoading && totalModels > 0 && (
+                                <div className="mt-6 p-4 bg-white/5 rounded-xl">
+                                    <div className="grid grid-cols-3 gap-4 text-center">
+                                        <div>
+                                            <div className="text-2xl font-bold text-cyan-400">{lmstudioModels.length}</div>
+                                            <div className="text-xs text-gray-500">LM Studio</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-2xl font-bold text-purple-400">{ollamaModels.length}</div>
+                                            <div className="text-xs text-gray-500">Ollama</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-2xl font-bold text-green-400">{loadedModels}</div>
+                                            <div className="text-xs text-gray-500">Active</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Empty State */}
+                            {!isLoading && totalModels === 0 && !error && (
+                                <div className="text-center py-8 text-gray-500">
+                                    <Brain size={48} className="mx-auto mb-4 opacity-30" />
+                                    <p>No AI models detected</p>
+                                    <p className="text-sm mt-2">
+                                        Start LM Studio or Ollama to see available models
+                                    </p>
+                                </div>
+                            )}
                         </div>
-                        <div>
-                            <div className="text-2xl font-bold text-purple-400">{ollamaModels.length}</div>
-                            <div className="text-xs text-gray-500">Ollama</div>
-                        </div>
-                        <div>
-                            <div className="text-2xl font-bold text-green-400">{loadedModels}</div>
-                            <div className="text-xs text-gray-500">Active</div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Empty State */}
-            {!isLoading && totalModels === 0 && !error && (
-                <div className="text-center py-8 text-gray-500">
-                    <Brain size={48} className="mx-auto mb-4 opacity-30" />
-                    <p>No AI models detected</p>
-                    <p className="text-sm mt-2">
-                        Start LM Studio or Ollama to see available models
-                    </p>
-                </div>
-            )}
-        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
     );
 }
 

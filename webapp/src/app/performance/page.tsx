@@ -95,6 +95,10 @@ export default function PerformancePage() {
     const [refreshInterval, setRefreshInterval] = useState(5000);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
+    // Panel Persistence State
+    const [modelsPanelOpen, setModelsPanelOpen] = useState(true);
+    const [agentsPanelOpen, setAgentsPanelOpen] = useState(true);
+
     // History for sparklines (kept for future use)
     const [gpuHistory, setGpuHistory] = useState<number[]>([]);
     const [ramHistory, setRamHistory] = useState<number[]>([]);
@@ -356,10 +360,20 @@ export default function PerformancePage() {
                             <Server className="text-purple-400" size={20} />
                             AI Models & Infrastructure
                         </h2>
-                        <ModelsPanel bridgeUrl={BRIDGE_URL} refreshInterval={30000} />
+                        <ModelsPanel
+                            bridgeUrl={BRIDGE_URL}
+                            refreshInterval={30000}
+                            isOpen={modelsPanelOpen}
+                            onToggle={() => setModelsPanelOpen(prev => !prev)}
+                        />
 
                         <div className="grid grid-cols-1 gap-6">
-                            <AgentsPanel bridgeUrl={BRIDGE_URL} refreshInterval={10000} />
+                            <AgentsPanel
+                                bridgeUrl={BRIDGE_URL}
+                                refreshInterval={10000}
+                                isOpen={agentsPanelOpen}
+                                onToggle={() => setAgentsPanelOpen(prev => !prev)}
+                            />
                         </div>
                     </div>
                 </div>

@@ -1,7 +1,3 @@
-/**
- * SystemOverview - Unified system status header with hardware info
- */
-
 'use client';
 
 import { motion } from 'framer-motion';
@@ -9,7 +5,7 @@ import {
     Zap, Activity,
     Server, Wifi, CheckCircle, AlertTriangle,
     Thermometer,
-    HardDrive
+    Cpu, Clock, AlertCircle
 } from 'lucide-react';
 import { HARDWARE_CONFIG, THRESHOLDS } from '@/lib/luxrig/constants';
 
@@ -33,6 +29,8 @@ export function SystemOverview({
     servicesOnline,
     servicesTotal
 }: SystemOverviewProps) {
+
+    // Helper: Format Uptime
     const formatUptime = (seconds: number) => {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
@@ -43,163 +41,137 @@ export function SystemOverview({
         return `${hours}h ${minutes}m`;
     };
 
+    // Helper: Get Status
     const getOverallStatus = () => {
-        if (!health) return { status: 'checking', color: 'gray', label: 'Checking...' };
+        if (!health) return { status: 'checking', color: 'text-gray-400', label: 'Checking...', icon: Activity };
         if (health.status === 'healthy' && servicesOnline === servicesTotal) {
-            return { status: 'optimal', color: 'green', label: 'All Systems Optimal' };
+            return { status: 'optimal', color: 'text-green-400', label: 'All Systems Optimal', icon: CheckCircle };
         }
         if (health.status === 'degraded' || servicesOnline < servicesTotal) {
-            return { status: 'degraded', color: 'yellow', label: 'Partial Degradation' };
+            return { status: 'degraded', color: 'text-yellow-400', label: 'Partial Degradation', icon: AlertTriangle };
         }
-        return { status: 'critical', color: 'red', label: 'Critical Issues' };
+        return { status: 'critical', color: 'text-red-400', label: 'Critical Issues', icon: AlertCircle };
     };
 
     const status = getOverallStatus();
+
+    // Metrics
     const gpuTemp = systemInfo?.gpu?.temperature;
+    const gpuUtil = systemInfo?.gpu?.utilization;
+
+    // RAM %
     const ramPercent = systemInfo?.memory?.used && systemInfo?.memory?.total
         ? Math.round((systemInfo.memory.used / systemInfo.memory.total) * 100)
         : null;
 
+    // --- Color Logic from User ---
+
     const tempColor =
-        gpuTemp && gpuTemp >= THRESHOLDS.GPU_TEMP.CRITICAL ? 'text-red-400 animate-pulse' :
+        gpuTemp && gpuTemp >= THRESHOLDS.GPU_TEMP.CRITICAL ? 'text-red-500 animate-pulse' :
             gpuTemp && gpuTemp >= THRESHOLDS.GPU_TEMP.WARNING ? 'text-yellow-400' :
-                'text-orange-400';
+                'text-cyan-400';
+
+    // GPU Util Color
+    const gpuUtilColor =
+        gpuUtil && gpuUtil >= 90 ? 'text-red-400 animate-pulse' :
+            gpuUtil && gpuUtil >= 50 ? 'text-yellow-400' :
+                'text-cyan-400';
+
+    // Uptime Color
+    const uptimeColor = health?.uptime && health.uptime < 3600 ? 'text-yellow-400' : 'text-purple-400';
+
+    // Services Color
+    const servicesColor =
+        servicesOnline === servicesTotal ? 'text-green-400' :
+            servicesOnline === 0 ? 'text-red-400 animate-pulse' :
+                'text-yellow-400';
 
     return (
         <motion.div
-            className="relative overflow-hidden rounded-2xl"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.01, transition: { duration: 0.25 } }}
+            className="glass-card p-6 border-b border-white/5 relative overflow-hidden group"
+            whileHover={{ scale: 1.01 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
-            {/* Background gradient based on status */}
-            <div className={`absolute inset-0 bg-gradient-to-r ${status.color === 'green' ? 'from-green-500/20 via-cyan-500/10 to-purple-500/20' :
-                status.color === 'yellow' ? 'from-yellow-500/20 via-orange-500/10 to-red-500/20' :
-                    status.color === 'red' ? 'from-red-500/30 via-red-500/20 to-orange-500/20' :
-                        'from-gray-500/20 via-gray-500/10 to-gray-500/20'
-                }`} />
+            {/* Ambient Background Glow based on Status */}
+            <div className={`absolute inset-0 opacity-10 blur-3xl transition-colors duration-700 pointer-events-none ${status.color.replace('text-', 'bg-')}`} />
 
-            {/* Animated pulse overlay for optimal status */}
-            {status.status === 'optimal' && (
-                <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-cyan-500/5 animate-pulse" />
-            )}
+            <div className="relative z-10 flex flex-col md:flex-row justify-between md:items-center gap-6">
 
-            <div className="relative p-6">
-                {/* Top row: Status + Hardware */}
-                <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-4">
-                        {/* Status indicator */}
-                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${status.color === 'green' ? 'bg-green-500/20' :
-                            status.color === 'yellow' ? 'bg-yellow-500/20' :
-                                status.color === 'red' ? 'bg-red-500/20 animate-pulse' :
-                                    'bg-gray-500/20'
-                            }`}>
-                            {status.status === 'optimal' ? (
-                                <CheckCircle size={32} className="text-green-400" />
-                            ) : status.status === 'degraded' ? (
-                                <AlertTriangle size={32} className="text-yellow-400" />
-                            ) : status.status === 'critical' ? (
-                                <AlertTriangle size={32} className="text-red-400 animate-bounce" />
-                            ) : (
-                                <Activity size={32} className="text-gray-400 animate-pulse" />
-                            )}
-                        </div>
-
-                        <div>
-                            <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                                LuxRig Command Center
-                            </h1>
-                            <p className={`text-sm ${status.color === 'green' ? 'text-green-400' :
-                                status.color === 'yellow' ? 'text-yellow-400' :
-                                    status.color === 'red' ? 'text-red-400' :
-                                        'text-gray-400'
-                                }`}>
-                                {status.label}
-                            </p>
-                        </div>
+                {/* Left: Overall Health & Status */}
+                <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-lg relative`}>
+                        <div className={`absolute inset-0 rounded-xl opacity-20 animate-pulse ${status.color.replace('text-', 'bg-')}`} />
+                        <status.icon size={32} className={`${status.color} relative z-10`} aria-label={`System status: ${status.label}`} role="status" />
                     </div>
-
-                    {/* Hardware badge */}
-                    <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                        <Server size={16} className="text-cyan-400" />
-                        <span className="text-sm text-gray-300">{HARDWARE_CONFIG.MOTHERBOARD.name}</span>
-                        <span className="text-gray-500">•</span>
-                        <span className="text-sm text-purple-400">{HARDWARE_CONFIG.GPU.name}</span>
+                    <div>
+                        <h2 className={`text-2xl font-bold tracking-tight ${status.color} drop-shadow-sm`}>
+                            {status.label}
+                        </h2>
+                        <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
+                            <span className="font-mono bg-white/5 px-2 py-0.5 rounded text-xs border border-white/5">
+                                {HARDWARE_CONFIG?.MOTHERBOARD?.name || 'Unknown MB'} • {HARDWARE_CONFIG?.GPU?.name || 'Unknown GPU'}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                {/* Stats row */}
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
-                    {/* Services */}
-                    <div className="p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10">
-                        <div className="flex items-center gap-2 mb-1">
-                            <Wifi size={14} className="text-cyan-400" />
-                            <span className="text-xs text-gray-500">Services</span>
-                        </div>
-                        <div className="text-xl font-bold font-mono">
-                            <span
-                                className={
-                                    servicesOnline === servicesTotal
-                                        ? 'text-green-400'
-                                        : servicesOnline === 0
-                                            ? 'text-red-400'
-                                            : 'text-yellow-400'
-                                }
-                            >
-                                {servicesOnline}
-                            </span>
-                            <span className="text-gray-500">/{servicesTotal}</span>
-                            {servicesOnline < servicesTotal && (
-                                <AlertTriangle size={14} className="ml-1.5 inline text-yellow-400" />
-                            )}
-                        </div>
-                    </div>
+                {/* Right: Key KPI Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 md:gap-6 w-full md:w-auto">
 
-                    {/* Uptime */}
-                    <div className="p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10">
-                        <div className="flex items-center gap-2 mb-1">
-                            <Activity size={14} className="text-purple-400" />
-                            <span className="text-xs text-gray-500">Uptime</span>
+                    {/* GPU Utilization */}
+                    <div className="text-center md:text-right">
+                        <div className="flex items-center justify-end gap-1.5 mb-1 text-xs text-gray-500 font-medium uppercase tracking-wider">
+                            <Zap size={12} className={gpuUtilColor} /> GPU
                         </div>
-                        <div className="text-xl font-bold text-purple-400">
-                            {health?.uptime ? formatUptime(health.uptime) : <span className="text-gray-500">--</span>}
+                        <div className={`text-xl md:text-2xl font-bold ${gpuUtilColor} font-mono tabular-nums leading-none`}>
+                            {gpuUtil != null ? `${gpuUtil}%` : <span className="text-gray-600">--</span>}
                         </div>
                     </div>
 
                     {/* GPU Temp */}
-                    <div className="p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10">
-                        <div className="flex items-center gap-2 mb-1">
-                            <Thermometer size={14} className={tempColor} />
-                            <span className="text-xs text-gray-500">GPU Temp</span>
+                    <div className="text-center md:text-right">
+                        <div className="flex items-center justify-end gap-1.5 mb-1 text-xs text-gray-500 font-medium uppercase tracking-wider">
+                            <Thermometer size={12} className={tempColor} /> Temp
                         </div>
-                        <div className={`text-xl font-bold ${tempColor}`}>
-                            {gpuTemp != null ? `${(gpuTemp * 1.8 + 32).toFixed(0)}°F` : <span className="text-gray-500">--</span>}
+                        <div className={`text-xl md:text-2xl font-bold ${tempColor} font-mono tabular-nums leading-none`}>
+                            {gpuTemp != null ? (
+                                <span>{(gpuTemp * 1.8 + 32).toFixed(0)}<span className="text-base align-top ml-0.5">°F</span></span>
+                            ) : <span className="text-gray-600">--</span>}
                         </div>
                     </div>
 
                     {/* RAM Usage */}
-                    <div className="p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10">
-                        <div className="flex items-center gap-2 mb-1">
-                            <HardDrive size={14} className="text-violet-400" />
-                            <span className="text-xs text-gray-500">RAM</span>
+                    <div className="text-center md:text-right">
+                        <div className="flex items-center justify-end gap-1.5 mb-1 text-xs text-gray-500 font-medium uppercase tracking-wider">
+                            <Cpu size={12} className="text-blue-400" /> RAM
                         </div>
-                        <div className="text-xl font-bold text-violet-400">
-                            {ramPercent !== null ? `${ramPercent}%` : <span className="text-gray-500">--</span>}
+                        <div className="text-xl md:text-2xl font-bold text-blue-400 font-mono tabular-nums leading-none">
+                            {ramPercent != null ? `${ramPercent}%` : <span className="text-gray-600">--</span>}
                         </div>
                     </div>
 
-                    {/* GPU Util */}
-                    <div className="p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10">
-                        <div className="flex items-center gap-2 mb-1">
-                            <Zap size={14} className="text-cyan-400" />
-                            <span className="text-xs text-gray-500">GPU</span>
+                    {/* Active Services */}
+                    <div className="text-center md:text-right">
+                        <div className="flex items-center justify-end gap-1.5 mb-1 text-xs text-gray-500 font-medium uppercase tracking-wider">
+                            <Activity size={12} className={servicesColor} /> Svc
                         </div>
-                        <div className="text-xl font-bold text-cyan-400">
-                            {systemInfo?.gpu?.utilization != null
-                                ? `${systemInfo.gpu.utilization}%`
-                                : <span className="text-gray-500">--</span>}
+                        <div className={`text-xl md:text-2xl font-bold ${servicesColor} font-mono tabular-nums leading-none`}>
+                            {servicesOnline}<span className="text-base text-gray-600">/{servicesTotal}</span>
                         </div>
                     </div>
+
+                    {/* Uptime */}
+                    <div className="text-center md:text-right sm:block hidden">
+                        <div className="flex items-center justify-end gap-1.5 mb-1 text-xs text-gray-500 font-medium uppercase tracking-wider">
+                            <Clock size={12} className={uptimeColor} /> Up
+                        </div>
+                        <div className={`text-xl md:text-2xl font-bold ${uptimeColor} font-mono tabular-nums leading-none`}>
+                            {health?.uptime ? formatUptime(health.uptime) : <span className="text-gray-600">--</span>}
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </motion.div>

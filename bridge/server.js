@@ -157,10 +157,41 @@ app.get('/', (req, res) => {
     });
 });
 
+import { deviceMonitor } from './services/deviceMonitor.js';
+
+// ...
+
+// Start Device Monitor and broadcast alerts
+deviceMonitor.start((alert) => {
+    broadcast(alert);
+});
+
+// ...
+
 // Full system status
 app.get('/status', async (req, res) => {
     try {
         const status = await getFullStatus();
+        res.json(status);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Run Network Speed Test
+app.get('/monitoring/speedtest', async (req, res) => {
+    try {
+        const result = await networkService.runSpeedTest();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Network Status (Latency/ISP check)
+app.get('/network/status', async (req, res) => {
+    try {
+        const status = await networkService.getStatus();
         res.json(status);
     } catch (error) {
         res.status(500).json({ error: error.message });
