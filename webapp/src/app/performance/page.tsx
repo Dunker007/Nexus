@@ -8,6 +8,7 @@ import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
 import { RefreshCw, Cpu, HardDrive, Thermometer, Zap, Activity, Server, AlertTriangle, CheckCircle, Clock, Wifi, Globe, Router, Network } from 'lucide-react';
 import { GpuMonitor } from '@/components/performance/GpuMonitor';
 import { MetricCard } from '@/components/performance/MetricCard';
+import { NetworkPanel } from '@/components/performance/NetworkPanel';
 
 // ============= TYPES =============
 interface ServiceStatus {
@@ -445,167 +446,9 @@ export default function PerformancePage() {
                 </section>
             )}
 
-            {/* Network Infrastructure */}
+            {/* Network Infrastructure - Now with live monitoring */}
             <section className="container-main pb-8">
-                <motion.div className="glass-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                        <Network size={20} className="text-cyan-400" />
-                        Network Infrastructure
-                    </h2>
-
-                    {/* ISP Row */}
-                    <div className="grid md:grid-cols-2 gap-4 mb-6">
-                        {/* Verizon 5G */}
-                        <div className="p-4 bg-gradient-to-br from-red-500/10 to-black/20 rounded-xl border border-red-500/20">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
-                                        <Globe size={20} className="text-red-400" />
-                                    </div>
-                                    <div>
-                                        <div className="font-bold text-red-400">Verizon 5G Home</div>
-                                        <div className="text-xs text-gray-500">ISP 1 • Primary</div>
-                                    </div>
-                                </div>
-                                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-green-500/20 text-green-400">
-                                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                    Online
-                                </span>
-                            </div>
-                            <div className="text-sm text-gray-400">
-                                <div className="flex justify-between py-1 border-b border-white/5">
-                                    <span>Model</span>
-                                    <span className="font-mono text-white">ASK-NCQ1338</span>
-                                </div>
-                                <div className="flex justify-between py-1">
-                                    <span>Type</span>
-                                    <span className="text-red-400">5G mmWave / C-Band</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* T-Mobile 5G */}
-                        <div className="p-4 bg-gradient-to-br from-pink-500/10 to-black/20 rounded-xl border border-pink-500/20">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center">
-                                        <Globe size={20} className="text-pink-400" />
-                                    </div>
-                                    <div>
-                                        <div className="font-bold text-pink-400">T-Mobile 5G Home</div>
-                                        <div className="text-xs text-gray-500">ISP 2 • Failover</div>
-                                    </div>
-                                </div>
-                                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-green-500/20 text-green-400">
-                                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                    Online
-                                </span>
-                            </div>
-                            <div className="text-sm text-gray-400">
-                                <div className="flex justify-between py-1 border-b border-white/5">
-                                    <span>Model</span>
-                                    <span className="font-mono text-white">Sagemcom Fast 5688W</span>
-                                </div>
-                                <div className="flex justify-between py-1">
-                                    <span>Type</span>
-                                    <span className="text-pink-400">5G n41 / n71</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Network Topology Visualization */}
-                    <div className="relative py-6">
-                        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-cyan-500/50 to-transparent"></div>
-
-                        {/* Connection Lines */}
-                        <div className="flex justify-center items-center gap-4 mb-4">
-                            <div className="flex-1 h-px bg-gradient-to-r from-red-500/50 to-cyan-500/50"></div>
-                            <div className="text-xs text-gray-500">WAN 1</div>
-                            <div className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse"></div>
-                            <div className="text-xs text-gray-500">WAN 2</div>
-                            <div className="flex-1 h-px bg-gradient-to-l from-pink-500/50 to-cyan-500/50"></div>
-                        </div>
-                    </div>
-
-                    {/* Core Router */}
-                    <div className="p-4 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-cyan-500/10 rounded-xl border border-cyan-500/20 mb-6">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/30 to-purple-500/30 flex items-center justify-center">
-                                    <Router size={24} className="text-cyan-400" />
-                                </div>
-                                <div>
-                                    <div className="font-bold text-lg text-cyan-400">TP-Link ER605 V2</div>
-                                    <div className="text-sm text-gray-400">Core Brain • Multi-WAN Load Balancer</div>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <div className="text-xs text-gray-500 mb-1">Mode</div>
-                                <span className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm">
-                                    Load Balance + Failover
-                                </span>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 gap-3 mt-4">
-                            <div className="p-2 bg-white/5 rounded-lg text-center">
-                                <div className="text-xs text-gray-500">WAN Ports</div>
-                                <div className="font-bold text-cyan-400">2 Active</div>
-                            </div>
-                            <div className="p-2 bg-white/5 rounded-lg text-center">
-                                <div className="text-xs text-gray-500">LAN Ports</div>
-                                <div className="font-bold text-green-400">4 Gigabit</div>
-                            </div>
-                            <div className="p-2 bg-white/5 rounded-lg text-center">
-                                <div className="text-xs text-gray-500">VPN</div>
-                                <div className="font-bold text-purple-400">Enabled</div>
-                            </div>
-                            <div className="p-2 bg-white/5 rounded-lg text-center">
-                                <div className="text-xs text-gray-500">Firewall</div>
-                                <div className="font-bold text-yellow-400">Active</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* WiFi Mesh */}
-                    <div className="p-4 bg-gradient-to-br from-green-500/10 to-black/20 rounded-xl border border-green-500/20">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
-                                    <Wifi size={24} className="text-green-400" />
-                                </div>
-                                <div>
-                                    <div className="font-bold text-lg text-green-400">Wyze Mesh Router Pro</div>
-                                    <div className="text-sm text-gray-400">WiFi 6E Tri-Band System</div>
-                                </div>
-                            </div>
-                            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-green-500/20 text-green-400">
-                                <CheckCircle size={12} />
-                                Broadcasting
-                            </span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-3">
-                            <div className="p-3 bg-white/5 rounded-lg text-center">
-                                <div className="text-2xl font-bold text-green-400">6E</div>
-                                <div className="text-xs text-gray-500">WiFi Standard</div>
-                            </div>
-                            <div className="p-3 bg-white/5 rounded-lg text-center">
-                                <div className="text-2xl font-bold text-cyan-400">Tri</div>
-                                <div className="text-xs text-gray-500">Band Config</div>
-                            </div>
-                            <div className="p-3 bg-white/5 rounded-lg text-center">
-                                <div className="text-2xl font-bold text-purple-400">Mesh</div>
-                                <div className="text-xs text-gray-500">Topology</div>
-                            </div>
-                        </div>
-                        <div className="mt-4 p-3 bg-white/5 rounded-lg">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-400">Bands</span>
-                                <span className="font-mono text-white">2.4GHz • 5GHz • 6GHz</span>
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
+                <NetworkPanel bridgeUrl={BRIDGE_URL} refreshInterval={30000} />
             </section>
 
             {/* Back link */}

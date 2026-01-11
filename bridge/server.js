@@ -30,6 +30,7 @@ import { StaffMeetingAgent } from './services/agents-staff-meeting.js';
 import { newsService } from './services/news.js';
 import { contentService } from './services/content.js';
 import { settingsService } from './services/settings.js';
+import { networkService } from './services/network.js';
 import pipelineRoutes from './routes/pipeline.js';
 import distributionRoutes from './routes/distribution.js';
 import artProductsRoutes from './routes/art-products.js';
@@ -278,6 +279,78 @@ app.get('/system/gpu', async (req, res) => {
     try {
         const gpu = await systemService.getGPU();
         res.json(gpu);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============ Network Routes ============
+
+// Get network status (ISPs, router)
+app.get('/network/status', async (req, res) => {
+    try {
+        const status = await networkService.getStatus();
+        res.json(status);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Ping a specific host
+app.get('/network/ping/:host', async (req, res) => {
+    try {
+        const count = parseInt(req.query.count) || 4;
+        const result = await networkService.ping(req.params.host, count);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Check ISP statuses
+app.get('/network/isps', async (req, res) => {
+    try {
+        const isps = await networkService.checkISPs();
+        res.json(isps);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Check router status
+app.get('/network/router', async (req, res) => {
+    try {
+        const router = await networkService.checkRouter();
+        res.json(router);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Run speed test
+app.post('/network/speedtest', async (req, res) => {
+    try {
+        const result = await networkService.runSpeedTest();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update network configuration (e.g., gateway IPs)
+app.post('/network/config', (req, res) => {
+    try {
+        const config = networkService.updateConfig(req.body);
+        res.json({ success: true, config });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get current network configuration
+app.get('/network/config', (req, res) => {
+    try {
+        res.json(networkService.config);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
