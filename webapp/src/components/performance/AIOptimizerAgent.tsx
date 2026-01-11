@@ -11,7 +11,7 @@ import {
     RefreshCw, CheckCircle, AlertTriangle, Activity,
     Gauge, ChevronRight, Sparkles, BarChart3
 } from 'lucide-react';
-import { HARDWARE_CONFIG, NVIDIA_SDK, ASROCK_SDK, STORAGE_SDK } from '@/lib/luxrig/constants';
+import { HARDWARE_CONFIG, NVIDIA_SDK, ASROCK_SDK, STORAGE_SDK, MEMORY_SDK } from '@/lib/luxrig/constants';
 
 interface DiagnosticResult {
     category: string;
@@ -71,6 +71,7 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
         const steps = [
             { name: 'GPU Health Check', delay: 500 },
             { name: 'VRAM Analysis', delay: 600 },
+            { name: 'System RAM', delay: 400 },
             { name: 'Tensor Core Status', delay: 400 },
             { name: 'CUDA Compatibility', delay: 500 },
             { name: 'NVMe Storage', delay: 400 },
@@ -123,6 +124,14 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                         value: '12GB',
                     });
                 }
+            } else if (step.name === 'System RAM') {
+                results.push({
+                    category: step.name,
+                    status: 'optimal',
+                    message: `${HARDWARE_CONFIG.RAM.model} ${HARDWARE_CONFIG.RAM.capacity} @ ${HARDWARE_CONFIG.RAM.speed}`,
+                    value: HARDWARE_CONFIG.RAM.timings,
+                });
+                recs.push(`Use Python mmap to load LLM weights directly to ${HARDWARE_CONFIG.RAM.speed} memory pool`);
             } else if (step.name === 'Tensor Core Status') {
                 results.push({
                     category: step.name,

@@ -198,8 +198,18 @@ export const HARDWARE_CONFIG = {
         socket: 'AM4',
     },
     RAM: {
+        model: 'G.SKILL Ripjaws V',
+        partNumber: 'F4-3600C16D-32GVKC',
         type: 'DDR4',
+        capacity: '32GB',
+        capacityBytes: 32 * 1024 * 1024 * 1024,
+        configuration: '2x16GB',
+        speed: '3600MT/s',
+        xmpProfile: 'XMP 2.0',
+        timings: 'CL16-19-19-39',
+        voltage: 1.35,
         slots: 4,
+        slotsUsed: 2,
     },
     STORAGE: {
         primary: {
@@ -213,6 +223,38 @@ export const HARDWARE_CONFIG = {
             firmware: 'P8CR004',
             directStorage: true,
         },
+    },
+} as const;
+
+// ============= MEMORY SDK CONFIG =============
+export const MEMORY_SDK = {
+    WMIC: {
+        name: 'Windows Management Instrumentation',
+        description: 'Query RAM speed, part number, and configuration',
+        commands: [
+            { cmd: 'wmic memorychip get speed, partnumber', description: 'Verify XMP speed' },
+            { cmd: 'wmic memorychip get configuredclockspeed', description: 'Confirm 3600MHz' },
+            { cmd: 'wmic memorychip get capacity', description: 'Check total capacity' },
+        ],
+    },
+    RAMMON: {
+        name: 'PassMark RAMMon',
+        description: 'SPD data export with timing details',
+        features: ['CL16-19-19-39 verification', 'Voltage monitoring', 'Module info'],
+    },
+    A_TUNING: {
+        name: 'ASRock A-Tuning',
+        description: 'Live DRAM voltage and clock monitoring',
+        capabilities: ['1.35V monitoring', 'Base clock adjustment', 'SoC voltage'],
+    },
+    PYTHON: {
+        name: 'Python Memory Control',
+        description: 'Programmatic memory optimization',
+        features: [
+            { name: 'mmap', description: 'Memory-mapped files for LLM weights' },
+            { name: 'psutil', description: 'Memory usage monitoring' },
+            { name: 'gc', description: 'Garbage collection control' },
+        ],
     },
 } as const;
 
