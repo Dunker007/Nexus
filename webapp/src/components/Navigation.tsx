@@ -10,7 +10,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { NavItem } from '@/components/NavItem';
 import {
     LayoutDashboard, Palette, MessageSquare, Bot, Radio, Users,
-    FlaskConical, DollarSign, Settings, Workflow, Newspaper
+    FlaskConical, DollarSign, Settings, Workflow, Newspaper, Activity
 } from 'lucide-react';
 import { StatusAvatar } from '@/components/StatusAvatar';
 
@@ -25,6 +25,7 @@ const navItems = [
     { href: '/labs', label: 'Labs', icon: <FlaskConical size={20} />, shortcut: 'G L' },
     { href: '/pipeline', label: 'Pipeline', icon: <Workflow size={20} />, shortcut: 'G P' },
     { href: '/income', label: 'Revenue', icon: <DollarSign size={20} />, shortcut: 'G I' },
+    { href: '/performance', label: 'Performance', icon: <Activity size={20} />, shortcut: 'G M' },
     { href: '/settings', label: 'Settings', icon: <Settings size={20} />, shortcut: 'G S' },
 ];
 

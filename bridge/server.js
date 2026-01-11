@@ -266,6 +266,127 @@ app.post('/llm/chat', async (req, res) => {
     }
 });
 
+// Load model (Ollama or LM Studio)
+app.post('/llm/:provider/load', async (req, res) => {
+    const { provider } = req.params;
+    const { model } = req.body;
+    try {
+        if (provider === 'ollama') {
+            await ollamaService.loadModel(model);
+        } else if (provider === 'lmstudio') {
+            await lmstudioService.loadModel(model);
+        } else {
+            throw new Error(`Unknown provider: ${provider}`);
+        }
+        res.json({ success: true, message: `Model ${model} loaded on ${provider}` });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Unload model (Ollama or LM Studio)
+app.post('/llm/:provider/unload', async (req, res) => {
+    const { provider } = req.params;
+    const { model } = req.body;
+    try {
+        if (provider === 'ollama') {
+            await ollamaService.unloadModel(model);
+        } else if (provider === 'lmstudio') {
+            await lmstudioService.unloadModel(model);
+        } else {
+            throw new Error(`Unknown provider: ${provider}`);
+        }
+        res.json({ success: true, message: `Model ${model} unloaded from ${provider}` });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============ Agent Routes ============
+
+// Reset an agent (restart/re-initialize)
+app.post('/agents/:type/reset', async (req, res) => {
+    const { type } = req.params;
+    const agentId = `${type}-agent`;
+
+    try {
+        // If agent exists in active registry, remove it
+        if (activeAgents.has(agentId)) {
+            activeAgents.delete(agentId);
+        }
+
+        // Create new instance if valid type
+        if (agentRegistry[type]) {
+            const newAgent = createAgent(type);
+            activeAgents.set(newAgent.id, newAgent);
+            console.log(`[Agents] Reset agent: ${type} (${newAgent.id})`);
+            res.json({ success: true, message: `Agent ${type} reset successfully` });
+        } else {
+            // For core agents like 'research' or 'code' that might not be in the simple registry list 
+            // but are in the registry object:
+            try {
+                const newAgent = createAgent(type);
+                activeAgents.set(newAgent.id, newAgent);
+                console.log(`[Agents] Reset agent: ${type} (${newAgent.id})`);
+                res.json({ success: true, message: `Agent ${type} reset successfully` });
+            } catch (e) {
+                res.status(400).json({ error: `Unknown agent type: ${type}` });
+            }
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============ Monitoring Routes ============
+
+// App metrics (connections, memory, etc.)
+app.get('/monitoring/metrics', (req, res) => {
+    try {
+        const memory = process.memoryUsage();
+        res.json({
+            activeConnections: clients.size,
+            activeAgents: activeAgents.size,
+            memory: {
+                heapUsed: memory.heapUsed,
+                heapTotal: memory.heapTotal,
+                rss: memory.rss
+            },
+            platform: process.platform,
+            nodeVersion: process.version,
+            uptime: process.uptime()
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Error logs
+app.get('/monitoring/errors', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 50;
+        const errors = await errorLogger.getErrors(limit);
+        const stats = await errorLogger.getErrorStats();
+
+        res.json({
+            errors,
+            stats
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Performance stats (requests)
+app.get('/monitoring/performance', async (req, res) => {
+    try {
+        const stats = await performanceMonitor.getAllStats();
+        res.json(stats);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // ============ System Routes ============
 
 // Real-time system metrics

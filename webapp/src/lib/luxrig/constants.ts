@@ -126,6 +126,14 @@ export const CHART_COLORS = {
     network: '#3B82F6',  // blue
     error: '#EF4444',    // red
     success: '#22C55E',  // green
+    // Generic colors
+    cyan: '#06B6D4',
+    yellow: '#F59E0B',
+    purple: '#8B5CF6',
+    pink: '#EC4899',
+    green: '#22C55E',
+    red: '#EF4444',
+    blue: '#3B82F6',
 } as const;
 
 // ============= AGENT DEFINITIONS =============

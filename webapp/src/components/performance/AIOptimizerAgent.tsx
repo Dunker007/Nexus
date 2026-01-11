@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Bot, Cpu, Zap, Brain, Terminal, Play, Pause,
     RefreshCw, CheckCircle, AlertTriangle, Activity,
-    Gauge, ChevronRight, Sparkles, BarChart3
+    Gauge, ChevronRight, Sparkles, BarChart3, ShieldCheck, Info
 } from 'lucide-react';
 import { HARDWARE_CONFIG, NVIDIA_SDK, ASROCK_SDK, STORAGE_SDK, MEMORY_SDK } from '@/lib/luxrig/constants';
 
@@ -21,6 +21,14 @@ interface DiagnosticResult {
     action?: string;
 }
 
+interface Recommendation {
+    id: string;
+    text: string;
+    type: 'optimization' | 'hardware' | 'software';
+    validity: 'proven' | 'expert' | 'theoretical';
+    impact: 'high' | 'medium' | 'low';
+}
+
 interface AIOptimizerAgentProps {
     bridgeUrl: string;
 }
@@ -29,7 +37,7 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
     const [isRunning, setIsRunning] = useState(false);
     const [diagnostics, setDiagnostics] = useState<DiagnosticResult[]>([]);
     const [currentStep, setCurrentStep] = useState<string | null>(null);
-    const [recommendations, setRecommendations] = useState<string[]>([]);
+    const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
     const [gpuStats, setGpuStats] = useState<{
         utilization?: number;
         temp?: number;
@@ -82,7 +90,7 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
         ];
 
         const results: DiagnosticResult[] = [];
-        const recs: string[] = [];
+        const recs: Recommendation[] = [];
 
         for (const step of steps) {
             setCurrentStep(step.name);
@@ -114,7 +122,13 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                     });
 
                     if (vramPercent > 75) {
-                        recs.push('Consider using quantized models (GGUF Q4/Q5) for lower VRAM usage');
+                        recs.push({
+                            id: 'rec-quant',
+                            text: 'Consider using quantized models (GGUF Q4/Q5) for lower VRAM usage',
+                            type: 'optimization',
+                            validity: 'proven',
+                            impact: 'high'
+                        });
                     }
                 } else {
                     results.push({
@@ -131,7 +145,13 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                     message: `${HARDWARE_CONFIG.RAM.model} ${HARDWARE_CONFIG.RAM.capacity} @ ${HARDWARE_CONFIG.RAM.speed}`,
                     value: HARDWARE_CONFIG.RAM.timings,
                 });
-                recs.push(`Use Python mmap to load LLM weights directly to ${HARDWARE_CONFIG.RAM.speed} memory pool`);
+                recs.push({
+                    id: 'rec-mmap',
+                    text: `Use Python mmap to load LLM weights directly to ${HARDWARE_CONFIG.RAM.speed} memory pool`,
+                    type: 'software',
+                    validity: 'expert',
+                    impact: 'medium'
+                });
             } else if (step.name === 'Tensor Core Status') {
                 results.push({
                     category: step.name,
@@ -139,7 +159,13 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                     message: 'Tensor Cores enabled for FP16/INT8 acceleration',
                     value: 'Active',
                 });
-                recs.push('Use TensorRT for optimal inference performance');
+                recs.push({
+                    id: 'rec-tensorrt',
+                    text: 'Use TensorRT for optimal inference performance',
+                    type: 'software',
+                    validity: 'proven',
+                    impact: 'high'
+                });
             } else if (step.name === 'CUDA Compatibility') {
                 results.push({
                     category: step.name,
@@ -155,7 +181,13 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                     value: HARDWARE_CONFIG.STORAGE.primary.readSpeed,
                 });
                 if (STORAGE_SDK.DIRECTSTORAGE.supported) {
-                    recs.push('DirectStorage enabled - AI data flows directly from T500 to RTX 3060');
+                    recs.push({
+                        id: 'rec-directstorage',
+                        text: 'DirectStorage enabled - AI data flows directly from NVMe to GPU',
+                        type: 'hardware',
+                        validity: 'theoretical',
+                        impact: 'high'
+                    });
                 }
             } else if (step.name === 'AI QuickSet Status') {
                 results.push({
@@ -164,7 +196,13 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                     message: `${ASROCK_SDK.AI_QUICKSET.name} available for WSL AI setup`,
                     value: 'Ready',
                 });
-                recs.push('Use ai-quickset CLI to install PyTorch/TensorFlow with GPU acceleration');
+                recs.push({
+                    id: 'rec-quickset',
+                    text: 'Use ai-quickset CLI to install PyTorch/TensorFlow with GPU acceleration',
+                    type: 'software',
+                    validity: 'proven',
+                    impact: 'high'
+                });
             } else if (step.name === 'CPU/Motherboard') {
                 results.push({
                     category: step.name,
@@ -172,7 +210,13 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                     message: `${HARDWARE_CONFIG.CPU.model} on ${HARDWARE_CONFIG.MOTHERBOARD.name}`,
                     value: `${HARDWARE_CONFIG.CPU.cores}C/${HARDWARE_CONFIG.CPU.threads}T`,
                 });
-                recs.push('AMDRMCLI available for Ryzen tuning via script');
+                recs.push({
+                    id: 'rec-amdrmcli',
+                    text: 'AMDRMCLI available for Ryzen tuning via script',
+                    type: 'optimization',
+                    validity: 'expert',
+                    impact: 'medium'
+                });
             } else if (step.name === 'Power Configuration') {
                 const powerDraw = gpuStats.powerDraw;
                 results.push({
@@ -197,7 +241,13 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                 });
 
                 if (temp && temp > 75) {
-                    recs.push('Consider undervolting GPU for lower temps with same performance');
+                    recs.push({
+                        id: 'rec-undervolt',
+                        text: 'Consider undervolting GPU for lower temps with same performance',
+                        type: 'hardware',
+                        validity: 'expert',
+                        impact: 'medium'
+                    });
                 }
             }
 
@@ -206,8 +256,20 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
 
         // Always add some useful recommendations
         if (recs.length === 0) {
-            recs.push('Enable NVIDIA NIM for containerized LLM deployment');
-            recs.push('Use AI Workbench for simplified environment setup');
+            recs.push({
+                id: 'rec-nim',
+                text: 'Enable NVIDIA NIM for containerized LLM deployment',
+                type: 'software',
+                validity: 'proven',
+                impact: 'medium'
+            });
+            recs.push({
+                id: 'rec-workbench',
+                text: 'Use AI Workbench for simplified environment setup',
+                type: 'software',
+                validity: 'proven',
+                impact: 'low'
+            });
         }
 
         setRecommendations(recs);
@@ -371,9 +433,27 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                     </h3>
                     <ul className="space-y-2">
                         {recommendations.map((rec, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-sm text-gray-300">
-                                <ChevronRight size={14} className="text-purple-400 mt-0.5 shrink-0" />
-                                {rec}
+                            <li key={idx} className="flex flex-col gap-1 p-2 rounded-lg bg-white/5 border border-white/5">
+                                <div className="flex items-start gap-2 text-sm text-gray-300">
+                                    <ChevronRight size={14} className="text-purple-400 mt-0.5 shrink-0" />
+                                    <span>{rec.text}</span>
+                                </div>
+                                <div className="flex items-center gap-2 ml-6 mt-1">
+                                    <span className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                                        rec.validity === 'proven' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
+                                        rec.validity === 'expert' ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' :
+                                        'bg-purple-500/10 border-purple-500/30 text-purple-400'
+                                    }`}>
+                                        {rec.validity.toUpperCase()}
+                                    </span>
+                                    <span className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                                        rec.impact === 'high' ? 'bg-red-500/10 border-red-500/30 text-red-400' :
+                                        rec.impact === 'medium' ? 'bg-orange-500/10 border-orange-500/30 text-orange-400' :
+                                        'bg-gray-500/10 border-gray-500/30 text-gray-400'
+                                    }`}>
+                                        {rec.impact.toUpperCase()} IMPACT
+                                    </span>
+                                </div>
                             </li>
                         ))}
                     </ul>
@@ -399,7 +479,7 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                 </span>
                 <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    Agent Active
+                    Agent Verification Active
                 </span>
             </div>
         </motion.div>

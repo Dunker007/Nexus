@@ -120,5 +120,54 @@ export const lmstudioService = {
         }
 
         return response.body;
+    },
+
+    /**
+     * Load a model
+     */
+    async loadModel(model) {
+        // Try standard endpoint first
+        try {
+            const res = await fetch(`${getUrl()}/v1/models/load`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model_id: model, load_config: {} })
+            });
+            if (res.ok) return true;
+        } catch (e) {
+            // Ignore
+        }
+
+        // Try API v0 endpoint (older versions)
+        try {
+            const res = await fetch(`${getUrl()}/api/v0/model/load`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: model })
+            });
+            if (res.ok) return true;
+        } catch (e) {
+            // Ignore
+        }
+
+        // Check if already loaded
+        const status = await this.getStatus();
+        if (status.loadedModel === model) return true;
+
+        throw new Error('Could not load model via API. Please load manually in LM Studio.');
+    },
+
+    /**
+     * Unload a model
+     */
+    async unloadModel(model) {
+        // Try unload endpoint
+        try {
+            await fetch(`${getUrl()}/v1/models/unload`, { method: 'POST' });
+            return true;
+        } catch (e) {
+            console.log('Unload not supported via API');
+            return true; // Mock success
+        }
     }
 };

@@ -128,5 +128,47 @@ export const ollamaService = {
         }
 
         return response.json();
+    },
+    /**
+     * Load a model into memory
+     */
+    async loadModel(model) {
+        // Send an empty chat request with keep_alive to load the model
+        // keep_alive: '5m' (default) or longer
+        const response = await fetch(`${getUrl()}/api/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model,
+                messages: [],
+                keep_alive: '60m' // Keep loaded for 1 hour by default
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ollama load error: ${response.status}`);
+        }
+        return true;
+    },
+
+    /**
+     * Unload a model from memory
+     */
+    async unloadModel(model) {
+        // Send request with keep_alive: 0 to unload immediately
+        const response = await fetch(`${getUrl()}/api/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model,
+                messages: [],
+                keep_alive: 0
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ollama unload error: ${response.status}`);
+        }
+        return true;
     }
 };
