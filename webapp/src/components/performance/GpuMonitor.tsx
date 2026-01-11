@@ -104,6 +104,7 @@ interface GpuDataPoint {
     utilization: number;
     temperature: number;
     vramUsed: number;
+    vramPercent: number;
     power: number;
 }
 
@@ -115,8 +116,6 @@ interface GpuMonitorProps {
     power: number;         // W
     gpuName?: string;
     maxDataPoints?: number;
-    gpuHistory?: number[]; // Added: History for core load
-    vramHistory?: number[]; // Added: History for VRAM
 }
 
 export function GpuMonitor({
@@ -127,20 +126,32 @@ export function GpuMonitor({
     power,
     gpuName = 'GPU',
     maxDataPoints = 60,
-    gpuHistory,
-    vramHistory
 }: GpuMonitorProps) {
     const [history, setHistory] = useState<GpuDataPoint[]>([]);
     const prevDataRef = useRef({ utilization, temperature, vramUsed, power });
+
+    // Detect max power roughly from GPU name (simple heuristic)
+    // Detect max power roughly from GPU name (simple heuristic)
+    const maxPower = gpuName.includes('4090') ? 450 :
+        gpuName.includes('3090') ? 350 :
+            gpuName.includes('5090') ? 600 :
+                gpuName.includes('A100') ? 400 : 350; // Fallback
+
+    // Helpers
+    const toFahrenheit = (c: number) => Math.round(c * 1.8 + 32);
+    const displayTemp = toFahrenheit(temperature);
+    const isTempWarningF = displayTemp >= toFahrenheit(THRESHOLDS.GPU_TEMP.WARNING);
+    const isTempCriticalF = displayTemp >= toFahrenheit(THRESHOLDS.GPU_TEMP.CRITICAL);
 
     // Add new data point on value change
     useEffect(() => {
         const prev = prevDataRef.current;
 
         // Only add if values actually changed
-        if (prev.utilization !== utilization || prev.temperature !== temperature) {
+        if (prev.utilization !== utilization || prev.temperature !== temperature || prev.vramUsed !== vramUsed || prev.power !== power) {
             const now = new Date();
             const timeStr = `${now.getMinutes()}:${now.getSeconds().toString().padStart(2, '0')}`;
+            const vramPercent = vramTotal > 0 ? (vramUsed / vramTotal) * 100 : 0;
 
             setHistory(prev => {
                 const newHistory = [...prev, {
@@ -148,6 +159,7 @@ export function GpuMonitor({
                     utilization,
                     temperature,
                     vramUsed,
+                    vramPercent,
                     power,
                 }];
 
@@ -157,15 +169,13 @@ export function GpuMonitor({
 
             prevDataRef.current = { utilization, temperature, vramUsed, power };
         }
-    }, [utilization, temperature, vramUsed, power, maxDataPoints]);
+    }, [utilization, temperature, vramUsed, vramTotal, power, maxDataPoints]);
 
     const vramPercent = vramTotal > 0 ? (vramUsed / vramTotal) * 100 : 0;
-    const isTempWarning = temperature >= THRESHOLDS.GPU_TEMP.WARNING;
-    const isTempCritical = temperature >= THRESHOLDS.GPU_TEMP.CRITICAL;
 
     return (
         <motion.div
-            className="glass-card p-6"
+            className={`glass-card p-6 ${isTempCriticalF ? 'ring-1 ring-red-500/50 animate-pulse-slow' : ''}`}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
         >
@@ -176,8 +186,8 @@ export function GpuMonitor({
                 </h2>
                 <div className="flex items-center gap-2">
                     <span className={`px-2 py-0.5 rounded text-xs border ${utilization > 90 ? 'bg-red-500/10 border-red-500/30 text-red-400' :
-                            utilization > 50 ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' :
-                                'bg-green-500/10 border-green-500/30 text-green-400'
+                        utilization > 50 ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400' :
+                            'bg-green-500/10 border-green-500/30 text-green-400'
                         }`}>
                         {utilization > 90 ? 'HEAVY LOAD' : utilization > 10 ? 'ACTIVE' : 'IDLE'}
                     </span>
@@ -192,14 +202,14 @@ export function GpuMonitor({
                     unit="%"
                     color="cyan"
                     icon={Cpu}
-                    history={gpuHistory}
+                    history={history.map(p => p.utilization)}
                 />
 
                 <DisplayCard
                     label="Temperature"
-                    value={temperature}
-                    unit="°C"
-                    max={100}
+                    value={displayTemp}
+                    unit="°F"
+                    max={212}
                     color="yellow"
                     icon={Thermometer}
                 />
@@ -211,14 +221,14 @@ export function GpuMonitor({
                     max={vramTotal}
                     color="purple"
                     icon={HardDrive}
-                    history={vramHistory}
+                    history={history.map(p => p.vramPercent)}
                 />
 
                 <DisplayCard
                     label="Power Draw"
                     value={power}
                     unit="W"
-                    max={350} // 3090/4090 ballpark
+                    max={maxPower}
                     color="green"
                     icon={Zap}
                 />
@@ -253,24 +263,24 @@ export function GpuMonitor({
 
                 {/* Temperature */}
                 <div className="flex flex-col items-center">
-                    <div className={`relative ${isTempCritical ? 'animate-pulse' : ''}`}>
+                    <div className={`relative ${isTempCriticalF ? 'animate-pulse' : ''}`}>
                         <ProgressRing
                             value={(temperature / 100) * 100}
                             size={80}
-                            color={isTempCritical ? 'error' : isTempWarning ? '#F59E0B' : 'gpu'}
+                            color={isTempCriticalF ? 'error' : isTempWarningF ? '#F59E0B' : 'gpu'}
                             showValue={false}
                         />
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
                             <Thermometer
                                 size={16}
-                                className={isTempCritical ? 'text-red-400' : isTempWarning ? 'text-yellow-400' : 'text-cyan-400'}
+                                className={isTempCriticalF ? 'text-red-400' : isTempWarningF ? 'text-yellow-400' : 'text-cyan-400'}
                             />
                             <span
-                                className={`text-sm font-bold ${isTempCritical ? 'text-red-400' :
-                                    isTempWarning ? 'text-yellow-400' : 'text-cyan-400'
+                                className={`text-sm font-bold ${isTempCriticalF ? 'text-red-400' :
+                                    isTempWarningF ? 'text-yellow-400' : 'text-cyan-400'
                                     }`}
                             >
-                                {temperature}°
+                                {displayTemp}°F
                             </span>
                         </div>
                     </div>
@@ -289,6 +299,9 @@ export function GpuMonitor({
                         <div className="flex items-center gap-1 text-[10px] text-purple-400">
                             <div className="w-2 h-2 rounded-full bg-purple-500"></div> VRAM
                         </div>
+                        <div className="flex items-center gap-1 text-[10px] text-green-400">
+                            <div className="w-2 h-2 rounded-full bg-green-500"></div> Power
+                        </div>
                     </div>
                 </div>
                 <div className="h-32 w-full bg-black/20 rounded-lg overflow-hidden border border-white/5">
@@ -299,19 +312,41 @@ export function GpuMonitor({
                                     <stop offset="0%" stopColor={CHART_COLORS.gpu} stopOpacity={0.3} />
                                     <stop offset="100%" stopColor={CHART_COLORS.gpu} stopOpacity={0} />
                                 </linearGradient>
+                                <linearGradient id="powerGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#4ade80" stopOpacity={0.25} />
+                                    <stop offset="100%" stopColor="#4ade80" stopOpacity={0} />
+                                </linearGradient>
                             </defs>
                             <XAxis dataKey="time" hide />
                             <YAxis domain={[0, 100]} hide />
                             <Tooltip
-                                contentStyle={{
-                                    background: '#0a0a0a',
-                                    border: '1px solid #333',
-                                    borderRadius: '8px',
-                                    fontSize: '11px',
-                                    boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
+                                content={({ active, payload, label }) => {
+                                    if (!active || !payload?.length) return null;
+                                    const data = payload[0].payload;
+                                    return (
+                                        <div className="bg-black/90 border border-white/10 rounded-lg p-3 text-xs shadow-xl backdrop-blur-md">
+                                            <div className="text-gray-400 mb-2 font-mono border-b border-white/5 pb-1">{label}</div>
+                                            <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 font-mono">
+                                                <div className="flex justify-between gap-4">
+                                                    <span className="text-cyan-400">Core:</span>
+                                                    <span className="text-white">{data.utilization.toFixed(1)}%</span>
+                                                </div>
+                                                <div className="flex justify-between gap-4">
+                                                    <span className="text-purple-400">VRAM:</span>
+                                                    <span className="text-white">{data.vramPercent.toFixed(1)}%</span>
+                                                </div>
+                                                <div className="flex justify-between gap-4">
+                                                    <span className="text-yellow-400">Temp:</span>
+                                                    <span className="text-white">{toFahrenheit(data.temperature)}°F</span>
+                                                </div>
+                                                <div className="flex justify-between gap-4">
+                                                    <span className="text-green-400">Power:</span>
+                                                    <span className="text-white">{data.power}W</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
                                 }}
-                                itemStyle={{ padding: 0 }}
-                                labelStyle={{ color: '#666', marginBottom: '4px' }}
                             />
                             <Area
                                 type="step"
@@ -324,10 +359,19 @@ export function GpuMonitor({
                             <Area
                                 type="step"
                                 dataKey="vramPercent"
-                                // Note: vramPercent isn't in history yet, would need to calculate or add to data point. 
-                                // For now just showing utilization as primary metric.
-                                stroke="transparent"
-                                fill="transparent"
+                                stroke="#a855f7"
+                                strokeWidth={1.5}
+                                fillOpacity={0.15}
+                                fill="#a855f7"
+                                isAnimationActive={false}
+                            />
+                            <Area
+                                type="step"
+                                dataKey="power"
+                                stroke="#4ade80"
+                                strokeWidth={1.5}
+                                fill="url(#powerGradient)"
+                                isAnimationActive={false}
                             />
                         </AreaChart>
                     </ResponsiveContainer>

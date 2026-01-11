@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useState, useEffect, useCallback, memo } from 'react';
 import { useSettings } from '@/components/SettingsContext';
 import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
-import { RefreshCw, Cpu, HardDrive, Thermometer, Zap, Activity, Server, AlertTriangle, ChevronRight, LayoutDashboard } from 'lucide-react';
+import { RefreshCw, Cpu, HardDrive, Thermometer, Zap, Activity, Server, AlertTriangle, ChevronRight, LayoutDashboard, Database, Bot, Clock } from 'lucide-react';
 import { GpuMonitor } from '@/components/performance/GpuMonitor';
 import { MetricCard } from '@/components/performance/MetricCard';
 import { NetworkPanel } from '@/components/performance/NetworkPanel';
@@ -42,9 +42,10 @@ interface Metrics {
 }
 
 interface SystemInfo {
-    gpu?: { name?: string; vram?: string; utilization?: number; temp?: number; power?: number };
+    gpu?: { name?: string; memoryUsedGB?: string; utilization?: number; temperature?: number; powerDraw?: number };
     memory?: { used?: number; total?: number };
-    cpu?: { usage?: number; cores?: number };
+    cpu?: { utilization?: number; cores?: number; name?: string };
+    disk?: { totalGB?: string; usedGB?: string; percentUsed?: string };
 }
 
 interface ErrorLog {
@@ -202,6 +203,12 @@ export default function PerformancePage() {
         return () => clearInterval(interval);
     }, [loadAllData, refreshInterval]);
 
+    const formatDuration = (seconds: number) => {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        return `${h}h ${m}m`;
+    };
+
     // Computed values
     const operationalCount = services.filter(s => s.status === 'operational').length;
 
@@ -246,7 +253,27 @@ export default function PerformancePage() {
                     </h2>
 
                     {/* Metrics Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+                        <MetricCard
+                            label="CPU Load"
+                            value={`${systemInfo?.cpu?.utilization ?? '--'}%`}
+                            icon={Cpu} color="cyan"
+                        />
+                        <MetricCard
+                            label="RAM Usage"
+                            value={systemInfo?.memory?.used ? `${(systemInfo.memory.used / 1024).toFixed(1)}GB` : '--'}
+                            icon={HardDrive} color="purple"
+                        />
+                        <MetricCard
+                            label="Disk (C:)"
+                            value={systemInfo?.disk?.percentUsed ? `${systemInfo.disk.percentUsed}%` : '--'}
+                            icon={Database} color="blue"
+                        />
+                        <MetricCard
+                            label="Active Agents"
+                            value={metrics?.activeAgents ?? '--'}
+                            icon={Bot} color="pink"
+                        />
                         <MetricCard
                             label="GPU Usage"
                             value={`${systemInfo?.gpu?.utilization ?? '--'}%`}
@@ -254,28 +281,18 @@ export default function PerformancePage() {
                         />
                         <MetricCard
                             label="GPU Temp"
-                            value={`${systemInfo?.gpu?.temp ?? '--'}°C`}
+                            value={systemInfo?.gpu?.temperature != null ? `${(systemInfo.gpu.temperature * 1.8 + 32).toFixed(1)}°F` : '--'}
                             icon={Thermometer} color="yellow"
-                        />
-                        <MetricCard
-                            label="GPU Power"
-                            value={`${systemInfo?.gpu?.power ?? '--'}W`}
-                            icon={Zap} color="green"
-                        />
-                        <MetricCard
-                            label="RAM Used"
-                            value={systemInfo?.memory?.used ? `${(systemInfo.memory.used / 1024).toFixed(1)}GB` : '--'}
-                            icon={HardDrive} color="purple"
                         />
                         <MetricCard
                             label="Active Conn"
                             value={metrics?.activeConnections ?? '--'}
-                            icon={Activity} color="pink"
+                            icon={Activity} color="blue"
                         />
                         <MetricCard
-                            label="Errors (24h)"
-                            value={errors.stats?.last24Hours ?? 0}
-                            icon={AlertTriangle} color="red"
+                            label="Sys Uptime"
+                            value={health?.uptime ? formatDuration(health.uptime) : '--'}
+                            icon={Clock} color="green"
                         />
                     </div>
 
@@ -284,13 +301,11 @@ export default function PerformancePage() {
                             {systemInfo?.gpu ? (
                                 <GpuMonitor
                                     utilization={systemInfo.gpu.utilization ?? 0}
-                                    temperature={systemInfo.gpu.temp ?? 0}
-                                    vramUsed={parseFloat(systemInfo?.gpu?.vram?.replace(/[^\d.]/g, '') || '0') || 0}
+                                    temperature={systemInfo.gpu.temperature ?? 0}
+                                    vramUsed={parseFloat(systemInfo?.gpu?.memoryUsedGB || '0') || 0}
                                     vramTotal={12} // RTX 3060 has 12GB
-                                    power={systemInfo.gpu.power ?? 0}
+                                    power={systemInfo.gpu.powerDraw ?? 0}
                                     gpuName={systemInfo.gpu.name || 'GPU'}
-                                    gpuHistory={gpuHistory}
-                                    vramHistory={ramHistory}
                                 />
                             ) : (
                                 <div className="glass-card flex items-center justify-center p-12 text-gray-500">

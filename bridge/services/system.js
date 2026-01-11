@@ -14,16 +14,18 @@ export const systemService = {
      * Get all system metrics
      */
     async getMetrics() {
-        const [gpu, cpu, memory] = await Promise.all([
+        const [gpu, cpu, memory, disk] = await Promise.all([
             this.getGPU(),
             this.getCPU(),
-            this.getMemory()
+            this.getMemory(),
+            this.getDisk()
         ]);
 
         return {
             gpu,
             cpu,
             memory,
+            disk,
             timestamp: new Date().toISOString()
         };
     },
