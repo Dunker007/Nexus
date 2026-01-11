@@ -15,3 +15,4 @@ export { AlertsPanel } from './AlertsPanel';
 export { DevToolsPanel } from './DevToolsPanel';
 export { SystemOverview } from './SystemOverview';
 export { OptimizePanel } from './OptimizePanel';
+export { AIOptimizerAgent } from './AIOptimizerAgent';

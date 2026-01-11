@@ -181,9 +181,12 @@ export const HARDWARE_CONFIG = {
         socket: 'AM4',
     },
     GPU: {
-        name: 'NVIDIA RTX 4070',
-        vram: '12GB GDDR6X',
-        tdp: 200, // watts
+        name: 'NVIDIA RTX 3060',
+        vram: '12GB GDDR6',
+        vramBytes: 12 * 1024 * 1024 * 1024,
+        tensorCores: true,
+        cudaCores: 3584,
+        tdp: 170, // watts
     },
     CPU: {
         model: 'AMD Ryzen 7 3700X',
@@ -199,4 +202,26 @@ export const HARDWARE_CONFIG = {
         slots: 4,
     },
 } as const;
+
+// ============= NVIDIA SDK CONFIG =============
+export const NVIDIA_SDK = {
+    CUDA: {
+        version: '13.1',
+        toolkit: 'CUDA Toolkit',
+    },
+    TENSORRT: {
+        name: 'TensorRT for RTX',
+        description: 'High-performance deep learning inference SDK',
+    },
+    NIM: {
+        name: 'NVIDIA NIM',
+        description: 'Inference Microservices for LLM/Vision deployment',
+    },
+    CLI_TOOLS: [
+        { name: 'nvidia-smi', description: 'GPU monitoring & compute mode' },
+        { name: 'AI Workbench', description: 'AI model prototyping toolkit' },
+        { name: 'Nsight Systems', description: 'Performance profiling' },
+    ],
+} as const;
+
 

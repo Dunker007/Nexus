@@ -16,6 +16,7 @@ import { AlertsPanel } from '@/components/performance/AlertsPanel';
 import { DevToolsPanel } from '@/components/performance/DevToolsPanel';
 import { SystemOverview } from '@/components/performance/SystemOverview';
 import { OptimizePanel } from '@/components/performance/OptimizePanel';
+import { AIOptimizerAgent } from '@/components/performance/AIOptimizerAgent';
 
 // ============= TYPES =============
 interface ServiceStatus {
@@ -450,6 +451,11 @@ export default function PerformancePage() {
             {/* Optimization Tools */}
             <section className="container-main pb-8">
                 <OptimizePanel bridgeUrl={BRIDGE_URL} />
+            </section>
+
+            {/* AI Optimizer Agent */}
+            <section className="container-main pb-8">
+                <AIOptimizerAgent bridgeUrl={BRIDGE_URL} />
             </section>
 
             {/* Back link */}
