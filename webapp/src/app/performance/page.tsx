@@ -9,6 +9,7 @@ import { RefreshCw, Cpu, HardDrive, Thermometer, Zap, Activity, Server, AlertTri
 import { GpuMonitor } from '@/components/performance/GpuMonitor';
 import { MetricCard } from '@/components/performance/MetricCard';
 import { NetworkPanel } from '@/components/performance/NetworkPanel';
+import { ModelsPanel } from '@/components/performance/ModelsPanel';
 
 // ============= TYPES =============
 interface ServiceStatus {
@@ -449,6 +450,11 @@ export default function PerformancePage() {
             {/* Network Infrastructure - Now with live monitoring */}
             <section className="container-main pb-8">
                 <NetworkPanel bridgeUrl={BRIDGE_URL} refreshInterval={30000} />
+            </section>
+
+            {/* AI Models Panel */}
+            <section className="container-main pb-8">
+                <ModelsPanel bridgeUrl={BRIDGE_URL} refreshInterval={30000} />
             </section>
 
             {/* Back link */}
