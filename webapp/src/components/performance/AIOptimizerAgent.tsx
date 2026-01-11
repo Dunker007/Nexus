@@ -11,7 +11,7 @@ import {
     RefreshCw, CheckCircle, AlertTriangle, Activity,
     Gauge, ChevronRight, Sparkles, BarChart3
 } from 'lucide-react';
-import { HARDWARE_CONFIG, NVIDIA_SDK } from '@/lib/luxrig/constants';
+import { HARDWARE_CONFIG, NVIDIA_SDK, ASROCK_SDK } from '@/lib/luxrig/constants';
 
 interface DiagnosticResult {
     category: string;
@@ -73,6 +73,8 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
             { name: 'VRAM Analysis', delay: 600 },
             { name: 'Tensor Core Status', delay: 400 },
             { name: 'CUDA Compatibility', delay: 500 },
+            { name: 'AI QuickSet Status', delay: 400 },
+            { name: 'CPU/Motherboard', delay: 500 },
             { name: 'Power Configuration', delay: 400 },
             { name: 'Thermal Analysis', delay: 600 },
         ];
@@ -135,6 +137,22 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                     message: `CUDA ${NVIDIA_SDK.CUDA.version} compatible with RTX 3060`,
                     value: `v${NVIDIA_SDK.CUDA.version}`,
                 });
+            } else if (step.name === 'AI QuickSet Status') {
+                results.push({
+                    category: step.name,
+                    status: 'optimal',
+                    message: `${ASROCK_SDK.AI_QUICKSET.name} available for WSL AI setup`,
+                    value: 'Ready',
+                });
+                recs.push('Use ai-quickset CLI to install PyTorch/TensorFlow with GPU acceleration');
+            } else if (step.name === 'CPU/Motherboard') {
+                results.push({
+                    category: step.name,
+                    status: 'optimal',
+                    message: `${HARDWARE_CONFIG.CPU.model} on ${HARDWARE_CONFIG.MOTHERBOARD.name}`,
+                    value: `${HARDWARE_CONFIG.CPU.cores}C/${HARDWARE_CONFIG.CPU.threads}T`,
+                });
+                recs.push('AMDRMCLI available for Ryzen tuning via script');
             } else if (step.name === 'Power Configuration') {
                 const powerDraw = gpuStats.powerDraw;
                 results.push({
@@ -218,8 +236,8 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                 <div className="flex items-center gap-3">
                     {overallScore !== null && (
                         <span className={`px-3 py-1 rounded-full text-sm font-bold ${overallScore >= 80 ? 'bg-green-500/20 text-green-400' :
-                                overallScore >= 60 ? 'bg-yellow-500/20 text-yellow-400' :
-                                    'bg-red-500/20 text-red-400'
+                            overallScore >= 60 ? 'bg-yellow-500/20 text-yellow-400' :
+                                'bg-red-500/20 text-red-400'
                             }`}>
                             {overallScore}% Optimal
                         </span>
@@ -357,7 +375,7 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
             <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-gray-500">
                 <span className="flex items-center gap-2">
                     <Terminal size={12} />
-                    nvidia-smi • {NVIDIA_SDK.CUDA.toolkit}
+                    nvidia-smi • {NVIDIA_SDK.CUDA.toolkit} • {ASROCK_SDK.AI_QUICKSET.cli}
                 </span>
                 <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />

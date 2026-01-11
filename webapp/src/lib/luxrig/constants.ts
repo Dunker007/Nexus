@@ -224,4 +224,42 @@ export const NVIDIA_SDK = {
     ],
 } as const;
 
+// ============= ASROCK SDK CONFIG =============
+export const ASROCK_SDK = {
+    AI_QUICKSET: {
+        name: 'ASRock AI QuickSet (WSL Edition)',
+        description: 'Automated AI framework setup with GPU acceleration',
+        cli: 'ai-quickset',
+        commands: [
+            { cmd: 'ai-quickset launch diffusers', description: 'Launch Stable Diffusion' },
+            { cmd: 'ai-quickset install pytorch', description: 'Install PyTorch with CUDA' },
+            { cmd: 'ai-quickset install tensorflow', description: 'Install TensorFlow' },
+        ],
+    },
+    SYSTEM_CLI: [
+        {
+            name: 'AMDRMCLI',
+            description: 'Ryzen Master CLI for CPU overclocking',
+            path: 'ASRock Motherboard Utilities/A-Tuning',
+        },
+        {
+            name: 'mgmtcli',
+            description: 'BIOS settings and firmware management',
+            path: 'ASRRM GMT Tool',
+        },
+        {
+            name: 'wICPFLASHADSBv2',
+            description: 'RGB controller firmware',
+            path: 'ASRRGBLED/Bin',
+        },
+    ],
+    OPENRGB: {
+        name: 'OpenRGB SDK',
+        description: 'Network-based RGB control (Python, C++, C#)',
+        bindings: ['Python', 'C++', 'C#'],
+        features: ['Polychrome Sync', 'Lighting Control'],
+    },
+} as const;
+
+
 
