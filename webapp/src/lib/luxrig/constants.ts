@@ -201,6 +201,56 @@ export const HARDWARE_CONFIG = {
         type: 'DDR4',
         slots: 4,
     },
+    STORAGE: {
+        primary: {
+            model: 'Crucial T500',
+            capacity: '4TB',
+            capacityBytes: 4 * 1024 * 1024 * 1024 * 1024,
+            interface: 'PCIe Gen4 x4 NVMe',
+            controller: 'Phison',
+            readSpeed: '7400 MB/s',
+            writeSpeed: '7000 MB/s',
+            firmware: 'P8CR004',
+            directStorage: true,
+        },
+    },
+} as const;
+
+// ============= STORAGE SDK CONFIG =============
+export const STORAGE_SDK = {
+    MSECLI: {
+        name: 'Micron Storage Executive CLI',
+        executable: 'msecli',
+        description: 'Low-level SSD management without GUI',
+        commands: [
+            { cmd: 'msecli -L', description: 'List all drives' },
+            { cmd: 'msecli -S -d 0', description: 'SMART health status' },
+            { cmd: 'msecli -U -d 0', description: 'Check firmware updates' },
+            { cmd: 'msecli -O -d 0 -p 10', description: 'Set 10% over-provisioning' },
+        ],
+        capabilities: [
+            'SMART health monitoring',
+            'Firmware updates (P8CR004)',
+            'Over-provisioning for AI training endurance',
+            'Secure erase/sanitization',
+            'Drive temperature monitoring',
+        ],
+    },
+    DIRECTSTORAGE: {
+        name: 'Microsoft DirectStorage',
+        description: 'GPU-direct data transfer, bypasses CPU',
+        benefit: 'Reduced latency for LLM inference - data flows directly from T500 to RTX 3060',
+        supported: true,
+    },
+    NVME_CLI: {
+        name: 'nvme-cli',
+        platform: 'Linux/WSL',
+        commands: [
+            { cmd: 'nvme smart-log /dev/nvme0', description: 'View SMART logs' },
+            { cmd: 'nvme list', description: 'List NVMe devices' },
+            { cmd: 'nvme id-ctrl /dev/nvme0', description: 'Controller info' },
+        ],
+    },
 } as const;
 
 // ============= NVIDIA SDK CONFIG =============

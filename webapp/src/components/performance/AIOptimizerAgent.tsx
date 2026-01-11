@@ -11,7 +11,7 @@ import {
     RefreshCw, CheckCircle, AlertTriangle, Activity,
     Gauge, ChevronRight, Sparkles, BarChart3
 } from 'lucide-react';
-import { HARDWARE_CONFIG, NVIDIA_SDK, ASROCK_SDK } from '@/lib/luxrig/constants';
+import { HARDWARE_CONFIG, NVIDIA_SDK, ASROCK_SDK, STORAGE_SDK } from '@/lib/luxrig/constants';
 
 interface DiagnosticResult {
     category: string;
@@ -73,6 +73,7 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
             { name: 'VRAM Analysis', delay: 600 },
             { name: 'Tensor Core Status', delay: 400 },
             { name: 'CUDA Compatibility', delay: 500 },
+            { name: 'NVMe Storage', delay: 400 },
             { name: 'AI QuickSet Status', delay: 400 },
             { name: 'CPU/Motherboard', delay: 500 },
             { name: 'Power Configuration', delay: 400 },
@@ -137,6 +138,16 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
                     message: `CUDA ${NVIDIA_SDK.CUDA.version} compatible with RTX 3060`,
                     value: `v${NVIDIA_SDK.CUDA.version}`,
                 });
+            } else if (step.name === 'NVMe Storage') {
+                results.push({
+                    category: step.name,
+                    status: 'optimal',
+                    message: `${HARDWARE_CONFIG.STORAGE.primary.model} ${HARDWARE_CONFIG.STORAGE.primary.capacity} with DirectStorage`,
+                    value: HARDWARE_CONFIG.STORAGE.primary.readSpeed,
+                });
+                if (STORAGE_SDK.DIRECTSTORAGE.supported) {
+                    recs.push('DirectStorage enabled - AI data flows directly from T500 to RTX 3060');
+                }
             } else if (step.name === 'AI QuickSet Status') {
                 results.push({
                     category: step.name,
@@ -375,7 +386,7 @@ export function AIOptimizerAgent({ bridgeUrl }: AIOptimizerAgentProps) {
             <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-gray-500">
                 <span className="flex items-center gap-2">
                     <Terminal size={12} />
-                    nvidia-smi • {NVIDIA_SDK.CUDA.toolkit} • {ASROCK_SDK.AI_QUICKSET.cli}
+                    nvidia-smi • {STORAGE_SDK.MSECLI.executable} • {ASROCK_SDK.AI_QUICKSET.cli}
                 </span>
                 <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
