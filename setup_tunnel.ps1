@@ -19,13 +19,29 @@ function Initialize-Tunnel {
     }
     
     $TunnelName = "nexus-bridge"
-    Write-Host "2. Creating Tunnel '$TunnelName'..." -ForegroundColor Yellow
-    # Create tunnel and capture UUID
-    $CreateOutput = ./cloudflared.exe tunnel create $TunnelName 2>&1
+    Write-Host "2. Creating/Finding Tunnel '$TunnelName'..." -ForegroundColor Yellow
     
-    # Extract UUID (regex for UUID pattern)
-    if ($CreateOutput -match "([a-f0-9-]{36})") {
-        $UUID = $matches[1]
+    # Try creating (may fail if exists)
+    try {
+        ./cloudflared.exe tunnel create $TunnelName 2>&1 | Out-Null
+    }
+    catch {
+        Write-Host "Tunnel likely exists. Checking list..." -ForegroundColor Gray
+    }
+    
+    # Get UUID from list (Reliable)
+    $ListOutput = ./cloudflared.exe tunnel list 2>&1
+    $UUID = $null
+    
+    foreach ($line in $ListOutput) {
+        # Match 'UUID NAME' format
+        if ($line -match "([a-f0-9-]{36})\s+$TunnelName") {
+            $UUID = $matches[1]
+            break
+        }
+    }
+    
+    if ($UUID) {
         Write-Host "Tunnel UUID: $UUID" -ForegroundColor Green
         
         # Create Config
@@ -42,13 +58,13 @@ ingress:
         Write-Host "Config file created."
         
         Write-Host "3. Routing DNS..." -ForegroundColor Yellow
-        ./cloudflared.exe tunnel route dns $TunnelName bridge.dlxstudios.online
+        ./cloudflared.exe tunnel route dns $TunnelName bridge.dlxstudios.online 2>&1 | Out-Null
         
         Write-Host "4. Starting Tunnel..." -ForegroundColor Green
         ./cloudflared.exe tunnel run $TunnelName
     }
     else {
-        Write-Error "Failed to extract UUID. Output: $CreateOutput"
+        Write-Error "Could not find tunnel '$TunnelName'. Please run: ./cloudflared.exe tunnel list"
     }
 }
 

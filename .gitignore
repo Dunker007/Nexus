@@ -28,6 +28,7 @@ webapp/src-tauri/gen/
 # Cloudflared
 cloudflared.exe
 config.yml
+_OLD_COPY_Nexus/
 npm-debug.log*
 
 # Data (runtime)
