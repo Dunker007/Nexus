@@ -293,3 +293,33 @@ model SystemSetting {
   
   @@index([category])
 }
+
+// SmartFolio Portfolio Data
+model SmartFolioPosition {
+  id        String   @id @default(uuid())
+  accountId String   // 'sui', 'alts'
+  symbol    String
+  units     Float
+  cost      Float    // Total cost basis
+  
+  updatedAt DateTime @updatedAt
+  
+  @@unique([accountId, symbol])
+  @@index([accountId])
+}
+
+model SmartFolioJournal {
+  id        String   @id // Import ID or generated ID
+  accountId String   // 'sui', 'alts'
+  type      String   // 'buy', 'sell', 'note'
+  symbol    String
+  units     Float?
+  price     Float?
+  notes     String?
+  timestamp DateTime
+  
+  createdAt DateTime @default(now())
+  
+  @@index([accountId])
+  @@index([timestamp])
+}

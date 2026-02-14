@@ -207,6 +207,7 @@ export const INITIAL_LABS_DATA = [
     { id: 'vision', icon: '👁️', name: 'Vision Lab', desc: 'Computer vision tools.', status: 'concept' as const, category: 'Creation' as const, priority: 'Low' as const, agents: ['lux'], href: '/vision', ideas: 1, timeline: { startMonth: 5, durationMonths: 6, progress: 5 }, owner: 'Lux' },
 
     // Capital
+    { id: 'smartfolio', icon: '💰', name: 'SmartFolio', desc: 'AI-driven portfolio management and analysis.', status: 'active' as const, category: 'Capital' as const, priority: 'High' as const, agents: ['oracle', 'antigravity'], href: '/labs/smartfolio', ideas: 15, timeline: { startMonth: 2, durationMonths: 12, progress: 85 }, owner: 'Oracle' },
     { id: 'income', icon: '💸', name: 'Passive Income', desc: 'Revenue tracking.', status: 'active' as const, category: 'Capital' as const, priority: 'High' as const, agents: ['oracle'], href: '/income', ideas: 12, timeline: { startMonth: 0, durationMonths: 12, progress: 60 }, owner: 'Oracle' },
     { id: 'crypto', icon: '💎', name: 'Crypto Lab', desc: 'DeFi & Solana.', status: 'active' as const, category: 'Capital' as const, priority: 'Medium' as const, agents: ['oracle'], href: '/crypto', ideas: 3, timeline: { startMonth: 2, durationMonths: 4, progress: 30 }, owner: 'Oracle' },
 

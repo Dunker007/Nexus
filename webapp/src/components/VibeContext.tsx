@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { ThemeId, Theme, themes, getTheme, applyTheme, saveTheme, loadSavedTheme } from '@/lib/themes';
 
+import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
+
 type VibeMode = 'normal' | 'high-load' | 'crisis' | 'focus';
 export type UserRole = 'architect' | 'developer' | 'viewer';
 
@@ -26,7 +28,6 @@ interface VibeState {
 
 export const VibeContext = createContext<VibeState | undefined>(undefined);
 
-const LUXRIG_BRIDGE_URL = process.env.NEXT_PUBLIC_BRIDGE_URL || 'http://localhost:3456';
 const WS_URL = LUXRIG_BRIDGE_URL.replace('http', 'ws') + '/stream';
 
 export function VibeProvider({ children }: { children: ReactNode }) {
@@ -59,6 +60,10 @@ export function VibeProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         const ws = new WebSocket(WS_URL);
+
+        ws.onerror = () => {
+            // Silently fail if bridge is not running
+        };
 
         ws.onmessage = (event) => {
             try {

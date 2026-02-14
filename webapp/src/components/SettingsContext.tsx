@@ -112,7 +112,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                     }));
                 }
             } catch (e) {
-                console.warn('Failed to fetch remote settings, using defaults/local', e);
+                // Bridge offline - using defaults/local
                 setSettings(prev => ({ ...prev, ...local }));
             }
         } catch (error) {

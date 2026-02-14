@@ -19,6 +19,16 @@ interface Studio {
 
 const studios: Studio[] = [
   {
+    id: 'smartfolio',
+    name: 'DLX SmartFolio',
+    description: 'AI-powered crypto portfolio management. Real-time analysis, strategy execution, and risk monitoring with Gemini 2.0.',
+    icon: '⚡',
+    href: '/labs/smartfolio',
+    color: 'emerald',
+    status: 'live',
+    features: ['Portfolio AI', 'Gemini 2.0', 'SUI Anchor', 'Risk Guard']
+  },
+  {
     id: 'music',
     name: 'DLX Music Studio',
     description: 'AI-powered songwriting with collaborative agents. Create lyrics, compose melodies, and generate Suno-ready prompts.',
@@ -199,7 +209,7 @@ export default function StudiosPage() {
         {/* Grid View */}
         {viewMode === 'grid' && (
           <motion.div
-            className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
             initial="hidden"
             animate="visible"
             variants={{ visible: { transition: { staggerChildren: 0.05 } } }}

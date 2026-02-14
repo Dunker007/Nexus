@@ -1,0 +1,444 @@
+"use client";
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+import { TRADE_FEE_PERCENT, STRATEGIES } from '@/lib/labs/smartfolio/data/strategy';
+import { hasGeminiKey, analyzePortfolio, type PortfolioSnapshot } from '@/lib/labs/smartfolio/geminiService';
+
+const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+export default function ReportPage() {
+    const { assets, pendingOrders, activeAccount, activeStrategy, recycledToSui, mounted, marketCondition } = usePortfolio();
+    const [mounted2, setMounted2] = useState(false);
+    const [aiBrief, setAiBrief] = useState<string | null>(null);
+    const [aiBriefLoading, setAiBriefLoading] = useState(false);
+    const [isGemini, setIsGemini] = useState(false);
+    React.useEffect(() => setMounted2(true), []);
+
+    const totalValue = assets.reduce((s, a) => s + a.currentValue, 0);
+    const coins = assets.filter(a => a.symbol !== 'USD');
+    const cashAsset = assets.find(a => a.symbol === 'USD');
+    const cashPercent = cashAsset ? (cashAsset.currentValue / totalValue) * 100 : 0;
+
+    // ─── Strategy compliance ───
+    const compliance = useMemo(() => {
+        const targets = activeStrategy.targets;
+        const checks: { label: string; target: string; actual: string; status: 'pass' | 'warn' | 'fail' }[] = [];
+
+        // Cash check
+        const cashMin = targets.cash.min || 10;
+        const cashIdeal = targets.cash.ideal || 25;
+        checks.push({
+            label: 'Cash Reserve',
+            target: `${cashMin}–${cashIdeal}%`,
+            actual: `${cashPercent.toFixed(1)}%`,
+            status: cashPercent >= cashMin ? (cashPercent >= cashIdeal * 0.8 ? 'pass' : 'warn') : 'fail',
+        });
+
+        if (activeAccount === 'sui') {
+            // SUI anchor check
+            const suiAlloc = assets.find(a => a.symbol === 'SUI')?.allocation || 0;
+            const suiTarget = targets.sui;
+            checks.push({
+                label: 'SUI Anchor Weight',
+                target: `${suiTarget.min}–${suiTarget.max}%`,
+                actual: `${suiAlloc.toFixed(1)}%`,
+                status: suiAlloc >= (suiTarget.min || 0) ? (suiAlloc <= (suiTarget.max || 100) ? 'pass' : 'warn') : 'fail',
+            });
+
+            // Alts check
+            const altAlloc = coins.filter(a => a.symbol !== 'SUI').reduce((s, a) => s + a.allocation, 0);
+            checks.push({
+                label: 'Alt Exposure',
+                target: `${targets.alts.min}–${targets.alts.max}%`,
+                actual: `${altAlloc.toFixed(1)}%`,
+                status: altAlloc <= (targets.alts.max || 100) ? 'pass' : 'warn',
+            });
+        } else {
+            // Concentration check
+            const maxAlloc = Math.max(...coins.map(a => a.allocation));
+            const maxSymbol = coins.find(a => a.allocation === maxAlloc)?.symbol || '?';
+            checks.push({
+                label: `Max Concentration (${maxSymbol})`,
+                target: `≤${activeStrategy.thresholds.maxConcentration}%`,
+                actual: `${maxAlloc.toFixed(1)}%`,
+                status: maxAlloc <= activeStrategy.thresholds.maxConcentration ? 'pass' : 'warn',
+            });
+
+            // Position count
+            checks.push({
+                label: 'Position Count',
+                target: '4–8 alts',
+                actual: `${coins.length} positions`,
+                status: coins.length >= 4 && coins.length <= 8 ? 'pass' : 'warn',
+            });
+        }
+
+        return checks;
+    }, [assets, activeAccount, activeStrategy, cashPercent, coins]);
+
+    const score = compliance.filter(c => c.status === 'pass').length / compliance.length * 100;
+
+    // ─── Best / Worst performers ───
+    const sorted = [...coins].sort((a, b) => (b.gainLoss || 0) - (a.gainLoss || 0));
+    const bestPerformers = sorted.filter(a => (a.gainLoss || 0) > 0).slice(0, 3);
+    const worstPerformers = sorted.filter(a => (a.gainLoss || 0) < 0).slice(-3).reverse();
+
+    // ─── Fee drag estimate ───
+    const totalFeeDrag = useMemo(() => {
+        // Estimate fees from orders + past fills
+        const orderFeeDrag = pendingOrders.reduce((s, o) => s + o.units * o.price * TRADE_FEE_PERCENT / 100, 0);
+        return orderFeeDrag;
+    }, [pendingOrders]);
+
+    // ─── Cross-account summary ───
+    const otherAccountId: AccountId = activeAccount === 'sui' ? 'alts' : 'sui';
+    const otherAssets = ACCOUNTS[otherAccountId].assets;
+    const otherTotal = otherAssets.reduce((s, a) => s + a.currentValue, 0);
+    const combinedTotal = totalValue + otherTotal;
+    const otherCoins = otherAssets.filter(a => a.symbol !== 'USD');
+
+    // ─── Trade recommendations ───
+    const recommendations = useMemo(() => {
+        const recs: { icon: string; text: string; priority: 'high' | 'medium' | 'low' }[] = [];
+        const cashTargets = activeStrategy.targets.cash;
+        const cashMin = cashTargets.min || 10;
+        const cashIdeal = cashTargets.ideal || 25;
+
+        // Dynamic Cash Checks
+        if (cashPercent < cashMin) {
+            recs.push({ icon: '🚨', text: `Cash critically low at ${cashPercent.toFixed(1)}% (Min: ${cashMin}%). Sell positions to rebuild dry powder.`, priority: 'high' });
+        } else if (cashPercent < cashIdeal * 0.9) {
+            recs.push({ icon: '⚠️', text: `Cash at ${cashPercent.toFixed(1)}% — below ideal ${cashIdeal}%. Monitor for opportunities to take profit.`, priority: 'medium' });
+        }
+
+        coins.forEach(a => {
+            const roi = a.totalCost ? ((a.gainLoss || 0) / a.totalCost) * 100 : 0;
+            const deviation = a.allocation - a.targetAllocation;
+
+            // Pending Order Awareness
+            const pendingBuys = pendingOrders.filter(o => o.symbol === a.symbol && o.type === 'buy');
+            const pendingSells = pendingOrders.filter(o => o.symbol === a.symbol && o.type === 'sell');
+            const hasPendingSell = pendingSells.length > 0;
+            const hasPendingBuy = pendingBuys.length > 0;
+
+            // Profit taking
+            if (roi > 50) {
+                if (hasPendingSell) {
+                    recs.push({ icon: '✅', text: `${a.symbol} is +${roi.toFixed(0)}% ROI. Profit-taking order already staged.`, priority: 'low' });
+                } else {
+                    recs.push({ icon: '💰', text: `${a.symbol} is +${roi.toFixed(0)}% ROI. Consider taking 25-50% profit.`, priority: 'medium' });
+                }
+            } else if (roi < -30) {
+                recs.push({ icon: '📉', text: `${a.symbol} is ${roi.toFixed(0)}% ROI. Evaluate thesis — hold or cut losses.`, priority: 'medium' });
+            }
+
+            // Rebalancing
+            if (deviation > 5) { // Significantly Overweight
+                if (hasPendingSell) {
+                    recs.push({ icon: '✅', text: `${a.symbol} overweight (${a.allocation.toFixed(1)}%). Trim order staged.`, priority: 'low' });
+                } else {
+                    recs.push({ icon: '⚖️', text: `${a.symbol} at ${a.allocation.toFixed(1)}% — overweight (target: ${a.targetAllocation.toFixed(1)}%). Trim suggested.`, priority: 'high' });
+                }
+            } else if (deviation < -5) { // Significantly Underweight
+                if (hasPendingBuy) {
+                    recs.push({ icon: '✅', text: `${a.symbol} underweight. Buy order staged.`, priority: 'low' });
+                } else {
+                    // Only suggest buying if cash allows
+                    if (cashPercent > cashMin) {
+                        recs.push({ icon: '🛒', text: `${a.symbol} underweight (${a.allocation.toFixed(1)}%). Consider adding on dips.`, priority: 'medium' });
+                    }
+                }
+            }
+        });
+
+        if (recs.length === 0) {
+            recs.push({ icon: '✨', text: 'Portfolio is balanced and strategy compliant. No actions needed.', priority: 'low' });
+        } else if (pendingOrders.length === 0 && recs.some(r => r.priority === 'high')) {
+            recs.push({ icon: '📋', text: 'High priority items detected. Use Order Builder to stage actions.', priority: 'high' });
+        }
+
+        return recs;
+    }, [assets, cashPercent, coins, pendingOrders, activeStrategy]);
+
+    // ─── Gemini Weekly Brief ───
+    const buildReportSnapshot = useCallback((): PortfolioSnapshot => {
+        return {
+            accountName: activeAccount === 'sui' ? 'SUI Account' : 'Alts Account',
+            strategyName: activeStrategy.name,
+            targetMask: activeStrategy.targetMask,
+            marketRegime: marketCondition || 'unknown',
+            totalValue,
+            cashPercent,
+            positions: coins.map(a => ({
+                symbol: a.symbol,
+                units: a.units,
+                avgCost: a.avgCost,
+                currentPrice: a.currentPrice,
+                currentValue: a.currentValue,
+                allocation: a.allocation,
+                targetAllocation: a.targetAllocation,
+                gainLoss: a.gainLoss,
+            })),
+            pendingOrders: pendingOrders.map(o => ({
+                type: o.type,
+                symbol: o.symbol,
+                units: o.units,
+                price: o.price,
+                note: o.note,
+            })),
+            strategyRules: activeStrategy.rules,
+        };
+    }, [activeAccount, activeStrategy, coins, pendingOrders, marketCondition, totalValue, cashPercent]);
+
+    const generateBrief = useCallback(async () => {
+        if (!hasGeminiKey()) return;
+        setAiBriefLoading(true);
+        try {
+            const snapshot = buildReportSnapshot();
+            const persona = activeAccount === 'sui' ? 'anchor' as const : 'tactician' as const;
+            const complianceSummary = compliance.map(c => `${c.label}: ${c.actual} (target ${c.target}) — ${c.status}`).join('; ');
+            const response = await analyzePortfolio(snapshot, persona,
+                `Write a concise weekly portfolio brief (150-200 words). Structure with:\n` +
+                `1. **Status**: One-line overall health assessment\n` +
+                `2. **Performance**: Key PnL highlights, best/worst performers\n` +
+                `3. **Compliance**: ${complianceSummary}\n` +
+                `4. **Action Items**: Top 2-3 specific trades or adjustments with exact numbers\n` +
+                `5. **Outlook**: 1-2 sentence forward view based on current regime\n` +
+                `Use bold for key numbers. Be specific with prices, units, and percentages.`
+            );
+            setAiBrief(response);
+        } catch {
+            setAiBrief('⚠️ Failed to generate AI brief. Check Gemini API key in Settings.');
+        }
+        setAiBriefLoading(false);
+    }, [buildReportSnapshot, activeAccount, compliance]);
+
+    useEffect(() => {
+        const geminiAvailable = hasGeminiKey();
+        setIsGemini(geminiAvailable);
+        if (geminiAvailable && mounted && mounted2) {
+            generateBrief();
+        }
+    }, [mounted, mounted2, activeAccount]);
+
+    if (!mounted || !mounted2) return null;
+
+    return (
+        <>
+            <header className="h-14 border-b border-white/5 bg-black/40 backdrop-blur-xl flex items-center justify-between px-6 z-30 sticky top-0">
+                <div className="flex items-center gap-3">
+                    <span className="text-lg">📋</span>
+                    <h1 className="text-sm font-black text-white uppercase tracking-widest">Portfolio Report</h1>
+                </div>
+                <div className="flex items-center gap-4">
+                    <span className="text-[9px] text-gray-500 font-mono bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                        Generated {new Date().toLocaleDateString()}
+                    </span>
+                </div>
+            </header>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 pb-20 custom-scrollbar relative z-10">
+                {/* ═══ STRATEGY SCORECARD ═══ */}
+                <div className="glass-card p-6 space-y-5">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Strategy Compliance</h3>
+                        <div className="flex items-center gap-3">
+                            <span className="text-[10px] text-gray-500 font-mono">{activeStrategy.name}</span>
+                            <div className={`px-3 py-1 rounded-lg text-xs font-black ${score >= 80 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                                score >= 50 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                                    'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                                }`}>
+                                {score.toFixed(0)}% Score
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {compliance.map((check, i) => (
+                            <div key={i} className={`p-4 rounded-xl border ${check.status === 'pass' ? 'bg-emerald-500/5 border-emerald-500/20' :
+                                check.status === 'warn' ? 'bg-amber-500/5 border-amber-500/20' :
+                                    'bg-rose-500/5 border-rose-500/20'
+                                }`}>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-sm">{check.status === 'pass' ? '✅' : check.status === 'warn' ? '⚠️' : '🚨'}</span>
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase">{check.label}</span>
+                                </div>
+                                <div className="text-base font-black font-mono text-white">{check.actual}</div>
+                                <div className="text-[9px] text-gray-600 font-mono mt-1">Target: {check.target}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* ═══ BEST PERFORMERS ═══ */}
+                    <div className="glass-card p-6 space-y-4">
+                        <h3 className="text-xs font-black text-emerald-400 uppercase tracking-[0.2em]">🏆 Best Performers</h3>
+                        {bestPerformers.length > 0 ? bestPerformers.map((a, i) => (
+                            <div key={a.symbol} className="flex items-center justify-between p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-lg">{i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}</span>
+                                    <div className="flex items-center gap-2">
+                                        {LOGO_MAPPING[a.symbol] && <img src={LOGO_MAPPING[a.symbol]} alt="" className="w-5 h-5" />}
+                                        <span className="text-sm font-black text-white">{a.symbol}</span>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-sm font-black font-mono text-emerald-400">+{currency.format(a.gainLoss || 0)}</span>
+                                    <div className="text-[9px] text-gray-500 font-mono">{a.totalCost ? `+${(((a.gainLoss || 0) / a.totalCost) * 100).toFixed(1)}% ROI` : ''}</div>
+                                </div>
+                            </div>
+                        )) : (
+                            <p className="text-xs text-gray-600 font-mono text-center py-4">No green positions</p>
+                        )}
+                    </div>
+
+                    {/* ═══ WORST PERFORMERS ═══ */}
+                    <div className="glass-card p-6 space-y-4">
+                        <h3 className="text-xs font-black text-rose-400 uppercase tracking-[0.2em]">📉 Needs Attention</h3>
+                        {worstPerformers.length > 0 ? worstPerformers.map(a => (
+                            <div key={a.symbol} className="flex items-center justify-between p-3 rounded-xl bg-rose-500/5 border border-rose-500/20">
+                                <div className="flex items-center gap-2">
+                                    {LOGO_MAPPING[a.symbol] && <img src={LOGO_MAPPING[a.symbol]} alt="" className="w-5 h-5" />}
+                                    <span className="text-sm font-black text-white">{a.symbol}</span>
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-sm font-black font-mono text-rose-400">{currency.format(a.gainLoss || 0)}</span>
+                                    <div className="text-[9px] text-gray-500 font-mono">{a.totalCost ? `${(((a.gainLoss || 0) / a.totalCost) * 100).toFixed(1)}% ROI` : ''}</div>
+                                </div>
+                            </div>
+                        )) : (
+                            <p className="text-xs text-gray-600 font-mono text-center py-4">All positions are green 🎉</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* ═══ TRADE RECOMMENDATIONS ═══ */}
+                <div className="glass-card p-6 space-y-4">
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">AI Recommendations</h3>
+                    {recommendations.length > 0 ? (
+                        <div className="space-y-3">
+                            {recommendations.sort((a, b) => {
+                                const p = { high: 0, medium: 1, low: 2 };
+                                return p[a.priority] - p[b.priority];
+                            }).map((rec, i) => (
+                                <div key={i} className={`p-4 rounded-xl border flex items-start gap-3 ${rec.priority === 'high' ? 'bg-rose-500/5 border-rose-500/20' :
+                                    rec.priority === 'medium' ? 'bg-amber-500/5 border-amber-500/20' :
+                                        'bg-white/[0.02] border-white/5'
+                                    }`}>
+                                    <span className="text-lg">{rec.icon}</span>
+                                    <div className="flex-1">
+                                        <p className="text-xs text-gray-300 leading-relaxed">{rec.text}</p>
+                                    </div>
+                                    <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded border ${rec.priority === 'high' ? 'text-rose-400 border-rose-500/30' :
+                                        rec.priority === 'medium' ? 'text-amber-400 border-amber-500/30' :
+                                            'text-gray-500 border-white/10'
+                                        }`}>{rec.priority}</span>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-xs text-gray-600 font-mono text-center py-4">Portfolio looks well-balanced. No action needed.</p>
+                    )}
+                </div>
+
+                {/* ═══ AI WEEKLY BRIEF ═══ */}
+                <div className="glass-card p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">🧠 AI Weekly Brief</h3>
+                            {isGemini && (
+                                <span className="text-[8px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">Gemini 2.0 Flash</span>
+                            )}
+                        </div>
+                        {isGemini && (
+                            <button
+                                onClick={generateBrief}
+                                disabled={aiBriefLoading}
+                                className="text-[9px] font-bold text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 px-3 py-1 rounded-lg border border-blue-500/20 transition-all disabled:opacity-50"
+                            >
+                                {aiBriefLoading ? 'Generating...' : '↻ Regenerate'}
+                            </button>
+                        )}
+                    </div>
+
+                    {aiBriefLoading ? (
+                        <div className="flex items-center gap-3 py-8 justify-center">
+                            <div className="flex gap-1">
+                                <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                                <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                                <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></span>
+                            </div>
+                            <span className="text-xs text-gray-500 font-mono">Gemini analyzing portfolio...</span>
+                        </div>
+                    ) : aiBrief ? (
+                        <div className="p-5 rounded-xl bg-gradient-to-br from-blue-900/10 to-purple-900/10 border border-white/5">
+                            <div className="text-xs text-gray-300 leading-relaxed whitespace-pre-wrap font-medium">
+                                {aiBrief}
+                            </div>
+                            <div className="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
+                                <span className="text-[8px] text-gray-600 font-mono">Generated {new Date().toLocaleTimeString()}</span>
+                                <span className="text-[8px] text-gray-600 font-mono">Strategy: {activeStrategy.name}</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="text-center py-8">
+                            <p className="text-xs text-gray-600 font-mono">Add your Gemini API key in Settings to enable AI-powered portfolio briefs.</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* ═══ CROSS-ACCOUNT SUMMARY ═══ */}
+                <div className="glass-card p-6 space-y-5">
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Cross-Account Summary</h3>
+
+                    <div className="grid grid-cols-2 gap-6">
+                        {/* Active account */}
+                        <div className="p-5 rounded-xl bg-blue-500/5 border border-blue-500/20 space-y-3">
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm">{activeAccount === 'sui' ? '👑' : '🔄'}</span>
+                                <span className="text-xs font-black text-white uppercase">{ACCOUNTS[activeAccount].accountName}</span>
+                                <span className="text-[8px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/30">ACTIVE</span>
+                            </div>
+                            <div className="text-xl font-black font-mono text-white">{currency.format(totalValue)}</div>
+                            <div className="space-y-1 text-[9px] text-gray-500 font-mono">
+                                <div>Strategy: {activeStrategy.name}</div>
+                                <div>Positions: {coins.length} coins + cash</div>
+                                <div>Pending orders: {pendingOrders.length}</div>
+                                <div>Cash: {cashPercent.toFixed(1)}%</div>
+                                {activeAccount === 'sui' && <div>Recycled to SUI: {currency.format(recycledToSui)}</div>}
+                            </div>
+                        </div>
+
+                        {/* Other account */}
+                        <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 space-y-3">
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm">{otherAccountId === 'sui' ? '👑' : '🔄'}</span>
+                                <span className="text-xs font-black text-gray-400 uppercase">{ACCOUNTS[otherAccountId].accountName}</span>
+                            </div>
+                            <div className="text-xl font-black font-mono text-gray-400">{currency.format(otherTotal)}</div>
+                            <div className="space-y-1 text-[9px] text-gray-600 font-mono">
+                                <div>Strategy: {STRATEGIES[otherAccountId].name}</div>
+                                <div>Positions: {otherCoins.length} coins + cash</div>
+                                <div>Pending orders: {ACCOUNTS[otherAccountId].pendingOrders.length}</div>
+                                <div>Cash: {((otherAssets.find(a => a.symbol === 'USD')?.currentValue || 0) / otherTotal * 100).toFixed(1)}%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
+                        <div className="flex flex-col">
+                            <span className="text-[9px] text-gray-600 uppercase tracking-widest">Combined AUM</span>
+                            <span className="text-xl font-black font-mono text-blue-400">{currency.format(combinedTotal)}</span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                            <span className="text-[9px] text-gray-600 uppercase tracking-widest">Total Fee Drag (Pending)</span>
+                            <span className="text-sm font-black font-mono text-amber-400">{currency.format(totalFeeDrag)}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+}

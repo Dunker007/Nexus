@@ -4,7 +4,7 @@
  */
 
 import express from 'express';
-// import { WebSocketServer } from 'ws';
+import { WebSocketServer } from 'ws';
 import cors from 'cors';
 import { createServer } from 'http';
 import dotenv from 'dotenv';
@@ -23,8 +23,8 @@ import { createAgent, SongwriterRoom, agentRegistry } from './services/agents.js
 import { errorHandler, errorLogger, rateLimiter, asyncHandler, validate } from './services/errors.js';
 import { performanceMonitor, cache } from './services/performance.js';
 import { prisma } from './services/database.js';
-// Security and swagger imports - commented out temporarily for debugging
-// import { security, securityHeaders, sessionMiddleware } from './services/security.js';
+// Security and swagger imports
+import { security, securityHeaders, sessionMiddleware } from './services/security.js';
 // import { swaggerSpec } from './config/swagger.js';
 import { StaffMeetingAgent } from './services/agents-staff-meeting.js';
 import { newsService } from './services/news.js';
@@ -34,6 +34,7 @@ import pipelineRoutes from './routes/pipeline.js';
 import distributionRoutes from './routes/distribution.js';
 import artProductsRoutes from './routes/art-products.js';
 import incomeRoutes from './routes/income.js';
+import smartfolioRoutes from './routes/smartfolio.js';
 const app = express();
 const PORT = process.env.PORT || 3456;
 
@@ -41,8 +42,34 @@ const PORT = process.env.PORT || 3456;
 // const staffMeetingAgent = new StaffMeetingAgent();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+const allowedOrigins = [
+    'https://dlxstudios.online',
+    'https://bridge.dlxstudios.online',
+    'http://localhost:3000',
+    'http://localhost:3456',
+    'http://127.0.0.1:3000'
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            // Check for Vercel preview deployments
+            if (origin.endsWith('.vercel.app')) {
+                return callback(null, true);
+            }
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    credentials: true
+}));
+
+app.use(express.json({ limit: '10mb' })); // Limit body size
+app.use(securityHeaders()); // Helmet security headers
+app.use(rateLimiter); // Standard rate limiting
 app.use(performanceMonitor.middleware()); // Track all request performance
 
 // Swagger UI - commented out temporarily
@@ -53,17 +80,17 @@ app.use('/pipeline', pipelineRoutes);
 app.use('/distribution', distributionRoutes);
 app.use('/art', artProductsRoutes);
 app.use('/income', incomeRoutes);
+app.use('/smartfolio', smartfolioRoutes);
 
 // Create HTTP server for both Express and WebSocket
 const server = createServer(app);
 
 // WebSocket server for real-time updates
-// const wss = new WebSocketServer({ server, path: '/stream' });
+const wss = new WebSocketServer({ server, path: '/stream' });
 
 // Track connected clients
 const clients = new Set();
 
-/*
 wss.on('connection', (ws) => {
     console.log('🔌 Client connected to stream');
     clients.add(ws);
@@ -80,27 +107,22 @@ wss.on('connection', (ws) => {
         console.log('🔌 Client disconnected');
     });
 });
-*/
 
 // Broadcast to all connected clients
 function broadcast(data) {
-    /*
     const message = JSON.stringify(data);
     clients.forEach(client => {
         if (client.readyState === 1) { // OPEN
             client.send(message);
         }
     });
-    */
 }
 
 // Send full status to a client
-/*
 async function sendStatus(ws) {
     const status = await getFullStatus();
     ws.send(JSON.stringify({ type: 'status', data: status }));
 }
-*/
 
 // Active agents registry (Moved up for scope visibility if needed, but getFullStatus needs it)
 const activeAgents = new Map();

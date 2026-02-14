@@ -83,7 +83,7 @@ export default function LabsPage() {
                     setDbStatus('disconnected');
                 }
             } catch (error) {
-                console.error('Failed to fetch projects:', error);
+                // Bridge likely offline, fallback to static data
                 setDbStatus('disconnected');
             }
         };
