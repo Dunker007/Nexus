@@ -44,6 +44,7 @@ const PORT = process.env.PORT || 3456;
 // Middleware
 const allowedOrigins = [
     'https://dlxstudios.online',
+    'https://www.dlxstudios.online',
     'https://bridge.dlxstudios.online',
     'http://localhost:3000',
     'http://localhost:3456',
@@ -91,7 +92,23 @@ const wss = new WebSocketServer({ server, path: '/stream' });
 // Track connected clients
 const clients = new Set();
 
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
+    // Basic API Key check for WebSockets (provided via query param)
+    try {
+        const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+        const key = url.searchParams.get('key');
+
+        if (key !== process.env.API_KEY) {
+            console.warn('⚠️ Unauthorized WebSocket connection blocked');
+            ws.close(1008, 'Unauthorized');
+            return;
+        }
+    } catch (e) {
+        console.error('WebSocket auth error:', e.message);
+        ws.close(1008, 'Auth Error');
+        return;
+    }
+
     console.log('🔌 Client connected to stream');
     clients.add(ws);
 
@@ -171,7 +188,7 @@ app.get('/', (req, res) => {
 });
 
 // Full system status
-app.get('/status', async (req, res) => {
+app.get('/status', security.authenticateApiKey(), async (req, res) => {
     try {
         const status = await getFullStatus();
         res.json(status);
@@ -183,7 +200,7 @@ app.get('/status', async (req, res) => {
 // ============ LLM Routes ============
 
 // List all models from all providers
-app.get('/llm/models', async (req, res) => {
+app.get('/llm/models', security.authenticateApiKey(), async (req, res) => {
     try {
         const [lmModels, ollamaModels] = await Promise.all([
             lmstudioService.listModels(),
@@ -201,7 +218,7 @@ app.get('/llm/models', async (req, res) => {
 });
 
 // List LM Studio models only
-app.get('/llm/lmstudio/models', async (req, res) => {
+app.get('/llm/lmstudio/models', security.authenticateApiKey(), async (req, res) => {
     try {
         const models = await lmstudioService.listModels();
         res.json(models);
@@ -211,7 +228,7 @@ app.get('/llm/lmstudio/models', async (req, res) => {
 });
 
 // List Ollama models only
-app.get('/llm/ollama/models', async (req, res) => {
+app.get('/llm/ollama/models', security.authenticateApiKey(), async (req, res) => {
     try {
         const models = await ollamaService.listModels();
         res.json(models);
@@ -221,7 +238,7 @@ app.get('/llm/ollama/models', async (req, res) => {
 });
 
 // Chat completion (routes to best available)
-app.post('/llm/chat', async (req, res) => {
+app.post('/llm/chat', security.authenticateApiKey(), async (req, res) => {
     const { messages, model, provider } = req.body;
 
     try {
@@ -243,7 +260,7 @@ app.post('/llm/chat', async (req, res) => {
 // ============ System Routes ============
 
 // Real-time system metrics
-app.get('/system', async (req, res) => {
+app.get('/system', security.authenticateApiKey(), async (req, res) => {
     try {
         const metrics = await systemService.getMetrics();
         res.json(metrics);
@@ -253,7 +270,7 @@ app.get('/system', async (req, res) => {
 });
 
 // GPU stats (nvidia-smi)
-app.get('/system/gpu', async (req, res) => {
+app.get('/system/gpu', security.authenticateApiKey(), async (req, res) => {
     try {
         const gpu = await systemService.getGPU();
         res.json(gpu);

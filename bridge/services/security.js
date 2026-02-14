@@ -396,6 +396,21 @@ export function securityHeaders() {
     };
 }
 
+/**
+ * Simple API Key Authentication for Bridge routes
+ */
+export function authenticateApiKey() {
+    return (req, res, next) => {
+        const apiKey = req.headers['x-api-key'];
+        const validKey = process.env.API_KEY;
+
+        if (!apiKey || apiKey !== validKey) {
+            return res.status(401).json({ error: 'Unauthorized: Invalid or missing API Key' });
+        }
+        next();
+    };
+}
+
 // ============ Export All ============
 
 export const security = {
@@ -425,7 +440,8 @@ export const security = {
     // Middleware
     csrfProtection,
     sessionMiddleware,
-    securityHeaders
+    securityHeaders,
+    authenticateApiKey
 };
 
 export default security;

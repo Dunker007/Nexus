@@ -21,7 +21,7 @@ export const API_ENDPOINTS = {
     complete: `${LUXRIG_BRIDGE_URL}/complete`,
 };
 
-// Fetch with timeout and error handling
+// Fetch with timeout and error handling (automatically injects Bridge API Key)
 export async function fetchWithTimeout(
     url: string,
     options: RequestInit = {},
@@ -30,9 +30,16 @@ export async function fetchWithTimeout(
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
 
+    // Inject security headers for Bridge communication
+    const headers = {
+        ...options.headers,
+        'X-API-Key': process.env.NEXT_PUBLIC_BRIDGE_API_KEY || '',
+    };
+
     try {
         const response = await fetch(url, {
             ...options,
+            headers,
             signal: controller.signal,
         });
         clearTimeout(id);

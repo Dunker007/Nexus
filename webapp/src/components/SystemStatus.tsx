@@ -55,7 +55,12 @@ export default function SystemStatus() {
     useEffect(() => {
         async function fetchStatus() {
             try {
-                const res = await fetch(`${LUXRIG_BRIDGE_URL}/status`);
+                // Manually add key for the initial status check
+                const res = await fetch(`${LUXRIG_BRIDGE_URL}/status`, {
+                    headers: {
+                        'X-API-Key': process.env.NEXT_PUBLIC_BRIDGE_API_KEY || ''
+                    }
+                });
                 const data = await res.json();
                 setStatus(data);
                 setError(null);
@@ -67,8 +72,9 @@ export default function SystemStatus() {
         // Initial fetch
         fetchStatus();
 
-        // WebSocket for real-time updates
-        const ws = new WebSocket(`${WS_URL}/stream`);
+        // WebSocket for real-time updates (passing key in query param since headers aren't supported)
+        const key = process.env.NEXT_PUBLIC_BRIDGE_API_KEY || '';
+        const ws = new WebSocket(`${WS_URL}/stream?key=${key}`);
 
         ws.onopen = () => {
             // console.log('🔌 Connected to LuxRig Bridge');
