@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
-const isWeb = process.env.NEXT_PUBLIC_IS_WEB === 'true';
+// detect if we are running in a web environment (Vercel) or desktop (Tauri)
+const isWeb = process.env.NEXT_PUBLIC_IS_WEB === 'true' || process.env.VERCEL === '1';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
