@@ -1,0 +1,13 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/bridge/:path*",
+            "destination": "https://bridge.dlxstudios.online/:path*"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/"
+        }
+    ],
+    "framework": "nextjs"
+}
