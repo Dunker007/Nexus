@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
         // Append History
         if (history && history.length > 0) {
             history.forEach((msg: any) => {
-                if (msg.text) {
+                if (msg.role === 'ai' || msg.role === 'user') {
                     contents.push({
                         role: msg.role === 'ai' ? 'model' : 'user',
                         parts: [{ text: msg.text }]
@@ -174,9 +174,10 @@ export async function POST(req: NextRequest) {
 
         const payload = {
             contents,
+            tools: [{ googleSearchRetrieval: { dynamicRetrievalConfig: { mode: "MODE_DYNAMIC", dynamicThreshold: 0.7 } } }],
             generationConfig: {
                 temperature: 0.7,
-                maxOutputTokens: 1000
+                maxOutputTokens: 2048
             }
         };
 
