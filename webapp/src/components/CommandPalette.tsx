@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Command, Sparkles, Clock, ArrowRight, Mic } from 'lucide-react';
-import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
+import { LUXRIG_BRIDGE_URL, bridgeFetch } from '@/lib/utils';
 import FocusTrap from '@/components/ui/FocusTrap';
 
 interface CommandItem {
@@ -128,7 +128,7 @@ export default function CommandPalette() {
 
         try {
             const query = search.startsWith('?') ? search.slice(1).trim() : search;
-            const response = await fetch(`${LUXRIG_BRIDGE_URL}/llm/chat`, {
+            const response = await bridgeFetch('/llm/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

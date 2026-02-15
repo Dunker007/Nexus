@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
-import { LUXRIG_BRIDGE_URL, storage } from '@/lib/utils';
+import { LUXRIG_BRIDGE_URL, storage, fetchWithTimeout } from '@/lib/utils';
 import { useSettings } from '@/components/SettingsContext';
 import PageBackground from '@/components/PageBackground';
 import {
@@ -233,7 +233,7 @@ export default function ChatPage() {
                 reqSystem = customSystemPrompt;
             }
 
-            const res = await fetch(`${BRIDGE_URL}/llm/chat`, {
+            const res = await fetchWithTimeout(`${BRIDGE_URL}/llm/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -247,7 +247,7 @@ export default function ChatPage() {
                         { role: 'user', content: userMsg.content }
                     ]
                 })
-            });
+            }, 30000);
 
             const data = await res.json();
             const reply = data.content || data.error || "No response.";

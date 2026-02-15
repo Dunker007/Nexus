@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { useSettings } from '@/components/SettingsContext';
+import { fetchWithTimeout } from '@/lib/utils';
 
 // Lux personality and tips per page context
 const LUX_TIPS: Record<string, string[]> = {
@@ -116,7 +117,7 @@ export default function LuxHelper({ initialOpen = false }: LuxHelperProps) {
         // 2. Fallback to LuxRig LLM
         try {
             // Using settings from context
-            const res = await fetch(`${settings.bridgeUrl}/llm/chat`, {
+            const res = await fetchWithTimeout(`${settings.bridgeUrl}/llm/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -127,7 +128,7 @@ export default function LuxHelper({ initialOpen = false }: LuxHelperProps) {
                         { role: 'user', content: input }
                     ]
                 })
-            });
+            }, 15000);
 
             const data = await res.json();
             const reply = data.content || data.error || "I'm having trouble connecting to my brain (LuxRig).";

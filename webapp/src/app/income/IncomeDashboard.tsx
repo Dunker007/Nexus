@@ -7,7 +7,7 @@ import {
     CheckCircle, Circle, AlertCircle,
     Music, Video, ShoppingBag, Mic, Printer, TrendingUp
 } from 'lucide-react';
-import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
+import { LUXRIG_BRIDGE_URL, bridgeFetch } from '@/lib/utils';
 import RevenueAgentWidget from '@/components/RevenueAgentWidget';
 import RevenueTracker from '@/components/RevenueTracker';
 import PageBackground from '@/components/PageBackground';
@@ -98,7 +98,7 @@ export default function IncomeDashboard({ dbStreams }: IncomeDashboardProps) {
         }
 
         try {
-            const response = await fetch(`${LUXRIG_BRIDGE_URL}/llm/chat`, {
+            const response = await bridgeFetch('/llm/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

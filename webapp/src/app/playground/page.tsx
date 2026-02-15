@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
-import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
+import { LUXRIG_BRIDGE_URL, fetchWithTimeout } from '@/lib/utils';
 
 const BRIDGE_URL = LUXRIG_BRIDGE_URL;
 
@@ -97,7 +97,7 @@ export default function PlaygroundPage() {
         setInput('');
 
         try {
-            const res = await fetch(`${BRIDGE_URL}/llm/chat`, {
+            const res = await fetchWithTimeout(`${BRIDGE_URL}/llm/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -110,7 +110,7 @@ export default function PlaygroundPage() {
                     temperature,
                     max_tokens: maxTokens
                 })
-            });
+            }, 30000);
 
             if (res.ok) {
                 const data = await res.json();

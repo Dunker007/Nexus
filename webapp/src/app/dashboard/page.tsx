@@ -5,7 +5,7 @@ import { Responsive, WidthProvider, Layout } from 'react-grid-layout';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Settings, Move, Send, Loader2 } from 'lucide-react';
-import { LUXRIG_BRIDGE_URL } from '@/lib/utils';
+import { LUXRIG_BRIDGE_URL, bridgeFetch } from '@/lib/utils';
 import { parseRSSFeed, NEWS_SOURCES } from '@/lib/news-service';
 import PageBackground from '@/components/PageBackground';
 
@@ -280,7 +280,7 @@ export default function DashboardPage() {
         setQuickAiResponse(''); // Clear previous response
 
         try {
-            const res = await fetch(`${LUXRIG_BRIDGE_URL}/llm/chat`, {
+            const res = await bridgeFetch('/llm/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

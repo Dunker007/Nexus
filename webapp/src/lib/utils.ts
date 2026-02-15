@@ -50,6 +50,16 @@ export async function fetchWithTimeout(
     }
 }
 
+// Convenience wrapper: bridgeFetch('/status') or bridgeFetch('/llm/chat', { method: 'POST', body: ... })
+export async function bridgeFetch(
+    path: string,
+    options: RequestInit = {},
+    timeout = 5000
+): Promise<Response> {
+    const url = path.startsWith('http') ? path : `${LUXRIG_BRIDGE_URL}${path}`;
+    return fetchWithTimeout(url, options, timeout);
+}
+
 // Format file sizes
 export function formatBytes(bytes: number): string {
     if (bytes === 0) return '0 B';
