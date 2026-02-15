@@ -53,6 +53,7 @@ interface PortfolioContextType {
     safetyNetPercent: number;
     isSafetyNetCritical: boolean;
     getAccountState: (id: AccountId) => AccountState;
+    systemEvents: any[]; // New queue for reconciliation events
 
     // 3. Active Account Convenience Accessors (Legacy Compat)
     totalValue: number;
@@ -144,8 +145,8 @@ async function fetchAccountState(accountId: AccountId): Promise<AccountState> {
             notes: j.notes
         }));
 
-        // Use bridge pending orders if available, otherwise fallback to local
-        const pendingOrders = data.pendingOrders && data.pendingOrders.length > 0
+        // Use bridge pending orders if it is an array (even empty), otherwise fallback
+        const pendingOrders = Array.isArray(data.pendingOrders)
             ? data.pendingOrders
             : loadFromStorage<Order[]>(storageKey(accountId, 'orders'), seed.pendingOrders);
 
@@ -208,6 +209,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const [isSyncing, setIsSyncing] = useState(false);
     const [lastSync, setLastSync] = useState<Date | null>(null);
     const [isLiveMode, setIsLiveMode] = useState(false);
+    const [systemEvents, setSystemEvents] = useState<any[]>([]);
 
     // Initial Load (Boot Sequence)
     useEffect(() => {
@@ -218,6 +220,38 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
         // Load BOTH accounts in parallel
         Promise.all([fetchAccountState('sui'), fetchAccountState('alts')]).then(([suiState, altsState]) => {
+
+            // ─── RECONCILIATION LOGIC ───
+            const events: any[] = [];
+
+            // Check SUI Orders
+            const localSuiOrders = loadFromStorage<Order[]>(storageKey('sui', 'orders'), []);
+            const missingSui = localSuiOrders.filter(l => !suiState.pendingOrders.some(r => r.id === l.id));
+
+            missingSui.forEach(lost => {
+                // Is there a matching journal entry? (Same symbol, ~same units, DIFFERENT price implies manual fill)
+                // We check the LAST 5 entries to be safe
+                const match = suiState.journal.slice(0, 5).find(j =>
+                    j.symbol === lost.symbol &&
+                    Math.abs((j.units || 0) - lost.units) < (lost.units * 0.1) && // 10% unit tolerance
+                    j.type === lost.type // same direction
+                );
+
+                if (match) {
+                    events.push({
+                        type: 'reconciliation',
+                        account: 'sui',
+                        payload: {
+                            order: lost,
+                            trade: match,
+                            message: `Detected manual override: ${lost.units} ${lost.symbol} order @ $${lost.price} was replaced by trade @ $${match.price}.`
+                        }
+                    });
+                }
+            });
+
+            setSystemEvents(events);
+
             setAccountsState({
                 sui: suiState,
                 alts: altsState
@@ -653,6 +687,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             safetyNetPercent: globalMetrics.safetyNetPercent,
             isSafetyNetCritical: globalMetrics.isSafetyNetCritical,
             getAccountState: (id) => accountsState[id],
+            systemEvents,
 
             // 3. Active Account Accessors
             totalValue,

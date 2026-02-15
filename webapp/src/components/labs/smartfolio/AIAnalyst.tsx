@@ -48,12 +48,35 @@ export default function AIAnalyst() {
         globalCashBalance,
         isSafetyNetCritical,
         getAccountState,
-        addJournalEntry
+        addJournalEntry,
+        systemEvents
     } = usePortfolio();
 
     const [query, setQuery] = useState('');
     const [history, setHistory] = useState<{ role: 'user' | 'ai'; text: string; timestamp: string }[]>([]);
     const [isTyping, setIsTyping] = useState(false);
+
+    // ─── Reconciliation Monitor ───
+    const processedEvents = useRef<Set<string>>(new Set());
+
+    useEffect(() => {
+        if (!systemEvents || systemEvents.length === 0) return;
+
+        systemEvents.forEach(evt => {
+            const evtId = `${evt.type}-${evt.payload.order.id}`;
+            if (processedEvents.current.has(evtId)) return;
+
+            if (evt.type === 'reconciliation' && evt.account === activeAccount) {
+                // Add System Message to History
+                setHistory(prev => [...prev, {
+                    role: 'ai',
+                    text: `⚠️ ${evt.payload.message} Shall I archive the pending order?`,
+                    timestamp: 'System'
+                }]);
+                processedEvents.current.add(evtId);
+            }
+        });
+    }, [systemEvents, activeAccount]);
 
     // Directive State (AI Driven or Local Fallback)
     const [primaryDirective, setPrimaryDirective] = useState<{ title: string; desc: string; type: 'alert' | 'success' | 'info' } | null>(null);
