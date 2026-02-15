@@ -132,7 +132,7 @@ export default function SmartFolioPage() {
                         <div className="lg:col-span-4 space-y-6 flex flex-col h-full">
                             <motion.div variants={itemVariants} className="bg-[#0b0e11]/40 backdrop-blur-2xl rounded-3xl border border-white/5 p-0 shadow-2xl relative overflow-hidden hover:border-purple-500/20 transition-colors duration-500">
                                 <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent pointer-events-none"></div>
-                                <div className="p-6 relative z-10">
+                                <div className="p-0 relative z-10 h-[650px] flex flex-col">
                                     <AIAnalyst />
                                 </div>
                             </motion.div>
