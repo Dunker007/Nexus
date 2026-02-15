@@ -49,6 +49,9 @@ const ID_MAP: Record<string, string> = {
     'ADA': 'cardano',
     'DOT': 'polkadot',
     'MATIC': 'matic-network',
+    'ONDO': 'ondo-finance',
+    'HYPE': 'hyperliquid',
+    'HBAR': 'hedera-hashgraph',
 };
 
 export default function CoinResearch({ symbol }: { symbol: string }) {

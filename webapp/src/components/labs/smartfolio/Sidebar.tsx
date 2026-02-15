@@ -11,16 +11,23 @@ const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: '
 const Sidebar = () => {
     const pathname = usePathname();
     const router = useRouter();
-    const { assets, activeAccount, switchAccount, activeStrategy, pendingOrders, marketCondition } = usePortfolio();
+    const { assets, activeAccount, switchAccount, activeStrategy, pendingOrders, marketCondition, mounted } = usePortfolio();
     const [isOpen, setIsOpen] = useState(false);
 
     const suiAsset = assets.find(a => a.symbol === 'SUI');
     const totalValue = assets.reduce((s, a) => s + a.currentValue, 0);
 
-    // Combined AUM: live data for active account + seed data for other
-    // Note: This logic relies on ACCOUNTS having data
+    // Combined AUM: live data for active account + persisted value for other
     const otherAccountId: AccountId = activeAccount === 'sui' ? 'alts' : 'sui';
-    const otherAccountValue = ACCOUNTS[otherAccountId].assets ? ACCOUNTS[otherAccountId].assets.reduce((s, a) => s + (a.currentValue || 0), 0) : 0;
+    const otherAccountValue = (() => {
+        if (!mounted) return 0;
+        try {
+            const stored = localStorage.getItem(`smartfolio_lastValue_${otherAccountId}`);
+            if (stored) return JSON.parse(stored) as number;
+        } catch { /* ignore */ }
+        // Fallback to seed data if no stored value yet
+        return ACCOUNTS[otherAccountId].assets ? ACCOUNTS[otherAccountId].assets.reduce((s, a) => s + (a.currentValue || 0), 0) : 0;
+    })();
     const combinedAUM = totalValue + otherAccountValue;
 
     // For Strategy Pulse — show anchor weight (SUI account) or cash weight (Alts account)

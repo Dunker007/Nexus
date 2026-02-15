@@ -86,7 +86,7 @@ export default function EquityCurve({ accountId, currentValue }: EquityCurveProp
                 <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">📈 Equity Curve</h3>
                 <div className="flex items-center gap-3">
                     <span className="text-[9px] text-gray-600 font-mono">{dataPoints.length} snapshots</span>
-                    <span className={`text - xs font - black font - mono ${isPositive ? 'text-emerald-400' : 'text-rose-400'} `}>
+                    <span className={`text-xs font-black font-mono ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
                         {isPositive ? '+' : ''}{totalChange.toFixed(1)}%
                     </span>
                 </div>
@@ -96,7 +96,7 @@ export default function EquityCurve({ accountId, currentValue }: EquityCurveProp
             <div className="relative h-[180px] w-full">
                 <svg viewBox={`0 0 ${chartWidth} ${chartHeight} `} className="w-full h-full" preserveAspectRatio="none">
                     <defs>
-                        <linearGradient id={`equity - gradient - ${accountId} `} x1="0" y1="0" x2="0" y2="1">
+                        <linearGradient id={`equity-gradient-${accountId}`} x1="0" y1="0" x2="0" y2="1">
                             <stop offset="0%" stopColor={isPositive ? '#10b981' : '#f43f5e'} stopOpacity="0.3" />
                             <stop offset="100%" stopColor={isPositive ? '#10b981' : '#f43f5e'} stopOpacity="0.02" />
                         </linearGradient>
@@ -116,7 +116,7 @@ export default function EquityCurve({ accountId, currentValue }: EquityCurveProp
                     {/* Fill area */}
                     <path
                         d={fillPath}
-                        fill={`url(#equity - gradient - ${accountId})`}
+                        fill={`url(#equity-gradient-${accountId})`}
                     />
 
                     {/* Line */}
@@ -163,10 +163,10 @@ export default function EquityCurve({ accountId, currentValue }: EquityCurveProp
                 ].map(stat => (
                     <div key={stat.label} className="text-center p-2 rounded-lg bg-white/[0.02] border border-white/5">
                         <div className="text-[8px] text-gray-600 uppercase tracking-widest mb-1">{stat.label}</div>
-                        <div className={`text - xs font - black font - mono ${stat.value === null ? 'text-gray-600' :
+                        <div className={`text-xs font-black font-mono ${stat.value === null ? 'text-gray-600' :
                             stat.value >= 0 ? 'text-emerald-400' : 'text-rose-400'
-                            } `}>
-                            {stat.value !== null ? `${stat.value >= 0 ? '+' : ''}${stat.value.toFixed(1)}% ` : '—'}
+                            }`}>
+                            {stat.value !== null ? `${stat.value >= 0 ? '+' : ''}${stat.value.toFixed(1)}%` : '—'}
                         </div>
                     </div>
                 ))}
@@ -178,7 +178,7 @@ export default function EquityCurve({ accountId, currentValue }: EquityCurveProp
                     <span className="text-[8px] text-gray-600 font-mono">
                         HWM: ${perf.highWaterMark.toFixed(0)}
                     </span>
-                    <span className={`text - [8px] font - mono ${perf.drawdown < -5 ? 'text-rose-400' : 'text-gray-600'} `}>
+                    <span className={`text-[8px] font-mono ${perf.drawdown < -5 ? 'text-rose-400' : 'text-gray-600'}`}>
                         Drawdown: {perf.drawdown.toFixed(1)}%
                     </span>
                 </div>

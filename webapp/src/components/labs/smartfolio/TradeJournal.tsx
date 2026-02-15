@@ -213,7 +213,8 @@ export default function TradeJournal() {
                     symbol: item.symbol,
                     units: item.units,
                     price: item.price,
-                    notes: 'Imported via bulk tool'
+                    notes: 'Imported via bulk tool',
+                    silent: true // Prevents double-counting when balances are also synced
                 });
             } else {
                 addOrder({

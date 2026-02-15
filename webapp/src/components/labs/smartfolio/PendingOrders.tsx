@@ -48,6 +48,20 @@ export default function PendingOrders() {
                             What If
                         </button>
                     </div>
+                    {pendingOrders.length > 0 && (
+                        <button
+                            onClick={() => {
+                                const text = pendingOrders
+                                    .map(o => `[ ] ${o.type.toUpperCase()} ${o.units} ${o.symbol} @ $${o.price}${o.note ? ` — ${o.note}` : ''}`)
+                                    .join('\n');
+                                navigator.clipboard.writeText(text);
+                            }}
+                            className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white text-[9px] font-bold uppercase tracking-wider transition-all border border-white/10"
+                            title="Copy all orders as checklist for Alto"
+                        >
+                            📋 Copy All
+                        </button>
+                    )}
                     <div className="text-right">
                         <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-tight">Projected Inflow</div>
                         <div className="text-sm font-black font-mono text-white">{currency.format(totalSellProceeds)}</div>
@@ -138,7 +152,11 @@ export default function PendingOrders() {
                                         <div className="w-px h-4 bg-white/10 mx-1"></div>
 
                                         <button
-                                            onClick={() => fillOrder(order.id)}
+                                            onClick={() => {
+                                                if (confirm(`Mark as filled: ${isBuy ? 'BUY' : 'SELL'} ${order.units} ${order.symbol} @ ${currency.format(order.price)}?`)) {
+                                                    fillOrder(order.id);
+                                                }
+                                            }}
                                             className="px-3 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500 text-blue-400 hover:text-white text-[10px] font-black uppercase tracking-widest transition-all border border-blue-500/20"
                                         >
                                             Execute

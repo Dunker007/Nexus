@@ -207,7 +207,7 @@ export default function ReportPage() {
                 `5. **Outlook**: 1-2 sentence forward view based on current regime\n` +
                 `Use bold for key numbers. Be specific with prices, units, and percentages.`
             );
-            setAiBrief(response);
+            setAiBrief(response.text);
         } catch {
             setAiBrief('⚠️ Failed to generate AI brief. Check Gemini API key in Settings.');
         }
@@ -349,7 +349,7 @@ export default function ReportPage() {
                         <div className="flex items-center gap-3">
                             <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">🧠 AI Weekly Brief</h3>
                             {isGemini && (
-                                <span className="text-[8px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">Gemini 2.0 Flash</span>
+                                <span className="text-[8px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">Gemini 2.5 Pro</span>
                             )}
                         </div>
                         {isGemini && (

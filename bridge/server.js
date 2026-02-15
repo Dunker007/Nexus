@@ -3,15 +3,15 @@
  * Aggregates all AI services running on LuxRig into a single API
  */
 
+import dotenv from 'dotenv';
+dotenv.config();
+dotenv.config({ path: '.env.local' });
+
 import express from 'express';
 import { WebSocketServer } from 'ws';
 import cors from 'cors';
 import { createServer } from 'http';
-import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
-
-// Load environment
-dotenv.config();
 
 // Import services
 import { lmstudioService } from './services/lmstudio.js';
@@ -47,6 +47,7 @@ const allowedOrigins = [
     'https://www.dlxstudios.online',
     'https://bridge.dlxstudios.online',
     'http://localhost:3000',
+    'http://localhost:3002',
     'http://localhost:3456',
 ];
 
@@ -139,7 +140,10 @@ async function sendStatus(ws) {
 // Active agents registry (Moved up for scope visibility if needed, but getFullStatus needs it)
 const activeAgents = new Map();
 
-// Get full system status
+
+
+
+// Full system status
 async function getFullStatus() {
     const [lmstudio, ollama, system, errors] = await Promise.all([
         lmstudioService.getStatus(),
@@ -191,6 +195,9 @@ app.get('/status', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+
+
 
 // ============ LLM Routes ============
 

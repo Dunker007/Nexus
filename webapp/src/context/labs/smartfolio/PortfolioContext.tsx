@@ -1,8 +1,8 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { ACCOUNTS, AccountId, Asset, Order, AccountData, JournalEntry } from '@/lib/labs/smartfolio/store/portfolio';
 import { STRATEGIES, Strategy, TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/store/strategy';
-import { startPolling, stopPolling, fetchPrices, type PriceMap } from '@/lib/labs/smartfolio/priceEngine';
+import { startPolling, fetchPrices, type PriceMap } from '@/lib/labs/smartfolio/priceEngine';
 import { saveSnapshot } from '@/lib/labs/smartfolio/snapshots';
 import { checkAlerts, requestNotificationPermission } from '@/lib/labs/smartfolio/alertEngine';
 
@@ -30,18 +30,31 @@ function saveToStorage(key: string, value: unknown) {
     } catch { /* quota exceeded */ }
 }
 
-// ─── Journal Entry ───
-// JournalEntry imported from data/portfolio
+// ─── State Interfaces ───
+interface AccountState {
+    assets: Asset[];
+    journal: JournalEntry[];
+    pendingOrders: Order[];
+    recycledToSui: number;
+    targetValue: number;
+}
 
 // ─── Context Interface ───
 interface PortfolioContextType {
-    // Account
+    // 1. Navigation & Active View
     activeAccount: AccountId;
     activeStrategy: Strategy;
     accountData: AccountData;
     switchAccount: (id: AccountId) => void;
 
-    // State
+    // 2. Unified State Access
+    globalTotalValue: number;
+    globalCashBalance: number;
+    safetyNetPercent: number;
+    isSafetyNetCritical: boolean;
+    getAccountState: (id: AccountId) => AccountState;
+
+    // 3. Active Account Convenience Accessors (Legacy Compat)
     totalValue: number;
     targetValue: number;
     setTargetValue: (v: number) => void;
@@ -53,15 +66,17 @@ interface PortfolioContextType {
     journal: JournalEntry[];
     mounted: boolean;
 
-    // Actions
+    // 4. Actions (Targeting Active Account, but could be extended)
     recyclePnL: (symbol: string) => void;
     fillOrder: (orderId: string) => void;
     killOrder: (orderId: string) => void;
     addOrder: (order: Omit<Order, 'status' | 'id' | 'date'> & { status?: 'open' | 'filled' | 'cancelled'; date?: string; id?: string }) => void;
-    addJournalEntry: (entry: Omit<JournalEntry, 'id' | 'timestamp'> & { id?: string; timestamp?: string }) => void;
+    addJournalEntry: (entry: Omit<JournalEntry, 'id' | 'timestamp'> & { id?: string; timestamp?: string; silent?: boolean }) => void;
     removeJournalEntry: (id: string) => void;
     syncAssetBalance: (symbol: string, units: number) => void;
     resetToDefaults: () => void;
+
+    // 5. System
     isLiveMode: boolean;
     toggleLiveMode: () => void;
     lastSync: Date | null;
@@ -71,10 +86,8 @@ interface PortfolioContextType {
     importData: (json: string) => boolean;
     marketCondition: 'accumulation' | 'bull' | 'bear' | 'distribution' | 'choppiness';
     setMarketCondition: (condition: 'accumulation' | 'bull' | 'bear' | 'distribution' | 'choppiness') => void;
-
-    // UI Helpers
     isRefreshing: boolean;
-    isSyncing: boolean; // Added
+    isSyncing: boolean;
     accounts: typeof ACCOUNTS;
 }
 
@@ -83,7 +96,8 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 // ─── Bridge API Helpers ───
 const BRIDGE_URL = '/api/bridge/smartfolio';
 
-async function fetchAccountState(accountId: AccountId) {
+async function fetchAccountState(accountId: AccountId): Promise<AccountState> {
+    const seed = ACCOUNTS[accountId];
     try {
         const res = await fetch(`${BRIDGE_URL}/${accountId}`, {
             headers: { 'x-api-key': process.env.NEXT_PUBLIC_BRIDGE_API_KEY || '' }
@@ -91,40 +105,32 @@ async function fetchAccountState(accountId: AccountId) {
         if (!res.ok) throw new Error('Failed to fetch from bridge');
         const data = await res.json();
 
-        // Map backend data to frontend model
-        // data.positions -> assets
-        // data.journal -> journal
-
-        const seed = ACCOUNTS[accountId];
-
-        // If no data, use seed
         if ((!data.positions || data.positions.length === 0) && (!data.journal || data.journal.length === 0)) {
+            // Fallback to seed + local storage for orders
             return {
                 assets: seed.assets,
                 journal: seed.journal || [],
-                // We don't persist these yet in DB, so keep from seed/local for now?
-                // Or maybe we should? For now keeping simplicity.
-                pendingOrders: seed.pendingOrders,
-                recycledToSui: seed.recycledToSui || 0,
-                targetValue: seed.targetValue || 0
+                pendingOrders: loadFromStorage<Order[]>(storageKey(accountId, 'orders'), seed.pendingOrders),
+                recycledToSui: loadFromStorage<number>(storageKey(accountId, 'recycled'), seed.recycledToSui || 0),
+                targetValue: loadFromStorage<number>(storageKey(accountId, 'target'), seed.targetValue || 0)
             };
         }
 
         const assets = data.positions.map((p: any) => {
             const seedAsset = seed.assets.find(a => a.symbol === p.symbol);
+            const isUSD = p.symbol === 'USD';
             return {
                 symbol: p.symbol,
                 units: p.units,
                 totalCost: p.cost,
-                // Merge static metadata from seed if available
                 name: seedAsset?.name || p.symbol,
                 logo: seedAsset?.logo,
                 targetAllocation: seedAsset?.targetAllocation || 0,
-                // Default live fields
-                currentPrice: seedAsset?.currentPrice || 0, // Fallback to seed price if live price not ready
-                currentValue: 0, // Will be updated by priceEngine
+                currentPrice: isUSD ? 1 : (seedAsset?.currentPrice || 0),
+                currentValue: isUSD ? p.units : 0,
                 gainLoss: 0,
-                allocation: 0
+                allocation: 0,
+                avgCost: isUSD ? 1 : (p.units > 0 ? (p.cost / p.units) : (seedAsset?.avgCost || 0)),
             };
         });
 
@@ -141,20 +147,12 @@ async function fetchAccountState(accountId: AccountId) {
         return {
             assets,
             journal,
-            // Non-persisted fields (for now, or use localStorage for these specifically?)
-            // Ideally we persist everything. But schema only has Positions/Journal.
-            // Let's use localStorage for ORDERS and SETTINGS for now to avoid complexity explosion,
-            // or just accept they are ephemeral?
-            // Users want persistence.
-            // I'll stick to localStorage for orders/recycled/target for now, and API for critical Portfolio/Journal data.
             pendingOrders: loadFromStorage<Order[]>(storageKey(accountId, 'orders'), seed.pendingOrders),
             recycledToSui: loadFromStorage<number>(storageKey(accountId, 'recycled'), seed.recycledToSui || 0),
             targetValue: loadFromStorage<number>(storageKey(accountId, 'target'), seed.targetValue || 0),
         };
     } catch (e) {
-        console.error('Bridge sync failed', e);
-        // Fallback to local
-        const seed = ACCOUNTS[accountId];
+        console.warn(`Bridge sync failed for ${accountId}, falling back to local.`);
         return {
             assets: loadFromStorage<Asset[]>(storageKey(accountId, 'assets'), seed.assets),
             journal: loadFromStorage<JournalEntry[]>(storageKey(accountId, 'journal'), seed.journal || []),
@@ -165,10 +163,7 @@ async function fetchAccountState(accountId: AccountId) {
     }
 }
 
-async function saveAccountStateToBridge(accountId: AccountId, state: {
-    assets: Asset[];
-    journal: JournalEntry[];
-}) {
+async function saveAccountStateToBridge(accountId: AccountId, assets: Asset[], journal: JournalEntry[]) {
     try {
         await fetch(`${BRIDGE_URL}/${accountId}/sync`, {
             method: 'POST',
@@ -177,12 +172,12 @@ async function saveAccountStateToBridge(accountId: AccountId, state: {
                 'x-api-key': process.env.NEXT_PUBLIC_BRIDGE_API_KEY || ''
             },
             body: JSON.stringify({
-                assets: state.assets.map(a => ({
+                assets: assets.map(a => ({
                     symbol: a.symbol,
                     units: a.units,
                     totalCost: a.totalCost
                 })),
-                journal: state.journal
+                journal: journal
             })
         });
     } catch (e) {
@@ -196,185 +191,138 @@ async function saveAccountStateToBridge(accountId: AccountId, state: {
 export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [mounted, setMounted] = useState(false);
     const [activeAccount, setActiveAccount] = useState<AccountId>('sui');
-    const [assets, setAssets] = useState<Asset[]>([]); // Start empty
-    const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
-    const [recycledToSui, setRecycledToSui] = useState(0);
-    const [targetValue, setTargetValue] = useState(35000);
-    const [marketTrends] = useState(ACCOUNTS.sui.marketTrends);
-    const [journal, setJournal] = useState<JournalEntry[]>([]);
-    const [marketCondition, setMarketCondition] = useState<'accumulation' | 'bull' | 'bear' | 'distribution' | 'choppiness'>('accumulation');
+
+    // ─── Unified State ───
+    const [accountsState, setAccountsState] = useState<Record<AccountId, AccountState>>({
+        sui: { assets: [], journal: [], pendingOrders: [], recycledToSui: 0, targetValue: 35000 },
+        alts: { assets: [], journal: [], pendingOrders: [], recycledToSui: 0, targetValue: 35000 }
+    });
+
+    const [marketCondition, setMarketConditionRaw] = useState<'accumulation' | 'bull' | 'bear' | 'distribution' | 'choppiness'>('accumulation');
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [isSyncing, setIsSyncing] = useState(false); // To track API save state if needed
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [lastSync, setLastSync] = useState<Date | null>(null);
+    const [isLiveMode, setIsLiveMode] = useState(false);
 
-    const activeStrategy = STRATEGIES[activeAccount];
-    const accountData = ACCOUNTS[activeAccount];
-
-    // Hydration: load from Bridge on mount
+    // Initial Load (Boot Sequence)
     useEffect(() => {
         const savedAccount = loadFromStorage<AccountId>(`${STORAGE_PREFIX}activeAccount`, 'sui');
         setActiveAccount(savedAccount);
+        const savedMarket = loadFromStorage<'accumulation' | 'bull' | 'bear' | 'distribution' | 'choppiness'>(`${STORAGE_PREFIX}marketCondition`, 'accumulation');
+        setMarketConditionRaw(savedMarket);
 
-        fetchAccountState(savedAccount).then(state => {
-            setAssets(state.assets);
-            setJournal(state.journal);
-            setPendingOrders(state.pendingOrders);
-            setRecycledToSui(state.recycledToSui);
-            setTargetValue(state.targetValue);
+        // Load BOTH accounts in parallel
+        Promise.all([fetchAccountState('sui'), fetchAccountState('alts')]).then(([suiState, altsState]) => {
+            setAccountsState({
+                sui: suiState,
+                alts: altsState
+            });
             setMounted(true);
         });
 
         requestNotificationPermission();
     }, []);
 
-    // Persist on state changes (Debounced or immediate?)
+    // ─── Persistence ───
     const hasHydrated = useRef(false);
     useEffect(() => {
         if (!mounted) return;
         if (!hasHydrated.current) { hasHydrated.current = true; return; }
 
-        // Save critical data to Bridge
-        setIsSyncing(true);
-        saveAccountStateToBridge(activeAccount, { assets, journal })
-            .then(() => setTimeout(() => setIsSyncing(false), 1000))
-            .catch(() => setIsSyncing(false));
+        const queueSave = async () => {
+            setIsSyncing(true);
 
-        // Save auxiliary data to LocalStorage
-        saveToStorage(storageKey(activeAccount, 'orders'), pendingOrders);
-        saveToStorage(storageKey(activeAccount, 'recycled'), recycledToSui);
-        saveToStorage(storageKey(activeAccount, 'target'), targetValue);
+            // Save Active to Bridge (Minimal network traffic, we trust active account updates most)
+            const activeState = accountsState[activeAccount];
+            await saveAccountStateToBridge(activeAccount, activeState.assets, activeState.journal);
 
-    }, [assets, journal, pendingOrders, recycledToSui, targetValue, mounted, activeAccount]);
-
-    // Derived values
-    const cashBalance = assets.find(a => a.symbol === 'USD')?.currentValue || 0;
-    const totalValue = assets.reduce((sum, a) => sum + a.currentValue, 0);
-
-    // ─── Account Switching ───
-    const switchAccount = useCallback(async (id: AccountId) => {
-        if (id === activeAccount) return;
-
-        // Save current first
-        await saveAccountStateToBridge(activeAccount, { assets, journal });
-        saveToStorage(storageKey(activeAccount, 'orders'), pendingOrders);
-
-        // Switch and load new
-        setActiveAccount(id);
-        const state = await fetchAccountState(id);
-
-        setAssets(state.assets);
-        setJournal(state.journal);
-        setPendingOrders(state.pendingOrders);
-        setRecycledToSui(state.recycledToSui);
-        setTargetValue(state.targetValue);
-
-        saveToStorage(`${STORAGE_PREFIX}activeAccount`, id);
-    }, [activeAccount, assets, journal, pendingOrders]);
-
-    // ─── Live Price Engine ───
-    const [isLiveMode, setIsLiveMode] = useState(false);
-    const [lastSync, setLastSync] = useState<Date | null>(null);
-
-    // Apply price updates from Coinbase
-    const applyPrices = useCallback((prices: PriceMap) => {
-        setAssets(prev => {
-            const updated = prev.map(asset => {
-                if (asset.symbol === 'USD') return asset;
-                const newPrice = prices[asset.symbol];
-                if (newPrice === undefined) return asset; // No price for this symbol
-                const newValue = asset.units * newPrice;
-                return {
-                    ...asset,
-                    currentPrice: newPrice,
-                    currentValue: newValue,
-                    gainLoss: newValue - (asset.totalCost || 0),
-                };
+            // Persist ALL local data to storage
+            (Object.keys(accountsState) as AccountId[]).forEach(id => {
+                const s = accountsState[id];
+                saveToStorage(storageKey(id, 'orders'), s.pendingOrders);
+                saveToStorage(storageKey(id, 'recycled'), s.recycledToSui);
+                saveToStorage(storageKey(id, 'target'), s.targetValue);
             });
-            const freshTotal = updated.reduce((s, a) => s + a.currentValue, 0);
-            return updated.map(a => ({ ...a, allocation: (a.currentValue / freshTotal) * 100 }));
-        });
-        // Check price alerts
-        const priceMap: Record<string, number> = {};
-        for (const [sym, price] of Object.entries(prices)) {
-            priceMap[sym] = price;
-        }
-        checkAlerts(priceMap);
+
+            setTimeout(() => setIsSyncing(false), 500);
+        };
+        queueSave();
+
+    }, [accountsState, activeAccount, mounted]);
+
+    // ─── Setters Helper ───
+    const updateActive = useCallback((transform: (prev: AccountState) => AccountState) => {
+        setAccountsState(prev => ({
+            ...prev,
+            [activeAccount]: transform(prev[activeAccount])
+        }));
+    }, [activeAccount]);
+
+
+    // ─── Global Computations ───
+    const globalMetrics = useMemo(() => {
+        const suiState = accountsState.sui;
+        const altsState = accountsState.alts;
+
+        const getVal = (assets: Asset[]) => assets.reduce((s, a) => s + a.currentValue, 0);
+        const getCash = (assets: Asset[]) => assets.find(a => a.symbol === 'USD')?.currentValue || 0;
+
+        const suiVal = getVal(suiState.assets);
+        const altsVal = getVal(altsState.assets);
+        const globalTotal = suiVal + altsVal;
+
+        const globalCash = getCash(suiState.assets) + getCash(altsState.assets);
+        const safetyNetPercent = globalTotal > 0 ? (globalCash / globalTotal) * 100 : 0;
+
+        return {
+            globalTotal,
+            globalCash,
+            safetyNetPercent,
+            isSafetyNetCritical: safetyNetPercent < 5
+        };
+    }, [accountsState]);
+
+    // ─── Active View Convenience ───
+    const activeState = accountsState[activeAccount];
+    const totalValue = activeState.assets.reduce((s, a) => s + a.currentValue, 0);
+    const cashBalance = activeState.assets.find(a => a.symbol === 'USD')?.currentValue || 0;
+
+    // ─── Helper Functions ───
+
+    // Switch Account
+    const switchAccount = useCallback((id: AccountId) => {
+        setActiveAccount(id);
+        saveToStorage(`${STORAGE_PREFIX}activeAccount`, id);
     }, []);
 
-    // Manual refresh
-    const refreshPrices = useCallback(async () => {
-        setIsRefreshing(true); // Start loading
-        const symbols = assets.filter(a => a.symbol !== 'USD').map(a => a.symbol);
-        const prices = await fetchPrices(symbols);
-        if (Object.keys(prices).length > 0) {
-            applyPrices(prices);
-            setLastSync(new Date());
-        }
-        setIsRefreshing(false); // End loading
-    }, [assets, applyPrices]);
+    // Set Target Value
+    const setTargetValue = useCallback((v: number) => {
+        updateActive(prev => ({ ...prev, targetValue: v }));
+    }, [updateActive]);
 
-    // Fetch live prices on mount (one-shot)
-    useEffect(() => {
-        if (!mounted) return;
-        const symbols = assets.filter(a => a.symbol !== 'USD').map(a => a.symbol);
-        fetchPrices(symbols).then(prices => {
-            if (Object.keys(prices).length > 0) {
-                applyPrices(prices);
-                setLastSync(new Date());
-            }
-        });
-    }, [mounted, activeAccount]); // Re-fetch on mount and account switch
+    const setMarketCondition = useCallback((condition: 'accumulation' | 'bull' | 'bear' | 'distribution' | 'choppiness') => {
+        setMarketConditionRaw(condition);
+        saveToStorage(`${STORAGE_PREFIX}marketCondition`, condition);
+    }, []);
 
-    // Save daily snapshot after prices update
-    useEffect(() => {
-        if (!mounted || !lastSync) return;
-        const cashAsset = assets.find(a => a.symbol === 'USD');
-        const total = assets.reduce((s, a) => s + a.currentValue, 0);
-        if (total > 0) {
-            saveSnapshot(
-                activeAccount,
-                total,
-                cashAsset?.currentValue || 0,
-                assets.filter(a => a.symbol !== 'USD').map(a => ({
-                    symbol: a.symbol,
-                    value: a.currentValue,
-                    allocation: a.allocation,
-                    price: a.currentPrice,
-                }))
-            );
-        }
-    }, [lastSync, mounted]);
-
-    // Live Mode: continuous polling every 30s
-    useEffect(() => {
-        if (!isLiveMode || !mounted) return;
-        const symbols = assets.filter(a => a.symbol !== 'USD').map(a => a.symbol);
-        const cleanup = startPolling({
-            symbols,
-            intervalMs: 30000, // 30 seconds
-            onPriceUpdate: applyPrices,
-            onSyncComplete: (ts) => setLastSync(ts),
-            onError: (err) => console.warn('[PriceEngine]', err.message),
-        });
-        return cleanup;
-    }, [isLiveMode, mounted, activeAccount, applyPrices]);
-
-    // ─── Actions ───
+    // ─── Logic Actions ───
 
     const recyclePnL = useCallback((symbol: string) => {
-        const anchorSymbol = activeAccount === 'sui' ? 'SUI' : null;
-        if (!anchorSymbol) return; // No recycle on alts account (no king)
+        if (activeAccount !== 'sui') return;
+        updateActive(prev => {
+            const anchorSymbol = 'SUI';
+            const assets = [...prev.assets];
+            const assetIndex = assets.findIndex(a => a.symbol === symbol);
+            const anchorIndex = assets.findIndex(a => a.symbol === anchorSymbol);
 
-        setAssets(prev => {
-            const assetIndex = prev.findIndex(a => a.symbol === symbol);
-            const anchorIndex = prev.findIndex(a => a.symbol === anchorSymbol);
             if (assetIndex === -1 || anchorIndex === -1) return prev;
 
-            const asset = prev[assetIndex];
+            const asset = assets[assetIndex];
             const profit = Math.max(0, asset.gainLoss || 0);
             if (profit <= 0) return prev;
 
-            const newAssets = [...prev];
-            newAssets[assetIndex] = {
+            // Sell Asset
+            assets[assetIndex] = {
                 ...asset,
                 units: asset.units - (profit / asset.currentPrice),
                 currentValue: asset.currentValue - profit,
@@ -382,145 +330,248 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                 totalCost: asset.totalCost || 0
             };
 
-            const anchor = newAssets[anchorIndex];
-            newAssets[anchorIndex] = {
+            // Buy Anchor
+            const anchor = assets[anchorIndex];
+            assets[anchorIndex] = {
                 ...anchor,
                 units: anchor.units + (profit / anchor.currentPrice),
                 currentValue: anchor.currentValue + profit,
                 totalCost: (anchor.totalCost || 0) + profit
             };
 
-            setRecycledToSui(curr => curr + profit);
-            return newAssets;
+            return {
+                ...prev,
+                assets,
+                recycledToSui: prev.recycledToSui + profit
+            };
         });
-    }, [activeAccount]);
+    }, [activeAccount, updateActive]);
+
+    const addOrder = useCallback((order: any) => {
+        updateActive(prev => {
+            const newOrder = {
+                ...order,
+                status: order.status || 'open',
+                date: order.date || new Date().toISOString().split('T')[0],
+                id: order.id || `${order.symbol}-${order.type}-${Date.now()}`
+            };
+            if (prev.pendingOrders.some(o => o.id === newOrder.id)) return prev;
+            return { ...prev, pendingOrders: [...prev.pendingOrders, newOrder] };
+        });
+    }, [updateActive]);
+
+
 
     const killOrder = useCallback((id: string) => {
-        setPendingOrders(prev => prev.filter(o => o.id !== id));
-    }, []);
+        updateActive(prev => ({
+            ...prev,
+            pendingOrders: prev.pendingOrders.filter(o => o.id !== id)
+        }));
+    }, [updateActive]);
 
-    const addOrder = useCallback((order: Omit<Order, 'status' | 'id' | 'date'> & { status?: 'open' | 'filled' | 'cancelled'; date?: string; id?: string }) => {
-        const { date, status, id, ...rest } = order;
-        const newOrder: Order = {
-            ...rest,
-            status: status || 'open',
-            date: date || new Date().toISOString().split('T')[0],
-            id: id || `${order.symbol}-${order.type}-${Date.now()}`,
-        };
-        setPendingOrders(prev => {
-            if (prev.some(o => o.id === newOrder.id)) return prev;
-            return [...prev, newOrder];
-        });
-    }, []);
+    // PRICE ENGINE Logic
+    const applyPrices = useCallback((prices: PriceMap) => {
+        setAccountsState(current => {
+            const newState = { ...current };
+            let changed = false;
 
-    const fillOrder = useCallback((id: string) => {
-        const order = pendingOrders.find(o => o.id === id);
-        if (!order) return;
+            // Update BOTH accounts
+            (Object.keys(newState) as AccountId[]).forEach(accId => {
+                const state = newState[accId];
+                const updatedAssets = state.assets.map(asset => {
+                    if (asset.symbol === 'USD') return asset;
+                    const newPrice = prices[asset.symbol];
+                    if (newPrice === undefined) return asset;
 
-        setAssets(currentAssets => {
-            const assetIndex = currentAssets.findIndex(a => a.symbol === order.symbol);
-            const cost = order.units * order.price;
-
-            if (assetIndex !== -1) {
-                const asset = currentAssets[assetIndex];
-                const next = [...currentAssets];
-                next[assetIndex] = {
-                    ...asset,
-                    units: asset.units + (order.type === 'buy' ? order.units : -order.units),
-                    totalCost: (asset.totalCost || 0) + (order.type === 'buy' ? cost : -cost),
-                    currentValue: (asset.units + (order.type === 'buy' ? order.units : -order.units)) * asset.currentPrice
-                };
-                return next;
-            }
-            return currentAssets;
-        });
-
-        setPendingOrders(prev => prev.filter(o => o.id !== id));
-    }, [pendingOrders]);
-
-    const addJournalEntry = useCallback((entry: Omit<JournalEntry, 'id' | 'timestamp'> & { id?: string; timestamp?: string }) => {
-        const newEntry: JournalEntry = {
-            id: entry.id || Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-            timestamp: entry.timestamp || new Date().toISOString(),
-            ...entry,
-        };
-
-        // 1. Update Journal Log
-        setJournal(prev => {
-            if (prev.some(e => e.id === newEntry.id)) return prev; // Dedup
-            return [newEntry, ...prev];
-        });
-
-        // 2. Execute Trade against Portfolio State (if price/units exist)
-        if (newEntry.units && newEntry.price) {
-            console.log(`[SmartFolio] Processing trade: ${newEntry.type} ${newEntry.units} ${newEntry.symbol} @ ${newEntry.price}`);
-            setAssets(currentAssets => {
-                const targetSymbol = newEntry.symbol.trim().toUpperCase();
-                const assetIndex = currentAssets.findIndex(a => a.symbol.toUpperCase() === targetSymbol);
-                const cashIndex = currentAssets.findIndex(a => a.symbol === 'USD');
-
-                if (assetIndex === -1) {
-                    console.warn(`[SmartFolio] Asset not found for trade: ${targetSymbol} (Available: ${currentAssets.map(a => a.symbol).join(', ')})`);
-                    return currentAssets;
-                }
-                if (cashIndex === -1) {
-                    console.error('[SmartFolio] Cash asset (USD) not found!');
-                    return currentAssets;
-                }
-
-                const next = [...currentAssets];
-                const asset = next[assetIndex];
-                const cash = next[cashIndex];
-
-                const gross = newEntry.units! * newEntry.price!;
-                // Use global constant
-                const feePercent = TRADE_FEE_PERCENT;
-                const fee = gross * (feePercent / 100);
-
-                if (newEntry.type === 'buy') {
-                    // BUY: Asset +, Cash -
-                    const cost = gross + fee;
-                    next[cashIndex] = { ...cash, currentValue: cash.currentValue - cost, units: cash.units - cost };
-                    next[assetIndex] = {
+                    const newValue = asset.units * newPrice;
+                    return {
                         ...asset,
-                        units: asset.units + newEntry.units!,
-                        currentValue: (asset.units + newEntry.units!) * asset.currentPrice,
-                        totalCost: (asset.totalCost || 0) + cost
+                        currentPrice: newPrice,
+                        currentValue: newValue,
+                        gainLoss: newValue - (asset.totalCost || 0),
                     };
-                } else if (newEntry.type === 'sell') {
-                    // SELL: Asset -, Cash +
-                    const proceeds = gross - fee;
-                    next[cashIndex] = { ...cash, currentValue: cash.currentValue + proceeds, units: cash.units + proceeds };
-                    next[assetIndex] = {
-                        ...asset,
-                        units: Math.max(0, asset.units - newEntry.units!),
-                        currentValue: Math.max(0, asset.units - newEntry.units!) * asset.currentPrice,
-                        // Proportional cost basis reduction
-                        totalCost: asset.units > 0 ? (asset.totalCost || 0) * (Math.max(0, asset.units - newEntry.units!) / asset.units) : 0
-                    };
-                }
+                });
 
-                console.log(`[SmartFolio] Trade executed. New ${targetSymbol} units: ${next[assetIndex].units}, New Cash: ${next[cashIndex].units}`);
-                return next;
+                // Re-calc allocations
+                const total = updatedAssets.reduce((s, a) => s + a.currentValue, 0);
+                const finalAssets = updatedAssets.map(a => ({
+                    ...a,
+                    allocation: total > 0 ? (a.currentValue / total) * 100 : 0
+                }));
+
+                newState[accId] = { ...state, assets: finalAssets };
+                changed = true;
             });
-        }
+
+            return changed ? newState : current;
+        });
+
+        checkAlerts(prices);
     }, []);
+
+    // LIVE MODE
+    useEffect(() => {
+        if (!isLiveMode || !mounted) return;
+        // Collect all distinct symbols from both accounts
+        const allSymbols = new Set<string>();
+        [...accountsState.sui.assets, ...accountsState.alts.assets].forEach(a => {
+            if (a.symbol !== 'USD') allSymbols.add(a.symbol);
+        });
+
+        const cleanup = startPolling({
+            symbols: Array.from(allSymbols),
+            intervalMs: 30000,
+            onPriceUpdate: applyPrices,
+            onSyncComplete: (ts) => setLastSync(ts),
+            onError: (err) => console.warn('[PriceEngine]', err.message),
+        });
+        return cleanup;
+    }, [isLiveMode, mounted, applyPrices, accountsState]);
+
+    // Manual Refresh
+    const refreshPrices = useCallback(async () => {
+        setIsRefreshing(true);
+        const allSymbols = new Set<string>();
+        [...accountsState.sui.assets, ...accountsState.alts.assets].forEach(a => {
+            if (a.symbol !== 'USD') allSymbols.add(a.symbol);
+        });
+        const prices = await fetchPrices(Array.from(allSymbols));
+        if (Object.keys(prices).length > 0) {
+            applyPrices(prices);
+            setLastSync(new Date());
+        }
+        setIsRefreshing(false);
+    }, [accountsState, applyPrices]);
+
+    // Import Asset
+    const importAsset = useCallback(async (symbol: string) => {
+        const target = symbol.trim().toUpperCase();
+        let price = 0;
+        let logo = '';
+
+        try {
+            const res = await fetch(`https://api.coinbase.com/v2/prices/${target}-USD/spot`);
+            const data = await res.json();
+            if (data?.data?.amount) price = parseFloat(data.data.amount);
+        } catch { }
+
+        try {
+            const res = await fetch(`https://api.coingecko.com/api/v3/search?query=${target}`);
+            const data = await res.json();
+            const coin = data.coins?.find((c: any) => c.symbol === target || c.symbol.toUpperCase() === target);
+            if (coin) logo = coin.large || coin.thumb;
+        } catch { }
+
+        updateActive(prev => {
+            if (prev.assets.some(a => a.symbol === target)) return prev;
+            return {
+                ...prev,
+                assets: [...prev.assets, {
+                    symbol: target, name: target, units: 0, avgCost: 0,
+                    currentPrice: price, currentValue: 0, totalCost: 0,
+                    gainLoss: 0, allocation: 0, targetAllocation: 0, logo
+                }]
+            };
+        });
+    }, [updateActive]);
+
+    // ─── Trade Execution & Journal ───
+    const addJournalEntry = useCallback((entry: any) => {
+        const { silent, ...entryData } = entry;
+        const newEntry = {
+            id: entry.id || Date.now().toString(36),
+            timestamp: entry.timestamp || new Date().toISOString(),
+            ...entryData,
+        };
+
+        updateActive(prev => {
+            // 1. Add to Journal
+            if (prev.journal.some(e => e.id === newEntry.id)) return prev;
+            const nextJournal = [newEntry, ...prev.journal];
+
+            // 2. Remove matching Pending Order
+            let nextOrders = prev.pendingOrders;
+            if (newEntry.id && prev.pendingOrders.some(o => o.id === newEntry.id)) {
+                nextOrders = prev.pendingOrders.filter(o => o.id !== newEntry.id);
+            }
+
+            // 3. Update Assets (if not silent)
+            let nextAssets = prev.assets;
+            if (newEntry.units && newEntry.price && !silent) {
+                const targetSymbol = newEntry.symbol.trim().toUpperCase();
+                const assetIdx = prev.assets.findIndex(a => a.symbol.toUpperCase() === targetSymbol);
+                const cashIdx = prev.assets.findIndex(a => a.symbol === 'USD');
+
+                if (assetIdx !== -1 && cashIdx !== -1) {
+                    nextAssets = [...prev.assets];
+                    const asset = nextAssets[assetIdx];
+                    const cash = nextAssets[cashIdx];
+
+                    const gross = newEntry.units * newEntry.price;
+                    const fee = gross * (TRADE_FEE_PERCENT / 100);
+
+                    if (newEntry.type === 'buy') {
+                        const cost = gross + fee;
+                        nextAssets[cashIdx] = { ...cash, currentValue: cash.currentValue - cost, units: cash.units - cost };
+                        nextAssets[assetIdx] = {
+                            ...asset,
+                            units: asset.units + newEntry.units,
+                            currentValue: (asset.units + newEntry.units) * asset.currentPrice,
+                            totalCost: (asset.totalCost || 0) + cost
+                        };
+                    } else if (newEntry.type === 'sell') {
+                        const proceeds = gross - fee;
+                        nextAssets[cashIdx] = { ...cash, currentValue: cash.currentValue + proceeds, units: cash.units + proceeds };
+                        const remaining = Math.max(0, asset.units - newEntry.units);
+                        const unitRatio = asset.units > 0 ? remaining / asset.units : 0;
+                        nextAssets[assetIdx] = {
+                            ...asset,
+                            units: remaining,
+                            currentValue: remaining * asset.currentPrice,
+                            totalCost: (asset.totalCost || 0) * unitRatio
+                        };
+                    }
+                    // Recalc Allocations
+                    const total = nextAssets.reduce((s, a) => s + a.currentValue, 0);
+                    nextAssets.forEach(a => { a.allocation = total > 0 ? (a.currentValue / total) * 100 : 0 });
+                }
+            }
+
+            return {
+                ...prev,
+                journal: nextJournal,
+                pendingOrders: nextOrders,
+                assets: nextAssets
+            };
+        });
+    }, [updateActive]);
+
+    const fillOrder = useCallback((orderId: string) => {
+        const currentOrder = accountsState[activeAccount].pendingOrders.find(o => o.id === orderId);
+        if (!currentOrder) return;
+
+        addJournalEntry({
+            ...currentOrder,
+            timestamp: new Date().toISOString(),
+            notes: 'Filled Order'
+        });
+    }, [accountsState, activeAccount, addJournalEntry]);
 
     const removeJournalEntry = useCallback((id: string) => {
-        setJournal(prev => prev.filter(e => e.id !== id));
-    }, []);
+        updateActive(prev => ({
+            ...prev,
+            journal: prev.journal.filter(e => e.id !== id)
+        }));
+    }, [updateActive]);
 
     const syncAssetBalance = useCallback((symbol: string, units: number) => {
-        setAssets(prev => {
+        updateActive(prev => {
             const target = symbol.trim().toUpperCase();
-            const idx = prev.findIndex(a => a.symbol.toUpperCase() === target);
-            if (idx === -1) {
-                console.warn(`[SmartFolio] syncAssetBalance: Symbol ${target} not found.`);
-                return prev;
-            }
+            const idx = prev.assets.findIndex(a => a.symbol.toUpperCase() === target);
+            if (idx === -1) return prev;
 
-            const next = [...prev];
-            const asset = next[idx];
+            const nextAssets = [...prev.assets];
+            const asset = nextAssets[idx];
             const safeUnits = isNaN(units) ? 0 : units;
 
             // Proportional cost adjustment
@@ -528,115 +579,89 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             if (asset.units > 0) {
                 newCost = (asset.totalCost || 0) * (safeUnits / asset.units);
             } else if (safeUnits > 0) {
-                // If starting from 0, assume cost basis = current value (0% PnL start)
                 newCost = safeUnits * asset.currentPrice;
             }
 
-            next[idx] = {
+            nextAssets[idx] = {
                 ...asset,
                 units: safeUnits,
                 currentValue: safeUnits * asset.currentPrice,
                 totalCost: newCost
             };
 
-            console.log(`[SmartFolio] Synced ${target} to ${safeUnits} units.`);
-            return next;
+            // Recalc Allocations
+            const total = nextAssets.reduce((s, a) => s + a.currentValue, 0);
+            nextAssets.forEach(a => { a.allocation = total > 0 ? (a.currentValue / total) * 100 : 0 });
+
+            return { ...prev, assets: nextAssets };
         });
-    }, []);
-
-    const toggleLiveMode = useCallback(() => setIsLiveMode(p => !p), []);
-
-    const importAsset = useCallback(async (symbol: string) => {
-        const target = symbol.trim().toUpperCase();
-        console.log(`[SmartFolio] Importing asset: ${target}`);
-
-        let price = 0;
-        let logo = '';
-
-        // 1. Fetch Price (Coinbase)
-        try {
-            const res = await fetch(`https://api.coinbase.com/v2/prices/${target}-USD/spot`);
-            const data = await res.json();
-            if (data?.data?.amount) {
-                price = parseFloat(data.data.amount);
-            }
-        } catch (e) { console.error('Price fetch failed', e); }
-
-        // 2. Fetch Logo (CoinGecko)
-        try {
-            const res = await fetch(`https://api.coingecko.com/api/v3/search?query=${target}`);
-            const data = await res.json();
-            const coin = data.coins?.find((c: any) => c.symbol === target || c.symbol.toUpperCase() === target);
-            if (coin) logo = coin.large || coin.thumb;
-        } catch (e) { console.error('Logo fetch failed', e); }
-
-        // 3. Add to Assets
-        setAssets(prev => {
-            if (prev.some(a => a.symbol === target)) return prev;
-            return [...prev, {
-                symbol: target,
-                name: target,
-                units: 0,
-                avgCost: 0,
-                currentPrice: price,
-                currentValue: 0,
-                totalCost: 0,
-                gainLoss: 0,
-                allocation: 0,
-                targetAllocation: 0, // Manual set later
-                logo: logo || undefined
-            }];
-        });
-    }, []);
+    }, [updateActive]);
 
     const resetToDefaults = useCallback(() => {
         const seed = ACCOUNTS[activeAccount];
-        // ... (existing logic)
-        setAssets(seed.assets);
-        setPendingOrders(seed.pendingOrders);
-        setRecycledToSui(seed.recycledToSui || 0);
-        setJournal(seed.journal || []);
-        setTargetValue(seed.targetValue || (activeAccount === 'sui' ? 35000 : 200000));
-        // Clear localStorage for this account
+        updateActive(() => ({
+            assets: seed.assets,
+            journal: seed.journal || [],
+            pendingOrders: seed.pendingOrders,
+            recycledToSui: seed.recycledToSui || 0,
+            targetValue: seed.targetValue || 35000
+        }));
         ['assets', 'orders', 'recycled', 'journal', 'target'].forEach(key =>
             localStorage.removeItem(storageKey(activeAccount, key))
         );
-    }, [activeAccount]);
+    }, [activeAccount, updateActive]);
 
-    // ... (export/import logic)
+    // Data Export/Import
     const exportData = useCallback(() => {
-        return JSON.stringify({ activeAccount, assets, pendingOrders, recycledToSui, journal }, null, 2);
-    }, [activeAccount, assets, pendingOrders, recycledToSui, journal]);
+        return JSON.stringify({
+            activeAccount,
+            ...accountsState[activeAccount]
+        }, null, 2);
+    }, [activeAccount, accountsState]);
 
     const importData = useCallback((json: string): boolean => {
         try {
             const data = JSON.parse(json);
-            if (data.assets) setAssets(data.assets);
-            if (data.pendingOrders) setPendingOrders(data.pendingOrders);
-            if (data.recycledToSui !== undefined) setRecycledToSui(data.recycledToSui);
-            if (data.journal) setJournal(data.journal);
+            updateActive(prev => ({
+                ...prev,
+                assets: data.assets || prev.assets,
+                journal: data.journal || prev.journal,
+                pendingOrders: data.pendingOrders || prev.pendingOrders,
+                recycledToSui: data.recycledToSui ?? prev.recycledToSui
+            }));
             return true;
-        } catch {
-            return false;
-        }
-    }, []);
+        } catch { return false; }
+    }, [updateActive]);
+
 
     return (
         <PortfolioContext.Provider value={{
+            // 1. Navigation
             activeAccount,
-            activeStrategy,
-            accountData,
+            activeStrategy: STRATEGIES[activeAccount],
+            accountData: ACCOUNTS[activeAccount],
             switchAccount,
+
+            // 2. Unified State
+            globalTotalValue: globalMetrics.globalTotal,
+            globalCashBalance: globalMetrics.globalCash,
+            safetyNetPercent: globalMetrics.safetyNetPercent,
+            isSafetyNetCritical: globalMetrics.isSafetyNetCritical,
+            getAccountState: (id) => accountsState[id],
+
+            // 3. Active Account Accessors
             totalValue,
-            targetValue,
+            targetValue: activeState.targetValue,
             setTargetValue,
+            assets: activeState.assets,
             cashBalance,
-            assets,
-            pendingOrders,
-            recycledToSui,
-            marketTrends,
-            journal,
+            pendingOrders: activeState.pendingOrders,
+            recycledToSui: activeState.recycledToSui,
+            marketTrends: ACCOUNTS.sui.marketTrends, // Legacy?
+            journal: activeState.journal,
             mounted,
+
+            // 4. Actions
             recyclePnL,
             fillOrder,
             killOrder,
@@ -645,8 +670,10 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             removeJournalEntry,
             syncAssetBalance,
             resetToDefaults,
+
+            // 5. System
             isLiveMode,
-            toggleLiveMode,
+            toggleLiveMode: () => setIsLiveMode(!isLiveMode),
             lastSync,
             refreshPrices,
             importAsset,
@@ -655,7 +682,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             marketCondition,
             setMarketCondition,
             isRefreshing,
-            isSyncing, // Added
+            isSyncing,
             accounts: ACCOUNTS,
         }}>
             {children}
@@ -668,4 +695,3 @@ export const usePortfolio = () => {
     if (!context) throw new Error('usePortfolio must be used within a PortfolioProvider');
     return context;
 };
-
