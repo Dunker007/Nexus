@@ -16,18 +16,9 @@ const nextConfig: NextConfig = {
   // Ensure trailing slashes for static files (Tauri requirement)
   trailingSlash: !isWeb,
 
-  // API Rewrites for Web (proxies /api/bridge -> Bridge URL)
+  // API Rewrites (None needed for internal API routes)
   async rewrites() {
-    if (!isWeb) return [];
-    // If running on web, proxy /api/bridge calls to the backend
-    // This solves CORS issues for simple REST calls
-    // Note: WebSockets should still connect directly to Bridge URL
-    return [
-      {
-        source: '/api/bridge/:path*',
-        destination: (process.env.NEXT_PUBLIC_BRIDGE_URL || 'http://localhost:3456') + '/:path*',
-      },
-    ];
+    return [];
   },
 };
 
