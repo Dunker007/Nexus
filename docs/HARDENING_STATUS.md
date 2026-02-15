@@ -1,13 +1,22 @@
 # Nexus Hardening - Task Breakdown
 
-**Objective:** Top-down hardening with Music Studio operational first. Creative but grounded.
+**Objective:** Top-down hardening with deployment complete. Desktop + Web both live.
 
-**Last Verified:** 2025-12-07 @ 22:33 CST
+**Last Verified:** 2026-02-14 @ 15:00 CST
+
+---
+
+## 🎉 MAJOR MILESTONE: Dual Deployment Live
+
+Nexus is now accessible from:
+- **Web:** https://www.dlxstudios.online (Vercel)
+- **Bridge API:** https://bridge.dlxstudios.online (Cloudflare Tunnel)
+- **Desktop:** Tauri app with auto-spawning Bridge
 
 ---
 
 ## Phase 1: Music Studio → Operational ✅ 100%
-*Priority: PRIMARY FOCUS*
+*Priority: PRIMARY FOCUS - COMPLETE*
 
 - [x] ✅ Verify Bridge API is running and agents are callable
   - `/music/agents` returns 4 agents: Lyricist, Composer, Critic, Producer
@@ -16,7 +25,7 @@
   - Lyricist brainstorm tested, returns concepts/imagery/emotions
   - Pipeline generates Suno-ready output with [Style] and [Lyrics]
 - [x] ✅ Verify News integration for Newsician/Sentinel modes
-  - RSS feeds configured (national + local MN sources)
+  - RSS feeds configured (100 sources: national + local MN)
   - Mode switching works, headlines appear in carousel
 - [x] ✅ UI polish: Clean up pipeline visualization
   - Pipeline steps animate correctly
@@ -32,8 +41,8 @@
 
 ---
 
-## Phase 2: Labs Hub → Project Board Operational ✅ 95%
-*Priority: Enable "build from within"*
+## Phase 2: Labs Hub → Project Board Operational ✅ 100%
+*Priority: Enable "build from within" - COMPLETE*
 
 - [x] ✅ Verify Gantt/Grid/Kanban views work correctly
   - 12-month timeline view displays all projects
@@ -54,17 +63,21 @@
   - Multi-agent debate with Architect, Security, QA personas working
 - [x] ✅ Link projects to their respective "front door" pages
   - Projects with href navigate correctly
-  - Updated `INITIAL_LABS_DATA` with correct paths (e.g. `/docs`, `/meeting`, `/dashboard`)
+  - Updated `INITIAL_LABS_DATA` with correct paths
+- [x] ✅ Smartfolio added (NEW)
+  - Portfolio CRUD API working
+  - AI Analyst integration via Gemini
+  - Journal tracking functional
 
 ---
 
-## Phase 3: Agents Hub → Core Infrastructure ✅ 95%
-*Priority: Foundation for everything else*
+## Phase 3: Agents Hub → Core Infrastructure ✅ 100%
+*Priority: Foundation for everything else - COMPLETE*
 
-- [x] ✅ Audit all 21 agent services in bridge/services/
-  - Files: agent-core, agents, agents-advanced, agents-intent, agents-revenue, agents-songwriter, agents-staff-meeting
+- [x] ✅ Audit all agent services in bridge/services/
+  - Files: agent-core, agents, agents-advanced, agents-intent, agents-revenue, agents-songwriter, agents-staff-meeting, analyst
 - [x] ✅ Verify agent registry is complete
-  - 16 agent types registered in agentRegistry
+  - 18 agent types now registered
 - [x] ✅ Test agent invocation from webapp
   - `/agents/execute` tested successfully
 - [x] ✅ Document which agents are operational vs stubs
@@ -80,6 +93,7 @@
 | revenue | ✅ Operational |
 | intent | ✅ Operational |
 | staff-meeting | ✅ Operational |
+| analyst | ✅ Operational (NEW) |
 | research | ⚠️ Stub |
 | code | ⚠️ Stub |
 | workflow | ⚠️ Stub |
@@ -90,80 +104,137 @@
 
 ---
 
-## Phase 4: Supporting Cast → Hardening ✅ 85%
-*Priority: Make daily-driver functional*
+## Phase 4: Supporting Cast → Hardening ✅ 100%
+*Priority: Make daily-driver functional - COMPLETE*
 
 - [x] ✅ Dashboard cleanup and system status display
   - Widget-based grid layout (drag/resize in edit mode)
   - System stats from Bridge `/system` endpoint
-  - News from RSS feeds (Alpha News, The Blaze)
+  - News from RSS feeds (100 sources)
   - Google Calendar integration (when connected)
   - Tasks, quotes, quick links widgets
+  - Hydration mismatch fixed
 - [x] ✅ Chat → LM Studio streaming verified
   - Agent selection panel (Lux, Architect, Dev, QA, Guardian, Ops)
-  - Model discovery from Bridge
-  - Chat interface ready (requires LM Studio running)
+  - Model discovery from Bridge (LM Studio + Ollama tabs)
+  - Chat interface with conversation persistence
   - Error handling shows connection failures gracefully
 - [x] ✅ News Hub → RSS feeds operational
   - Filter tabs (All, Local, National, Saved)
-  - Source filtering
+  - Source filtering (100 sources configured)
   - Breaking news ticker
   - Fact-check status indicators
-  - Static demo data with RSS ready
 - [x] ✅ Settings → Config management works
   - Theme, language, timezone settings
   - LLM provider/model configuration
   - Bridge URL and auto-connect settings
   - Notifications preferences
   - Google OAuth connection
+  - Start on boot option (Tauri autostart)
+  - Remote access tab
 
 ---
 
-## Phase 5: Infrastructure → Tauri Integration 🏗️ In Progress
-*Priority: Desktop shell*
+## Phase 5: Infrastructure → Web Deployment ✅ 100%
+*Priority: Remote access - COMPLETE*
 
 - [x] ✅ Verify Tauri build environment
   - Validated `cargo clean` and rebuild process
-  - Confirmed compilation of 300+ crates including `windows` and `tauri`
-  - Fixed `src-tauri/src/main.rs` to look for correct `bridge-bundle` resource path
-- [ ] Test unified launch (webapp + bridge)
-  - `npm run tauri:dev` triggers build
-  - Bridge auto-launch logic exists in `main.rs`
-- [ ] Hot reload / dev cycle improvements
+  - Confirmed compilation of 300+ crates
+  - Bridge auto-spawn working in production
+- [x] ✅ Vercel Deployment
+  - Live at https://www.dlxstudios.online
+  - Environment detection (isWeb flag)
+  - Static export for Tauri, SSR for Vercel
+  - Prisma postinstall generation fixed
+- [x] ✅ Cloudflare Tunnel (Bridge)
+  - `setup_tunnel.ps1` automation script
+  - Live at https://bridge.dlxstudios.online
+  - Config stored in `config.yml`
+- [x] ✅ Security Hardening
+  - API key authentication on protected endpoints
+  - CORS configured for dlxstudios.online + vercel.app
+  - WebSocket auth via query param
+  - Rate limiting enabled
 
 ---
 
-## Final Verification Results (2025-12-07 @ 22:45 CST)
+## Final Verification Results (2026-02-14 @ 15:00 CST)
 
 ### API Endpoint Tests
 | Endpoint | Status | Details |
 |----------|--------|---------|
-| `/music/agents` | ✅ Working | 4 agents returned (Lyricist, Composer, Critic, Producer) |
-| `/projects` | ✅ Working | Database connected, `source: "database"` |
-| `/agents/meeting/status` | ✅ Working | Meeting system ready with 3 personas |
-| `/system` | ✅ Working | GPU temp, LM Studio online, Ollama online |
-| `/status` | ✅ Working | Bridge operational |
+| `/` | ✅ Working | Bridge info + endpoints list |
+| `/health` | ✅ Working | Full health check with uptime |
+| `/status` | ✅ Working | Requires API key |
+| `/llm/models` | ✅ Working | LM Studio + Ollama models |
+| `/music/agents` | ✅ Working | 4 songwriter agents |
+| `/projects` | ✅ Working | Labs database |
+| `/agents/meeting/status` | ✅ Working | Meeting system |
+| `/system` | ✅ Working | System metrics |
+| `/smartfolio/:id` | ✅ Working | Portfolio data |
+
+### Deployment Status
+| Platform | URL | Status |
+|----------|-----|--------|
+| Web (Vercel) | dlxstudios.online | ✅ Live |
+| Bridge (Cloudflare) | bridge.dlxstudios.online | ✅ Live |
+| Desktop (Tauri) | Local install | ✅ Working |
 
 ### Visual Verification
-All 4 phase pages verified via browser:
-- **Phase 1 (Music):** Mode tabs, pipeline, status indicator ✅
-- **Phase 2 (Labs):** Gantt view, "DB Connected" indicator ✅
-- **Phase 3 (Agents):** Agent tiles, status indicators ✅
-- **Phase 4 (Dashboard):** Widgets, system stats, greeting ✅
+All core pages verified via browser:
+- **Dashboard:** Widgets, system stats, greeting ✅
+- **Chat:** Model selector, persistence, streaming ✅
+- **Music:** Pipeline, modes, copy-to-suno ✅
+- **Labs:** Gantt view, DB status, Smartfolio ✅
+- **Agents:** Agent tiles, invoke capability ✅
+- **Settings:** All tabs functional ✅
+- **News:** 100 sources, filters ✅
 
 ---
 
 ## Known Gaps / Next Steps
 
-1. **Phase 5 Build:** Tauri build environment verified, integration in progress.
-2. **Labs Database:** Seeding operational (currently using in-memory fallback), data available in UI.
-3. **Project Front Door:** Links updated and functional in Labs Hub.
-4. **LM Studio Model:** Chat needs a loaded model to function.
+1. **Stub Agents:** Research, Code, QA, Architect, Security, DevOps still stubs
+2. **Token Display:** Chat doesn't show token count (deferred)
+3. **Keyboard Shortcuts:** Global hotkeys not implemented (deferred)
+4. **Meeting Export:** Transcript export not implemented (Wave 5)
+5. **Old Folders:** `_OLD_COPY_Nexus` and `Nexus/Nexus` can be deleted
 
 ---
 
-## Known Pain Points (From Master Plan)
-- App restart is cumbersome
-- Backend must start separately (Tauri integration aims to fix this)
-- NODE_ENV warning spam
-- Prisma CommonJS warnings
+## New Services Added (Since Dec 2025)
+
+| Service | Purpose |
+|---------|---------|
+| `smartfolio.js` | Portfolio management |
+| `analyst.js` | AI-powered financial analysis |
+| `security.js` | API key auth + CORS |
+
+## New Routes Added
+
+| Route | Purpose |
+|-------|---------|
+| `/smartfolio` | Portfolio CRUD + AI analysis |
+| `/smartfolio/analyze` | Gemini-powered insights |
+
+## New Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `@google/generative-ai` | Gemini API |
+| `recharts` | Charts for Smartfolio |
+
+---
+
+## Infrastructure Files Added
+
+| File | Purpose |
+|------|---------|
+| `setup_tunnel.ps1` | Cloudflare tunnel automation |
+| `cloudflared.exe` | Tunnel binary |
+| `config.yml` | Tunnel configuration |
+
+---
+
+*Hardening Phase Complete. Desktop + Web Live. Wave 5 (Operations Labs) is next.*
