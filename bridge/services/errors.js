@@ -342,4 +342,17 @@ export class RateLimiter {
     }
 }
 
-export const rateLimiter = new RateLimiter();
+const limiterInstance = new RateLimiter();
+
+/**
+ * Rate Limiter Middleware
+ */
+export const rateLimiter = (req, res, next) => {
+    try {
+        const identifier = req.ip || req.headers['x-forwarded-for'] || 'anonymous';
+        limiterInstance.check(identifier);
+        next();
+    } catch (error) {
+        next(error);
+    }
+};

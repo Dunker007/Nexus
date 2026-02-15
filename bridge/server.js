@@ -48,22 +48,24 @@ const allowedOrigins = [
     'https://bridge.dlxstudios.online',
     'http://localhost:3000',
     'http://localhost:3456',
-    'http://127.0.0.1:3000'
 ];
 
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
-            // Check for Vercel preview deployments
-            if (origin.endsWith('.vercel.app')) {
-                return callback(null, true);
-            }
-            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
+
+        // Match dlxstudios.online, www.dlxstudios.online, and vercel previews
+        const isAllowed = origin.includes('dlxstudios.online') ||
+            origin.includes('vercel.app') ||
+            origin.includes('localhost');
+
+        if (isAllowed) {
+            return callback(null, true);
+        } else {
+            console.warn(`[CORS] Blocked origin: ${origin}`);
+            return callback(new Error('Not allowed by CORS'), false);
         }
-        return callback(null, true);
     },
     credentials: true
 }));
