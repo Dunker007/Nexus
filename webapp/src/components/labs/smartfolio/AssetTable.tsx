@@ -432,7 +432,7 @@ function MiniAIChat({ symbol, asset, activeAccount, currentCashPercent }: {
             analyzePortfolio(snapshot, persona,
                 `Give a 2-3 sentence brief on ${symbol}. Current price: $${asset.currentPrice}, avg cost: ${asset.avgCost ? '$' + asset.avgCost : 'unknown'}, PnL: $${(asset.gainLoss || 0).toFixed(2)}, allocation: ${asset.allocation.toFixed(1)}% (target ${asset.targetAllocation.toFixed(1)}%). Cash at ${currentCashPercent.toFixed(0)}%. Focus on actionable insight.`
             ).then(response => {
-                setMessages([{ role: 'ai', text: response }]);
+                setMessages([{ role: 'ai', text: response.text }]);
                 setTyping(false);
             }).catch(() => {
                 setMessages([{ role: 'ai', text: generateInitialBrief(symbol, asset, activeAccount, currentCashPercent) }]);
@@ -457,7 +457,7 @@ function MiniAIChat({ symbol, asset, activeAccount, currentCashPercent }: {
                 const response = await analyzePortfolio(snapshot, persona,
                     `User asks about ${symbol}: "${q}". Focus your answer on this specific position. ${symbol} details: price $${asset.currentPrice}, cost ${asset.avgCost ? '$' + asset.avgCost : 'unknown'}, PnL $${(asset.gainLoss || 0).toFixed(2)}, allocation ${asset.allocation.toFixed(1)}% (target ${asset.targetAllocation.toFixed(1)}%). Cash: ${currentCashPercent.toFixed(0)}%. Keep under 80 words.`
                 );
-                setMessages(prev => [...prev, { role: 'ai', text: response }]);
+                setMessages(prev => [...prev, { role: 'ai', text: response.text }]);
             } catch {
                 const fallback = generatePositionResponse(q.toLowerCase(), symbol, asset, activeAccount, currentCashPercent);
                 setMessages(prev => [...prev, { role: 'ai', text: fallback }]);
