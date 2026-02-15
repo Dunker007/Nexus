@@ -144,10 +144,15 @@ async function fetchAccountState(accountId: AccountId): Promise<AccountState> {
             notes: j.notes
         }));
 
+        // Use bridge pending orders if available, otherwise fallback to local
+        const pendingOrders = data.pendingOrders && data.pendingOrders.length > 0
+            ? data.pendingOrders
+            : loadFromStorage<Order[]>(storageKey(accountId, 'orders'), seed.pendingOrders);
+
         return {
             assets,
             journal,
-            pendingOrders: loadFromStorage<Order[]>(storageKey(accountId, 'orders'), seed.pendingOrders),
+            pendingOrders,
             recycledToSui: loadFromStorage<number>(storageKey(accountId, 'recycled'), seed.recycledToSui || 0),
             targetValue: loadFromStorage<number>(storageKey(accountId, 'target'), seed.targetValue || 0),
         };
