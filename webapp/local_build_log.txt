@@ -1,0 +1,125 @@
+
+> website-v2@2.0.0 build
+> next build
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Γû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ Γ£ô Compiled successfully in 4.1s
+   Running TypeScript ...
+   Collecting page data using 15 workers ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 15 workers (0/83) ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 15 workers (20/83) 
+   Generating static pages using 15 workers (41/83) 
+   Generating static pages using 15 workers (62/83) 
+ Γ£ô Generating static pages using 15 workers (83/83) in 1078.3ms
+   Finalizing page optimization ...
+
+Route (app)
+Γöî Γùï /
+Γö£ Γùï /_not-found
+Γö£ Γùï /admin/governance
+Γö£ Γùï /agents
+Γö£ Γùï /analytics
+Γö£ Γùï /api-keys
+Γö£ Γùï /apps
+Γö£ Γùï /auth/github/callback
+Γö£ Γùï /auth/google/callback
+Γö£ Γùï /backup
+Γö£ Γùï /blog
+Γö£ Γùï /budget
+Γö£ Γùï /calendar
+Γö£ Γùï /changelog
+Γö£ Γùï /chat
+Γö£ Γùï /community
+Γö£ Γùï /compare
+Γö£ Γùï /crypto
+Γö£ Γùï /dashboard
+Γö£ Γùï /deals
+Γö£ Γùï /docs
+Γö£ Γùï /download
+Γö£ Γùï /files
+Γö£ Γùï /github
+Γö£ Γùï /google-test
+Γö£ Γùï /home
+Γö£ Γùï /idle
+Γö£ Γùï /income
+Γö£ Γùï /income/art
+Γö£ Γùï /income/ideas
+Γö£ Γùï /income/music
+Γö£ Γùï /income/opportunities
+Γö£ Γùï /income/tracker
+Γö£ Γùï /integrations
+Γö£ Γùï /labs
+Γö£ Γùï /labs/smartfolio
+Γö£ Γùï /labs/smartfolio/aum
+Γö£ Γùï /labs/smartfolio/market
+Γö£ Γùï /labs/smartfolio/orders
+Γö£ Γùï /labs/smartfolio/report
+Γö£ Γùï /labs/smartfolio/risk
+Γö£ Γùï /labs/smartfolio/settings
+Γö£ Γùï /learn
+Γö£ Γùï /logs
+Γö£ Γùï /media
+Γö£ Γùï /meeting
+Γö£ Γùï /models
+Γö£ Γùï /monitoring
+Γö£ Γùï /music
+Γö£ Γùï /news
+Γö£ Γùï /notes
+Γö£ Γùï /notifications
+Γö£ Γùï /pipeline
+Γö£ Γùï /playground
+Γö£ Γùï /portfolio
+Γö£ Γùï /profile
+Γö£ Γùï /projects
+Γö£ Γùï /prompts
+Γö£ Γùï /scratchpad
+Γö£ Γùï /search
+Γö£ Γùï /settings
+Γö£ Γùï /setup
+Γö£ Γùï /shortcuts
+Γö£ Γùï /showcase
+Γö£ Γùï /status
+Γö£ Γùï /studio
+Γö£ Γùï /studios
+Γö£ Γùï /studios/3dprint
+Γö£ Γùï /studios/art
+Γö£ Γùï /studios/blog
+Γö£ Γùï /studios/dev
+Γö£ Γùï /studios/laser
+Γö£ Γùï /studios/podcast
+Γö£ Γùï /studios/video
+Γö£ Γùï /terminal
+Γö£ Γùï /themes
+Γö£ Γùï /trading
+Γö£ Γùï /trends
+Γö£ Γùï /vision
+Γö£ Γùï /voice
+Γöö Γùï /workflows
+
+
+Γùï  (Static)  prerendered as static content
+

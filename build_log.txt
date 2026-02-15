@@ -1,0 +1,922 @@
+Vercel CLI 50.4.6
+Retrieving projectΓÇª
+Deploying mn-fraud-watch/nexus
+Uploading [--------------------] (0.0B/270B)
+Uploading [====================] (270.0B/270B)
+Inspect: https://vercel.com/mn-fraud-watch/nexus/CfrpdkyoNKaM4HB5Kg6XEBn8vArf [4s]
+Production: https://nexus-ptamno5y0-mn-fraud-watch.vercel.app [4s]
+Building...
+Building...
+Building: Running build in Portland, USA (West) ΓÇô pdx1 (Turbo Build Machine)
+Building: Build machine configuration: 30 cores, 60 GB
+Building: Retrieving list of deployment files...
+Building: Downloading 291 deployment files...
+Building: Restored build cache from previous deployment (66tugBYTkuz8rgzxaARiXmZ6QDf9)
+Building: Running "vercel build"
+Building: Vercel CLI 50.15.1
+Building: Installing dependencies...
+Building: > website-v2@2.0.0 postinstall
+Building: > prisma generate
+Building: Loaded Prisma config from prisma.config.ts.
+Building: Prisma schema loaded from prisma/schema.prisma
+Building: Γ£ö Generated Prisma Client (v7.1.0) to ./node_modules/@prisma/client in 66ms
+Building: Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+Building: Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+Building: up to date in 2s
+Building: 271 packages are looking for funding
+Building: run `npm fund` for details
+Building: Detected Next.js version: 16.0.7
+Building: Running "npm run build"
+Building: > website-v2@2.0.0 build
+Building: > next build
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: ΓÜá Found lockfile missing swc dependencies, run next locally to automatically patch
+Building: Γû▓ Next.js 16.0.7 (Turbopack)
+Building: - Environments: .env
+Building: Creating an optimized production build ...
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: ΓÜá Found lockfile missing swc dependencies, run next locally to automatically patch
+Building: > Build error occurred
+Building: Error: Turbopack build failed with 17 errors:
+Building: ./webapp/src/app/labs/smartfolio/aum/page.tsx:4:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+Building: 2 | import React, { useMemo } from 'react';
+Building: 3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: > 4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING, type Asset } from '@/lib/labs/smartfolio/data/portfolio';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 5 | import { STRATEGIES } from '@/lib/labs/smartfolio/data/strategy';
+Building: 6 | import PriceTicker from '@/components/labs/smartfolio/PriceTicker';
+Building: 7 |
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/app/labs/smartfolio/aum/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/aum/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/app/labs/smartfolio/aum/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/aum/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/app/labs/smartfolio/orders/page.tsx:4:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+Building: 2 | import React, { useState, useMemo } from 'react';
+Building: 3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: > 4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+Building: 6 |
+Building: 7 |
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/app/labs/smartfolio/orders/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/orders/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/app/labs/smartfolio/orders/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/orders/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx:4:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+Building: 2 | import React, { useState, useMemo, useEffect, useCallback } from 'react';
+Building: 3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: > 4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 5 | import { TRADE_FEE_PERCENT, STRATEGIES } from '@/lib/labs/smartfolio/data/strategy';
+Building: 6 | import { hasGeminiKey, analyzePortfolio, type PortfolioSnapshot } from '@/lib/labs/smartfolio/geminiService';
+Building: 7 |
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/app/labs/smartfolio/risk/page.tsx:4:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+Building: 2 | import React, { useState, useMemo, useEffect } from 'react';
+Building: 3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: > 4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+Building: 6 |
+Building: 7 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/app/labs/smartfolio/risk/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/risk/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/app/labs/smartfolio/risk/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/risk/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/components/labs/smartfolio/AllocationChart.tsx:4:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+Building: 2 | import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+Building: 3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: > 4 | import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 5 |
+Building: 6 | const fmt = (n: number) => n.toFixed(1) + '%';
+Building: 7 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/components/labs/smartfolio/AllocationChart.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/components/labs/smartfolio/AllocationChart.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/components/labs/smartfolio/AssetTable.tsx:4:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+Building: 2 | import React, { useState, useRef, useCallback, useEffect } from 'react';
+Building: 3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: > 4 | import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+Building: 6 | import { hasGeminiKey, analyzePortfolio, PortfolioSnapshot } from '@/lib/labs/smartfolio/geminiService';
+Building: 7 | import CoinResearch from './CoinResearch';
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/components/labs/smartfolio/AssetTable.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/components/labs/smartfolio/AssetTable.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/components/labs/smartfolio/PendingOrders.tsx:3:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+Building: 1 | "use client";
+Building: 2 | import React, { useState } from 'react';
+Building: > 3 | import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 4 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+Building: 6 |
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/components/labs/smartfolio/PendingOrders.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/components/labs/smartfolio/PendingOrders.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/components/labs/smartfolio/Sidebar.tsx:7:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+Building: 5 |
+Building: 6 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: >  7 | import { ACCOUNTS, type AccountId } from '@/lib/labs/smartfolio/data/portfolio';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 8 |
+Building: 9 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 });
+Building: 10 |
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/components/labs/smartfolio/Sidebar.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/layout.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/layout.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/components/labs/smartfolio/Sidebar.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/layout.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/layout.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/context/labs/smartfolio/PortfolioContext.tsx:3:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+Building: 1 | "use client";
+Building: 2 | import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+Building: > 3 | import { ACCOUNTS, AccountId, Asset, Order, AccountData, JournalEntry } from '@/lib/labs/smartfolio/data/portfolio';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 4 | import { STRATEGIES, Strategy, TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+Building: 5 | import { startPolling, stopPolling, fetchPrices, type PriceMap } from '@/lib/labs/smartfolio/priceEngine';
+Building: 6 | import { saveSnapshot } from '@/lib/labs/smartfolio/snapshots';
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/context/labs/smartfolio/PortfolioContext.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/context/labs/smartfolio/PortfolioContext.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/app/labs/smartfolio/aum/page.tsx:5:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+Building: 3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: 4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING, type Asset } from '@/lib/labs/smartfolio/data/portfolio';
+Building: > 5 | import { STRATEGIES } from '@/lib/labs/smartfolio/data/strategy';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 6 | import PriceTicker from '@/components/labs/smartfolio/PriceTicker';
+Building: 7 |
+Building: 8 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/app/labs/smartfolio/aum/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/aum/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/app/labs/smartfolio/aum/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/aum/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/app/labs/smartfolio/orders/page.tsx:5:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+Building: 3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: 4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+Building: > 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 6 |
+Building: 7 |
+Building: 8 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/app/labs/smartfolio/orders/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/orders/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/app/labs/smartfolio/orders/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/orders/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx:5:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+Building: 3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: 4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+Building: > 5 | import { TRADE_FEE_PERCENT, STRATEGIES } from '@/lib/labs/smartfolio/data/strategy';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 6 | import { hasGeminiKey, analyzePortfolio, type PortfolioSnapshot } from '@/lib/labs/smartfolio/geminiService';
+Building: 7 |
+Building: 8 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/app/labs/smartfolio/risk/page.tsx:5:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+Building: 3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: 4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+Building: > 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 6 |
+Building: 7 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+Building: 8 |
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/app/labs/smartfolio/risk/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/risk/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/app/labs/smartfolio/risk/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/risk/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/components/labs/smartfolio/AssetTable.tsx:5:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+Building: 3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: 4 | import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+Building: > 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 6 | import { hasGeminiKey, analyzePortfolio, PortfolioSnapshot } from '@/lib/labs/smartfolio/geminiService';
+Building: 7 | import CoinResearch from './CoinResearch';
+Building: 8 |
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/components/labs/smartfolio/AssetTable.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/components/labs/smartfolio/AssetTable.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/components/labs/smartfolio/PendingOrders.tsx:5:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+Building: 3 | import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+Building: 4 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: > 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 6 |
+Building: 7 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+Building: 8 |
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/components/labs/smartfolio/PendingOrders.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/components/labs/smartfolio/PendingOrders.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/components/labs/smartfolio/TradeJournal.tsx:5:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+Building: 3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+Building: 4 | import { LOGO_MAPPING, JournalEntry } from '@/lib/labs/smartfolio/data/portfolio';
+Building: > 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 6 |
+Building: 7 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+Building: 8 |
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/components/labs/smartfolio/TradeJournal.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/components/labs/smartfolio/TradeJournal.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: ./webapp/src/context/labs/smartfolio/PortfolioContext.tsx:4:1
+Building: Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+Building: 2 | import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+Building: 3 | import { ACCOUNTS, AccountId, Asset, Order, AccountData, JournalEntry } from '@/lib/labs/smartfolio/data/portfolio';
+Building: > 4 | import { STRATEGIES, Strategy, TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+Building: | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 5 | import { startPolling, stopPolling, fetchPrices, type PriceMap } from '@/lib/labs/smartfolio/priceEngine';
+Building: 6 | import { saveSnapshot } from '@/lib/labs/smartfolio/snapshots';
+Building: 7 | import { checkAlerts, requestNotificationPermission } from '@/lib/labs/smartfolio/alertEngine';
+Building: Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+Building: Import traces:
+Building: Client Component Browser:
+Building: ./webapp/src/context/labs/smartfolio/PortfolioContext.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component Browser]
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+Building: Client Component SSR:
+Building: ./webapp/src/context/labs/smartfolio/PortfolioContext.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component SSR]
+Building: ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+Building: https://nextjs.org/docs/messages/module-not-found
+Building: at <unknown> (./webapp/src/app/labs/smartfolio/aum/page.tsx:4:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/app/labs/smartfolio/orders/page.tsx:4:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/app/labs/smartfolio/report/page.tsx:4:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/app/labs/smartfolio/risk/page.tsx:4:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/components/labs/smartfolio/AllocationChart.tsx:4:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/components/labs/smartfolio/AssetTable.tsx:4:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/components/labs/smartfolio/PendingOrders.tsx:3:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/components/labs/smartfolio/Sidebar.tsx:7:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/context/labs/smartfolio/PortfolioContext.tsx:3:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/app/labs/smartfolio/aum/page.tsx:5:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/app/labs/smartfolio/orders/page.tsx:5:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/app/labs/smartfolio/report/page.tsx:5:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/app/labs/smartfolio/risk/page.tsx:5:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/components/labs/smartfolio/AssetTable.tsx:5:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/components/labs/smartfolio/PendingOrders.tsx:5:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/components/labs/smartfolio/TradeJournal.tsx:5:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: at <unknown> (./webapp/src/context/labs/smartfolio/PortfolioContext.tsx:4:1)
+Building: at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+Building: Error: Command "npm run build" exited with 1
+2026-02-15T02:08:28.182Z  Running build in Portland, USA (West) ΓÇô pdx1 (Turbo Build Machine)
+2026-02-15T02:08:28.182Z  Build machine configuration: 30 cores, 60 GB
+2026-02-15T02:08:28.263Z  Retrieving list of deployment files...
+2026-02-15T02:08:28.608Z  Downloading 291 deployment files...
+2026-02-15T02:08:30.398Z  Restored build cache from previous deployment (66tugBYTkuz8rgzxaARiXmZ6QDf9)
+2026-02-15T02:08:30.622Z  Running "vercel build"
+2026-02-15T02:08:31.037Z  Vercel CLI 50.15.1
+2026-02-15T02:08:31.274Z  Installing dependencies...
+2026-02-15T02:08:32.665Z  
+2026-02-15T02:08:32.665Z  > website-v2@2.0.0 postinstall
+2026-02-15T02:08:32.665Z  > prisma generate
+2026-02-15T02:08:32.665Z  
+2026-02-15T02:08:33.596Z  Loaded Prisma config from prisma.config.ts.
+2026-02-15T02:08:33.597Z  
+2026-02-15T02:08:33.642Z  Prisma schema loaded from prisma/schema.prisma
+2026-02-15T02:08:33.757Z  
+2026-02-15T02:08:33.757Z  Γ£ö Generated Prisma Client (v7.1.0) to ./node_modules/@prisma/client in 66ms
+2026-02-15T02:08:33.758Z  
+2026-02-15T02:08:33.758Z  Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+2026-02-15T02:08:33.758Z  
+2026-02-15T02:08:33.758Z  Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+2026-02-15T02:08:33.758Z  
+2026-02-15T02:08:33.775Z  
+2026-02-15T02:08:33.775Z  up to date in 2s
+2026-02-15T02:08:33.775Z  
+2026-02-15T02:08:33.775Z  271 packages are looking for funding
+2026-02-15T02:08:33.775Z  run `npm fund` for details
+2026-02-15T02:08:33.802Z  Detected Next.js version: 16.0.7
+2026-02-15T02:08:33.807Z  Running "npm run build"
+2026-02-15T02:08:33.890Z  
+2026-02-15T02:08:33.890Z  > website-v2@2.0.0 build
+2026-02-15T02:08:33.890Z  > next build
+2026-02-15T02:08:33.890Z  
+2026-02-15T02:08:34.104Z  [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+2026-02-15T02:08:34.654Z  ΓÜá Found lockfile missing swc dependencies, run next locally to automatically patch
+2026-02-15T02:08:34.708Z  Γû▓ Next.js 16.0.7 (Turbopack)
+2026-02-15T02:08:34.708Z  - Environments: .env
+2026-02-15T02:08:34.708Z  
+2026-02-15T02:08:34.739Z  Creating an optimized production build ...
+2026-02-15T02:08:34.854Z  [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+2026-02-15T02:08:35.153Z  ΓÜá Found lockfile missing swc dependencies, run next locally to automatically patch
+2026-02-15T02:08:38.941Z  
+2026-02-15T02:08:38.941Z  > Build error occurred
+2026-02-15T02:08:38.946Z  Error: Turbopack build failed with 17 errors:
+2026-02-15T02:08:38.946Z  ./webapp/src/app/labs/smartfolio/aum/page.tsx:4:1
+2026-02-15T02:08:38.946Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+2026-02-15T02:08:38.946Z  2 | import React, { useMemo } from 'react';
+2026-02-15T02:08:38.946Z  3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.946Z  > 4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING, type Asset } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.947Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.947Z  5 | import { STRATEGIES } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.947Z  6 | import PriceTicker from '@/components/labs/smartfolio/PriceTicker';
+2026-02-15T02:08:38.947Z  7 |
+2026-02-15T02:08:38.947Z  
+2026-02-15T02:08:38.947Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+2026-02-15T02:08:38.947Z  
+2026-02-15T02:08:38.947Z  
+2026-02-15T02:08:38.947Z  Import traces:
+2026-02-15T02:08:38.947Z  Client Component Browser:
+2026-02-15T02:08:38.947Z  ./webapp/src/app/labs/smartfolio/aum/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.947Z  ./webapp/src/app/labs/smartfolio/aum/page.tsx [Server Component]
+2026-02-15T02:08:38.947Z  
+2026-02-15T02:08:38.947Z  Client Component SSR:
+2026-02-15T02:08:38.947Z  ./webapp/src/app/labs/smartfolio/aum/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.947Z  ./webapp/src/app/labs/smartfolio/aum/page.tsx [Server Component]
+2026-02-15T02:08:38.947Z  
+2026-02-15T02:08:38.947Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.947Z  
+2026-02-15T02:08:38.947Z  
+2026-02-15T02:08:38.947Z  ./webapp/src/app/labs/smartfolio/orders/page.tsx:4:1
+2026-02-15T02:08:38.947Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+2026-02-15T02:08:38.947Z  2 | import React, { useState, useMemo } from 'react';
+2026-02-15T02:08:38.947Z  3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.948Z  > 4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.948Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.948Z  5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.948Z  6 |
+2026-02-15T02:08:38.948Z  7 |
+2026-02-15T02:08:38.948Z  
+2026-02-15T02:08:38.948Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+2026-02-15T02:08:38.948Z  
+2026-02-15T02:08:38.948Z  
+2026-02-15T02:08:38.948Z  Import traces:
+2026-02-15T02:08:38.948Z  Client Component Browser:
+2026-02-15T02:08:38.948Z  ./webapp/src/app/labs/smartfolio/orders/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.948Z  ./webapp/src/app/labs/smartfolio/orders/page.tsx [Server Component]
+2026-02-15T02:08:38.948Z  
+2026-02-15T02:08:38.948Z  Client Component SSR:
+2026-02-15T02:08:38.948Z  ./webapp/src/app/labs/smartfolio/orders/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.948Z  ./webapp/src/app/labs/smartfolio/orders/page.tsx [Server Component]
+2026-02-15T02:08:38.948Z  
+2026-02-15T02:08:38.948Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.948Z  
+2026-02-15T02:08:38.948Z  
+2026-02-15T02:08:38.948Z  ./webapp/src/app/labs/smartfolio/report/page.tsx:4:1
+2026-02-15T02:08:38.948Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+2026-02-15T02:08:38.948Z  2 | import React, { useState, useMemo, useEffect, useCallback } from 'react';
+2026-02-15T02:08:38.948Z  3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.948Z  > 4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.948Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.949Z  5 | import { TRADE_FEE_PERCENT, STRATEGIES } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.949Z  6 | import { hasGeminiKey, analyzePortfolio, type PortfolioSnapshot } from '@/lib/labs/smartfolio/geminiService';
+2026-02-15T02:08:38.949Z  7 |
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  Import traces:
+2026-02-15T02:08:38.949Z  Client Component Browser:
+2026-02-15T02:08:38.949Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.949Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  Client Component SSR:
+2026-02-15T02:08:38.949Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.949Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  ./webapp/src/app/labs/smartfolio/risk/page.tsx:4:1
+2026-02-15T02:08:38.949Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+2026-02-15T02:08:38.949Z  2 | import React, { useState, useMemo, useEffect } from 'react';
+2026-02-15T02:08:38.949Z  3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.949Z  > 4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.949Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.949Z  5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.949Z  6 |
+2026-02-15T02:08:38.949Z  7 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  Import traces:
+2026-02-15T02:08:38.949Z  Client Component Browser:
+2026-02-15T02:08:38.949Z  ./webapp/src/app/labs/smartfolio/risk/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.949Z  ./webapp/src/app/labs/smartfolio/risk/page.tsx [Server Component]
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  Client Component SSR:
+2026-02-15T02:08:38.949Z  ./webapp/src/app/labs/smartfolio/risk/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.949Z  ./webapp/src/app/labs/smartfolio/risk/page.tsx [Server Component]
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  
+2026-02-15T02:08:38.949Z  ./webapp/src/components/labs/smartfolio/AllocationChart.tsx:4:1
+2026-02-15T02:08:38.949Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+2026-02-15T02:08:38.949Z  2 | import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+2026-02-15T02:08:38.949Z  3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.949Z  > 4 | import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.949Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.949Z  5 |
+2026-02-15T02:08:38.949Z  6 | const fmt = (n: number) => n.toFixed(1) + '%';
+2026-02-15T02:08:38.950Z  7 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+2026-02-15T02:08:38.950Z  
+2026-02-15T02:08:38.950Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+2026-02-15T02:08:38.950Z  
+2026-02-15T02:08:38.950Z  
+2026-02-15T02:08:38.950Z  Import traces:
+2026-02-15T02:08:38.950Z  Client Component Browser:
+2026-02-15T02:08:38.950Z  ./webapp/src/components/labs/smartfolio/AllocationChart.tsx [Client Component Browser]
+2026-02-15T02:08:38.950Z  ./webapp/src/app/labs/smartfolio/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.950Z  ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+2026-02-15T02:08:38.950Z  
+2026-02-15T02:08:38.950Z  Client Component SSR:
+2026-02-15T02:08:38.950Z  ./webapp/src/components/labs/smartfolio/AllocationChart.tsx [Client Component SSR]
+2026-02-15T02:08:38.950Z  ./webapp/src/app/labs/smartfolio/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.950Z  ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+2026-02-15T02:08:38.950Z  
+2026-02-15T02:08:38.950Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.950Z  
+2026-02-15T02:08:38.950Z  
+2026-02-15T02:08:38.950Z  ./webapp/src/components/labs/smartfolio/AssetTable.tsx:4:1
+2026-02-15T02:08:38.950Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+2026-02-15T02:08:38.950Z  2 | import React, { useState, useRef, useCallback, useEffect } from 'react';
+2026-02-15T02:08:38.950Z  3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.950Z  > 4 | import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.950Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.950Z  5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.951Z  6 | import { hasGeminiKey, analyzePortfolio, PortfolioSnapshot } from '@/lib/labs/smartfolio/geminiService';
+2026-02-15T02:08:38.951Z  7 | import CoinResearch from './CoinResearch';
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  Import traces:
+2026-02-15T02:08:38.951Z  Client Component Browser:
+2026-02-15T02:08:38.951Z  ./webapp/src/components/labs/smartfolio/AssetTable.tsx [Client Component Browser]
+2026-02-15T02:08:38.951Z  ./webapp/src/app/labs/smartfolio/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.951Z  ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  Client Component SSR:
+2026-02-15T02:08:38.951Z  ./webapp/src/components/labs/smartfolio/AssetTable.tsx [Client Component SSR]
+2026-02-15T02:08:38.951Z  ./webapp/src/app/labs/smartfolio/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.951Z  ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  ./webapp/src/components/labs/smartfolio/PendingOrders.tsx:3:1
+2026-02-15T02:08:38.951Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+2026-02-15T02:08:38.951Z  1 | "use client";
+2026-02-15T02:08:38.951Z  2 | import React, { useState } from 'react';
+2026-02-15T02:08:38.951Z  > 3 | import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.951Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.951Z  4 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.951Z  5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.951Z  6 |
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  Import traces:
+2026-02-15T02:08:38.951Z  Client Component Browser:
+2026-02-15T02:08:38.951Z  ./webapp/src/components/labs/smartfolio/PendingOrders.tsx [Client Component Browser]
+2026-02-15T02:08:38.951Z  ./webapp/src/app/labs/smartfolio/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.951Z  ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  Client Component SSR:
+2026-02-15T02:08:38.951Z  ./webapp/src/components/labs/smartfolio/PendingOrders.tsx [Client Component SSR]
+2026-02-15T02:08:38.951Z  ./webapp/src/app/labs/smartfolio/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.951Z  ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  
+2026-02-15T02:08:38.951Z  ./webapp/src/components/labs/smartfolio/Sidebar.tsx:7:1
+2026-02-15T02:08:38.951Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+2026-02-15T02:08:38.951Z  5 |
+2026-02-15T02:08:38.952Z  6 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.952Z  >  7 | import { ACCOUNTS, type AccountId } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.952Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.952Z  8 |
+2026-02-15T02:08:38.952Z  9 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 });
+2026-02-15T02:08:38.952Z  10 |
+2026-02-15T02:08:38.952Z  
+2026-02-15T02:08:38.952Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+2026-02-15T02:08:38.952Z  
+2026-02-15T02:08:38.952Z  
+2026-02-15T02:08:38.952Z  Import traces:
+2026-02-15T02:08:38.952Z  Client Component Browser:
+2026-02-15T02:08:38.952Z  ./webapp/src/components/labs/smartfolio/Sidebar.tsx [Client Component Browser]
+2026-02-15T02:08:38.952Z  ./webapp/src/app/labs/smartfolio/layout.tsx [Client Component Browser]
+2026-02-15T02:08:38.952Z  ./webapp/src/app/labs/smartfolio/layout.tsx [Server Component]
+2026-02-15T02:08:38.952Z  
+2026-02-15T02:08:38.952Z  Client Component SSR:
+2026-02-15T02:08:38.952Z  ./webapp/src/components/labs/smartfolio/Sidebar.tsx [Client Component SSR]
+2026-02-15T02:08:38.952Z  ./webapp/src/app/labs/smartfolio/layout.tsx [Client Component SSR]
+2026-02-15T02:08:38.952Z  ./webapp/src/app/labs/smartfolio/layout.tsx [Server Component]
+2026-02-15T02:08:38.952Z  
+2026-02-15T02:08:38.952Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.952Z  
+2026-02-15T02:08:38.952Z  
+2026-02-15T02:08:38.952Z  ./webapp/src/context/labs/smartfolio/PortfolioContext.tsx:3:1
+2026-02-15T02:08:38.952Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/portfolio'
+2026-02-15T02:08:38.952Z  1 | "use client";
+2026-02-15T02:08:38.952Z  2 | import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+2026-02-15T02:08:38.952Z  > 3 | import { ACCOUNTS, AccountId, Asset, Order, AccountData, JournalEntry } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.952Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.952Z  4 | import { STRATEGIES, Strategy, TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.952Z  5 | import { startPolling, stopPolling, fetchPrices, type PriceMap } from '@/lib/labs/smartfolio/priceEngine';
+2026-02-15T02:08:38.952Z  6 | import { saveSnapshot } from '@/lib/labs/smartfolio/snapshots';
+2026-02-15T02:08:38.952Z  
+2026-02-15T02:08:38.952Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/portfolio' inside of [project]/webapp
+2026-02-15T02:08:38.952Z  
+2026-02-15T02:08:38.952Z  
+2026-02-15T02:08:38.952Z  Import traces:
+2026-02-15T02:08:38.952Z  Client Component Browser:
+2026-02-15T02:08:38.952Z  ./webapp/src/context/labs/smartfolio/PortfolioContext.tsx [Client Component Browser]
+2026-02-15T02:08:38.952Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.952Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+2026-02-15T02:08:38.952Z  
+2026-02-15T02:08:38.953Z  Client Component SSR:
+2026-02-15T02:08:38.953Z  ./webapp/src/context/labs/smartfolio/PortfolioContext.tsx [Client Component SSR]
+2026-02-15T02:08:38.953Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.953Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  ./webapp/src/app/labs/smartfolio/aum/page.tsx:5:1
+2026-02-15T02:08:38.953Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+2026-02-15T02:08:38.953Z  3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.953Z  4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING, type Asset } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.953Z  > 5 | import { STRATEGIES } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.953Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.953Z  6 | import PriceTicker from '@/components/labs/smartfolio/PriceTicker';
+2026-02-15T02:08:38.953Z  7 |
+2026-02-15T02:08:38.953Z  8 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  Import traces:
+2026-02-15T02:08:38.953Z  Client Component Browser:
+2026-02-15T02:08:38.953Z  ./webapp/src/app/labs/smartfolio/aum/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.953Z  ./webapp/src/app/labs/smartfolio/aum/page.tsx [Server Component]
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  Client Component SSR:
+2026-02-15T02:08:38.953Z  ./webapp/src/app/labs/smartfolio/aum/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.953Z  ./webapp/src/app/labs/smartfolio/aum/page.tsx [Server Component]
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  ./webapp/src/app/labs/smartfolio/orders/page.tsx:5:1
+2026-02-15T02:08:38.953Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+2026-02-15T02:08:38.953Z  3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.953Z  4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.953Z  > 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.953Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.953Z  6 |
+2026-02-15T02:08:38.953Z  7 |
+2026-02-15T02:08:38.953Z  8 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  Import traces:
+2026-02-15T02:08:38.953Z  Client Component Browser:
+2026-02-15T02:08:38.953Z  ./webapp/src/app/labs/smartfolio/orders/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.953Z  ./webapp/src/app/labs/smartfolio/orders/page.tsx [Server Component]
+2026-02-15T02:08:38.953Z  
+2026-02-15T02:08:38.953Z  Client Component SSR:
+2026-02-15T02:08:38.954Z  ./webapp/src/app/labs/smartfolio/orders/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.954Z  ./webapp/src/app/labs/smartfolio/orders/page.tsx [Server Component]
+2026-02-15T02:08:38.954Z  
+2026-02-15T02:08:38.954Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.954Z  
+2026-02-15T02:08:38.954Z  
+2026-02-15T02:08:38.954Z  ./webapp/src/app/labs/smartfolio/report/page.tsx:5:1
+2026-02-15T02:08:38.954Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+2026-02-15T02:08:38.954Z  3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.954Z  4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.954Z  > 5 | import { TRADE_FEE_PERCENT, STRATEGIES } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.954Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.954Z  6 | import { hasGeminiKey, analyzePortfolio, type PortfolioSnapshot } from '@/lib/labs/smartfolio/geminiService';
+2026-02-15T02:08:38.954Z  7 |
+2026-02-15T02:08:38.954Z  8 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+2026-02-15T02:08:38.954Z  
+2026-02-15T02:08:38.954Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+2026-02-15T02:08:38.954Z  
+2026-02-15T02:08:38.954Z  
+2026-02-15T02:08:38.954Z  Import traces:
+2026-02-15T02:08:38.954Z  Client Component Browser:
+2026-02-15T02:08:38.954Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.954Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+2026-02-15T02:08:38.954Z  
+2026-02-15T02:08:38.954Z  Client Component SSR:
+2026-02-15T02:08:38.954Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.954Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+2026-02-15T02:08:38.954Z  
+2026-02-15T02:08:38.954Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.954Z  
+2026-02-15T02:08:38.954Z  
+2026-02-15T02:08:38.954Z  ./webapp/src/app/labs/smartfolio/risk/page.tsx:5:1
+2026-02-15T02:08:38.954Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+2026-02-15T02:08:38.954Z  3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.954Z  4 | import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.954Z  > 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.954Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.954Z  6 |
+2026-02-15T02:08:38.954Z  7 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+2026-02-15T02:08:38.955Z  8 |
+2026-02-15T02:08:38.955Z  
+2026-02-15T02:08:38.955Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+2026-02-15T02:08:38.955Z  
+2026-02-15T02:08:38.955Z  
+2026-02-15T02:08:38.955Z  Import traces:
+2026-02-15T02:08:38.955Z  Client Component Browser:
+2026-02-15T02:08:38.955Z  ./webapp/src/app/labs/smartfolio/risk/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.955Z  ./webapp/src/app/labs/smartfolio/risk/page.tsx [Server Component]
+2026-02-15T02:08:38.955Z  
+2026-02-15T02:08:38.955Z  Client Component SSR:
+2026-02-15T02:08:38.955Z  ./webapp/src/app/labs/smartfolio/risk/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.955Z  ./webapp/src/app/labs/smartfolio/risk/page.tsx [Server Component]
+2026-02-15T02:08:38.955Z  
+2026-02-15T02:08:38.955Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.955Z  
+2026-02-15T02:08:38.955Z  
+2026-02-15T02:08:38.955Z  ./webapp/src/components/labs/smartfolio/AssetTable.tsx:5:1
+2026-02-15T02:08:38.955Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+2026-02-15T02:08:38.955Z  3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.955Z  4 | import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.955Z  > 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.955Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.955Z  6 | import { hasGeminiKey, analyzePortfolio, PortfolioSnapshot } from '@/lib/labs/smartfolio/geminiService';
+2026-02-15T02:08:38.955Z  7 | import CoinResearch from './CoinResearch';
+2026-02-15T02:08:38.955Z  8 |
+2026-02-15T02:08:38.955Z  
+2026-02-15T02:08:38.955Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+2026-02-15T02:08:38.955Z  
+2026-02-15T02:08:38.955Z  
+2026-02-15T02:08:38.955Z  Import traces:
+2026-02-15T02:08:38.955Z  Client Component Browser:
+2026-02-15T02:08:38.955Z  ./webapp/src/components/labs/smartfolio/AssetTable.tsx [Client Component Browser]
+2026-02-15T02:08:38.956Z  ./webapp/src/app/labs/smartfolio/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.956Z  ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  Client Component SSR:
+2026-02-15T02:08:38.956Z  ./webapp/src/components/labs/smartfolio/AssetTable.tsx [Client Component SSR]
+2026-02-15T02:08:38.956Z  ./webapp/src/app/labs/smartfolio/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.956Z  ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  ./webapp/src/components/labs/smartfolio/PendingOrders.tsx:5:1
+2026-02-15T02:08:38.956Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+2026-02-15T02:08:38.956Z  3 | import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.956Z  4 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.956Z  > 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.956Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.956Z  6 |
+2026-02-15T02:08:38.956Z  7 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+2026-02-15T02:08:38.956Z  8 |
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  Import traces:
+2026-02-15T02:08:38.956Z  Client Component Browser:
+2026-02-15T02:08:38.956Z  ./webapp/src/components/labs/smartfolio/PendingOrders.tsx [Client Component Browser]
+2026-02-15T02:08:38.956Z  ./webapp/src/app/labs/smartfolio/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.956Z  ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  Client Component SSR:
+2026-02-15T02:08:38.956Z  ./webapp/src/components/labs/smartfolio/PendingOrders.tsx [Client Component SSR]
+2026-02-15T02:08:38.956Z  ./webapp/src/app/labs/smartfolio/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.956Z  ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  ./webapp/src/components/labs/smartfolio/TradeJournal.tsx:5:1
+2026-02-15T02:08:38.956Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+2026-02-15T02:08:38.956Z  3 | import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
+2026-02-15T02:08:38.956Z  4 | import { LOGO_MAPPING, JournalEntry } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.956Z  > 5 | import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.956Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.956Z  6 |
+2026-02-15T02:08:38.956Z  7 | const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+2026-02-15T02:08:38.956Z  8 |
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.956Z  
+2026-02-15T02:08:38.957Z  Import traces:
+2026-02-15T02:08:38.957Z  Client Component Browser:
+2026-02-15T02:08:38.957Z  ./webapp/src/components/labs/smartfolio/TradeJournal.tsx [Client Component Browser]
+2026-02-15T02:08:38.957Z  ./webapp/src/app/labs/smartfolio/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.957Z  ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+2026-02-15T02:08:38.957Z  
+2026-02-15T02:08:38.957Z  Client Component SSR:
+2026-02-15T02:08:38.957Z  ./webapp/src/components/labs/smartfolio/TradeJournal.tsx [Client Component SSR]
+2026-02-15T02:08:38.957Z  ./webapp/src/app/labs/smartfolio/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.957Z  ./webapp/src/app/labs/smartfolio/page.tsx [Server Component]
+2026-02-15T02:08:38.957Z  
+2026-02-15T02:08:38.957Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.957Z  
+2026-02-15T02:08:38.957Z  
+2026-02-15T02:08:38.957Z  ./webapp/src/context/labs/smartfolio/PortfolioContext.tsx:4:1
+2026-02-15T02:08:38.957Z  Module not found: Can't resolve '@/lib/labs/smartfolio/data/strategy'
+2026-02-15T02:08:38.957Z  2 | import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+2026-02-15T02:08:38.957Z  3 | import { ACCOUNTS, AccountId, Asset, Order, AccountData, JournalEntry } from '@/lib/labs/smartfolio/data/portfolio';
+2026-02-15T02:08:38.957Z  > 4 | import { STRATEGIES, Strategy, TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+2026-02-15T02:08:38.957Z  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-15T02:08:38.957Z  5 | import { startPolling, stopPolling, fetchPrices, type PriceMap } from '@/lib/labs/smartfolio/priceEngine';
+2026-02-15T02:08:38.957Z  6 | import { saveSnapshot } from '@/lib/labs/smartfolio/snapshots';
+2026-02-15T02:08:38.957Z  7 | import { checkAlerts, requestNotificationPermission } from '@/lib/labs/smartfolio/alertEngine';
+2026-02-15T02:08:38.957Z  
+2026-02-15T02:08:38.957Z  Import map: aliased to relative './src/lib/labs/smartfolio/data/strategy' inside of [project]/webapp
+2026-02-15T02:08:38.957Z  
+2026-02-15T02:08:38.957Z  
+2026-02-15T02:08:38.957Z  Import traces:
+2026-02-15T02:08:38.957Z  Client Component Browser:
+2026-02-15T02:08:38.957Z  ./webapp/src/context/labs/smartfolio/PortfolioContext.tsx [Client Component Browser]
+2026-02-15T02:08:38.957Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component Browser]
+2026-02-15T02:08:38.957Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+2026-02-15T02:08:38.957Z  
+2026-02-15T02:08:38.957Z  Client Component SSR:
+2026-02-15T02:08:38.957Z  ./webapp/src/context/labs/smartfolio/PortfolioContext.tsx [Client Component SSR]
+2026-02-15T02:08:38.957Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Client Component SSR]
+2026-02-15T02:08:38.957Z  ./webapp/src/app/labs/smartfolio/report/page.tsx [Server Component]
+2026-02-15T02:08:38.957Z  
+2026-02-15T02:08:38.957Z  https://nextjs.org/docs/messages/module-not-found
+2026-02-15T02:08:38.957Z  
+2026-02-15T02:08:38.957Z  
+2026-02-15T02:08:38.957Z  at <unknown> (./webapp/src/app/labs/smartfolio/aum/page.tsx:4:1)
+2026-02-15T02:08:38.957Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.957Z  at <unknown> (./webapp/src/app/labs/smartfolio/orders/page.tsx:4:1)
+2026-02-15T02:08:38.957Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.957Z  at <unknown> (./webapp/src/app/labs/smartfolio/report/page.tsx:4:1)
+2026-02-15T02:08:38.957Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.957Z  at <unknown> (./webapp/src/app/labs/smartfolio/risk/page.tsx:4:1)
+2026-02-15T02:08:38.957Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.957Z  at <unknown> (./webapp/src/components/labs/smartfolio/AllocationChart.tsx:4:1)
+2026-02-15T02:08:38.957Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.958Z  at <unknown> (./webapp/src/components/labs/smartfolio/AssetTable.tsx:4:1)
+2026-02-15T02:08:38.958Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.958Z  at <unknown> (./webapp/src/components/labs/smartfolio/PendingOrders.tsx:3:1)
+2026-02-15T02:08:38.958Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.958Z  at <unknown> (./webapp/src/components/labs/smartfolio/Sidebar.tsx:7:1)
+2026-02-15T02:08:38.958Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.958Z  at <unknown> (./webapp/src/context/labs/smartfolio/PortfolioContext.tsx:3:1)
+2026-02-15T02:08:38.958Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.958Z  at <unknown> (./webapp/src/app/labs/smartfolio/aum/page.tsx:5:1)
+2026-02-15T02:08:38.958Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.958Z  at <unknown> (./webapp/src/app/labs/smartfolio/orders/page.tsx:5:1)
+2026-02-15T02:08:38.958Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.958Z  at <unknown> (./webapp/src/app/labs/smartfolio/report/page.tsx:5:1)
+2026-02-15T02:08:38.958Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.958Z  at <unknown> (./webapp/src/app/labs/smartfolio/risk/page.tsx:5:1)
+2026-02-15T02:08:38.958Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.958Z  at <unknown> (./webapp/src/components/labs/smartfolio/AssetTable.tsx:5:1)
+2026-02-15T02:08:38.958Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.958Z  at <unknown> (./webapp/src/components/labs/smartfolio/PendingOrders.tsx:5:1)
+2026-02-15T02:08:38.958Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.958Z  at <unknown> (./webapp/src/components/labs/smartfolio/TradeJournal.tsx:5:1)
+2026-02-15T02:08:38.958Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:38.958Z  at <unknown> (./webapp/src/context/labs/smartfolio/PortfolioContext.tsx:4:1)
+2026-02-15T02:08:38.958Z  at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+2026-02-15T02:08:39.011Z  Error: Command "npm run build" exited with 1
+https://nexus-ptamno5y0-mn-fraud-watch.vercel.app

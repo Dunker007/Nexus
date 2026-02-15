@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
-import { ACCOUNTS, type AccountId } from '@/lib/labs/smartfolio/data/portfolio';
+import { ACCOUNTS, type AccountId } from '@/lib/labs/smartfolio/store/portfolio';
 
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 });
 
@@ -238,3 +238,4 @@ const NavItem = ({ icon, label, href, active, onClick }: { icon: string; label: 
 );
 
 export default Sidebar;
+

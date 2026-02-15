@@ -1,7 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { ACCOUNTS, AccountId, Asset, Order, AccountData, JournalEntry } from '@/lib/labs/smartfolio/data/portfolio';
-import { STRATEGIES, Strategy, TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+import { ACCOUNTS, AccountId, Asset, Order, AccountData, JournalEntry } from '@/lib/labs/smartfolio/store/portfolio';
+import { STRATEGIES, Strategy, TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/store/strategy';
 import { startPolling, stopPolling, fetchPrices, type PriceMap } from '@/lib/labs/smartfolio/priceEngine';
 import { saveSnapshot } from '@/lib/labs/smartfolio/snapshots';
 import { checkAlerts, requestNotificationPermission } from '@/lib/labs/smartfolio/alertEngine';
@@ -81,11 +81,13 @@ interface PortfolioContextType {
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
 
 // ─── Bridge API Helpers ───
-const BRIDGE_URL = 'http://localhost:3456/smartfolio';
+const BRIDGE_URL = '/api/bridge/smartfolio';
 
 async function fetchAccountState(accountId: AccountId) {
     try {
-        const res = await fetch(`${BRIDGE_URL}/${accountId}`);
+        const res = await fetch(`${BRIDGE_URL}/${accountId}`, {
+            headers: { 'x-api-key': process.env.NEXT_PUBLIC_BRIDGE_API_KEY || '' }
+        });
         if (!res.ok) throw new Error('Failed to fetch from bridge');
         const data = await res.json();
 
@@ -165,7 +167,10 @@ async function saveAccountStateToBridge(accountId: AccountId, state: {
     try {
         await fetch(`${BRIDGE_URL}/${accountId}/sync`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.NEXT_PUBLIC_BRIDGE_API_KEY || ''
+            },
             body: JSON.stringify({
                 assets: state.assets.map(a => ({
                     symbol: a.symbol,
@@ -658,3 +663,4 @@ export const usePortfolio = () => {
     if (!context) throw new Error('usePortfolio must be used within a PortfolioProvider');
     return context;
 };
+

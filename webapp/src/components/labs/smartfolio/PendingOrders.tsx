@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from 'react';
-import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+import { LOGO_MAPPING } from '@/lib/labs/smartfolio/store/portfolio';
 import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
-import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/store/strategy';
 
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
@@ -200,8 +200,8 @@ export default function PendingOrders() {
 
 // ─── What-If Scenario Card ───
 function WhatIfScenario({ label, icon, color, orders, assets, fee, isSell }: {
-    label: string; icon: string; color: string; orders: typeof import('@/lib/labs/smartfolio/data/portfolio').ACCOUNTS['sui']['pendingOrders'];
-    assets: typeof import('@/lib/labs/smartfolio/data/portfolio').ACCOUNTS['sui']['assets'];
+    label: string; icon: string; color: string; orders: typeof import('@/lib/labs/smartfolio/store/portfolio').ACCOUNTS['sui']['pendingOrders'];
+    assets: typeof import('@/lib/labs/smartfolio/store/portfolio').ACCOUNTS['sui']['assets'];
     fee: number; isSell: boolean;
 }) {
     const totalValue = assets.reduce((s, a) => s + a.currentValue, 0);
@@ -249,3 +249,4 @@ function WhatIfScenario({ label, icon, color, orders, assets, fee, isSell }: {
         </div>
     );
 }
+

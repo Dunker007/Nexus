@@ -1,7 +1,7 @@
 "use client";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
-import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+import { LOGO_MAPPING } from '@/lib/labs/smartfolio/store/portfolio';
 
 const fmt = (n: number) => n.toFixed(1) + '%';
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
@@ -205,3 +205,4 @@ function generateDirective(
         };
     }
 }
+

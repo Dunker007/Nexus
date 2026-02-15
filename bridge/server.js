@@ -79,11 +79,11 @@ app.use(performanceMonitor.middleware()); // Track all request performance
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Growth Phase Routes
-app.use('/pipeline', pipelineRoutes);
-app.use('/distribution', distributionRoutes);
-app.use('/art', artProductsRoutes);
-app.use('/income', incomeRoutes);
-app.use('/smartfolio', smartfolioRoutes);
+app.use('/pipeline', security.authenticateApiKey(), pipelineRoutes);
+app.use('/distribution', security.authenticateApiKey(), distributionRoutes);
+app.use('/art', security.authenticateApiKey(), artProductsRoutes);
+app.use('/income', security.authenticateApiKey(), incomeRoutes);
+app.use('/smartfolio', security.authenticateApiKey(), smartfolioRoutes);
 
 // Create HTTP server for both Express and WebSocket
 const server = createServer(app);

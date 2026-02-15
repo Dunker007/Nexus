@@ -1,7 +1,7 @@
 "use client";
 import React, { useMemo } from 'react';
 import { getSnapshots, calculatePerformance, type PortfolioSnapshotEntry } from '@/lib/labs/smartfolio/snapshots';
-import { AccountId } from '@/lib/labs/smartfolio/data/portfolio';
+import { AccountId } from '@/lib/labs/smartfolio/store/portfolio';
 
 interface EquityCurveProps {
     accountId: string;
@@ -181,3 +181,4 @@ export default function EquityCurve({ accountId, currentValue }: EquityCurveProp
         </div>
     );
 }
+

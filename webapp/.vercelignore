@@ -1,0 +1,12 @@
+# Vercel Ignore for Webapp Only deployment
+/node_modules/
+/.next/
+/out/
+/build/
+/coverage/
+.vercel
+*.log
+.DS_Store
+*.env*
+.env
+.env.local

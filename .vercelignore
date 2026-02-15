@@ -1,0 +1,23 @@
+# Strict Monorepo Ignore for Vercel
+node_modules/
+.git/
+.next/
+out/
+build/
+dist/
+bridge/
+_OLD_COPY_Nexus/
+docs/
+tests/
+pipeline/
+.agent/
+.claude/
+src-tauri/
+cloudflared.exe
+*.db
+*.log
+*.zip
+*.rar
+/.env.local
+/webapp/.env.local
+

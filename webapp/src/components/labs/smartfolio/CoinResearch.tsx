@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
+import { LOGO_MAPPING } from '@/lib/labs/smartfolio/store/portfolio';
 
 interface CoinData {
     id: string;
@@ -227,3 +227,4 @@ function Momentum({ label, val }: { label: string; val: number | undefined | nul
         </div>
     );
 }
+

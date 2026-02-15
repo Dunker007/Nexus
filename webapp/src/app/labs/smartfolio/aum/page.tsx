@@ -1,8 +1,8 @@
 "use client";
 import React, { useMemo } from 'react';
 import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
-import { ACCOUNTS, type AccountId, LOGO_MAPPING, type Asset } from '@/lib/labs/smartfolio/data/portfolio';
-import { STRATEGIES } from '@/lib/labs/smartfolio/data/strategy';
+import { ACCOUNTS, type AccountId, LOGO_MAPPING, type Asset } from '@/lib/labs/smartfolio/store/portfolio';
+import { STRATEGIES } from '@/lib/labs/smartfolio/store/strategy';
 import PriceTicker from '@/components/labs/smartfolio/PriceTicker';
 
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
@@ -401,3 +401,4 @@ export default function AUMDashboard() {
         </>
     );
 }
+

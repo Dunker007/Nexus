@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from 'react';
 import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
-import { LOGO_MAPPING, JournalEntry } from '@/lib/labs/smartfolio/data/portfolio';
-import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+import { LOGO_MAPPING, JournalEntry } from '@/lib/labs/smartfolio/store/portfolio';
+import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/store/strategy';
 
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
@@ -523,3 +523,4 @@ export default function TradeJournal() {
         </div>
     );
 }
+

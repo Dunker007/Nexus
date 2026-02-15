@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useMemo } from 'react';
 import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
-import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
-import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/store/portfolio';
+import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/store/strategy';
 
 
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
@@ -718,3 +718,4 @@ function PortfolioImpact({ symbol, orderType, gross, fee, assets }: {
         </div>
     );
 }
+

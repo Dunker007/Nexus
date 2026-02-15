@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
-import { TAX_WRAPPER } from '@/lib/labs/smartfolio/data/strategy';
+import { TAX_WRAPPER } from '@/lib/labs/smartfolio/store/strategy';
 
 const currency = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -270,3 +270,4 @@ export default function DetailedMetrics() {
         </>
     );
 }
+

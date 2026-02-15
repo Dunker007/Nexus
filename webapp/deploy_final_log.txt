@@ -1,0 +1,176 @@
+Vercel CLI 50.4.6
+Retrieving projectΓÇª
+Deploying mn-fraud-watch/webapp
+Uploading [--------------------] (0.0B/14.8KB)
+Uploading [=================---] (13.1KB/14.8KB)
+Uploading [====================] (14.8KB/14.8KB)
+Inspect: https://vercel.com/mn-fraud-watch/webapp/A21LwAZoQpYSF15QLHA9dZUhveRT [7s]
+Production: https://webapp-8kik02m75-mn-fraud-watch.vercel.app [7s]
+Building...
+Building...
+Building: Running build in Portland, USA (West) ΓÇô pdx1 (Turbo Build Machine)
+Building: Build machine configuration: 30 cores, 60 GB
+Building: Retrieving list of deployment files...
+Building: Downloading 11635 deployment files...
+Building: Restored build cache from previous deployment (EaDcYgGn7sn5EmE8H91iRZf9xJrr)
+Building: Running "vercel build"
+Building: Vercel CLI 50.15.1
+Building: Installing dependencies...
+Building: > website-v2@2.0.0 postinstall
+Building: > prisma generate
+Building: Loaded Prisma config from prisma.config.ts.
+Building: Prisma schema loaded from prisma/schema.prisma
+Building: Γ£ö Generated Prisma Client (v7.1.0) to ./node_modules/@prisma/client in 65ms
+Building: Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+Building: Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+Building: up to date in 3s
+Building: 271 packages are looking for funding
+Building: run `npm fund` for details
+Building: Detected Next.js version: 16.0.7
+Building: Running "npm run build"
+Building: > website-v2@2.0.0 build
+Building: > next build
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: ΓÜá Found lockfile missing swc dependencies, run next locally to automatically patch
+Building: Γû▓ Next.js 16.0.7 (Turbopack)
+Building: Creating an optimized production build ...
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: ΓÜá Found lockfile missing swc dependencies, run next locally to automatically patch
+Building: Γ£ô Compiled successfully in 16.5s
+Building: Running TypeScript ...
+Building: Collecting page data using 29 workers ...
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: Generating static pages using 29 workers (0/83) ...
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Building: Generating static pages using 29 workers (20/83)
+Building: Generating static pages using 29 workers (41/83)
+Building: Generating static pages using 29 workers (62/83)
+Building: Γ£ô Generating static pages using 29 workers (83/83) in 997.0ms
+Building: Finalizing page optimization ...
+Building: Route (app)
+Building: Γöî Γùï /
+Building: Γö£ Γùï /_not-found
+Building: Γö£ Γùï /admin/governance
+Building: Γö£ Γùï /agents
+Building: Γö£ Γùï /analytics
+Building: Γö£ Γùï /api-keys
+Building: Γö£ Γùï /apps
+Building: Γö£ Γùï /auth/github/callback
+Building: Γö£ Γùï /auth/google/callback
+Building: Γö£ Γùï /backup
+Building: Γö£ Γùï /blog
+Building: Γö£ Γùï /budget
+Building: Γö£ Γùï /calendar
+Building: Γö£ Γùï /changelog
+Building: Γö£ Γùï /chat
+Building: Γö£ Γùï /community
+Building: Γö£ Γùï /compare
+Building: Γö£ Γùï /crypto
+Building: Γö£ Γùï /dashboard
+Building: Γö£ Γùï /deals
+Building: Γö£ Γùï /docs
+Building: Γö£ Γùï /download
+Building: Γö£ Γùï /files
+Building: Γö£ Γùï /github
+Building: Γö£ Γùï /google-test
+Building: Γö£ Γùï /home
+Building: Γö£ Γùï /idle
+Building: Γö£ Γùï /income
+Building: Γö£ Γùï /income/art
+Building: Γö£ Γùï /income/ideas
+Building: Γö£ Γùï /income/music
+Building: Γö£ Γùï /income/opportunities
+Building: Γö£ Γùï /income/tracker
+Building: Γö£ Γùï /integrations
+Building: Γö£ Γùï /labs
+Building: Γö£ Γùï /labs/smartfolio
+Building: Γö£ Γùï /labs/smartfolio/aum
+Building: Γö£ Γùï /labs/smartfolio/market
+Building: Γö£ Γùï /labs/smartfolio/orders
+Building: Γö£ Γùï /labs/smartfolio/report
+Building: Γö£ Γùï /labs/smartfolio/risk
+Building: Γö£ Γùï /labs/smartfolio/settings
+Building: Γö£ Γùï /learn
+Building: Γö£ Γùï /logs
+Building: Γö£ Γùï /media
+Building: Γö£ Γùï /meeting
+Building: Γö£ Γùï /models
+Building: Γö£ Γùï /monitoring
+Building: Γö£ Γùï /music
+Building: Γö£ Γùï /news
+Building: Γö£ Γùï /notes
+Building: Γö£ Γùï /notifications
+Building: Γö£ Γùï /pipeline
+Building: Γö£ Γùï /playground
+Building: Γö£ Γùï /portfolio
+Building: Γö£ Γùï /profile
+Building: Γö£ Γùï /projects
+Building: Γö£ Γùï /prompts
+Building: Γö£ Γùï /scratchpad
+Building: Γö£ Γùï /search
+Building: Γö£ Γùï /settings
+Building: Γö£ Γùï /setup
+Building: Γö£ Γùï /shortcuts
+Building: Γö£ Γùï /showcase
+Building: Γö£ Γùï /status
+Building: Γö£ Γùï /studio
+Building: Γö£ Γùï /studios
+Building: Γö£ Γùï /studios/3dprint
+Building: Γö£ Γùï /studios/art
+Building: Γö£ Γùï /studios/blog
+Building: Γö£ Γùï /studios/dev
+Building: Γö£ Γùï /studios/laser
+Building: Γö£ Γùï /studios/podcast
+Building: Γö£ Γùï /studios/video
+Building: Γö£ Γùï /terminal
+Building: Γö£ Γùï /themes
+Building: Γö£ Γùï /trading
+Building: Γö£ Γùï /trends
+Building: Γö£ Γùï /vision
+Building: Γö£ Γùï /voice
+Building: Γöö Γùï /workflows
+Building: Γùï  (Static)  prerendered as static content
+Building: Traced Next.js server files in: 22.607ms
+Building: Created all serverless functions in: 232.13ms
+Building: Collected static files (public/, static/, .next/static): 5.308ms
+Building: Build Completed in /vercel/output [34s]
+Building: Deploying outputs...
+Building: Deployment completed
+Building: Creating build cache...
+Building: Created build cache: 7s
+Building: Uploading build cache [293.35 MB]
+[2K[1A[2K[GProduction: https://webapp-8kik02m75-mn-fraud-watch.vercel.app [2m]
+Completing...
+Aliased: https://webapp-indol-three.vercel.app [2m]
+https://webapp-8kik02m75-mn-fraud-watch.vercel.app

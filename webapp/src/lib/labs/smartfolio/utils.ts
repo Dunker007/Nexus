@@ -1,4 +1,4 @@
-import { Strategy, AllocationHealth } from './data/strategy';
+import { Strategy, AllocationHealth } from './store/strategy';
 
 export function getCashHealth(cashPercent: number, strategy: Strategy): AllocationHealth {
     if (cashPercent < strategy.thresholds.cashCriticalBelow) return 'CRITICAL';

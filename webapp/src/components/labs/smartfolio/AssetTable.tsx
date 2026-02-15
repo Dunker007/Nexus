@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
-import { LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
-import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/data/strategy';
+import { LOGO_MAPPING } from '@/lib/labs/smartfolio/store/portfolio';
+import { TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/store/strategy';
 import { hasGeminiKey, analyzePortfolio, PortfolioSnapshot } from '@/lib/labs/smartfolio/geminiService';
 import CoinResearch from './CoinResearch';
 
@@ -533,3 +533,4 @@ function generatePositionResponse(q: string, symbol: string, asset: PositionDeta
 
     return `${symbol}: ${currency.format(asset.currentValue)} value, ${asset.units.toLocaleString()} units at ${currency.format(asset.currentPrice)}. PnL: ${pnl >= 0 ? '+' : ''}${currency.format(pnl)} (${roi}%). Allocation: ${asset.allocation.toFixed(1)}% vs ${asset.targetAllocation.toFixed(1)}% target. Ask about sell, buy, targets, or risk.`;
 }
+

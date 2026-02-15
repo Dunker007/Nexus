@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
-import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/data/portfolio';
-import { TRADE_FEE_PERCENT, STRATEGIES } from '@/lib/labs/smartfolio/data/strategy';
+import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/labs/smartfolio/store/portfolio';
+import { TRADE_FEE_PERCENT, STRATEGIES } from '@/lib/labs/smartfolio/store/strategy';
 import { hasGeminiKey, analyzePortfolio, type PortfolioSnapshot } from '@/lib/labs/smartfolio/geminiService';
 
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
@@ -442,3 +442,4 @@ export default function ReportPage() {
         </>
     );
 }
+

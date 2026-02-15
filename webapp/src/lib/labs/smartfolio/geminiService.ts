@@ -39,7 +39,7 @@ export interface ChatMessage {
     timestamp?: string;
 }
 
-const BRIDGE_URL = 'http://localhost:3456/smartfolio/analyze';
+const BRIDGE_URL = '/api/bridge/smartfolio/analyze';
 
 // ─── API Calls ───
 
@@ -55,7 +55,10 @@ export async function sendMessage(
     try {
         const response = await fetch(BRIDGE_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.NEXT_PUBLIC_BRIDGE_API_KEY || ''
+            },
             body: JSON.stringify({
                 snapshot,
                 persona,
