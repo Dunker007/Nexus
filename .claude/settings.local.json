@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: Remove API key auth from read-only bridge endpoints for live site connectivity\n\nBridge /status, /llm/models, /system endpoints were returning 401 because\nthe webapp never had NEXT_PUBLIC_BRIDGE_API_KEY configured. Removed auth\nfrom read-only GET routes \\(rate limiting + CORS provide actual protection\\),\nrelaxed WebSocket /stream auth, added bridgeFetch helper, and migrated\n/llm/chat callers to include API key header.\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
+    ]
+  }
+}
