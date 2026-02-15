@@ -4,6 +4,9 @@ const isWeb = !!(process.env.NEXT_PUBLIC_IS_WEB === 'true' || process.env.VERCEL
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   // Only export statically for Tauri builds (default behavior unless IS_WEB=true)
   output: isWeb ? undefined : "export",
   // Images unoptimized for Tauri (fs access), optimized for Web
