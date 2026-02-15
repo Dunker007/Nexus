@@ -113,7 +113,7 @@ export default function SmartFolioPage() {
 
                         {/* Left: Visualization (Allocation & Curve) */}
                         <div className="lg:col-span-8 space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+                            <div className="flex flex-col gap-6">
                                 {/* Allocation */}
                                 <motion.div variants={itemVariants} className="bg-[#0b0e11]/40 backdrop-blur-2xl rounded-3xl border border-white/5 p-6 shadow-2xl relative overflow-hidden group hover:border-blue-500/20 transition-all duration-500">
                                     <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-blue-500/10 transition-all duration-1000"></div>
