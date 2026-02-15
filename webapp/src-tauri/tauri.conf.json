@@ -53,7 +53,11 @@
       }
     },
     "resources": [
-      "bridge-bundle"
+      "bridge.zip",
+      "tunnel-config.zip"
+    ],
+    "externalBin": [
+      "bin/cloudflared"
     ]
   },
   "plugins": {}

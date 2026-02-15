@@ -9,8 +9,13 @@ interface EquityCurveProps {
 }
 
 export default function EquityCurve({ accountId, currentValue }: EquityCurveProps) {
-    const snapshots = useMemo(() => getSnapshots(accountId), [accountId]);
-    const perf = useMemo(() => calculatePerformance(accountId), [accountId]);
+    const [snapshots, setSnapshots] = React.useState<PortfolioSnapshotEntry[]>([]);
+    const [perf, setPerf] = React.useState<{ daily: number | null, weekly: number | null, monthly: number | null, allTime: number | null, highWaterMark: number, drawdown: number }>({ daily: null, weekly: null, monthly: null, allTime: null, highWaterMark: 0, drawdown: 0 });
+
+    React.useEffect(() => {
+        setSnapshots(getSnapshots(accountId));
+        setPerf(calculatePerformance(accountId)); // This is safe to run on client
+    }, [accountId]);
 
     // Build data points including today's live value
     const dataPoints = useMemo(() => {
@@ -159,7 +164,7 @@ export default function EquityCurve({ accountId, currentValue }: EquityCurveProp
                     <div key={stat.label} className="text-center p-2 rounded-lg bg-white/[0.02] border border-white/5">
                         <div className="text-[8px] text-gray-600 uppercase tracking-widest mb-1">{stat.label}</div>
                         <div className={`text - xs font - black font - mono ${stat.value === null ? 'text-gray-600' :
-                                stat.value >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                            stat.value >= 0 ? 'text-emerald-400' : 'text-rose-400'
                             } `}>
                             {stat.value !== null ? `${stat.value >= 0 ? '+' : ''}${stat.value.toFixed(1)}% ` : '—'}
                         </div>

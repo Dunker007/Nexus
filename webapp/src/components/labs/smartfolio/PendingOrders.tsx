@@ -20,7 +20,7 @@ export default function PendingOrders() {
     const totalSellFees = totalSellProceeds * (TRADE_FEE_PERCENT / 100);
 
     return (
-        <div className="flex flex-col h-full bg-[#0a0a0a] rounded-lg p-0 relative overflow-hidden border border-white/5">
+        <div className="flex flex-col h-full bg-[#0b0e11]/60 backdrop-blur-xl rounded-2xl p-0 relative overflow-hidden border border-white/5 shadow-2xl shadow-black/50">
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-2 z-10">
                 <div className="flex flex-col">

@@ -110,18 +110,23 @@ async function fetchAccountState(accountId: AccountId) {
             };
         }
 
-        const assets = data.positions.map((p: any) => ({
-            symbol: p.symbol,
-            units: p.units,
-            totalCost: p.cost,
-            // Default other fields that we calculate live
-            name: p.symbol,
-            currentPrice: 0,
-            currentValue: 0,
-            gainLoss: 0,
-            allocation: 0,
-            targetAllocation: 0
-        }));
+        const assets = data.positions.map((p: any) => {
+            const seedAsset = seed.assets.find(a => a.symbol === p.symbol);
+            return {
+                symbol: p.symbol,
+                units: p.units,
+                totalCost: p.cost,
+                // Merge static metadata from seed if available
+                name: seedAsset?.name || p.symbol,
+                logo: seedAsset?.logo,
+                targetAllocation: seedAsset?.targetAllocation || 0,
+                // Default live fields
+                currentPrice: seedAsset?.currentPrice || 0, // Fallback to seed price if live price not ready
+                currentValue: 0, // Will be updated by priceEngine
+                gainLoss: 0,
+                allocation: 0
+            };
+        });
 
         const journal = data.journal.map((j: any) => ({
             id: j.id,

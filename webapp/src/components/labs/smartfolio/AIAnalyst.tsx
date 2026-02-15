@@ -75,7 +75,17 @@ export default function AIAnalyst() {
     }), [activeAccount, activeStrategy, assets, pendingOrders, marketCondition, totalValue, cashPercent]);
 
     // ─── Initialize Chat on Account Change ───
+    const lastGreetedAccount = useRef<string | null>(null);
+
     useEffect(() => {
+        // Prevent re-running on every asset update/tick
+        if (lastGreetedAccount.current === activeAccount) return;
+
+        // Only run if we actually have data
+        if (assets.length === 0) return;
+
+        lastGreetedAccount.current = activeAccount;
+
         // Simple health check as greeting
         const snapshot = buildSnapshot();
 
@@ -85,14 +95,16 @@ export default function AIAnalyst() {
                 text: greeting,
                 timestamp: 'Just now'
             }]);
-        }).catch(() => {
+        }).catch((err: any) => {
+            console.warn("Gemini Greeting Failed", err);
+            // If it's a 429, we might want to just show the static fallback
             setHistory([{
                 role: 'ai',
                 text: `${persona.name} Online. Bridge Connected. How can I assist?`,
                 timestamp: 'Just now'
             }]);
         });
-    }, [activeAccount, persona, buildSnapshot]);
+    }, [activeAccount, persona, assets.length]); // Depend on assets.length to ensure we have data, but not every tick
 
     // ─── Ongoing Rule-Based Analysis Engine (always runs) ───
     useEffect(() => {

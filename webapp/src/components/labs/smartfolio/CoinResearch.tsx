@@ -127,7 +127,8 @@ export default function CoinResearch({ symbol }: { symbol: string }) {
     );
 
     // Parse description - remove HTML links
-    const desc = data.description.en.split('. ')[0] + '.';
+    const rawDesc = data.description?.en || '';
+    const desc = rawDesc ? rawDesc.split('. ')[0] + '.' : 'No description available for this asset.';
     const cleanDesc = desc.replace(/<[^>]*>?/gm, '');
 
     const fmt = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);

@@ -81,7 +81,7 @@ export default function PortfolioHealth() {
                 <span className="text-[10px] text-gray-600 font-mono">vs {activeStrategy.targetMask}</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3">
                 {gauges.map(g => {
                     const styles = getHealthColor(g.health);
                     const deviation = g.current - g.target;

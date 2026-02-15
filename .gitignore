@@ -11,6 +11,9 @@ build/
 # Tauri
 webapp/src-tauri/target/
 webapp/src-tauri/bridge-bundle/
+webapp/src-tauri/bin/
+webapp/src-tauri/tunnel-config/
+webapp/src-tauri/*.zip
 webapp/src-tauri/gen/
 
 # IDE

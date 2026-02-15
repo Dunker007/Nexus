@@ -69,7 +69,7 @@ const Metric = ({
     return (
         <div
             onClick={onClick}
-            className={`flex flex-col justify-between p-4 rounded-xl border border-white/5 bg-gradient-to-br from-white/5 to-transparent hover:from-white/10 transition-all duration-300 relative overflow-hidden group min-h-[100px] ${onClick ? 'cursor-pointer hover:border-white/20 hover:scale-[1.02] active:scale-[0.98]' : ''} ${className || ''}`}
+            className={`flex flex-col justify-between p-4 rounded-xl border border-white/5 bg-[#0b0e11]/40 backdrop-blur-md hover:bg-[#0b0e11]/60 transition-all duration-300 relative overflow-hidden group min-h-[100px] ${onClick ? 'cursor-pointer hover:border-white/20 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/20 hover:shadow-black/40' : ''} ${className || ''}`}
         >
             {/* Background Glow */}
             <div className={`absolute -right-8 -top-8 w-32 h-32 rounded-full blur-3xl opacity-5 group-hover:opacity-10 transition-opacity ${color?.includes('rose') ? 'bg-rose-500' : color?.includes('emerald') ? 'bg-emerald-500' : 'bg-blue-500'}`}></div>

@@ -91,8 +91,8 @@ export const analystService = {
             }
         };
 
-        try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+        const generate = async (model) => {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -100,22 +100,29 @@ export const analystService = {
             });
 
             if (!response.ok) {
+                if (response.status === 429) throw new Error('RATE_LIMIT');
                 const errText = await response.text();
                 throw new Error(`Gemini API Error: ${response.status} - ${errText}`);
             }
 
             const data = await response.json();
-
             if (!data.candidates || data.candidates.length === 0) {
-                // If safety ratings block content, data.promptFeedback might exist
-                if (data.promptFeedback?.blockReason) {
-                    throw new Error(`Safety Block: ${data.promptFeedback.blockReason}`);
-                }
+                if (data.promptFeedback?.blockReason) throw new Error(`Safety Block: ${data.promptFeedback.blockReason}`);
                 throw new Error('No response candidates from Gemini.');
             }
-
             return data.candidates[0].content.parts[0].text;
+        };
 
+        try {
+            try {
+                return await generate('gemini-2.0-flash');
+            } catch (err) {
+                if (err.message === 'RATE_LIMIT') {
+                    console.warn('[Analyst] 2.0 Flash Rate Limit. Falling back to 1.5 Flash...');
+                    return await generate('gemini-1.5-flash');
+                }
+                throw err;
+            }
         } catch (error) {
             console.error('[AnalystService] Error:', error);
             throw error;

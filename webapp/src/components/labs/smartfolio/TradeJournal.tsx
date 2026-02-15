@@ -271,7 +271,7 @@ export default function TradeJournal() {
     };
 
     return (
-        <div className="flex flex-col h-full relative">
+        <div className="flex flex-col h-full relative bg-[#0b0e11]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-6 shadow-2xl shadow-black/50 overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">

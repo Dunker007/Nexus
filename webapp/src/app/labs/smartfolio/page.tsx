@@ -17,77 +17,89 @@ export default function SmartFolioPage() {
     const { activeAccount, switchAccount: setActiveAccount, refreshPrices, isRefreshing, lastSync: lastUpdated, accounts, totalValue } = usePortfolio();
 
     return (
-        <div className="flex-1 overflow-y-auto h-full w-full custom-scrollbar">
-            <div className="max-w-7xl mx-auto px-4 py-6 space-y-6 text-gray-200 font-sans selection:bg-emerald-500/30">
-                {/* ─── Dashboard Header ─── */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-[#0b0e11]/50 backdrop-blur-md px-4 py-1 rounded-2xl border border-white/5">
-                    <div className="flex items-center gap-4 flex-1 min-w-0">
+        <div className="flex-1 overflow-y-auto h-full w-full custom-scrollbar bg-[#0b0e11]">
+            <div className="max-w-[1600px] mx-auto px-6 py-8 space-y-8 text-gray-200 font-sans selection:bg-emerald-500/30">
 
-                        <div className="hidden md:block w-full max-w-[600px] rounded-xl overflow-hidden border border-white/5 relative">
-                            <PriceTicker />
-                        </div>
+                {/* ─── 1. Header & Controls ─── */}
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-1">
+                    <div className="flex-1 w-full md:w-auto">
+                        <PriceTicker />
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="flex bg-white/5 p-0.5 rounded-lg border border-white/5">
-                            {/* <span className="text-[10px] text-gray-500 font-mono flex items-center px-2">ACCOUNT:</span> */}
-                            {(['sui', 'alts'] as const).map(acc => (
-                                <button
-                                    key={acc}
-                                    onClick={() => setActiveAccount(acc)}
-                                    className={`px-4 py-0.5 rounded-md text-xs font-black uppercase tracking-widest transition-all ${activeAccount === acc
-                                        ? 'bg-white/10 text-white shadow-sm border border-white/10'
-                                        : 'text-gray-500 hover:text-gray-300'
-                                        }`}
-                                >
-                                    {acc}
-                                </button>
-                            ))}
-                        </div>
-
+                    <div className="flex items-center gap-3 bg-white/[0.03] backdrop-blur-sm p-1.5 rounded-xl border border-white/5 shadow-xl">
+                        {(['sui', 'alts'] as const).map(acc => (
+                            <button
+                                key={acc}
+                                onClick={() => setActiveAccount(acc)}
+                                className={`px-6 py-2 rounded-lg text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 ${activeAccount === acc
+                                    ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] ring-1 ring-white/20'
+                                    : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                                    }`}
+                            >
+                                {acc}
+                            </button>
+                        ))}
+                        <div className="w-px h-6 bg-white/10 mx-1"></div>
                         <button
                             onClick={refreshPrices}
                             disabled={isRefreshing}
-                            className={`p-0.5 rounded-lg border transition-all ${isRefreshing
-                                ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400 animate-pulse'
-                                : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
+                            className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all ${isRefreshing
+                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                                : 'bg-transparent border-transparent text-gray-400 hover:text-white hover:bg-white/5'
                                 }`}
                         >
-                            <span className={`block ${isRefreshing ? 'animate-spin' : ''}`}>↻</span>
+                            <span className={`text-lg leading-none ${isRefreshing ? 'animate-spin' : ''}`}>↻</span>
                         </button>
                     </div>
                 </div>
 
-                {/* ─── Main Content ─── */}
-
-                {/* ─── Metrics Row ─── */}
+                {/* ─── 2. Key Metrics ─── */}
                 <DetailedMetrics />
 
-                {/* ─── Main Content ─── */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    {/* Left Col: Key Metrics & Allocation */}
+                {/* ─── 3. Strategy & Analysis Grid ─── */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+                    {/* Left: Visualization (Allocation & Curve) */}
                     <div className="lg:col-span-8 space-y-6">
-                        {/* Allocation Chart */}
-                        <div className="min-h-[350px] bg-[#0F1216] rounded-2xl border border-white/5 p-6 relative overflow-hidden group">
-                            <AllocationChart />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+                            {/* Allocation */}
+                            <div className="bg-[#0b0e11]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-6 shadow-2xl shadow-black/50 relative overflow-hidden group hover:border-white/10 transition-colors">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                                <AllocationChart />
+                            </div>
+
+                            {/* Equity Curve (or Health if no curve data yet) */}
+                            <div className="bg-[#0b0e11]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-1 shadow-2xl shadow-black/50 relative overflow-hidden group hover:border-white/10 transition-colors flex flex-col">
+                                <EquityCurve accountId={activeAccount} currentValue={totalValue} />
+                            </div>
                         </div>
-
-                        {/* Equity Curve */}
-                        <EquityCurve accountId={activeAccount} currentValue={totalValue} />
-
-                        <AssetTable />
                     </div>
 
-                    {/* Right Col: AI, Health, Utilities */}
-                    <div className="lg:col-span-4 space-y-6">
-                        <PortfolioHealth />
-                        <FearGreedIndex />
-                        <AIAnalyst />
+                    {/* Right: AI & Market Intel */}
+                    <div className="lg:col-span-4 space-y-6 flex flex-col h-full">
+                        <div className="bg-[#0b0e11]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-6 shadow-2xl relative overflow-hidden">
+                            <AIAnalyst />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <PortfolioHealth />
+                            <FearGreedIndex />
+                        </div>
+                    </div>
+                </div>
+
+                {/* ─── 4. Main Asset Table (Full Width) ─── */}
+                <div className="relative">
+                    <AssetTable />
+                </div>
+
+                {/* ─── 5. Operations: Orders, Journal, Alerts ─── */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-1 space-y-6">
                         <PendingOrders />
                         <PriceAlerts />
-                        <div className="h-[400px]">
-                            <TradeJournal />
-                        </div>
+                    </div>
+                    <div className="lg:col-span-2">
+                        <TradeJournal />
                     </div>
                 </div>
             </div>
