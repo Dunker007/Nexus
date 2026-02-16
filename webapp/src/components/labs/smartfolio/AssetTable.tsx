@@ -185,6 +185,8 @@ function AssetAnalyst({ symbol, asset, activeAccount, currentCashPercent }: {
         };
     }, [activeAccount, activeStrategy, assets, pendingOrders, marketCondition, currentCashPercent]);
 
+    // INITIAL ANALYSIS - Runs once on mount or when symbol changes
+    // Removed excessive deps to prevent re-renders on price updates
     useEffect(() => {
         setTyping(true);
         const snapshot = buildPositionSnapshot();
@@ -197,7 +199,8 @@ function AssetAnalyst({ symbol, asset, activeAccount, currentCashPercent }: {
             setMessages([{ role: 'ai', text: `${persona.name} here. Monitoring ${symbol}. Standing by for queries.`, timestamp: 'Now' }]);
             setTyping(false);
         });
-    }, [symbol, persona.persona, buildPositionSnapshot, asset.currentPrice, asset.gainLoss, asset.allocation, asset.targetAllocation, currentCashPercent]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [symbol]); // ONLY re-run when symbol changes
 
     const handleSend = useCallback(async () => {
         if (!query.trim()) return;

@@ -5,6 +5,8 @@
  * No client-side keys or heavy SDKs.
  */
 
+import { aiError } from './errorNotificationService';
+
 // ─── Interfaces ───
 export interface SimpleAccountSnapshot {
     totalValue: number;
@@ -149,9 +151,20 @@ export async function sendMessage(
         return { text: finalText, data: aiData };
 
     } catch (error: any) {
-        console.error('[Bridge AI]', error);
+        const errorMsg = error?.message || 'Unknown error';
+        const isNetworkError = errorMsg.toLowerCase().includes('fetch') ||
+            errorMsg.toLowerCase().includes('network');
+
+        aiError(
+            'AI analysis failed',
+            errorMsg,
+            isNetworkError
+                ? 'Network connection issue. Check your internet connection.'
+                : 'AI service unavailable. Try again later.'
+        );
+
         return {
-            text: `⚠️ Bridge Error: ${error?.message || 'Unknown'}. Check console.`
+            text: `⚠️ ${isNetworkError ? 'Connection Error' : 'AI Service Error'}: ${errorMsg}`
         };
     }
 }

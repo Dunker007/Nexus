@@ -3,12 +3,14 @@
  * ================================
  * Polls Coinbase public API for real-time spot prices.
  * No API key required — uses the free /v2/prices endpoint.
- * 
+ *
  * Architecture:
  *   - fetchPrices(): One-shot fetch for all symbols
  *   - startPolling(): Continuous polling at configurable interval
  *   - Callbacks: onPriceUpdate fires with { symbol, price } map
  */
+
+import { priceError } from './errorNotificationService';
 
 // ─── Types ───
 export interface PriceMap {
@@ -29,10 +31,23 @@ async function fetchCoinbasePrice(symbol: string): Promise<number | null> {
         const res = await fetch(`https://api.coinbase.com/v2/prices/${symbol}-USD/spot`, {
             cache: 'no-store',
         });
-        if (!res.ok) return null;
+
+        if (!res.ok) {
+            priceError(
+                `Price fetch failed for ${symbol}`,
+                `HTTP ${res.status}: ${res.statusText}`
+            );
+            return null;
+        }
+
         const data = await res.json();
         return data?.data?.amount ? parseFloat(data.data.amount) : null;
-    } catch {
+    } catch (e) {
+        const errorMsg = e instanceof Error ? e.message : String(e);
+        priceError(
+            `Network error fetching ${symbol}`,
+            errorMsg
+        );
         return null;
     }
 }
@@ -53,6 +68,15 @@ export async function fetchPrices(symbols: string[]): Promise<PriceMap> {
                     prices[symbol] = price;
                 }
             })
+        );
+    }
+
+    // Log batch summary
+    const failedSymbols = tradableSymbols.filter(s => prices[s] === undefined);
+    if (failedSymbols.length > 0) {
+        priceError(
+            `Failed to fetch prices for ${failedSymbols.length} symbols`,
+            `Symbols: ${failedSymbols.join(', ')}`
         );
     }
 

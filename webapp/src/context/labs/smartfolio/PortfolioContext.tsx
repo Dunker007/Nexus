@@ -5,6 +5,7 @@ import { STRATEGIES, Strategy, TRADE_FEE_PERCENT } from '@/lib/labs/smartfolio/s
 import { startPolling, fetchPrices, type PriceMap } from '@/lib/labs/smartfolio/priceEngine';
 import { saveSnapshot } from '@/lib/labs/smartfolio/snapshots';
 import { checkAlerts, requestNotificationPermission } from '@/lib/labs/smartfolio/alertEngine';
+import { bridgeError, bridgeWarning, priceError, requestErrorNotificationPermission } from '@/lib/labs/smartfolio/errorNotificationService';
 
 // ─── localStorage helpers ───
 const STORAGE_PREFIX = 'smartfolio_';
@@ -159,7 +160,13 @@ async function fetchAccountState(accountId: AccountId): Promise<AccountState> {
             targetValue: loadFromStorage<number>(storageKey(accountId, 'target'), seed.targetValue || 0),
         };
     } catch (e) {
-        console.warn(`Bridge sync failed for ${accountId}, falling back to local.`);
+        const errorMsg = e instanceof Error ? e.message : String(e);
+        bridgeWarning(
+            `Bridge sync failed for ${accountId}`,
+            errorMsg
+        );
+
+        // Fallback to local storage
         return {
             assets: loadFromStorage<Asset[]>(storageKey(accountId, 'assets'), seed.assets),
             journal: loadFromStorage<JournalEntry[]>(storageKey(accountId, 'journal'), seed.journal || []),
@@ -188,7 +195,12 @@ async function saveAccountStateToBridge(accountId: AccountId, assets: Asset[], j
             })
         });
     } catch (e) {
-        console.error('Bridge save failed', e);
+        const errorMsg = e instanceof Error ? e.message : String(e);
+        bridgeError(
+            'Failed to save portfolio to bridge',
+            errorMsg,
+            'Portfolio sync failed. Changes saved locally but may not persist across devices.'
+        );
     }
 }
 
@@ -212,6 +224,12 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const [isLiveMode, setIsLiveMode] = useState(false);
     const [fearGreed, setFearGreed] = useState<{ value: number; classification: string } | null>(null);
     const [systemEvents, setSystemEvents] = useState<any[]>([]);
+
+    // Keep ref in sync with accountsState to prevent stale closures in polling
+    const accountsStateRef = useRef(accountsState);
+    useEffect(() => {
+        accountsStateRef.current = accountsState;
+    }, [accountsState]);
 
     // Initial Load (Boot Sequence)
     useEffect(() => {
@@ -262,6 +280,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         });
 
         requestNotificationPermission();
+        requestErrorNotificationPermission();
 
         // Fear & Greed Polling
         const fetchFng = () => {
@@ -428,7 +447,9 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     // PRICE ENGINE Logic
     const applyPrices = useCallback((prices: PriceMap) => {
         setAccountsState(current => {
-            const newState = { ...current };
+            // Use latest state from ref to avoid stale closure
+            const latestState = accountsStateRef.current;
+            const newState = { ...latestState };
             let changed = false;
 
             // Update BOTH accounts
@@ -463,41 +484,52 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         });
 
         checkAlerts(prices);
-    }, []);
+    }, []); // Empty deps - no stale closures
 
-    // LIVE MODE
+    // LIVE MODE - Use ref to access latest symbols
     useEffect(() => {
         if (!isLiveMode || !mounted) return;
-        // Collect all distinct symbols from both accounts
-        const allSymbols = new Set<string>();
-        [...accountsState.sui.assets, ...accountsState.alts.assets].forEach(a => {
-            if (a.symbol !== 'USD') allSymbols.add(a.symbol);
-        });
+
+        // Collect symbols from LATEST state (via ref)
+        const getSymbols = () => {
+            const latest = accountsStateRef.current;
+            const allSymbols = new Set<string>();
+            [...latest.sui.assets, ...latest.alts.assets].forEach(a => {
+                if (a.symbol !== 'USD') allSymbols.add(a.symbol);
+            });
+            return Array.from(allSymbols);
+        };
 
         const cleanup = startPolling({
-            symbols: Array.from(allSymbols),
+            symbols: getSymbols(),
             intervalMs: 30000,
             onPriceUpdate: applyPrices,
             onSyncComplete: (ts) => setLastSync(ts),
-            onError: (err) => console.warn('[PriceEngine]', err.message),
+            onError: (err) => {
+                priceError('Price fetch failed', err.message);
+            },
         });
         return cleanup;
-    }, [isLiveMode, mounted, applyPrices, accountsState]);
+    }, [isLiveMode, mounted, applyPrices]); // accountsState removed
 
-    // Manual Refresh
+    // Manual Refresh - Use ref for latest state
     const refreshPrices = useCallback(async () => {
         setIsRefreshing(true);
+
+        // Use latest state via ref
+        const latest = accountsStateRef.current;
         const allSymbols = new Set<string>();
-        [...accountsState.sui.assets, ...accountsState.alts.assets].forEach(a => {
+        [...latest.sui.assets, ...latest.alts.assets].forEach(a => {
             if (a.symbol !== 'USD') allSymbols.add(a.symbol);
         });
+
         const prices = await fetchPrices(Array.from(allSymbols));
         if (Object.keys(prices).length > 0) {
             applyPrices(prices);
             setLastSync(new Date());
         }
         setIsRefreshing(false);
-    }, [accountsState, applyPrices]);
+    }, [applyPrices]); // accountsState removed
 
     // Import Asset
     const importAsset = useCallback(async (symbol: string) => {

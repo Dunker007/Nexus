@@ -20,6 +20,7 @@ const REGIMES = [
 export default function MarketPage() {
     const { marketCondition, setMarketCondition, fearGreed } = usePortfolio();
     const container = useRef<HTMLDivElement>(null);
+    const widgetRef = useRef<any>(null);
 
     // Initialize TradingView Widget
     useEffect(() => {
@@ -29,7 +30,13 @@ export default function MarketPage() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         script.onload = () => {
             if (window.TradingView && container.current) {
-                new window.TradingView.widget({
+                // Destroy previous widget if it exists
+                if (widgetRef.current) {
+                    widgetRef.current.remove();
+                }
+
+                // Create and store new widget
+                widgetRef.current = new window.TradingView.widget({
                     "width": "100%",
                     "height": "100%",
                     "symbol": "COINBASE:BTCUSD",
@@ -48,6 +55,14 @@ export default function MarketPage() {
         document.head.appendChild(script);
         return () => {
             if (script.parentNode) script.parentNode.removeChild(script);
+            if (widgetRef.current) {
+                try {
+                    widgetRef.current.remove();
+                    widgetRef.current = null;
+                } catch (err) {
+                    console.warn('[TradingView] Cleanup failed:', err);
+                }
+            }
         };
     }, []);
 
