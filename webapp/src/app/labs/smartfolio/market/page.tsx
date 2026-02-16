@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useRef } from 'react';
 import { usePortfolio } from '@/context/labs/smartfolio/PortfolioContext';
-import FearGreedIndex from '@/components/labs/smartfolio/FearGreedIndex';
 
 // TradingView Widget Configuration
 declare global {
@@ -19,7 +18,7 @@ const REGIMES = [
 ] as const;
 
 export default function MarketPage() {
-    const { marketCondition, setMarketCondition } = usePortfolio();
+    const { marketCondition, setMarketCondition, fearGreed } = usePortfolio();
     const container = useRef<HTMLDivElement>(null);
 
     // Initialize TradingView Widget
@@ -95,7 +94,40 @@ export default function MarketPage() {
 
                 {/* Fear & Greed Index */}
                 <div className="lg:w-1/3">
-                    <FearGreedIndex />
+                    <div className="glass-card p-6 h-full flex flex-col justify-between">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest">Fear & Greed</h2>
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        </div>
+
+                        {fearGreed ? (
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="relative flex items-center justify-center">
+                                    {/* Semi-circle Gauge logic could go here, but a clean text/desc is premium too */}
+                                    <div className={`text-6xl font-black tracking-tighter ${fearGreed.value > 75 ? 'text-emerald-400' : fearGreed.value < 25 ? 'text-rose-400' : 'text-blue-400'
+                                        }`}>
+                                        {fearGreed.value}
+                                    </div>
+                                    <span className="absolute -bottom-2 text-[10px] text-gray-500 font-mono uppercase tracking-widest">/ 100</span>
+                                </div>
+                                <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border ${fearGreed.value > 75 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                                    fearGreed.value < 25 ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' :
+                                        'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                                    }`}>
+                                    {fearGreed.classification}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex-1 flex flex-col items-center justify-center gap-3">
+                                <div className="w-8 h-8 rounded-full border-2 border-t-blue-500 border-white/5 animate-spin"></div>
+                                <span className="text-[10px] text-gray-600 font-mono uppercase animate-pulse">Scanning Sentiment...</span>
+                            </div>
+                        )}
+
+                        <div className="mt-6 pt-4 border-t border-white/5 text-[9px] text-gray-500 text-center uppercase tracking-widest font-bold">
+                            Live Alternative.me Feed
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -87,6 +87,7 @@ interface PortfolioContextType {
     importData: (json: string) => boolean;
     marketCondition: 'accumulation' | 'bull' | 'bear' | 'distribution' | 'choppiness';
     setMarketCondition: (condition: 'accumulation' | 'bull' | 'bear' | 'distribution' | 'choppiness') => void;
+    fearGreed: { value: number; classification: string } | null;
     isRefreshing: boolean;
     isSyncing: boolean;
     accounts: typeof ACCOUNTS;
@@ -209,6 +210,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const [isSyncing, setIsSyncing] = useState(false);
     const [lastSync, setLastSync] = useState<Date | null>(null);
     const [isLiveMode, setIsLiveMode] = useState(false);
+    const [fearGreed, setFearGreed] = useState<{ value: number; classification: string } | null>(null);
     const [systemEvents, setSystemEvents] = useState<any[]>([]);
 
     // Initial Load (Boot Sequence)
@@ -260,6 +262,21 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         });
 
         requestNotificationPermission();
+
+        // Fear & Greed Polling
+        const fetchFng = () => {
+            fetch('https://api.alternative.me/fng/?limit=1')
+                .then(res => res.json())
+                .then(json => {
+                    if (json?.data && json.data.length > 0) {
+                        setFearGreed({ value: parseInt(json.data[0].value), classification: json.data[0].value_classification });
+                    }
+                })
+                .catch(console.warn);
+        };
+        fetchFng();
+        const interval = setInterval(fetchFng, 3600000); // Poll hourly
+        return () => clearInterval(interval);
     }, []);
 
     // ─── Persistence ───
@@ -721,6 +738,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             importData,
             marketCondition,
             setMarketCondition,
+            fearGreed,
             isRefreshing,
             isSyncing,
             accounts: ACCOUNTS,

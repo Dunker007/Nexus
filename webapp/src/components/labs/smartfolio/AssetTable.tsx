@@ -456,9 +456,8 @@ function PositionDetail({ asset, orders, fillOrder, killOrder, addOrder, current
 // ─── Main Component ───
 
 export default function AssetTable() {
-    const { assets, pendingOrders, fillOrder, killOrder, activeAccount, activeStrategy } = usePortfolio();
+    const { assets, pendingOrders, fillOrder, killOrder, activeAccount, activeStrategy, fearGreed } = usePortfolio();
     const [expandedSymbol, setExpandedSymbol] = useState<string | null>(null);
-    const [fng, setFng] = useState<{ value: number; classification: string } | null>(null);
     const [alerts, setAlerts] = useState<PriceAlert[]>([]);
     const refreshAlerts = useCallback(() => setAlerts(getAlerts()), []);
 
@@ -471,16 +470,6 @@ export default function AssetTable() {
     const sortedAssets = [...assets].sort((a, b) => b.currentValue - a.currentValue);
     const isLoading = assets.length === 0;
 
-    useEffect(() => {
-        fetch('https://api.alternative.me/fng/?limit=1')
-            .then(res => res.json())
-            .then(json => {
-                if (json?.data && json.data.length > 0) {
-                    setFng({ value: parseInt(json.data[0].value), classification: json.data[0].value_classification });
-                }
-            })
-            .catch(console.warn);
-    }, []);
 
     useEffect(() => {
         refreshAlerts();
@@ -512,11 +501,11 @@ export default function AssetTable() {
                             <span className="text-[8px] text-gray-500 uppercase tracking-wider">Fee</span>
                             <span className="text-[10px] font-mono font-bold text-gray-300">{TRADE_FEE_PERCENT}%</span>
                         </div>
-                        {fng && (
+                        {fearGreed && (
                             <div className="flex flex-col">
                                 <span className="text-[8px] text-gray-500 uppercase tracking-wider">Sentiment</span>
-                                <span className={`text-[10px] font-mono font-bold ${fng.value > 75 ? 'text-emerald-400' : fng.value < 25 ? 'text-rose-400' : 'text-gray-300'}`}>
-                                    {fng.value} <span className="text-[8px] opacity-60">/ 100</span>
+                                <span className={`text-[10px] font-mono font-bold ${fearGreed.value > 75 ? 'text-emerald-400' : fearGreed.value < 25 ? 'text-rose-400' : 'text-gray-300'}`}>
+                                    {fearGreed.value} <span className="text-[8px] opacity-60">/ 100</span>
                                 </span>
                             </div>
                         )}
