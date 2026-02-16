@@ -18,7 +18,16 @@ const nextConfig: NextConfig = {
 
   // API Rewrites (None needed for internal API routes)
   async rewrites() {
-    return [];
+    return [
+      {
+        source: '/api/bridge/smartfolio/:accountId',
+        destination: 'http://localhost:3456/smartfolio/:accountId',
+      },
+      {
+        source: '/api/bridge/smartfolio/:accountId/sync',
+        destination: 'http://localhost:3456/smartfolio/:accountId/sync',
+      },
+    ];
   },
 };
 
