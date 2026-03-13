@@ -13,20 +13,27 @@ async function startServer() {
   const app = express();
   app.use(express.json({ limit: '10mb' }));
 
-  // Monitoring
+  // Request logger — always logs method + path + status + duration
   app.use((req, res, next) => {
     const start = Date.now();
     res.on('finish', () => {
       const duration = Date.now() - start;
-      if (duration > 2000) { // Log requests slower than 2s
-        console.warn(`[PERF] ${req.method} ${req.url} - ${duration}ms`);
-      }
+      const level = duration > 2000 ? 'warn' : 'log';
+      console[level](`[API] ${req.method} ${req.url} → ${res.statusCode} (${duration}ms)`);
     });
     next();
   });
 
   // API routes first
   setupRoutes(app);
+
+  // ─── Global error handler ────────────────────────────────────────────────
+  // Must have 4 args so Express recognises it as an error handler
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((err: any, _req: any, res: any, _next: any) => {
+    console.error('[ERROR]', err.message || err);
+    res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
+  });
 
   if (isDev) {
     // Vite dev middleware (HMR, fast refresh, etc.)

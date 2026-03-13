@@ -44,8 +44,12 @@ data/published/*
 .DS_Store
 Thumbs.db
 
-# Prisma
+# Database
+*.db
+*.sqlite
 *.db-journal
+*.db-shm
+*.db-wal
 
 # Testing
 coverage/

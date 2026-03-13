@@ -14,25 +14,34 @@ export const WIDGET_CATALOG: Record<WidgetType, { title: string; icon: string; d
     recent: { title: '🕐 Recent', icon: '🕐', defaultW: 1, defaultH: 2, minW: 1, minH: 1 },
 };
 
-// Default Layout
+// Default Layout — full 4-column spread (lg: 4 cols)
+// Row 0: Quick AI (2w) | System (1w) | Music (1w)
+// Row 1: News (2w)    | Calendar (1w)| Scratchpad (1w)
+// Row 2: Tasks (1w)   | Quote (1w)   | Quick Links (1w) | Recent (1w)
 export const DEFAULT_LAYOUT: any[] = [
-    { i: 'quick_ai-1', x: 0, y: 0, w: 2, h: 3 },
-    { i: 'system-1', x: 2, y: 0, w: 1, h: 2 },
-    { i: 'news-1', x: 0, y: 3, w: 2, h: 3 },
-    { i: 'calendar-1', x: 2, y: 3, w: 1, h: 3 },
-    { i: 'tasks-1', x: 0, y: 6, w: 1, h: 3 },
-    { i: 'quote-1', x: 1, y: 6, w: 1, h: 2 },
+    { i: 'quick_ai-1',   x: 0, y: 0, w: 2, h: 3 },
+    { i: 'system-1',     x: 2, y: 0, w: 1, h: 2 },
+    { i: 'music-1',      x: 3, y: 0, w: 1, h: 3 },
+    { i: 'news-1',       x: 0, y: 3, w: 2, h: 3 },
+    { i: 'calendar-1',   x: 2, y: 3, w: 1, h: 3 },
+    { i: 'scratchpad-1', x: 3, y: 3, w: 1, h: 3 },
+    { i: 'tasks-1',      x: 0, y: 6, w: 1, h: 3 },
+    { i: 'quote-1',      x: 1, y: 6, w: 1, h: 2 },
     { i: 'quicklinks-1', x: 2, y: 6, w: 1, h: 2 },
+    { i: 'recent-1',     x: 3, y: 6, w: 1, h: 2 },
 ];
 
 export const DEFAULT_WIDGETS: WidgetConfig[] = [
-    { i: 'quick_ai-1', type: 'quick_ai', title: '⚡ Quick AI', icon: '⚡' },
-    { i: 'system-1', type: 'system', title: '🖥️ System', icon: '🖥️' },
-    { i: 'news-1', type: 'news', title: '📰 News', icon: '📰' },
-    { i: 'calendar-1', type: 'calendar', title: '📅 Calendar', icon: '📅' },
-    { i: 'tasks-1', type: 'tasks', title: '✅ Tasks', icon: '✅' },
-    { i: 'quote-1', type: 'quote', title: '✨ Quote', icon: '✨' },
+    { i: 'quick_ai-1',   type: 'quick_ai',   title: '⚡ Quick AI',    icon: '⚡' },
+    { i: 'system-1',     type: 'system',     title: '🖥️ System',      icon: '🖥️' },
+    { i: 'music-1',      type: 'music',      title: '🎵 Music',       icon: '🎵' },
+    { i: 'news-1',       type: 'news',       title: '📰 News',        icon: '📰' },
+    { i: 'calendar-1',   type: 'calendar',   title: '📅 Calendar',    icon: '📅' },
+    { i: 'scratchpad-1', type: 'scratchpad', title: '📝 Scratchpad',  icon: '📝' },
+    { i: 'tasks-1',      type: 'tasks',      title: '✅ Tasks',       icon: '✅' },
+    { i: 'quote-1',      type: 'quote',      title: '✨ Quote',       icon: '✨' },
     { i: 'quicklinks-1', type: 'quicklinks', title: '🔗 Quick Links', icon: '🔗' },
+    { i: 'recent-1',     type: 'recent',     title: '🕐 Recent',      icon: '🕐' },
 ];
 
 // Sample Data

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { GitBranch, Plus, Save, Clock, CheckCircle2, Circle, PlayCircle, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useToast } from '../contexts/ToastContext';
 
 interface PipelineStep {
   name: string;
@@ -45,6 +46,7 @@ export function Pipeline() {
   const [isCreating, setIsCreating] = useState(false);
   const [editForm, setEditForm] = useState<Partial<PipelineTrack>>({});
   const [syncing, setSyncing] = useState(false);
+  const { toast } = useToast();
 
   const fetchTracks = async () => {
     try {
@@ -55,9 +57,12 @@ export function Pipeline() {
         if (data.length > 0 && !selectedTrack && !isCreating) {
           setSelectedTrack(data[0]);
         }
+      } else {
+        toast.error('Failed to load pipeline tracks');
       }
     } catch (err) {
       console.error(err);
+      toast.error('Could not reach the server');
     } finally {
       setLoading(false);
     }
@@ -90,6 +95,9 @@ export function Pipeline() {
         setSelectedTrack(saved);
         setIsCreating(false);
         setIsEditing(false);
+        toast.success(`"${newTrack.title}" added to pipeline`);
+      } else {
+        toast.error('Failed to create track');
       }
     } else if (selectedTrack) {
       const updatedTrack = { ...selectedTrack, ...editForm };
@@ -102,7 +110,10 @@ export function Pipeline() {
         setTracks(prev => prev.map(t => t.id === updatedTrack.id ? updatedTrack : t));
         setSelectedTrack(updatedTrack);
         setIsEditing(false);
-        fetchTracks(); // refresh
+        toast.success('Track saved');
+        fetchTracks();
+      } else {
+        toast.error('Failed to save track');
       }
     }
   };
@@ -138,6 +149,7 @@ export function Pipeline() {
 
   const handleSync = async () => {
     setSyncing(true);
+    toast.info('Syncing with Google Sheets…');
     try {
       const res = await fetch('/api/pipeline/sync', { method: 'POST' });
       if (res.ok) {
@@ -148,13 +160,15 @@ export function Pipeline() {
              const updatedCurrent = data.tracks.find((t: PipelineTrack) => t.id === selectedTrack.id);
              if (updatedCurrent) setSelectedTrack(updatedCurrent);
            }
+           toast.success('Pipeline synced with Google Sheets');
         }
       } else {
         const err = await res.json();
-        alert('Sync Error: ' + err.error);
+        toast.error('Sync failed: ' + err.error);
       }
     } catch (e) {
         console.error(e);
+        toast.error('Sync failed — server unreachable');
     } finally {
       setSyncing(false);
     }

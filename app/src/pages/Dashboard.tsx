@@ -1,13 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import * as RGLNamespace from 'react-grid-layout';
-const RGL: any = RGLNamespace;
-const Responsive = RGL.Responsive || RGL.default?.Responsive || RGL.ResponsiveGridLayout;
-const WidthProvider = RGL.WidthProvider || RGL.default?.WidthProvider;
-
-// Safe HOC call - only if WidthProvider is a function and we have a component
-const ResponsiveGridLayout = (typeof WidthProvider === 'function' && Responsive) 
-    ? WidthProvider(Responsive) 
-    : Responsive;
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Responsive } from 'react-grid-layout';
+const ResponsiveGridLayout = Responsive as any;
 
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Plus, Settings, Move } from 'lucide-react';
@@ -40,12 +33,36 @@ export function Dashboard() {
     const [editMode, setEditMode] = useState(false);
     const [showWidgetPicker, setShowWidgetPicker] = useState(false);
 
+    const LAYOUT_VERSION = 'v2'; // bump this to clear cached layouts
+
     const [layouts, setLayouts] = useState<{ lg: any[] }>({ lg: DEFAULT_LAYOUT });
     const [widgets, setWidgets] = useState<WidgetConfig[]>(DEFAULT_WIDGETS);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [gridWidth, setGridWidth] = useState(1200);
 
-
+    // Track container width via ResizeObserver so grid always fills real estate
+    useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+        const ro = new ResizeObserver(([entry]) => {
+            setGridWidth(entry.contentRect.width);
+        });
+        ro.observe(el);
+        setGridWidth(el.getBoundingClientRect().width);
+        return () => ro.disconnect();
+    }, []);
 
     useEffect(() => {
+        const storedVersion = localStorage.getItem('dashboard-version');
+
+        // If version mismatch, clear stale cache and use new defaults
+        if (storedVersion !== LAYOUT_VERSION) {
+            localStorage.removeItem('dashboard-layout');
+            localStorage.removeItem('dashboard-widgets');
+            localStorage.setItem('dashboard-version', LAYOUT_VERSION);
+            return;
+        }
+
         const saved = localStorage.getItem('dashboard-layout');
         const savedWidgets = localStorage.getItem('dashboard-widgets');
         
@@ -57,8 +74,8 @@ export function Dashboard() {
         }
     }, []);
 
-    const onLayoutChange = useCallback((_currentLayout: any[], allLayouts: { lg: any[] }) => {
-        setLayouts(allLayouts);
+    const onLayoutChange = useCallback((_: any, allLayouts: any) => {
+        setLayouts(allLayouts as { lg: any[] });
         localStorage.setItem('dashboard-layout', JSON.stringify(allLayouts));
     }, []);
 
@@ -186,10 +203,11 @@ export function Dashboard() {
                 </div>
 
                 {/* Grid Area */}
-                <div className="dashboard-grid-container min-h-[600px] border border-transparent rounded-2xl p-1 bg-white/[0.01]">
+                <div ref={containerRef} className="dashboard-grid-container min-h-[600px] border border-transparent rounded-2xl p-1 bg-white/[0.01]">
                     <ResponsiveGridLayout
                         className="layout"
                         layouts={layouts}
+                        width={gridWidth}
                         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                         cols={{ lg: 4, md: 3, sm: 2, xs: 1, xxs: 1 }}
                         rowHeight={100}

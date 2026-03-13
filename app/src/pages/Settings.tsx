@@ -1,6 +1,8 @@
 import { Settings2, Monitor, Database, Shield, Link2, Bell } from 'lucide-react';
+import { useToast } from '../contexts/ToastContext';
 
 export function Settings() {
+  const { toast } = useToast();
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-8">
@@ -82,7 +84,10 @@ export function Settings() {
             </div>
             
             <div className="mt-8 pt-6 border-t border-white/5 flex justify-end">
-              <button className="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-colors">
+              <button
+                onClick={() => toast.success('Settings saved successfully')}
+                className="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-colors"
+              >
                 Save Changes
               </button>
             </div>

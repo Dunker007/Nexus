@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { Users, Bot, Settings, Activity, Plus, Save, Power, PowerOff } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useToast } from '../contexts/ToastContext';
 
 interface Agent {
   id: string;
@@ -18,6 +19,7 @@ export function Agents() {
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Agent>>({});
+  const { toast } = useToast();
 
   const fetchAgents = async () => {
     try {
@@ -35,32 +37,54 @@ export function Agents() {
   const handleToggleStatus = async (agent: Agent, e?: React.MouseEvent) => {
     e?.stopPropagation();
     const newStatus = agent.status === 'active' ? 'inactive' : 'active';
-    const res = await fetch(`/api/agents/${agent.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...agent, status: newStatus }),
-    });
-    if (res.ok) {
-      const updated = await res.json();
-      setAgents(a => a.map(x => x.id === updated.id ? updated : x));
-      if (selectedAgent?.id === updated.id) setSelectedAgent(updated);
-    }
+    try {
+      const res = await fetch(`/api/agents/${agent.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...agent, status: newStatus }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setAgents(a => a.map(x => x.id === updated.id ? updated : x));
+        if (selectedAgent?.id === updated.id) setSelectedAgent(updated);
+        toast.info(`${agent.name} set to ${newStatus}`);
+      } else {
+        toast.error('Failed to toggle agent status');
+      }
+    } catch { toast.error('Server unreachable'); }
   };
 
   const handleSave = async () => {
     if (isCreating) {
       const id = editForm.name?.toLowerCase().replace(/[^a-z0-9]/g, '-') || 'new-agent';
-      const res = await fetch('/api/agents', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, name: editForm.name || 'New Agent', role: editForm.role || 'Assistant', description: editForm.description || '', status: editForm.status || 'active', system_prompt: editForm.system_prompt || '' }),
-      });
-      if (res.ok) { const a = await res.json(); setAgents(p => [...p, a]); setSelectedAgent(a); setIsCreating(false); setIsEditing(false); }
+      try {
+        const res = await fetch('/api/agents', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, name: editForm.name || 'New Agent', role: editForm.role || 'Assistant', description: editForm.description || '', status: editForm.status || 'active', system_prompt: editForm.system_prompt || '' }),
+        });
+        if (res.ok) {
+          const a = await res.json();
+          setAgents(p => [...p, a]);
+          setSelectedAgent(a);
+          setIsCreating(false);
+          setIsEditing(false);
+          toast.success(`Agent "${a.name}" created`);
+        } else { toast.error('Failed to create agent'); }
+      } catch { toast.error('Server unreachable'); }
     } else if (selectedAgent) {
-      const res = await fetch(`/api/agents/${selectedAgent.id}`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...selectedAgent, ...editForm }),
-      });
-      if (res.ok) { const a = await res.json(); setAgents(p => p.map(x => x.id === a.id ? a : x)); setSelectedAgent(a); setIsEditing(false); }
+      try {
+        const res = await fetch(`/api/agents/${selectedAgent.id}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...selectedAgent, ...editForm }),
+        });
+        if (res.ok) {
+          const a = await res.json();
+          setAgents(p => p.map(x => x.id === a.id ? a : x));
+          setSelectedAgent(a);
+          setIsEditing(false);
+          toast.success(`"${a.name}" updated`);
+        } else { toast.error('Failed to save agent'); }
+      } catch { toast.error('Server unreachable'); }
     }
   };
 

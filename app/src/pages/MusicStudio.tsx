@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Music, Sparkles, Mic2, FileText, Send, RefreshCw, Copy, Check, ChevronDown } from 'lucide-react';
+import { useToast } from '../contexts/ToastContext';
 
 type Tab = 'songwriter' | 'library';
 
@@ -47,6 +48,7 @@ function parseSongResponse(text: string): Partial<SongDraft> {
 }
 
 export function MusicStudio() {
+  const { toast } = useToast();
   const [tab, setTab] = useState<Tab>('songwriter');
   const [theme, setTheme] = useState('');
   const [genre, setGenre] = useState('Hip-Hop');
@@ -80,8 +82,10 @@ export function MusicStudio() {
       const data = await res.json();
       const parsed = parseSongResponse(data.text);
       setDraft({ title: parsed.title || 'Untitled', genre, mood, theme, lyrics: parsed.lyrics || '', sunoPrompt: parsed.sunoPrompt || '' });
+      toast.success(`Generated "${parsed.title || 'Untitled'}"`);
     } catch (e: any) {
       setError(e.message);
+      toast.error(`Failed to generate: ${e.message}`);
     } finally {
       setGenerating(false);
     }
@@ -114,8 +118,10 @@ export function MusicStudio() {
         }),
       });
       setSaved(true);
+      toast.success(`Saved "${draft.title}" to library`);
     } catch (e) {
       console.error(e);
+      toast.error('Failed to save song');
     } finally {
       setSaving(false);
     }
