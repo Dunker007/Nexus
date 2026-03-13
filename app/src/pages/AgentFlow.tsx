@@ -175,7 +175,7 @@ export function AgentFlow() {
 
   return (
     <ErrorBoundary>
-    <div className="flex-1 flex flex-col bg-[#0b0e11] text-white">
+    <div className="flex-1 flex flex-col bg-[#0b0e11] text-white h-screen">
       {/* Header */}
       <div className="p-6 border-b border-white/10 bg-[#12121a]">
         <div className="flex items-center justify-between max-w-[1800px] mx-auto">
@@ -224,7 +224,7 @@ export function AgentFlow() {
       </div>
 
       {/* React Flow Canvas */}
-      <div className="flex-1 relative" style={{ minHeight: '600px' }}>
+      <div className="flex-1 relative w-full h-full">
         <ReactFlow
           nodes={nodes}
           edges={edges}
