@@ -135,9 +135,6 @@ export function AgentFlow() {
     return '#06b6d4';
   }, []);
 
-  // Memoize empty nodeTypes to satisfy React Flow
-  const nodeTypes = useMemo(() => ({}), []);
-
   const handleExecute = useCallback(async () => {
     setIsExecuting(true);
     toast.info('Executing workflow...');
@@ -231,7 +228,6 @@ export function AgentFlow() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          nodeTypes={nodeTypes}
           fitView
           className="bg-[#0b0e11]"
           defaultEdgeOptions={defaultEdgeOptions}

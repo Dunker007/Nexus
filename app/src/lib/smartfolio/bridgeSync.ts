@@ -3,7 +3,7 @@ import { loadFromStorage, storageKey } from './storage';
 import { bridgeError, bridgeWarning } from './errorNotificationService';
 import type { AccountState } from '@/contexts/labs/smartfolio/PortfolioContext';
 
-const BRIDGE_URL = '/api/bridge/smartfolio';
+const BRIDGE_URL = '/api/portfolio/bridge/smartfolio';
 
 export async function fetchAccountState(accountId: AccountId): Promise<AccountState> {
     const seed = ACCOUNTS[accountId];
