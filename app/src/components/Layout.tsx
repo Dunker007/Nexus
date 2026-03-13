@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Users, HardDrive, GitBranch, Music, Newspaper, Wifi, WifiOff, Settings, Beaker, UsersRound, Command, Moon, Palette, Menu, X } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Users, HardDrive, GitBranch, Music, Newspaper, Wifi, WifiOff, Settings, Beaker, UsersRound, Command, Moon, Palette, Menu, X, Workflow } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useMemory } from '../contexts/MemoryContext';
 import VoiceControl from './VoiceControl';
@@ -10,6 +10,7 @@ const navItems = [
   { to: '/studios', icon: Music, label: 'Studios' },
   { to: '/chat', icon: MessageSquare, label: 'Chat' },
   { to: '/agents', icon: Users, label: 'Agents' },
+  { to: '/agentflow', icon: Workflow, label: 'AgentFlow' },
   { to: '/news', icon: Newspaper, label: 'News' },
   { to: '/meeting', icon: UsersRound, label: 'Meeting' },
   { to: '/labs', icon: Beaker, label: 'Labs' },

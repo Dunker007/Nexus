@@ -16,6 +16,7 @@ import { Labs } from './pages/Labs';
 import { Meeting } from './pages/Meeting';
 import { Settings } from './pages/Settings';
 import { SmartFolio } from './pages/SmartFolio';
+import { AgentFlow } from './pages/AgentFlow';
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
               <Route path="pipeline" element={<Pipeline />} />
               <Route path="music" element={<MusicStudio />} />
               <Route path="agents" element={<Agents />} />
+              <Route path="agentflow" element={<AgentFlow />} />
               <Route path="drive" element={<Drive />} />
               <Route path="settings" element={<Settings />} />
             </Route>
