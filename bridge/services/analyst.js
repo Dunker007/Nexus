@@ -155,25 +155,37 @@ export const analystService = {
         const generate = async (model, version = 'v1beta') => {
             const url = `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
             console.log(`[Analyst] Calling Gemini API (${version}): models/${model}`);
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000); // 1 minute hard limit
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
 
-            if (!response.ok) {
-                const errText = await response.text();
-                // Simple error mapping
-                if (response.status === 429) throw new Error('RATE_LIMIT');
-                if (response.status === 404) throw new Error('MODEL_NOT_FOUND');
-                throw new Error(`Gemini API Error: ${response.status}`);
-            }
+                if (!response.ok) {
+                    const errText = await response.text();
+                    // Simple error mapping
+                    if (response.status === 429) throw new Error('RATE_LIMIT');
+                    if (response.status === 404) throw new Error('MODEL_NOT_FOUND');
+                    throw new Error(`Gemini API Error: ${response.status}`);
+                }
 
-            const data = await response.json();
-            if (!data.candidates || data.candidates.length === 0) {
-                throw new Error('No response candidates from Gemini.');
+                const data = await response.json();
+                if (!data.candidates || data.candidates.length === 0) {
+                    throw new Error('No response candidates from Gemini.');
+                }
+                return data.candidates[0].content.parts[0].text;
+            } catch (err) {
+                if (err.name === 'AbortError') throw new Error('GEMINI_TIMEOUT');
+                throw err;
+            } finally {
+                clearTimeout(timeoutId);
             }
-            return data.candidates[0].content.parts[0].text;
         };
 
         try {
