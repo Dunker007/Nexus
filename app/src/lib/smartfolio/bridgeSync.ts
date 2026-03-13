@@ -9,7 +9,7 @@ export async function fetchAccountState(accountId: AccountId): Promise<AccountSt
     const seed = ACCOUNTS[accountId];
     try {
         const res = await fetch(`${BRIDGE_URL}/${accountId}`, {
-            headers: { 'x-api-key': process.env.NEXT_PUBLIC_BRIDGE_API_KEY || '' }
+            headers: { 'x-api-key': import.meta.env.VITE_BRIDGE_API_KEY || '' }
         });
         if (!res.ok) throw new Error('Failed to fetch from bridge');
         const data = await res.json();
@@ -89,7 +89,7 @@ export async function saveAccountStateToBridge(accountId: AccountId, assets: Ass
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': process.env.NEXT_PUBLIC_BRIDGE_API_KEY || ''
+                'x-api-key': import.meta.env.VITE_BRIDGE_API_KEY || ''
             },
             body: JSON.stringify({
                 assets: assets.map(a => ({

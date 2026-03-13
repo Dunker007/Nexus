@@ -110,5 +110,11 @@ safeAlter(`ALTER TABLE news_items    ADD COLUMN created_at DATETIME DEFAULT CURR
 // Add agent_id to chat_history for per-agent thread scoping
 safeAlter(`ALTER TABLE chat_history  ADD COLUMN agent_id TEXT DEFAULT NULL`);
 
+// Add pipeline track fields for enhanced tracking
+safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN genre TEXT DEFAULT NULL`);
+safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN bpm INTEGER DEFAULT NULL`);
+safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN key TEXT DEFAULT NULL`);
+safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN notes TEXT DEFAULT NULL`);
+
 console.log(`[DB] SQLite connected: ${DB_PATH}`);
 

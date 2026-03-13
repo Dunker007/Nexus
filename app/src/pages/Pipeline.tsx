@@ -52,17 +52,24 @@ export function Pipeline() {
     try {
       const res = await fetch('/api/pipeline');
       if (res.ok) {
-        const data = await res.json();
-        setTracks(data);
-        if (data.length > 0 && !selectedTrack && !isCreating) {
-          setSelectedTrack(data[0]);
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await res.json();
+          setTracks(data);
+          if (data.length > 0 && !selectedTrack && !isCreating) {
+            setSelectedTrack(data[0]);
+          }
+        } else {
+          console.warn('Pipeline API returned non-JSON response');
+          setTracks([]);
         }
       } else {
-        toast.error('Failed to load pipeline tracks');
+        console.warn(`Pipeline API returned ${res.status}`);
+        setTracks([]);
       }
     } catch (err) {
-      console.error(err);
-      toast.error('Could not reach the server');
+      console.error('Pipeline fetch error:', err);
+      setTracks([]);
     } finally {
       setLoading(false);
     }

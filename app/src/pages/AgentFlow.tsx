@@ -17,10 +17,8 @@ import { Play, Plus, Save, Sparkles, Music, FileText, MessageSquare, CheckCircle
 import { useToast } from '../contexts/ToastContext';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 
-// Define node types for agents
-const nodeTypes = {
-  // Custom node components can be added here
-};
+// Define node types for agents - memoized outside component to prevent re-creation
+const nodeTypes = {};
 
 const initialNodes: Node[] = [
   {
@@ -226,7 +224,7 @@ export function AgentFlow() {
       </div>
 
       {/* React Flow Canvas */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative" style={{ minHeight: '600px' }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}

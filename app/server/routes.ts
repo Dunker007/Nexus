@@ -9,6 +9,7 @@ import { newsRouter } from './api/news.js';
 import { songsRouter } from './api/songs.js';
 import { tasksRouter } from './api/tasks.js';
 import { portfolioRouter } from './api/portfolio.js';
+import { pipelineRouter } from './api/pipeline.js';
 // ─── Google Auth Helper ───────────────────────────────────────────────────────
 
 const getGoogleAuth = (scopes: string[]) => {
@@ -309,6 +310,7 @@ export function setupRoutes(app: Express) {
   app.use('/api/songs', songsRouter);
   app.use('/api/tasks', tasksRouter);
   app.use('/api/portfolio', portfolioRouter);
+  app.use('/api/pipeline', pipelineRouter);
 
   // ─── Google Sheets (Pipeline Sync) ────────────────────────────────────────
 
