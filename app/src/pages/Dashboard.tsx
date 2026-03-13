@@ -18,6 +18,7 @@ import { RecentWidget } from '../components/dashboard/widgets/RecentWidget';
 import { PortfolioSummaryWidget } from '../components/dashboard/widgets/PortfolioSummaryWidget';
 import { LLMPlaygroundWidget } from '../components/dashboard/widgets/LLMPlaygroundWidget';
 import { VoiceControlWidget } from '../components/dashboard/widgets/VoiceControlWidget';
+import { FearGreedWidget } from '../components/dashboard/widgets/FearGreedWidget';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -191,6 +192,7 @@ export function Dashboard() {
             case 'portfolio': return <PortfolioSummaryWidget />;
             case 'llm_playground': return <LLMPlaygroundWidget />;
             case 'voice_control': return <VoiceControlWidget />;
+            case 'fear_greed': return <FearGreedWidget />;
             default: return <div className="text-gray-500 flex items-center justify-center h-full text-xs font-mono uppercase tracking-widest">Unknown widget</div>;
         }
     }

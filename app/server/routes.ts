@@ -8,6 +8,7 @@ import { chatRouter } from './api/chat.js';
 import { newsRouter } from './api/news.js';
 import { songsRouter } from './api/songs.js';
 import { tasksRouter } from './api/tasks.js';
+import { portfolioRouter } from './api/portfolio.js';
 // ─── Google Auth Helper ───────────────────────────────────────────────────────
 
 const getGoogleAuth = (scopes: string[]) => {
@@ -307,6 +308,7 @@ export function setupRoutes(app: Express) {
   app.use('/api/news', newsRouter);
   app.use('/api/songs', songsRouter);
   app.use('/api/tasks', tasksRouter);
+  app.use('/api/portfolio', portfolioRouter);
 
   // ─── Google Sheets (Pipeline Sync) ────────────────────────────────────────
 
@@ -318,33 +320,6 @@ export function setupRoutes(app: Express) {
       const sheets = google.sheets({ version: 'v4', auth });
       const response = await sheets.spreadsheets.values.get({ spreadsheetId, range });
       res.json(response.data.values || []);
-    } catch (e: any) { res.status(500).json({ error: e.message }); }
-  });
-
-  // ─── Portfolio ────────────────────────────────────────────────────────────
-
-  app.get('/api/portfolio/accounts', (_req, res) => {
-    try {
-      const accounts = db.prepare('SELECT * FROM portfolio_accounts').all() as any[];
-      const allPositions = db.prepare('SELECT * FROM portfolio_positions').all() as any[];
-      res.json(accounts.map(acc => ({ ...acc, positions: allPositions.filter(p => p.account_id === acc.id) })));
-    } catch (e: any) { res.status(500).json({ error: e.message }); }
-  });
-
-  app.get('/api/portfolio/summary', (_req, res) => {
-    try {
-      const accounts = db.prepare('SELECT * FROM portfolio_accounts').all() as any[];
-      const positions = db.prepare('SELECT * FROM portfolio_positions').all() as any[];
-      const totalAum = accounts.reduce((s, a) => s + a.balance, 0);
-      const totalPnl = accounts.reduce((s, a) => s + a.pnl, 0);
-      const totalCash = accounts.reduce((s, a) => s + (a.balance * (a.cash_percent / 100)), 0);
-      res.json({
-        totalAum, totalPnl,
-        pnlPercent: totalAum > 0 ? (totalPnl / (totalAum - totalPnl)) * 100 : 0,
-        totalCash,
-        cashPercent: totalAum > 0 ? (totalCash / totalAum) * 100 : 0,
-        totalPositions: positions.length,
-      });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
