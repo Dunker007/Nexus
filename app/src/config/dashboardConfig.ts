@@ -12,6 +12,9 @@ export const WIDGET_CATALOG: Record<WidgetType, { title: string; icon: string; d
     scratchpad: { title: '📝 Scratchpad', icon: '📝', defaultW: 1, defaultH: 3, minW: 1, minH: 2 },
     music: { title: '🎵 Music', icon: '🎵', defaultW: 1, defaultH: 3, minW: 1, minH: 2 },
     recent: { title: '🕐 Recent', icon: '🕐', defaultW: 1, defaultH: 2, minW: 1, minH: 1 },
+    portfolio: { title: '💰 Portfolio', icon: '💰', defaultW: 1, defaultH: 3, minW: 1, minH: 2 },
+    llm_playground: { title: '🤖 LLM Playground', icon: '🤖', defaultW: 2, defaultH: 3, minW: 2, minH: 2 },
+    voice_control: { title: '🎤 Voice Control', icon: '🎤', defaultW: 1, defaultH: 3, minW: 1, minH: 2 },
 };
 
 // Default Layout — full 4-column spread (lg: 4 cols)

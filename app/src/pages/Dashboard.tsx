@@ -15,6 +15,9 @@ import { QuickLinksWidget } from '../components/dashboard/widgets/QuickLinksWidg
 import { ScratchpadWidget } from '../components/dashboard/widgets/ScratchpadWidget';
 import { MusicWidget } from '../components/dashboard/widgets/MusicWidget';
 import { RecentWidget } from '../components/dashboard/widgets/RecentWidget';
+import { PortfolioSummaryWidget } from '../components/dashboard/widgets/PortfolioSummaryWidget';
+import { LLMPlaygroundWidget } from '../components/dashboard/widgets/LLMPlaygroundWidget';
+import { VoiceControlWidget } from '../components/dashboard/widgets/VoiceControlWidget';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -90,6 +93,40 @@ export function Dashboard() {
         return () => clearInterval(timer);
     }, []);
 
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Ignore if user is typing in an input field
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+                return;
+            }
+
+            // E - Toggle edit mode
+            if (e.key === 'e' || e.key === 'E') {
+                e.preventDefault();
+                setEditMode(prev => !prev);
+            }
+
+            // + or = - Open widget picker (only in edit mode)
+            if ((e.key === '+' || e.key === '=') && editMode) {
+                e.preventDefault();
+                setShowWidgetPicker(true);
+            }
+
+            // Escape - Close widget picker or exit edit mode
+            if (e.key === 'Escape') {
+                if (showWidgetPicker) {
+                    setShowWidgetPicker(false);
+                } else if (editMode) {
+                    setEditMode(false);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [editMode, showWidgetPicker]);
+
 
 
     function addWidget(type: WidgetType) {
@@ -151,6 +188,9 @@ export function Dashboard() {
             case 'scratchpad': return <ScratchpadWidget />;
             case 'music': return <MusicWidget />;
             case 'recent': return <RecentWidget />;
+            case 'portfolio': return <PortfolioSummaryWidget />;
+            case 'llm_playground': return <LLMPlaygroundWidget />;
+            case 'voice_control': return <VoiceControlWidget />;
             default: return <div className="text-gray-500 flex items-center justify-center h-full text-xs font-mono uppercase tracking-widest">Unknown widget</div>;
         }
     }
@@ -218,8 +258,17 @@ export function Dashboard() {
                         margin={[16, 16]}
                         useCSSTransforms={true}
                     >
-                        {widgets.map(widget => (
-                            <div key={widget.i} className={`rounded-2xl border border-white/10 bg-[#0d0d14] backdrop-blur-md flex flex-col group transition-colors shadow-lg ${editMode ? 'ring-2 ring-cyan-500/30 ring-offset-2 ring-offset-[#0b0e11] cursor-move' : 'hover:border-cyan-500/20'}`}>
+                        {widgets.map((widget, index) => (
+                            <motion.div
+                                key={widget.i}
+                                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                transition={{
+                                    duration: 0.3,
+                                    delay: index * 0.05,
+                                    ease: [0.23, 1, 0.32, 1]
+                                }}
+                                className={`rounded-2xl border border-white/10 bg-[#0d0d14] backdrop-blur-md flex flex-col group transition-colors shadow-lg ${editMode ? 'ring-2 ring-cyan-500/30 ring-offset-2 ring-offset-[#0b0e11] cursor-move' : 'hover:border-cyan-500/20'}`}>
                                 
                                 {/* Widget Header */}
                                 <div className={`flex items-center justify-between p-3 shrink-0 border-b border-white/5 bg-white/[0.02] rounded-t-2xl ${editMode ? 'drag-handle bg-cyan-500/10' : ''}`}>
@@ -238,7 +287,7 @@ export function Dashboard() {
                                 <div className="flex-1 overflow-hidden p-3 relative bg-gradient-to-br from-white/[0.01] to-transparent rounded-b-2xl">
                                     {renderWidgetContent(widget)}
                                 </div>
-                            </div>
+                            </motion.div>
                         ))}
                     </ResponsiveGridLayout>
                 </div>

@@ -1,4 +1,4 @@
-export type WidgetType = 'quick_ai' | 'calendar' | 'news' | 'tasks' | 'quote' | 'system' | 'quicklinks' | 'scratchpad' | 'music' | 'recent';
+export type WidgetType = 'quick_ai' | 'calendar' | 'news' | 'tasks' | 'quote' | 'system' | 'quicklinks' | 'scratchpad' | 'music' | 'recent' | 'portfolio' | 'llm_playground' | 'voice_control';
 
 export interface WidgetConfig {
     i: string;
