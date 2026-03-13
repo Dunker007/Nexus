@@ -17,9 +17,6 @@ import { Play, Plus, Save, Sparkles, Music, FileText, MessageSquare, CheckCircle
 import { useToast } from '../contexts/ToastContext';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 
-// Define node types for agents - memoized outside component to prevent re-creation
-const nodeTypes = {};
-
 const initialNodes: Node[] = [
   {
     id: '1',
@@ -137,6 +134,9 @@ export function AgentFlow() {
     if (node.type === 'output') return '#10b981';
     return '#06b6d4';
   }, []);
+
+  // Memoize empty nodeTypes to satisfy React Flow
+  const nodeTypes = useMemo(() => ({}), []);
 
   const handleExecute = useCallback(async () => {
     setIsExecuting(true);
