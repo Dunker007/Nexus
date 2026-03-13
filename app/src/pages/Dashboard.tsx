@@ -36,7 +36,7 @@ export function Dashboard() {
     const [editMode, setEditMode] = useState(false);
     const [showWidgetPicker, setShowWidgetPicker] = useState(false);
 
-    const LAYOUT_VERSION = 'v2'; // bump this to clear cached layouts
+    const LAYOUT_VERSION = 'v3-phase2'; // bump this to clear cached layouts
 
     const [layouts, setLayouts] = useState<{ lg: any[] }>({ lg: DEFAULT_LAYOUT });
     const [widgets, setWidgets] = useState<WidgetConfig[]>(DEFAULT_WIDGETS);
@@ -259,17 +259,13 @@ export function Dashboard() {
                         useCSSTransforms={true}
                     >
                         {widgets.map((widget, index) => (
-                            <motion.div
+                            <div
                                 key={widget.i}
-                                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                transition={{
-                                    duration: 0.3,
-                                    delay: index * 0.05,
-                                    ease: [0.23, 1, 0.32, 1]
+                                className={`rounded-2xl border border-white/10 bg-[#0d0d14] backdrop-blur-md flex flex-col group transition-colors shadow-lg ${editMode ? 'ring-2 ring-cyan-500/30 ring-offset-2 ring-offset-[#0b0e11] cursor-move' : 'hover:border-cyan-500/20'}`}
+                                style={{
+                                    animation: `fadeInUp 0.3s ease-out ${index * 0.05}s backwards`
                                 }}
-                                className={`rounded-2xl border border-white/10 bg-[#0d0d14] backdrop-blur-md flex flex-col group transition-colors shadow-lg ${editMode ? 'ring-2 ring-cyan-500/30 ring-offset-2 ring-offset-[#0b0e11] cursor-move' : 'hover:border-cyan-500/20'}`}>
-                                
+                            >
                                 {/* Widget Header */}
                                 <div className={`flex items-center justify-between p-3 shrink-0 border-b border-white/5 bg-white/[0.02] rounded-t-2xl ${editMode ? 'drag-handle bg-cyan-500/10' : ''}`}>
                                     <h3 className="font-bold text-xs uppercase tracking-wider flex items-center gap-2 text-white/80">
@@ -287,7 +283,7 @@ export function Dashboard() {
                                 <div className="flex-1 overflow-hidden p-3 relative bg-gradient-to-br from-white/[0.01] to-transparent rounded-b-2xl">
                                     {renderWidgetContent(widget)}
                                 </div>
-                            </motion.div>
+                            </div>
                         ))}
                     </ResponsiveGridLayout>
                 </div>
