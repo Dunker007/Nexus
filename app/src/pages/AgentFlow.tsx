@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import {
   ReactFlow,
   Background,
@@ -15,6 +15,7 @@ import {
 import 'reactflow/dist/style.css';
 import { Play, Plus, Save, Sparkles, Music, FileText, MessageSquare, CheckCircle } from 'lucide-react';
 import { useToast } from '../contexts/ToastContext';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 // Define node types for agents
 const nodeTypes = {
@@ -126,7 +127,20 @@ export function AgentFlow() {
     [setEdges]
   );
 
-  const handleExecute = async () => {
+  // Memoize default edge options to prevent re-creation on every render
+  const defaultEdgeOptions = useMemo(() => ({
+    animated: true,
+    style: { stroke: '#06b6d4', strokeWidth: 2 },
+  }), []);
+
+  // Memoize node color function for MiniMap
+  const nodeColor = useCallback((node: Node) => {
+    if (node.type === 'input') return '#667eea';
+    if (node.type === 'output') return '#10b981';
+    return '#06b6d4';
+  }, []);
+
+  const handleExecute = useCallback(async () => {
     setIsExecuting(true);
     toast.info('Executing workflow...');
 
@@ -135,15 +149,15 @@ export function AgentFlow() {
       setIsExecuting(false);
       toast.success('Workflow executed successfully!');
     }, 2000);
-  };
+  }, [toast]);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     const workflow = { nodes, edges };
     localStorage.setItem('agentflow-workflow', JSON.stringify(workflow));
     toast.success('Workflow saved!');
-  };
+  }, [nodes, edges, toast]);
 
-  const addNode = (type: string) => {
+  const addNode = useCallback((type: string) => {
     const newNode: Node = {
       id: `${Date.now()}`,
       data: { label: `New ${type} Node` },
@@ -159,9 +173,10 @@ export function AgentFlow() {
     };
     setNodes((nds) => [...nds, newNode]);
     toast.success(`Added ${type} node`);
-  };
+  }, [setNodes, toast]);
 
   return (
+    <ErrorBoundary>
     <div className="flex-1 flex flex-col bg-[#0b0e11] text-white">
       {/* Header */}
       <div className="p-6 border-b border-white/10 bg-[#12121a]">
@@ -221,20 +236,13 @@ export function AgentFlow() {
           nodeTypes={nodeTypes}
           fitView
           className="bg-[#0b0e11]"
-          defaultEdgeOptions={{
-            animated: true,
-            style: { stroke: '#06b6d4', strokeWidth: 2 },
-          }}
+          defaultEdgeOptions={defaultEdgeOptions}
         >
           <Background color="#ffffff10" gap={16} />
           <Controls className="bg-[#1a1a2e] border border-white/10 rounded-lg" />
           <MiniMap
             className="bg-[#1a1a2e] border border-white/10 rounded-lg"
-            nodeColor={(node) => {
-              if (node.type === 'input') return '#667eea';
-              if (node.type === 'output') return '#10b981';
-              return '#06b6d4';
-            }}
+            nodeColor={nodeColor}
           />
 
           {/* Agent Templates Panel */}
@@ -295,5 +303,6 @@ export function AgentFlow() {
         </ReactFlow>
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

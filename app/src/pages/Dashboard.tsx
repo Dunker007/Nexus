@@ -1,24 +1,26 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { Responsive } from 'react-grid-layout';
 const ResponsiveGridLayout = Responsive as any;
 
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Plus, Settings, Move } from 'lucide-react';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
-import { QuickAIWidget } from '../components/dashboard/widgets/QuickAIWidget';
-import { CalendarWidget } from '../components/dashboard/widgets/CalendarWidget';
-import { NewsWidget } from '../components/dashboard/widgets/NewsWidget';
-import { TasksWidget } from '../components/dashboard/widgets/TasksWidget';
-import { QuoteWidget } from '../components/dashboard/widgets/QuoteWidget';
-import { SystemStatsWidget } from '../components/dashboard/widgets/SystemStatsWidget';
-import { QuickLinksWidget } from '../components/dashboard/widgets/QuickLinksWidget';
-import { ScratchpadWidget } from '../components/dashboard/widgets/ScratchpadWidget';
-import { MusicWidget } from '../components/dashboard/widgets/MusicWidget';
-import { RecentWidget } from '../components/dashboard/widgets/RecentWidget';
-import { PortfolioSummaryWidget } from '../components/dashboard/widgets/PortfolioSummaryWidget';
-import { LLMPlaygroundWidget } from '../components/dashboard/widgets/LLMPlaygroundWidget';
-import { VoiceControlWidget } from '../components/dashboard/widgets/VoiceControlWidget';
-import { FearGreedWidget } from '../components/dashboard/widgets/FearGreedWidget';
+// Lazy load widgets for code splitting and faster initial load
+const QuickAIWidget = lazy(() => import('../components/dashboard/widgets/QuickAIWidget').then(m => ({ default: m.QuickAIWidget })));
+const CalendarWidget = lazy(() => import('../components/dashboard/widgets/CalendarWidget').then(m => ({ default: m.CalendarWidget })));
+const NewsWidget = lazy(() => import('../components/dashboard/widgets/NewsWidget').then(m => ({ default: m.NewsWidget })));
+const TasksWidget = lazy(() => import('../components/dashboard/widgets/TasksWidget').then(m => ({ default: m.TasksWidget })));
+const QuoteWidget = lazy(() => import('../components/dashboard/widgets/QuoteWidget').then(m => ({ default: m.QuoteWidget })));
+const SystemStatsWidget = lazy(() => import('../components/dashboard/widgets/SystemStatsWidget').then(m => ({ default: m.SystemStatsWidget })));
+const QuickLinksWidget = lazy(() => import('../components/dashboard/widgets/QuickLinksWidget').then(m => ({ default: m.QuickLinksWidget })));
+const ScratchpadWidget = lazy(() => import('../components/dashboard/widgets/ScratchpadWidget').then(m => ({ default: m.ScratchpadWidget })));
+const MusicWidget = lazy(() => import('../components/dashboard/widgets/MusicWidget').then(m => ({ default: m.MusicWidget })));
+const RecentWidget = lazy(() => import('../components/dashboard/widgets/RecentWidget').then(m => ({ default: m.RecentWidget })));
+const PortfolioSummaryWidget = lazy(() => import('../components/dashboard/widgets/PortfolioSummaryWidget').then(m => ({ default: m.PortfolioSummaryWidget })));
+const LLMPlaygroundWidget = lazy(() => import('../components/dashboard/widgets/LLMPlaygroundWidget').then(m => ({ default: m.LLMPlaygroundWidget })));
+const VoiceControlWidget = lazy(() => import('../components/dashboard/widgets/VoiceControlWidget').then(m => ({ default: m.VoiceControlWidget })));
+const FearGreedWidget = lazy(() => import('../components/dashboard/widgets/FearGreedWidget').then(m => ({ default: m.FearGreedWidget })));
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -178,23 +180,37 @@ export function Dashboard() {
     }
 
     function renderWidgetContent(widget: WidgetConfig) {
-        switch (widget.type) {
-            case 'quick_ai': return <QuickAIWidget />;
-            case 'calendar': return <CalendarWidget />;
-            case 'news': return <NewsWidget />;
-            case 'tasks': return <TasksWidget />;
-            case 'quote': return <QuoteWidget />;
-            case 'system': return <SystemStatsWidget />;
-            case 'quicklinks': return <QuickLinksWidget />;
-            case 'scratchpad': return <ScratchpadWidget />;
-            case 'music': return <MusicWidget />;
-            case 'recent': return <RecentWidget />;
-            case 'portfolio': return <PortfolioSummaryWidget />;
-            case 'llm_playground': return <LLMPlaygroundWidget />;
-            case 'voice_control': return <VoiceControlWidget />;
-            case 'fear_greed': return <FearGreedWidget />;
-            default: return <div className="text-gray-500 flex items-center justify-center h-full text-xs font-mono uppercase tracking-widest">Unknown widget</div>;
-        }
+        const widgetComponent = (() => {
+            switch (widget.type) {
+                case 'quick_ai': return <QuickAIWidget />;
+                case 'calendar': return <CalendarWidget />;
+                case 'news': return <NewsWidget />;
+                case 'tasks': return <TasksWidget />;
+                case 'quote': return <QuoteWidget />;
+                case 'system': return <SystemStatsWidget />;
+                case 'quicklinks': return <QuickLinksWidget />;
+                case 'scratchpad': return <ScratchpadWidget />;
+                case 'music': return <MusicWidget />;
+                case 'recent': return <RecentWidget />;
+                case 'portfolio': return <PortfolioSummaryWidget />;
+                case 'llm_playground': return <LLMPlaygroundWidget />;
+                case 'voice_control': return <VoiceControlWidget />;
+                case 'fear_greed': return <FearGreedWidget />;
+                default: return <div className="text-gray-500 flex items-center justify-center h-full text-xs font-mono uppercase tracking-widest">Unknown widget</div>;
+            }
+        })();
+
+        return (
+            <ErrorBoundary>
+                <Suspense fallback={
+                    <div className="flex items-center justify-center h-full">
+                        <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+                    </div>
+                }>
+                    {widgetComponent}
+                </Suspense>
+            </ErrorBoundary>
+        );
     }
 
     return (

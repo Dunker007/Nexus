@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { TrendingDown, TrendingUp, AlertCircle } from 'lucide-react';
 
 interface FearGreedData {
@@ -7,6 +7,9 @@ interface FearGreedData {
   timestamp: string;
 }
 
+const CACHE_KEY = 'fear-greed-cache';
+const CACHE_DURATION = 3600000; // 1 hour in ms
+
 export function FearGreedWidget() {
   const [data, setData] = useState<FearGreedData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -14,17 +17,35 @@ export function FearGreedWidget() {
 
   const fetchFearGreed = async () => {
     try {
+      // Check cache first
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { data: cachedData, timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          setData(cachedData);
+          setLoading(false);
+          return;
+        }
+      }
+
       const res = await fetch('https://api.alternative.me/fng/?limit=1');
       if (!res.ok) throw new Error('Failed to fetch Fear & Greed index');
 
       const json = await res.json();
       if (json?.data && json.data.length > 0) {
-        setData({
+        const newData = {
           value: parseInt(json.data[0].value),
           classification: json.data[0].value_classification,
           timestamp: json.data[0].timestamp
-        });
+        };
+        setData(newData);
         setError(null);
+
+        // Cache the result
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+          data: newData,
+          timestamp: Date.now()
+        }));
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load index');
@@ -35,7 +56,7 @@ export function FearGreedWidget() {
 
   useEffect(() => {
     fetchFearGreed();
-    const timer = setInterval(fetchFearGreed, 3600000); // Update hourly
+    const timer = setInterval(fetchFearGreed, CACHE_DURATION);
     return () => clearInterval(timer);
   }, []);
 
@@ -61,42 +82,44 @@ export function FearGreedWidget() {
     );
   }
 
-  // Color based on Fear & Greed value
-  const getColor = (value: number) => {
-    if (value <= 25) return 'text-red-400';
-    if (value <= 45) return 'text-orange-400';
-    if (value <= 55) return 'text-yellow-400';
-    if (value <= 75) return 'text-emerald-400';
-    return 'text-green-400';
-  };
+  // Memoize color calculations to prevent recalculation on every render
+  const colorClasses = useMemo(() => {
+    if (!data) return { color: '', bgGradient: '', borderColor: '' };
 
-  const getGradient = (value: number) => {
-    if (value <= 25) return 'from-red-500 to-red-600';
-    if (value <= 45) return 'from-orange-500 to-orange-600';
-    if (value <= 55) return 'from-yellow-500 to-yellow-600';
-    if (value <= 75) return 'from-emerald-500 to-emerald-600';
-    return 'from-green-500 to-green-600';
-  };
+    const { value } = data;
+    let color = '', bgGradient = '', borderColor = '';
 
-  const getBgGradient = (value: number) => {
-    if (value <= 25) return 'bg-red-500/10';
-    if (value <= 45) return 'bg-orange-500/10';
-    if (value <= 55) return 'bg-yellow-500/10';
-    if (value <= 75) return 'bg-emerald-500/10';
-    return 'bg-green-500/10';
-  };
+    if (value <= 25) {
+      color = 'text-red-400';
+      bgGradient = 'bg-red-500/10';
+      borderColor = 'border-red-500/30';
+    } else if (value <= 45) {
+      color = 'text-orange-400';
+      bgGradient = 'bg-orange-500/10';
+      borderColor = 'border-orange-500/30';
+    } else if (value <= 55) {
+      color = 'text-yellow-400';
+      bgGradient = 'bg-yellow-500/10';
+      borderColor = 'border-yellow-500/30';
+    } else if (value <= 75) {
+      color = 'text-emerald-400';
+      bgGradient = 'bg-emerald-500/10';
+      borderColor = 'border-emerald-500/30';
+    } else {
+      color = 'text-green-400';
+      bgGradient = 'bg-green-500/10';
+      borderColor = 'border-green-500/30';
+    }
 
-  const isExtreme = data.value <= 25 || data.value >= 75;
+    return { color, bgGradient, borderColor };
+  }, [data]);
+
+  const isExtreme = data ? (data.value <= 25 || data.value >= 75) : false;
 
   return (
     <div className="flex flex-col h-full gap-3">
       {/* Main Display */}
-      <div className={`flex-1 rounded-xl border p-4 ${getBgGradient(data.value)} ${
-        data.value <= 25 ? 'border-red-500/30' :
-        data.value <= 45 ? 'border-orange-500/30' :
-        data.value <= 55 ? 'border-yellow-500/30' :
-        data.value <= 75 ? 'border-emerald-500/30' : 'border-green-500/30'
-      } flex flex-col items-center justify-center gap-3`}>
+      <div className={`flex-1 rounded-xl border p-4 ${colorClasses.bgGradient} ${colorClasses.borderColor} flex flex-col items-center justify-center gap-3`}>
 
         {/* Value Circle */}
         <div className="relative">
@@ -125,15 +148,15 @@ export function FearGreedWidget() {
             />
             <defs>
               <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" className={`${getColor(data.value)}`} />
-                <stop offset="100%" className={`${getColor(data.value)}`} />
+                <stop offset="0%" className={colorClasses.color} />
+                <stop offset="100%" className={colorClasses.color} />
               </linearGradient>
             </defs>
           </svg>
 
           {/* Center text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className={`text-4xl font-bold tracking-tight ${getColor(data.value)}`}>
+            <div className={`text-4xl font-bold tracking-tight ${colorClasses.color}`}>
               {data.value}
             </div>
             <div className="text-[10px] text-white/40 font-mono uppercase tracking-wider">
@@ -144,7 +167,7 @@ export function FearGreedWidget() {
 
         {/* Classification */}
         <div className="flex flex-col items-center gap-1">
-          <div className={`text-sm font-bold uppercase tracking-wider ${getColor(data.value)}`}>
+          <div className={`text-sm font-bold uppercase tracking-wider ${colorClasses.color}`}>
             {data.classification}
           </div>
           <div className="text-[10px] text-white/30 font-mono uppercase tracking-widest">
