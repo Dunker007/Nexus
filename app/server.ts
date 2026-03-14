@@ -10,6 +10,7 @@ import { setupRoutes } from './server/routes.js';
 import { loadSecrets, requireIAP } from './server/gcp.js';
 import { autoMigrateCloud } from './server/migrate-cloud.js';
 import { initSocket } from './server/socket.js';
+import { logger } from './server/logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -71,7 +72,7 @@ async function startServer() {
       const isLocal = ip.includes('127.0.0.1') || ip.includes('::1') || ip.includes('::ffff:127.') || ip.includes('::ffff:100.') || ip.includes('100.');
       if (ip && !isLocal) {
         if (isDev) {
-          console.warn(`[API] Unrecognized IP: ${ip}`);
+          logger.warn('Unrecognized IP', { ip });
         } else {
           return res.status(403).json({ error: 'Access denied: Network not authorized' });
         }
@@ -87,8 +88,9 @@ async function startServer() {
     const start = Date.now();
     res.on('finish', () => {
       const duration = Date.now() - start;
-      const level = duration > 2000 ? 'warn' : 'log';
-      console[level](`[API] ${req.method} ${req.url} → ${res.statusCode} (${duration}ms)`);
+      const meta = { method: req.method, url: req.url, status: res.statusCode, ms: duration };
+      if (duration > 2000) logger.warn('Slow request', meta);
+      else logger.info('Request', meta);
     });
     next();
   });
@@ -100,7 +102,7 @@ async function startServer() {
   // Must have 4 args so Express recognises it as an error handler
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use((err: any, _req: any, res: any, _next: any) => {
-    console.error('[ERROR]', err.message || err);
+    logger.error('Unhandled error', { message: err.message, stack: err.stack });
     res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
   });
 
@@ -119,10 +121,8 @@ async function startServer() {
   }
 
   httpServer.listen(PORT, '0.0.0.0', () => {
-    console.log(`\n🚀 Nexus running on http://localhost:${PORT}`);
-    console.log(`   Network: http://0.0.0.0:${PORT}  (Tailscale-accessible)`);
-    console.log(`   Mode: ${isDev ? 'development' : 'production'}\n`);
+    logger.info('Nexus started', { port: PORT, mode: isDev ? 'development' : 'production' });
   });
 }
 
-startServer().catch(console.error);
+startServer().catch(err => logger.error('Fatal startup error', { message: err.message, stack: err.stack }));
