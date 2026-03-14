@@ -1,25 +1,40 @@
 import { Router } from 'express';
 import { db } from '../db.js';
+import { verifyToken } from '../auth.js';
 
 export const portfolioRouter = Router();
 
+// ─── Resolve user from cookie (optional — falls back to 'default') ────────────
+const getUserId = (req: any): string => {
+  const token = req.cookies?.nexus_token;
+  if (!token) return 'default';
+  const user = verifyToken(token);
+  return user?.id || 'default';
+};
+
 // ─── DB helpers ───────────────────────────────────────────────────────────────
-const getSyncRow = (accountId: string) => {
-  const row = db.prepare('SELECT * FROM portfolio_sync WHERE account_id = ?').get(accountId) as any;
-  if (!row) return null;
+const getSyncRow = (userId: string, accountId: string) => {
+  const row = db.prepare('SELECT * FROM portfolio_sync WHERE user_id = ? AND account_id = ?').get(userId, accountId) as any;
+  // Fall back to 'default' user rows for backwards compat
+  const fallback = userId !== 'default'
+    ? db.prepare('SELECT * FROM portfolio_sync WHERE user_id = ? AND account_id = ?').get('default', accountId) as any
+    : null;
+  const r = row || fallback;
+  if (!r) return null;
   return {
-    positions: JSON.parse(row.positions),
-    journal: JSON.parse(row.journal),
+    positions: JSON.parse(r.positions),
+    journal: JSON.parse(r.journal),
     pendingOrders: [],
-    lastSync: row.last_sync,
+    lastSync: r.last_sync,
   };
 };
 
 // Portfolio summary for dashboard widget
-portfolioRouter.get('/summary', (_req, res) => {
+portfolioRouter.get('/summary', (req, res) => {
   try {
-    const suiData = getSyncRow('sui');
-    const altsData = getSyncRow('alts');
+    const userId = getUserId(req);
+    const suiData = getSyncRow(userId, 'sui');
+    const altsData = getSyncRow(userId, 'alts');
 
     // Calculate totals from both accounts
     const calculateTotal = (data: any) => {
@@ -81,7 +96,8 @@ portfolioRouter.get('/accounts', (_req, res) => {
 // Retrieve specific account data (Bridge)
 portfolioRouter.get('/:accountId', (req, res) => {
   const { accountId } = req.params;
-  const data = getSyncRow(accountId.toLowerCase());
+  const userId = getUserId(req);
+  const data = getSyncRow(userId, accountId.toLowerCase());
   res.json(data || { positions: [], journal: [], pendingOrders: [] });
 });
 
@@ -89,15 +105,17 @@ portfolioRouter.get('/:accountId', (req, res) => {
 portfolioRouter.post('/:accountId/sync', (req, res) => {
   const { accountId } = req.params;
   const { assets, journal } = req.body;
+  const userId = getUserId(req);
 
   db.prepare(`
-    INSERT INTO portfolio_sync (account_id, positions, journal, last_sync)
-    VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+    INSERT INTO portfolio_sync (user_id, account_id, positions, journal, last_sync)
+    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
     ON CONFLICT(account_id) DO UPDATE SET
+      user_id    = excluded.user_id,
       positions  = excluded.positions,
       journal    = excluded.journal,
       last_sync  = excluded.last_sync
-  `).run(accountId.toLowerCase(), JSON.stringify(assets || []), JSON.stringify(journal || []));
+  `).run(userId, accountId.toLowerCase(), JSON.stringify(assets || []), JSON.stringify(journal || []));
 
   res.json({ success: true });
 });

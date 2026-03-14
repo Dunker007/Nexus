@@ -146,6 +146,9 @@ db.exec(`
     last_sync  DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 `);
+// Add user_id for per-user portfolio scoping (defaults to 'default' for existing rows)
+safeAlter(`ALTER TABLE portfolio_sync ADD COLUMN user_id TEXT NOT NULL DEFAULT 'default'`);
+safeIndex(`CREATE INDEX IF NOT EXISTS idx_portfolio_sync_user ON portfolio_sync(user_id, account_id)`);
 
 // ─── Users table (Google OAuth) ───────────────────────────────────────────────
 db.exec(`
