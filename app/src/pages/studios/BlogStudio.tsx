@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, PenTool, Search, Send, FileText, Check, RefreshCw, Globe, ArrowRight, Save } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import PageLayout, { PageHeader, StatPill } from '../../components/PageLayout';
 
 const MOCK_IDEAS = [
     "The Future of AI in 2026: What to Expect",
@@ -40,18 +40,22 @@ export function BlogStudio() {
     };
 
     return (
-        <div className="flex-1 overflow-y-auto w-full custom-scrollbar bg-[#050508] text-white relative">
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-emerald-900/10 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-teal-900/10 rounded-full blur-[120px]"></div>
-            </div>
-
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-8 z-10 relative">
-                <div className="flex items-center gap-2 mb-8 text-xs font-bold uppercase tracking-widest text-emerald-400">
-                    <Link to="/studios" className="hover:text-emerald-300 transition-colors">Studios</Link>
-                    <span className="opacity-30">/</span>
-                    <span className="text-white/40">Blog</span>
-                </div>
+        <PageLayout color="green">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+                <PageHeader
+                    title="Blog Studio"
+                    subtitle="CONTENT COMMAND CENTER • SEO • WORDPRESS"
+                    icon={<BookOpen size={24} className="text-green-400" />}
+                    color="green"
+                    actions={
+                        <div className="flex items-center gap-3">
+                            <StatPill label={`${MOCK_DRAFTS.length} Drafts`} color="green" />
+                            <button onClick={() => setMode(mode === 'dashboard' ? 'create' : 'dashboard')} className="flex items-center gap-2 px-4 py-2 bg-green-500/10 text-green-400 border border-green-500/20 rounded-lg hover:bg-green-500/20 transition-colors text-xs font-bold uppercase tracking-wider">
+                                <PenTool size={14} /> {mode === 'dashboard' ? 'New Article' : 'Dashboard'}
+                            </button>
+                        </div>
+                    }
+                />
 
                 {mode === 'dashboard' && (
                     <div className="space-y-8">
@@ -85,7 +89,7 @@ export function BlogStudio() {
                         </motion.div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <div className="bg-[#12121a] border border-white/5 p-6 rounded-3xl shadow-xl space-y-6">
+                            <div className="glass-card border-white/5 space-y-6">
                                 <h3 className="font-bold text-white/30 uppercase tracking-[0.2em] text-[10px]">Performance Metrics</h3>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="p-5 bg-black/40 rounded-2xl border border-white/5 group hover:border-emerald-500/30 transition-all">
@@ -99,7 +103,7 @@ export function BlogStudio() {
                                 </div>
                             </div>
 
-                            <div className="bg-[#12121a] border border-white/5 p-6 rounded-3xl shadow-xl col-span-2">
+                            <div className="glass-card border-white/5 col-span-2">
                                 <h3 className="font-bold text-white/30 uppercase tracking-[0.2em] text-[10px] mb-4">Recent Drafts</h3>
                                 <div className="space-y-3">
                                     {MOCK_DRAFTS.map(draft => (
@@ -129,7 +133,7 @@ export function BlogStudio() {
                         className="grid grid-cols-1 lg:grid-cols-12 gap-8"
                     >
                         <div className="lg:col-span-3 space-y-6">
-                            <div className="bg-[#12121a] border border-white/5 p-5 rounded-2xl shadow-xl">
+                            <div className="glass-card border-white/5">
                                 <button
                                     onClick={() => setMode('dashboard')}
                                     className="text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-white flex items-center gap-2 mb-8 transition-colors group"
@@ -154,7 +158,7 @@ export function BlogStudio() {
                             </div>
 
                             {mode === 'write' && (
-                                <div className="bg-[#12121a] border border-white/5 p-5 rounded-2xl shadow-xl">
+                                <div className="glass-card border-white/5">
                                     <h3 className="font-bold text-[10px] text-white/30 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                                         <Search size={14} className="text-emerald-400" /> SEO Integrity
                                     </h3>
@@ -184,7 +188,7 @@ export function BlogStudio() {
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: -20 }}
-                                        className="bg-[#12121a] border border-white/5 p-8 min-h-[500px] rounded-3xl shadow-xl"
+                                        className="glass-card border-white/5 min-h-[500px]"
                                     >
                                         <h2 className="text-2xl font-bold mb-8 uppercase tracking-tight text-white/90">Curate New Narrative</h2>
                                         <div className="flex gap-4 mb-10">
@@ -273,6 +277,6 @@ export function BlogStudio() {
                     </motion.div>
                 )}
             </div>
-        </div>
+        </PageLayout>
     );
 }

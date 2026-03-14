@@ -1,14 +1,10 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { usePortfolio } from '@/contexts/labs/smartfolio/PortfolioContext';
-
-type KeyStatus = 'idle' | 'testing' | 'valid' | 'invalid';
-
 export function SmartFolioSettings() {
-    const { exportData, importData, resetToDefaults, activeAccount } = usePortfolio();
+    const { exportData, importData, resetToDefaults } = usePortfolio();
     const [mounted, setMounted] = useState(false);
     // Key management removed - handled by Bridge
-    const [keyStatus, setKeyStatus] = useState<KeyStatus>('valid'); // Assume valid for now (Bridge managed)
     const [importJson, setImportJson] = useState('');
     const [importResult, setImportResult] = useState<'success' | 'error' | null>(null);
     const [exportCopied, setExportCopied] = useState(false);

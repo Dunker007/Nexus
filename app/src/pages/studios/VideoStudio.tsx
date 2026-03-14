@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Film, Music, Upload, Play, Pause, Settings, Share2, Monitor, ExternalLink, Video, Clock, CheckCircle, RefreshCw, Wand2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import PageLayout, { PageHeader, StatPill } from '../../components/PageLayout';
 
 const projects = [
     { id: 1, name: 'Neon City Drive', status: 'completed', duration: '3:45', date: '2h ago' },
@@ -76,23 +76,22 @@ export function VideoStudio() {
     };
 
     return (
-        <div className="flex-1 overflow-y-auto w-full custom-scrollbar bg-[#050508] text-white relative">
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-900/10 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-red-900/10 rounded-full blur-[120px]"></div>
-            </div>
-
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-8 z-10 relative">
-                <div className="flex items-center gap-2 mb-8 text-xs font-bold uppercase tracking-widest text-orange-400">
-                    <Link to="/studios" className="hover:text-orange-300 transition-colors">Studios</Link>
-                    <span className="opacity-30">/</span>
-                    <span className="text-white/40">Video</span>
-                </div>
+        <PageLayout color="amber">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+                <PageHeader
+                    title="Video Studio"
+                    subtitle="NEURAL FRAMES • AI VIDEO GENERATION • RENDER QUEUE"
+                    icon={<Film size={24} className="text-amber-400" />}
+                    color="amber"
+                    actions={
+                        <StatPill label={isRendering ? `Rendering ${renderProgress}%` : resultReady ? 'Render Complete' : 'Idle'} color={isRendering ? 'amber' : resultReady ? 'green' : 'cyan'} pulse={isRendering} />
+                    }
+                />
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     <div className="lg:col-span-3 space-y-6">
                         <motion.div
-                            className="bg-[#12121a] border border-white/5 p-5 rounded-2xl shadow-xl space-y-4"
+                            className="glass-card border-white/5 space-y-4"
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                         >
@@ -147,7 +146,7 @@ export function VideoStudio() {
                         </motion.div>
 
                         <motion.div
-                            className="bg-[#12121a] border border-white/5 p-5 rounded-2xl shadow-xl space-y-4"
+                            className="glass-card border-white/5 space-y-4"
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.1 }}
@@ -280,7 +279,7 @@ export function VideoStudio() {
                             )}
                         </motion.div>
 
-                        <div className="bg-[#12121a] border border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+                        <div className="glass-card border-white/5 relative overflow-hidden">
                              <div className="flex justify-between items-center mb-6">
                                 <h3 className="font-bold text-lg flex items-center gap-2">
                                    <Film size={20} className="text-orange-400" /> Recent Projects
@@ -336,7 +335,7 @@ export function VideoStudio() {
                         </motion.div>
 
                         <motion.div
-                            className="bg-[#12121a] border border-white/5 p-6 rounded-3xl"
+                            className="glass-card border-white/5"
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.1 }}
@@ -373,6 +372,6 @@ export function VideoStudio() {
                     </div>
                 </div>
             </div>
-        </div>
+        </PageLayout>
     );
 }

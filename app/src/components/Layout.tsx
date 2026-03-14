@@ -1,27 +1,40 @@
 import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Users, HardDrive, GitBranch, Music, Newspaper, Wifi, WifiOff, Settings, Beaker, UsersRound, Command, Moon, Palette, Menu, X, Workflow } from 'lucide-react';
+import { 
+  LayoutDashboard, MessageSquare, Users, HardDrive, GitBranch, 
+  Music, Newspaper, Wifi, WifiOff, Settings, Beaker, 
+  UsersRound, Command as CommandIcon, Palette, Menu, X, Workflow 
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useMemory } from '../contexts/MemoryContext';
+import { useVibe } from '../contexts/VibeContext';
 import VoiceControl from './VoiceControl';
+import VibeController from './VibeController';
+import KeyboardShortcuts from './KeyboardShortcuts';
+import CommandPalette from './CommandPalette';
+import { ThemeToggle } from './ThemeToggle';
+import { NavigationItem } from './NavigationItem';
+import PageTransition from './PageTransition';
 
 const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', shortcut: 'G D' },
   { to: '/studios', icon: Music, label: 'Studios' },
-  { to: '/chat', icon: MessageSquare, label: 'Chat' },
-  { to: '/agents', icon: Users, label: 'Agents' },
+  { to: '/chat', icon: MessageSquare, label: 'Chat', shortcut: 'G C' },
+  { to: '/agents', icon: Users, label: 'Agents', shortcut: 'G A' },
   { to: '/agentflow', icon: Workflow, label: 'AgentFlow' },
-  { to: '/news', icon: Newspaper, label: 'News' },
+  { to: '/news', icon: Newspaper, label: 'News', shortcut: 'G N' },
   { to: '/meeting', icon: UsersRound, label: 'Meeting' },
-  { to: '/labs', icon: Beaker, label: 'Labs' },
-  { to: '/pipeline', icon: GitBranch, label: 'Pipeline' },
+  { to: '/labs', icon: Beaker, label: 'Labs', shortcut: 'G L' },
+  { to: '/pipeline', icon: GitBranch, label: 'Pipeline', shortcut: 'G P' },
   { to: '/drive', icon: HardDrive, label: 'Drive' },
-  { to: '/settings', icon: Settings, label: 'Settings' },
+  { to: '/settings', icon: Settings, label: 'Settings', shortcut: 'G S' },
 ];
 
 export function Layout() {
   const { loading, error } = useMemory();
+  const { mode, setMode } = useVibe();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const location = useLocation();
 
   // Close mobile menu on route change
@@ -29,15 +42,20 @@ export function Layout() {
     setMobileOpen(false);
   }, [location.pathname]);
 
+  const toggleVibeMode = () => {
+    const modes: ('normal' | 'high-load' | 'crisis' | 'focus')[] = ['normal', 'high-load', 'crisis', 'focus'];
+    const currentIndex = modes.indexOf(mode);
+    const nextIndex = (currentIndex + 1) % modes.length;
+    setMode(modes[nextIndex]);
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-[#07070a] text-white overflow-hidden font-sans selection:bg-cyan-500/30">
-      {/* Background Ambience */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-32 bg-cyan-500/5 blur-[120px] rounded-full" />
-      </div>
+    <div className="flex flex-col h-screen bg-[var(--bg-void)] text-white overflow-hidden font-sans selection:bg-cyan-500/30">
+      <KeyboardShortcuts />
+      <CommandPalette />
 
       {/* Top Navigation Bar */}
-      <nav className="flex-none h-16 border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-2xl relative z-50 px-4 md:px-8">
+      <nav className="flex-none h-16 border-b border-white/5 bg-[var(--glass-bg)] backdrop-blur-2xl relative z-50 px-4 md:px-8">
         <div className="h-full flex items-center justify-between">
           
           {/* Logo Section */}
@@ -57,35 +75,18 @@ export function Layout() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-2 px-6 overflow-x-auto custom-scrollbar flex-1 justify-center max-w-5xl">
-            {navItems.map((item) => {
-              const { to, icon: Icon, label } = item;
-              return (
-                <NavLink
-                  key={to}
-                  to={to}
-                  className={({ isActive }) =>
-                    `flex items-center gap-2.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all relative group whitespace-nowrap border ${
-                      isActive
-                        ? 'text-cyan-400 bg-white/5 border-white/10 shadow-lg shadow-black/20'
-                        : 'text-white/30 border-transparent hover:text-white hover:bg-white/[0.02]'
-                    }`
-                  }
-                >
-                  {({ isActive }) => (
-                    <>
-                      <Icon className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-cyan-400' : ''}`} />
-                      <span>{label}</span>
-                      {isActive && (
-                        <motion.div 
-                            layoutId="nav-active-pill"
-                            className="absolute -bottom-[21px] left-1/2 -translate-x-1/2 w-12 h-1 bg-cyan-500 rounded-full shadow-[0_0_12px_rgba(6,182,212,0.8)]" 
-                        />
-                      )}
-                    </>
-                  )}
-                </NavLink>
-              );
-            })}
+            {navItems.map((item) => (
+              <div 
+                key={item.to}
+                onMouseEnter={() => setHoveredItem(item.to)}
+                onMouseLeave={() => setHoveredItem(null)}
+              >
+                <NavigationItem 
+                  {...item} 
+                  isHovered={hoveredItem === item.to}
+                />
+              </div>
+            ))}
           </div>
 
           {/* Right Actions */}
@@ -104,19 +105,22 @@ export function Layout() {
              <div className="w-px h-6 bg-white/5 mx-1 hidden lg:block"></div>
 
             <div className="hidden md:flex items-center gap-2">
-                <button className="w-10 h-10 rounded-xl flex items-center justify-center text-white/20 hover:text-white hover:bg-white/5 transition-all" title="Kernel Display">
-                    <Moon className="w-4 h-4" />
-                </button>
-                <button className="w-10 h-10 rounded-xl flex items-center justify-center text-purple-400/40 hover:text-purple-400 hover:bg-purple-500/10 transition-all" title="Interface Matrix">
-                    <Palette className="w-4 h-4" />
+                <ThemeToggle />
+                <button 
+                  onClick={toggleVibeMode}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-purple-400/40 hover:text-purple-400 hover:bg-purple-500/10 transition-all" 
+                  title={`Vibe Mode: ${mode}`}
+                >
+                    <Palette className={`w-4 h-4 ${mode !== 'normal' ? 'animate-pulse' : ''}`} />
                 </button>
             </div>
             
             <button 
+                onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
                 className="hidden xl:flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 transition-all text-[10px] font-black uppercase tracking-widest"
             >
-                <Command className="w-3.5 h-3.5" />
-                <span>Quick Access</span>
+                <CommandIcon className="w-3.5 h-3.5" />
+                <span>Ctrl+K</span>
             </button>
 
             <div className="relative group p-0.5 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-white/10 hover:border-cyan-500/40 transition-all cursor-pointer">
@@ -148,7 +152,7 @@ export function Layout() {
                 initial={{ opacity: 0, scale: 0.95, y: -20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                className="lg:hidden absolute top-20 left-4 right-4 bg-[#0d0d14]/95 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden z-[60] shadow-2xl p-4"
+                className="lg:hidden absolute top-20 left-4 right-4 bg-[var(--bg-deep)]/95 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden z-[60] shadow-2xl p-4"
             >
                 <div className="grid grid-cols-2 gap-3">
                     {navItems.map((item) => {
@@ -176,14 +180,15 @@ export function Layout() {
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-auto relative z-10 custom-scrollbar">
-        <Outlet />
+      <main className="flex-1 w-full overflow-auto relative z-10 custom-scrollbar">
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
 
       {/* Global Overlays */}
-      <div className="fixed bottom-8 right-8 z-[100]">
-        <VoiceControl />
-      </div>
+      <VoiceControl />
+      <VibeController />
     </div>
   );
 }

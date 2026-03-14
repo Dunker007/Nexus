@@ -1,0 +1,13 @@
+node_modules
+.env
+.env.local
+nexus.db
+nexus.db-shm
+nexus.db-wal
+tauri_build.log
+src-tauri
+.git
+.vscode
+dist
+.claude
+*_OLD_*

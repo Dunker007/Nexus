@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { Terminal, Cpu, GitBranch, Github, ExternalLink, RefreshCw, Folder } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import PageLayout, { PageHeader, StatPill } from '../../components/PageLayout';
 
 interface Repo {
     id: number;
@@ -97,36 +98,14 @@ export function DevStudio() {
     };
 
     return (
-        <div className="flex-1 overflow-y-auto w-full custom-scrollbar bg-[#0b0e11] relative text-gray-200">
-             {/* Background Details */}
-             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-[120px] mix-blend-screen overflow-hidden" />
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] mix-blend-screen overflow-hidden" />
-            </div>
-
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-8 z-10 relative">
-                {/* Header */}
-                <section className="mb-10">
-                    <motion.div
-                        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                    >
-                        <div>
-                            <div className="flex items-center gap-2 mb-2 text-xs font-bold uppercase tracking-widest text-cyan-400">
-                                <Link to="/studios" className="hover:text-cyan-300 transition-colors">Studios</Link>
-                                <span className="opacity-30">/</span>
-                                <span className="text-white/40">Dev</span>
-                            </div>
-                            <h1 className="text-3xl font-bold flex items-center gap-3 mb-2">
-                                <Terminal className="text-cyan-400" size={32} />
-                                Dev Studio
-                            </h1>
-                            <p className="text-white/40 text-sm">
-                                Manage repositories, system performance, and deployments.
-                            </p>
-                        </div>
-
+        <PageLayout color="cyan">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+                <PageHeader
+                    title="Dev Studio"
+                    subtitle="CODE REPOSITORIES • SYSTEM PERFORMANCE • DEPLOYMENTS"
+                    icon={<Terminal size={24} className="text-cyan-400" />}
+                    color="cyan"
+                    actions={
                         <div className="flex gap-2">
                             <button
                                 onClick={fetchRepos}
@@ -143,8 +122,8 @@ export function DevStudio() {
                                 GitHub
                             </Link>
                         </div>
-                    </motion.div>
-                </section>
+                    }
+                />
 
                 {/* Dashboard Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -157,11 +136,11 @@ export function DevStudio() {
                         </h2>
 
                         {loading ? (
-                            <div className="flex items-center justify-center h-64 bg-white/[0.02] border border-white/5 rounded-2xl">
-                                <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                            <div className="flex items-center justify-center h-64 glass-card border-white/5">
+                                <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin shadow-[0_0_10px_rgba(0,245,212,0.4)]"></div>
                             </div>
                         ) : error && repos.length === 0 ? (
-                            <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 text-center">
+                            <div className="glass-card border-white/5 p-8 text-center">
                                 <p className="text-red-400 mb-4">{error}</p>
                                 <button
                                     onClick={fetchRepos}
@@ -178,7 +157,7 @@ export function DevStudio() {
                                         href={repo.html_url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="bg-[#12121a] border border-white/5 p-5 rounded-2xl hover:border-cyan-500/30 transition-all group relative overflow-hidden"
+                                        className="glass-card border-white/5 hover:border-cyan-500/30 transition-all group relative overflow-hidden"
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: i * 0.05 }}
@@ -192,15 +171,10 @@ export function DevStudio() {
                                                     {repo.name}
                                                 </span>
                                             </div>
-                                            {repo.visibility === 'public' ? (
-                                                <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] uppercase font-bold tracking-widest border border-emerald-500/20">
-                                                    Public
-                                                </span>
-                                            ) : (
-                                                <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 text-[10px] uppercase font-bold tracking-widest border border-amber-500/20">
-                                                    Private
-                                                </span>
-                                            )}
+                                            <StatPill
+                                                label={repo.visibility === 'public' ? 'Public' : 'Private'}
+                                                color={repo.visibility === 'public' ? 'green' : 'amber'}
+                                            />
                                         </div>
 
                                         <p className="text-xs text-white/40 line-clamp-2 h-8 mb-4 relative z-10 font-medium leading-relaxed">
@@ -234,7 +208,7 @@ export function DevStudio() {
                     {/* System Status & Tools */}
                     <aside className="lg:col-span-4 space-y-6">
                         <motion.div
-                            className="bg-[#12121a] border border-white/5 rounded-2xl p-6 relative overflow-hidden"
+                            className="glass-card border-white/5 relative overflow-hidden"
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                         >
@@ -251,9 +225,9 @@ export function DevStudio() {
                                         <span className="text-white/40">Memory Usage</span>
                                         <span className="text-cyan-400">{status?.memory?.used || 742} MB</span>
                                     </div>
-                                    <div className="h-1.5 bg-black/40 rounded-full overflow-hidden">
+                                    <div className="progress-bar">
                                         <motion.div
-                                            className="h-full bg-gradient-to-r from-cyan-500 to-blue-500"
+                                            className="progress-fill"
                                             initial={{ width: 0 }}
                                             animate={{ width: `${Math.min(((status?.memory?.used || 742) / 8192) * 100, 100)}%` }}
                                         />
@@ -263,11 +237,12 @@ export function DevStudio() {
                                 <div>
                                     <div className="flex justify-between text-xs font-bold uppercase tracking-widest mb-2">
                                         <span className="text-white/40">Engine Load</span>
-                                        <span className="text-purple-400">{status?.cpu?.usage || status?.services?.system === 'up' ? '12%' : 'Offline'}</span>
+                                        <span className="text-purple-400">{status?.services?.system === 'up' ? '12%' : 'Offline'}</span>
                                     </div>
-                                    <div className="h-1.5 bg-black/40 rounded-full overflow-hidden">
+                                    <div className="progress-bar">
                                         <motion.div
-                                            className="h-full bg-linear-to-r from-purple-500 to-pink-500"
+                                            className="progress-fill"
+                                            style={{ background: 'linear-gradient(90deg, #a855f7, #ec4899)' }}
                                             initial={{ width: 0 }}
                                             animate={{ width: `${status?.services?.system === 'up' ? 12 : 0}%` }}
                                         />
@@ -288,7 +263,7 @@ export function DevStudio() {
                         </motion.div>
 
                         <motion.div
-                            className="bg-[#12121a] border border-white/5 rounded-2xl p-6 relative overflow-hidden"
+                            className="glass-card border-white/5 relative overflow-hidden"
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.1 }}
@@ -325,6 +300,6 @@ export function DevStudio() {
                     </aside>
                 </div>
             </div>
-        </div>
+        </PageLayout>
     );
 }

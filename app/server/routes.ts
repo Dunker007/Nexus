@@ -1,8 +1,10 @@
 import { Express } from 'express';
+import { z } from 'zod';
 import { db } from './db.js';
 import { google } from 'googleapis';
 import { driveConfig, ollamaConfig, lmStudioConfig } from './config.js';
 import { required } from './middleware/validate.js';
+import { ai } from './genkit.js';
 import { agentsRouter } from './api/agents.js';
 import { chatRouter } from './api/chat.js';
 import { newsRouter } from './api/news.js';
@@ -115,6 +117,22 @@ async function callLocalLLM(prompt: string, systemPrompt?: string): Promise<stri
   }
 }
 
+// ─── Genkit Flows (Phase 7: Tracing) ─────────────────────────────────────────
+
+export const llmInferenceFlow = ai.defineFlow(
+  {
+    name: 'llmInference',
+    inputSchema: z.object({
+      prompt: z.string(),
+      systemPrompt: z.string().optional()
+    }),
+    outputSchema: z.string()
+  },
+  async (input) => {
+    return await callLocalLLM(input.prompt, input.systemPrompt);
+  }
+);
+
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
 export function setupRoutes(app: Express) {
@@ -130,9 +148,17 @@ export function setupRoutes(app: Express) {
   // LLM inference (Ollama / LM Studio — no Gemini)
   app.post('/api/brain-link', async (req, res) => {
     try {
-      const { prompt, context, systemPrompt } = req.body;
+      const schema = z.object({
+        prompt: z.string().min(1, 'Prompt is required'),
+        context: z.string().optional(),
+        systemPrompt: z.string().optional()
+      });
+      const { prompt, context, systemPrompt } = schema.parse(req.body);
       const fullPrompt = context ? `${prompt}\n\nContext: ${context}` : prompt;
-      const text = await callLocalLLM(fullPrompt, systemPrompt);
+      
+      // Execute through Genkit flow instead of raw function to generate tracing data
+      const text = await llmInferenceFlow({ prompt: fullPrompt, systemPrompt });
+      
       res.json({ text });
     } catch (error: any) {
       console.error('[brain-link] Error:', error.message);
@@ -200,7 +226,11 @@ export function setupRoutes(app: Express) {
 
   app.post('/api/drive/folders', async (req, res) => {
     try {
-      const { name, parentId } = req.body;
+      const schema = z.object({
+        name: z.string().min(1, 'Name is required'),
+        parentId: z.string().optional()
+      });
+      const { name, parentId } = schema.parse(req.body);
       const auth = getGoogleAuth(driveConfig.scopes);
       const drive = google.drive({ version: 'v3', auth });
       const folder = await drive.files.create({
@@ -220,7 +250,13 @@ export function setupRoutes(app: Express) {
 
   app.post('/api/drive/files', async (req, res) => {
     try {
-      const { name, content, mimeType, parentId } = req.body;
+      const schema = z.object({
+        name: z.string().min(1, 'Name is required'),
+        content: z.string().optional(),
+        mimeType: z.string().optional(),
+        parentId: z.string().optional()
+      });
+      const { name, content, mimeType, parentId } = schema.parse(req.body);
       const auth = getGoogleAuth(driveConfig.scopes);
       const drive = google.drive({ version: 'v3', auth });
       const file = await drive.files.create({
@@ -275,7 +311,10 @@ export function setupRoutes(app: Express) {
 
   app.post('/api/memory/ops', async (req, res) => {
     try {
-      const { content } = req.body;
+      const schema = z.object({
+        content: z.string()
+      });
+      const { content } = schema.parse(req.body);
       let fileId = resolveOpsFileId();
       const auth = getGoogleAuth(['https://www.googleapis.com/auth/drive.file']);
       const drive = google.drive({ version: 'v3', auth });

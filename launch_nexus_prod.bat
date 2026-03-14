@@ -10,33 +10,32 @@ echo   N E X U S   L U X R I G   C O M M A N D   C E N T E R
 echo ========================================================
 echo.
 
-if exist "webapp" (
-    cd webapp
+if exist "app" (
+    cd app
 ) else (
-    echo [ERROR] 'webapp' directory not found!
+    echo [ERROR] 'app' directory not found!
     pause
     exit /b
 )
 
 :: Check if build folder exists
-if not exist ".next" (
+if not exist "dist" (
     echo [WARNING] No build found. Running setup first...
     cd ..
     call setup_luxrig.bat
-    cd webapp
+    cd app
 )
 
 echo.
 echo [Nexus] Launching Production Server...
 echo.
-echo  - Port:    3002
+echo  - Port:    3001
 echo  - Status:  ONLINE
 echo.
 echo Press Ctrl+C to stop.
 echo.
 
-:: Run start command with port 3002, accessible to network
-call npm start -- -p 3002 --hostname 0.0.0.0
+call npm run preview
 
 echo.
 echo [SERVER STOPPED]

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { usePortfolio } from '@/contexts/labs/smartfolio/PortfolioContext';
 import { ACCOUNTS, type AccountId, LOGO_MAPPING } from '@/lib/smartfolio/store/portfolio';
 import { TRADE_FEE_PERCENT } from '@/lib/smartfolio/store/strategy';
@@ -80,12 +80,10 @@ export function SmartFolioRisk() {
 
     const { assets: simulatedAssets, totalValue } = simulatedData;
     const coins = simulatedAssets.filter(a => a.symbol !== 'USD');
-    const cashAsset = simulatedAssets.find(a => a.symbol === 'USD');
 
     // ─── Rebalance Logic (Smart) ───
     const rebalanceSuggestions = useMemo(() => {
         return coins.map(a => {
-            const range = activeStrategy.targets[a.symbol.toLowerCase() as 'sui' | 'alts'] || activeStrategy.targets.alts; // fallback
             // Note: Strategy targets are complex, simplified here to use asset-level targetAllocation which comes from portfolio.ts
             // We use the asset's targetAllocation as the source of truth for the dashboard to match the bar charts.
 
@@ -241,7 +239,6 @@ export function SmartFolioRisk() {
                             {rebalanceSuggestions.map(a => {
                                 const isTrim = a.action === 'TRIM';
                                 const isCovered = a.status === 'COVERED';
-                                const colorClass = isTrim ? 'rose' : 'emerald';
 
                                 return (
                                     <div key={a.symbol} className={`p-4 rounded-xl border transition-all ${isTrim ? 'bg-rose-500/5 border-rose-500/20' : 'bg-emerald-500/5 border-emerald-500/20'} ${isCovered ? 'opacity-60 grayscale-[0.5]' : ''}`}>

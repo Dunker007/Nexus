@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import { PrismaClient } from '@prisma/client';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -6,6 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '..', 'nexus.db');
 
 export const db = new Database(DB_PATH);
+export const prisma = new PrismaClient();
 
 // Enable WAL mode for better concurrent performance
 db.pragma('journal_mode = WAL');

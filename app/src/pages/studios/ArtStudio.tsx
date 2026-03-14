@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Image as ImageIcon, Download, Wand2, Settings, Layers, Maximize } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import PageLayout, { PageHeader, StatPill } from '../../components/PageLayout';
 
 // Mock styles
 const styles = [
@@ -47,38 +47,27 @@ export function ArtStudio() {
     };
 
     return (
-        <div className="flex-1 overflow-y-auto w-full custom-scrollbar bg-[#050508] relative text-white">
-            {/* Background Gradients */}
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-purple-900/10 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-pink-900/5 rounded-full blur-[120px]"></div>
-            </div>
-
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-8 z-10 relative">
-                {/* Header */}
-                <div className="flex items-center gap-2 mb-8 text-xs font-bold uppercase tracking-widest text-purple-400">
-                    <Link to="/studios" className="hover:text-purple-300 transition-colors">Studios</Link>
-                    <span className="opacity-30">/</span>
-                    <span className="text-white/40">Art</span>
-                </div>
+        <PageLayout color="purple">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+                <PageHeader
+                    title="Art Studio"
+                    subtitle="AI IMAGE GENERATION • STYLES • PROJECT LIBRARY"
+                    icon={<ImageIcon size={24} className="text-purple-400" />}
+                    color="purple"
+                    actions={
+                        <StatPill label={isGenerating ? 'Generating...' : `${generatedImages.length} Images`} color={isGenerating ? 'purple' : 'cyan'} pulse={isGenerating} />
+                    }
+                />
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* Controls Sidebar */}
                     <div className="lg:col-span-4 space-y-6">
                         <motion.div
-                            className="bg-[#12121a] border border-white/5 p-6 rounded-2xl shadow-xl relative overflow-hidden"
+                            className="glass-card border-white/5 relative overflow-hidden"
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                            
-                            <h1 className="text-2xl font-bold mb-2 flex items-center gap-3 relative z-10">
-                                <ImageIcon className="text-purple-500" size={24} />
-                                Art Studio
-                            </h1>
-                            <p className="text-white/40 text-xs mb-8 relative z-10 font-medium">
-                                Create stunning visuals with AI.
-                            </p>
 
                             <div className="space-y-6 relative z-10">
                                 {/* Project Selector */}
@@ -174,7 +163,7 @@ export function ArtStudio() {
                     <div className="lg:col-span-8">
                         {generatedImages.length === 0 && !isGenerating ? (
                             <motion.div
-                                className="h-full min-h-[600px] bg-[#12121a] border border-white/5 rounded-2xl flex flex-col items-center justify-center text-white/20 shadow-inner"
+                                className="h-full min-h-[600px] glass-card border-white/5 flex flex-col items-center justify-center text-white/20"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                             >
@@ -189,7 +178,7 @@ export function ArtStudio() {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {isGenerating && (
-                                    <div className="aspect-square bg-[#12121a] border border-purple-500/20 rounded-2xl flex flex-col items-center justify-center animate-pulse">
+                                    <div className="aspect-square glass-card border-purple-500/20 flex flex-col items-center justify-center animate-pulse">
                                         <div className="w-12 h-12 border-2 border-purple-500/20 border-t-purple-500 rounded-full animate-spin mb-4"></div>
                                         <p className="text-purple-400/60 text-[10px] font-bold uppercase tracking-widest">Generating Visual...</p>
                                     </div>
@@ -199,7 +188,7 @@ export function ArtStudio() {
                                         key={img.id}
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
-                                        className="group relative aspect-square rounded-2xl overflow-hidden bg-[#12121a] border border-white/5 shadow-2xl"
+                                        className="group relative aspect-square rounded-2xl overflow-hidden glass-card border-white/5 shadow-2xl"
                                     >
                                         <img
                                             src={img.url}
@@ -244,7 +233,7 @@ export function ArtStudio() {
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        className="bg-[#12121a] border border-white/10 max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-2"
+                        className="glass-card border-white/10 max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-2"
                     >
                         <div className="aspect-square overflow-hidden bg-black">
                             <img src={refineImage.url} className="w-full h-full object-cover" />
@@ -285,6 +274,6 @@ export function ArtStudio() {
                     </motion.div>
                 </div>
             )}
-        </div>
+        </PageLayout>
     );
 }

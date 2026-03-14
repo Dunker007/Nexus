@@ -1,170 +1,182 @@
 import { motion } from 'motion/react';
-import { Settings2, Monitor, Database, Shield, Link2, Bell } from 'lucide-react';
+import { Settings2, Monitor, Database, Shield, Link2, Bell, Clock, Cpu, HardDrive } from 'lucide-react';
 import { useToast } from '../contexts/ToastContext';
+import PageLayout, { PageHeader, StatPill } from '../components/PageLayout';
+import { useState } from 'react';
 
 export function Settings() {
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('general');
+
+  const TABS = [
+    { id: 'general', label: 'General', icon: Monitor },
+    { id: 'ai', label: 'Local Models', icon: Database },
+    { id: 'privacy', label: 'Privacy', icon: Shield },
+    { id: 'connections', label: 'Connections', icon: Link2 },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+  ];
+
   return (
-    <div className="relative min-h-full bg-[#07070a] text-gray-100 overflow-hidden bg-mesh-purple">
-      {/* Background Ambience */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute top-1/4 -right-20 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full" />
-          <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] rounded-full" />
-      </div>
-
-      <div className="relative z-10 p-8 md:p-12 max-w-6xl mx-auto h-full">
-        {/* Header */}
-        <div className="mb-12">
-          <motion.h1 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-4xl font-black flex items-center gap-4 text-white mb-3 tracking-tight"
-          >
-            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shadow-lg shadow-purple-500/5">
-                <Settings2 className="text-purple-400 w-6 h-6" />
+    <PageLayout color="purple" noPadding>
+      <div className="max-w-7xl mx-auto px-6 py-10 pb-32">
+        <PageHeader
+          title="Kernel Settings"
+          subtitle="CONFIGURATION ENGINE • DLX STUDIOS LOCAL v4.2"
+          icon={<Settings2 size={24} className="text-purple-400" />}
+          actions={
+            <div className="flex items-center gap-3">
+              <StatPill label="SYSTEM_AUTH_OK" color="green" />
+              <StatPill label="KERN_v4.28" />
             </div>
-            <span>KERNEL <span className="text-gradient-purple">SETTINGS</span></span>
-          </motion.h1>
-          <motion.p 
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             transition={{ delay: 0.1 }}
-             className="text-white/30 text-xs font-black uppercase tracking-[0.3em] ml-16"
-          >
-             Configuration Engine • DLX Studios Local v4.2
-          </motion.p>
-        </div>
+          }
+        />
 
-        <div className="flex flex-col lg:flex-row gap-10 items-start">
-          {/* Side Nav */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="w-full lg:w-72 shrink-0 glass-card p-4 space-y-2 border-white/5"
-          >
-            {[
-              { id: 'general', label: 'General', icon: Monitor, active: true },
-              { id: 'ai', label: 'Local Models', icon: Database },
-              { id: 'privacy', label: 'Privacy', icon: Shield },
-              { id: 'connections', label: 'Connections', icon: Link2 },
-              { id: 'notifications', label: 'Notifications', icon: Bell },
-            ].map((tab) => (
-              <motion.button 
-                whileHover={{ x: 4 }}
-                whileTap={{ scale: 0.98 }}
-                key={tab.id} 
-                className={`w-full flex items-center justify-between px-5 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                tab.active ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-lg' : 'text-white/30 border border-transparent hover:bg-white/[0.02] hover:text-white/60'
-              }`}
-            >
-                <div className="flex items-center gap-4">
-                    <tab.icon className={`w-4 h-4 ${tab.active ? 'text-purple-400' : 'text-white/20'}`} />
-                    {tab.label}
-                </div>
-                {tab.active && <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.6)]" />}
-              </motion.button>
-            ))}
-          </motion.div>
+        <div className="grid lg:grid-cols-12 gap-10 items-start mt-4">
+          
+          {/* Sidebar Navigation */}
+          <div className="lg:col-span-3 space-y-6">
+            <div className="glass-card p-4 border-white/5 bg-white/[0.01]">
+              <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-6 ml-4">Sub-Systems</h3>
+              <div className="space-y-1">
+                {TABS.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`w-full flex items-center justify-between px-5 py-4 rounded-xl transition-all border ${
+                      activeTab === tab.id 
+                        ? 'bg-purple-500/10 border-purple-500/30 text-white shadow-xl shadow-purple-950/20' 
+                        : 'text-white/30 border-transparent hover:bg-white/[0.02] hover:text-white/60'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <tab.icon size={16} className={activeTab === tab.id ? 'text-purple-400' : 'text-white/10'} />
+                      <span className="text-[11px] font-black uppercase tracking-widest">{tab.label}</span>
+                    </div>
+                    {activeTab === tab.id && <div className="w-1 h-3 bg-purple-500 rounded-full" />}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          {/* Main Content */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex-1 w-full"
-          >
-            <div className="glass-card border-white/5 shadow-2xl overflow-hidden relative">
-              <div className="p-8 md:p-10">
-                <div className="flex items-center gap-3 mb-10 pb-6 border-b border-white/5">
-                    <div className="w-1.5 h-6 bg-purple-500 rounded-full" />
-                    <h2 className="text-xl font-black text-white uppercase tracking-wider">General Preferences</h2>
+            <div className="glass-card p-6 border-white/5 bg-gradient-to-br from-purple-500/[0.02] to-transparent">
+               <h4 className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-4">Hardware Telemetry</h4>
+               <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                     <div className="flex items-center gap-3 text-white/40">
+                        <Cpu size={12} />
+                        <span className="text-[10px] font-black uppercase tracking-tight">Processor</span>
+                     </div>
+                     <span className="text-[10px] font-black text-purple-400">READY</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                     <div className="flex items-center gap-3 text-white/40">
+                        <HardDrive size={12} />
+                        <span className="text-[10px] font-black uppercase tracking-tight">Storage</span>
+                     </div>
+                     <span className="text-[10px] font-black text-cyan-400">OK</span>
+                  </div>
+               </div>
+            </div>
+          </div>
+
+          {/* Main Configuration Workspace */}
+          <div className="lg:col-span-9">
+            <div className="glass-card border-white/5 bg-white/[0.01] overflow-hidden min-h-[600px] flex flex-col">
+              <div className="p-10 flex-1">
+                <div className="flex items-center gap-4 mb-12 pb-6 border-b border-white/5">
+                   <div className="w-1 h-6 bg-purple-500 rounded-full" />
+                   <h2 className="text-xl font-black text-white uppercase tracking-tighter">System Parameters</h2>
                 </div>
                 
-                <div className="space-y-12">
+                <div className="space-y-12 max-w-3xl">
+                  {/* Theme Section */}
                   <div className="group">
-                    <label className="flex items-center justify-between cursor-pointer">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="space-y-1">
-                        <div className="text-sm font-black text-white/80 uppercase tracking-widest group-hover:text-white transition-colors">Interface Theme Matrix</div>
-                        <div className="text-[10px] text-white/20 font-black uppercase tracking-widest">Nexus OS defaults to native OLED/Dark optimization</div>
+                        <div className="text-xs font-black text-white uppercase tracking-widest group-hover:text-purple-400 transition-colors">Interface Matrix Optimization</div>
+                        <p className="text-[10px] text-white/20 font-black uppercase tracking-widest leading-relaxed">Nexus OS defaults to native OLED/Dark glass mode for maximum neural focus</p>
                       </div>
-                      <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black text-white/30 tracking-widest uppercase">
-                        Locked to Kernel
+                      <div className="px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black text-white/20 tracking-widest uppercase">
+                        KERNEL_LOCKED
                       </div>
-                    </label>
+                    </div>
                   </div>
 
-                  <div className="pt-8 border-t border-white/5">
-                    <label className="flex items-center justify-between cursor-pointer mb-8">
-                      <div className="space-y-1">
-                        <div className="text-sm font-black text-white/80 uppercase tracking-widest">Tailscale Neural Mesh</div>
-                        <div className="text-[10px] text-white/20 font-black uppercase tracking-widest">Secure peer-to-peer remote workstation uplink</div>
-                      </div>
-                      <div className="w-14 h-7 bg-purple-600/20 border border-purple-500/30 rounded-full relative shadow-inner">
-                        <div className="absolute right-1.5 top-1.5 w-4 h-4 bg-purple-400 rounded-full shadow-[0_0_12px_rgba(168,85,247,0.8)]" />
-                      </div>
-                    </label>
+                  {/* Mesh Section */}
+                  <div className="pt-10 border-t border-white/5">
+                    <div className="flex items-center justify-between mb-8">
+                       <div className="space-y-1">
+                         <div className="text-xs font-black text-white uppercase tracking-widest">Neural Mesh (Tailscale)</div>
+                         <p className="text-[10px] text-white/20 font-black uppercase tracking-widest">Secure peer-to-peer encrypted workstation uplink</p>
+                       </div>
+                       <motion.div 
+                          whileHover={{ scale: 1.05 }}
+                          className="w-14 h-7 bg-purple-500/20 border border-purple-500/40 rounded-full relative cursor-pointer"
+                       >
+                          <div className="absolute right-1 top-1 w-5 h-5 bg-purple-400 rounded-full shadow-[0_0_15px_rgba(168,85,247,0.6)]" />
+                       </motion.div>
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-5 bg-black/40 border border-white/5 rounded-2xl space-y-4 font-mono text-xs">
+                        <div className="p-6 bg-black/40 border border-white/5 rounded-2xl space-y-4 font-mono">
                            <div className="flex justify-between items-center pb-3 border-b border-white/5">
-                             <span className="text-white/20 font-black uppercase tracking-widest text-[9px]">Local Host</span>
-                             <span className="text-emerald-400 font-bold">3001 Secure</span>
+                             <span className="text-white/10 font-black uppercase tracking-widest text-[8px]">Network Node</span>
+                             <span className="text-emerald-400 text-[10px] font-black uppercase">Active_Link</span>
                            </div>
-                           <div className="flex justify-between items-center text-white/80 font-bold">
-                             <span>Native IP:</span>
-                             <span className="bg-white/5 px-2 py-1 rounded">127.0.0.1</span>
+                           <div className="flex justify-between items-center text-white/60">
+                             <span className="text-[10px] uppercase font-black tracking-widest">Host Vector</span>
+                             <span className="text-[11px] font-black px-2 py-1 rounded bg-white/5 text-white/80">3001</span>
                            </div>
                         </div>
 
-                        <div className="p-5 bg-black/40 border border-white/5 rounded-2xl space-y-4 font-mono text-xs">
+                        <div className="p-6 bg-black/40 border border-white/5 rounded-2xl space-y-4 font-mono">
                            <div className="flex justify-between items-center pb-3 border-b border-white/5">
-                             <span className="text-white/20 font-black uppercase tracking-widest text-[9px]">Mesh Access</span>
-                             <span className="text-cyan-400 font-bold">Active</span>
+                             <span className="text-white/10 font-black uppercase tracking-widest text-[8px]">Mesh Access</span>
+                             <span className="text-cyan-400 text-[10px] font-black uppercase">Synchronized</span>
                            </div>
-                           <div className="flex justify-between items-center text-white/80 font-bold">
-                             <span>Tail IP:</span>
-                             <span className="bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20">100.x.x.x</span>
+                           <div className="flex justify-between items-center text-white/60">
+                             <span className="text-[10px] uppercase font-black tracking-widest">Global IP</span>
+                             <span className="text-[11px] font-black px-2 py-1 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">100.X.X.X</span>
                            </div>
                         </div>
                     </div>
                   </div>
 
-                  <div className="pt-8 border-t border-white/5">
-                    <h3 className="text-sm font-black text-white/80 uppercase tracking-widest mb-6">Cloud Synapse Integration</h3>
-                    <div className="relative group overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="p-6 bg-blue-500/5 border border-blue-500/10 rounded-2xl relative z-10">
-                          <div className="flex items-center gap-4 mb-3">
-                            <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
-                            <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Neural Bridge Authenticated</span>
+                  {/* Cloud Access */}
+                  <div className="pt-10 border-t border-white/5">
+                    <h3 className="text-xs font-black text-white/40 uppercase tracking-widest mb-6">Cloud Synapse Integration</h3>
+                    <div className="relative group overflow-hidden bg-[#0d0d14] rounded-2xl border border-white/5">
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/[0.03] to-cyan-500/[0.03] opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                        <div className="p-8 relative z-10">
+                          <div className="flex items-center gap-4 mb-4">
+                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
+                            <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.3em]">Synapse Bridge: OK</span>
                           </div>
-                          <p className="text-[11px] text-white/40 font-medium leading-relaxed max-w-lg uppercase tracking-tight">
-                            Nexus is securely mapped to <span className="text-blue-300">LuxRig_Brain</span> via service account. Shared memory and daily ops are synchronized.
+                          <p className="text-[11px] text-white/30 font-black uppercase leading-loose tracking-widest max-w-xl">
+                            Local environment is securely mapped to <span className="text-purple-400">LuxRig_Brain</span>. 
+                            FileSystem and Drive sectors are synchronized under DLX Studios protocol.
                           </p>
                         </div>
                     </div>
                   </div>
                 </div>
-                
-                <div className="mt-12 pt-8 border-t border-white/5 flex justify-between items-center">
-                  <div className="text-[9px] font-black text-white/10 tracking-[0.5em] uppercase">
-                    System Auth v4.28.0
-                  </div>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => toast.success('Kernel profiles updated successfully')}
-                    className="px-8 py-3 bg-gradient-to-br from-purple-500 to-purple-700 hover:from-purple-400 hover:to-purple-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-xl shadow-purple-500/20"
-                  >
-                    Commit Changes
-                  </motion.button>
+              </div>
+
+              <div className="p-8 border-t border-white/5 bg-white/[0.01] flex justify-between items-center mt-auto">
+                <div className="flex items-center gap-2 text-[8px] font-black text-white/5 uppercase tracking-[0.6em]">
+                  <Clock size={10} /> Last Commit: {new Date().toLocaleTimeString()}
                 </div>
+                <button
+                  onClick={() => toast.success('Kernel profiles updated successfully')}
+                  className="px-10 py-4 bg-gradient-to-r from-purple-600 to-indigo-800 hover:brightness-110 text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl transition-all shadow-2xl shadow-purple-950/40"
+                >
+                  Confirm Changes
+                </button>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

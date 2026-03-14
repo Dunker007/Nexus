@@ -13,12 +13,10 @@ import {
   Panel,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Play, Plus, Save, Sparkles, Music, FileText, MessageSquare, CheckCircle } from 'lucide-react';
+import { Play, Plus, Save, Sparkles, Music, FileText, MessageSquare, CheckCircle, RefreshCw } from 'lucide-react';
 import { useToast } from '../contexts/ToastContext';
 import { ErrorBoundary } from '../components/ErrorBoundary';
-
-// Note: Custom nodes or edge definitions removed because we only use default types and
-// empty types objects trigger dev warnings in Strict Mode due to HMR reference changes.
+import PageLayout, { PageHeader, StatPill } from '../components/PageLayout';
 
 const initialNodes: Node[] = [
   {
@@ -27,13 +25,16 @@ const initialNodes: Node[] = [
     data: { label: '🎯 Start: Song Idea' },
     position: { x: 250, y: 50 },
     style: {
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      color: 'white',
-      border: '2px solid #667eea',
+      background: 'rgba(102, 126, 234, 0.1)',
+      color: '#667eea',
+      border: '1px solid rgba(102, 126, 234, 0.3)',
       borderRadius: '12px',
       padding: '12px 20px',
-      fontSize: '14px',
-      fontWeight: 'bold',
+      fontSize: '11px',
+      fontWeight: '900',
+      textTransform: 'uppercase',
+      letterSpacing: '0.1em',
+      backdropFilter: 'blur(10px)',
     },
   },
   {
@@ -41,12 +42,15 @@ const initialNodes: Node[] = [
     data: { label: '✍️ Lyricist Agent', description: 'Generates creative lyrics' },
     position: { x: 200, y: 150 },
     style: {
-      background: '#1a1a2e',
+      background: 'rgba(6, 182, 212, 0.05)',
       color: 'white',
-      border: '2px solid #06b6d4',
-      borderRadius: '12px',
+      border: '1px solid rgba(6, 182, 212, 0.2)',
+      borderRadius: '16px',
       padding: '16px',
       width: '200px',
+      fontSize: '10px',
+      fontWeight: 'bold',
+      backdropFilter: 'blur(10px)',
     },
   },
   {
@@ -54,12 +58,15 @@ const initialNodes: Node[] = [
     data: { label: '🎵 Composer Agent', description: 'Creates melodies & chords' },
     position: { x: 450, y: 150 },
     style: {
-      background: '#1a1a2e',
+      background: 'rgba(139, 92, 246, 0.05)',
       color: 'white',
-      border: '2px solid #8b5cf6',
-      borderRadius: '12px',
+      border: '1px solid rgba(139, 92, 246, 0.2)',
+      borderRadius: '16px',
       padding: '16px',
       width: '200px',
+      fontSize: '10px',
+      fontWeight: 'bold',
+      backdropFilter: 'blur(10px)',
     },
   },
   {
@@ -67,12 +74,15 @@ const initialNodes: Node[] = [
     data: { label: '🎭 Critic Agent', description: 'Reviews & provides feedback' },
     position: { x: 325, y: 280 },
     style: {
-      background: '#1a1a2e',
+      background: 'rgba(245, 158, 11, 0.05)',
       color: 'white',
-      border: '2px solid #f59e0b',
-      borderRadius: '12px',
+      border: '1px solid rgba(245, 158, 11, 0.2)',
+      borderRadius: '16px',
       padding: '16px',
       width: '200px',
+      fontSize: '10px',
+      fontWeight: 'bold',
+      backdropFilter: 'blur(10px)',
     },
   },
   {
@@ -80,12 +90,15 @@ const initialNodes: Node[] = [
     data: { label: '🎚️ Producer Agent', description: 'Final mixing & mastering' },
     position: { x: 325, y: 410 },
     style: {
-      background: '#1a1a2e',
+      background: 'rgba(16, 185, 129, 0.05)',
       color: 'white',
-      border: '2px solid #10b981',
-      borderRadius: '12px',
+      border: '1px solid rgba(16, 185, 129, 0.2)',
+      borderRadius: '16px',
       padding: '16px',
       width: '200px',
+      fontSize: '10px',
+      fontWeight: 'bold',
+      backdropFilter: 'blur(10px)',
     },
   },
   {
@@ -94,24 +107,27 @@ const initialNodes: Node[] = [
     data: { label: '🎉 Final Song' },
     position: { x: 350, y: 540 },
     style: {
-      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-      color: 'white',
-      border: '2px solid #10b981',
+      background: 'rgba(16, 185, 129, 0.1)',
+      color: '#10b981',
+      border: '1px solid rgba(16, 185, 129, 0.3)',
       borderRadius: '12px',
       padding: '12px 20px',
-      fontSize: '14px',
-      fontWeight: 'bold',
+      fontSize: '11px',
+      fontWeight: '900',
+      textTransform: 'uppercase',
+      letterSpacing: '0.1em',
+      backdropFilter: 'blur(10px)',
     },
   },
 ];
 
 const initialEdges: Edge[] = [
-  { id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: '#06b6d4' } },
-  { id: 'e1-3', source: '1', target: '3', animated: true, style: { stroke: '#8b5cf6' } },
-  { id: 'e2-4', source: '2', target: '4', animated: true, style: { stroke: '#f59e0b' } },
-  { id: 'e3-4', source: '3', target: '4', animated: true, style: { stroke: '#f59e0b' } },
-  { id: 'e4-5', source: '4', target: '5', animated: true, style: { stroke: '#10b981' } },
-  { id: 'e5-6', source: '5', target: '6', animated: true, style: { stroke: '#10b981' } },
+  { id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: 'rgba(6, 182, 212, 0.3)', strokeWidth: 1 } },
+  { id: 'e1-3', source: '1', target: '3', animated: true, style: { stroke: 'rgba(139, 92, 246, 0.3)', strokeWidth: 1 } },
+  { id: 'e2-4', source: '2', target: '4', animated: true, style: { stroke: 'rgba(245, 158, 11, 0.3)', strokeWidth: 1 } },
+  { id: 'e3-4', source: '3', target: '4', animated: true, style: { stroke: 'rgba(245, 158, 11, 0.3)', strokeWidth: 1 } },
+  { id: 'e4-5', source: '4', target: '5', animated: true, style: { stroke: 'rgba(16, 185, 129, 0.3)', strokeWidth: 1 } },
+  { id: 'e5-6', source: '5', target: '6', animated: true, style: { stroke: 'rgba(16, 185, 129, 0.3)', strokeWidth: 1 } },
 ];
 
 export function AgentFlow() {
@@ -121,191 +137,165 @@ export function AgentFlow() {
   const [isExecuting, setIsExecuting] = useState(false);
 
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge({ ...params, animated: true }, eds)),
+    (params: Connection) => setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: 'rgba(255,255,255,0.2)', strokeWidth: 1 } }, eds)),
     [setEdges]
   );
 
-  // Memoize default edge options to prevent re-creation on every render
   const defaultEdgeOptions = useMemo(() => ({
     animated: true,
-    style: { stroke: '#06b6d4', strokeWidth: 2 },
+    style: { stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 },
   }), []);
 
-  // Memoize node color function for MiniMap
   const nodeColor = useCallback((node: Node) => {
-    if (node.type === 'input') return '#667eea';
-    if (node.type === 'output') return '#10b981';
-    return '#06b6d4';
+    if (node.type === 'input') return 'rgba(102, 126, 234, 0.3)';
+    if (node.type === 'output') return 'rgba(16, 185, 129, 0.3)';
+    return 'rgba(255,255,255,0.05)';
   }, []);
 
-  // Memoize empty nodeTypes and edgeTypes to resolve React Flow warnings in Strict Mode
   const nodeTypes = useMemo(() => ({}), []);
   const edgeTypes = useMemo(() => ({}), []);
 
   const handleExecute = useCallback(async () => {
     setIsExecuting(true);
-    toast.info('Executing workflow...');
+    toast.info('Initiating Neural Sequence…');
 
-    // Simulate workflow execution
     setTimeout(() => {
       setIsExecuting(false);
-      toast.success('Workflow executed successfully!');
-    }, 2000);
+      toast.success('Sequence Successfully Terminated');
+    }, 2500);
   }, [toast]);
 
   const handleSave = useCallback(() => {
     const workflow = { nodes, edges };
     localStorage.setItem('agentflow-workflow', JSON.stringify(workflow));
-    toast.success('Workflow saved!');
+    toast.success('Workflow Matrix Cached');
   }, [nodes, edges, toast]);
 
   const addNode = useCallback((type: string) => {
     const newNode: Node = {
       id: `${Date.now()}`,
       data: { label: `New ${type} Node` },
-      position: { x: Math.random() * 400 + 100, y: Math.random() * 400 + 100 },
+      position: { x: 400, y: 300 },
       style: {
-        background: '#1a1a2e',
+        background: 'rgba(255, 255, 255, 0.02)',
         color: 'white',
-        border: '2px solid #06b6d4',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
         borderRadius: '12px',
         padding: '16px',
         width: '180px',
+        fontSize: '10px',
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
       },
     };
     setNodes((nds) => [...nds, newNode]);
-    toast.success(`Added ${type} node`);
+    toast.success(`Node ${type} Initialized`);
   }, [setNodes, toast]);
 
   return (
-    <ErrorBoundary>
-    <div className="flex-1 flex flex-col bg-[#0b0e11] text-white h-screen">
-      {/* Header */}
-      <div className="p-6 border-b border-white/10 bg-[#12121a]">
-        <div className="flex items-center justify-between max-w-[1800px] mx-auto">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3 mb-2">
-              <Sparkles className="text-purple-400" />
-              Agent Flow
-            </h1>
-            <p className="text-white/40 text-sm">Visual workflow builder for AI agent orchestration</p>
+    <PageLayout color="purple" noPadding>
+      <ErrorBoundary>
+        <div className="flex flex-col h-[calc(100vh-64px)] relative overflow-hidden bg-[var(--bg-void)]">
+          
+          {/* Tactical Header */}
+          <div className="px-8 py-6 border-b border-white/5 bg-black/40 backdrop-blur-xl relative z-30">
+            <PageHeader
+               title="Agent Flow"
+               subtitle="VISUAL WORKFLOW ORCHESTRATION"
+               icon={<Sparkles size={24} className="text-purple-400" />}
+               actions={
+                 <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => addNode('Generic')}
+                      className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all flex items-center gap-2"
+                    >
+                      <Plus size={14} /> New Node
+                    </button>
+                    <button 
+                      onClick={handleSave}
+                      className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all flex items-center gap-2"
+                    >
+                      <Save size={14} /> Cache Matrix
+                    </button>
+                    <button 
+                      onClick={handleExecute}
+                      disabled={isExecuting}
+                      className="px-6 py-2.5 rounded-xl bg-purple-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-purple-500 disabled:opacity-30 disabled:grayscale transition-all flex items-center gap-2 shadow-xl shadow-purple-500/20"
+                    >
+                      {isExecuting ? <RefreshCw size={14} className="animate-spin" /> : <Play size={14} />}
+                      {isExecuting ? 'TRANSMITTING' : 'INITIATE'}
+                    </button>
+                 </div>
+               }
+            />
           </div>
 
-          <div className="flex gap-2">
-            <button
-              onClick={() => addNode('Agent')}
-              className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-colors text-sm uppercase tracking-wider"
+          {/* Canvas Ecosystem */}
+          <div className="flex-1 relative w-full h-full bg-mesh-purple">
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
+              fitView
+              className="bg-[var(--bg-void)]"
+              defaultEdgeOptions={defaultEdgeOptions}
             >
-              <Plus size={16} />
-              Add Node
-            </button>
-            <button
-              onClick={handleSave}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors text-sm uppercase tracking-wider"
-            >
-              <Save size={16} />
-              Save
-            </button>
-            <button
-              onClick={handleExecute}
-              disabled={isExecuting}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-colors text-sm uppercase tracking-wider"
-            >
-              {isExecuting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Executing...
-                </>
-              ) : (
-                <>
-                  <Play size={16} />
-                  Execute
-                </>
-              )}
-            </button>
+              <Background color="#ffffff05" gap={20} />
+              <Controls className="!bg-black/60 !border-white/10 !rounded-xl !p-2 !backdrop-blur-xl" />
+              <MiniMap
+                className="!bg-black/60 !border-white/10 !rounded-xl !backdrop-blur-xl"
+                nodeColor={nodeColor}
+                maskColor="rgba(0,0,0,0.6)"
+              />
+
+              {/* Template Panel Overlay */}
+              <Panel position="top-left" className="m-6 p-6 glass-card border-white/5 bg-black/40 backdrop-blur-xl w-56 space-y-4">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-6">Neural Templates</h3>
+                <div className="space-y-2">
+                  {[
+                    { type: 'Lyricist', icon: FileText, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+                    { type: 'Composer', icon: Music, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+                    { type: 'Critic', icon: MessageSquare, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+                    { type: 'Producer', icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+                  ].map((t) => (
+                    <button
+                      key={t.type}
+                      onClick={() => addNode(t.type)}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/5 hover:border-white/20 transition-all text-white/40 hover:text-white"
+                    >
+                      <t.icon size={14} className={t.color} />
+                      <span className="text-[9px] font-black uppercase tracking-widest">{t.type}</span>
+                    </button>
+                  ))}
+                </div>
+              </Panel>
+
+              {/* Stats Panel Overlay */}
+              <Panel position="top-right" className="m-6 p-6 glass-card border-white/5 bg-black/40 backdrop-blur-xl w-56 space-y-4">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-6">Matrix Status</h3>
+                <div className="space-y-3">
+                   <div className="flex justify-between items-center">
+                     <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Nodes</span>
+                     <StatPill label={nodes.length.toString()} color="purple" />
+                   </div>
+                   <div className="flex justify-between items-center">
+                     <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Vector Trace</span>
+                     <StatPill label={edges.length.toString()} color="cyan" />
+                   </div>
+                   <div className="flex justify-between items-center">
+                     <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Lifecycle</span>
+                     <StatPill label={isExecuting ? 'SEQ_RUN' : 'SIGNAL_OK'} color={isExecuting ? 'amber' : 'green'} pulse={isExecuting} />
+                   </div>
+                </div>
+              </Panel>
+            </ReactFlow>
           </div>
         </div>
-      </div>
-
-      {/* React Flow Canvas */}
-      <div className="flex-1 relative w-full h-full">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          fitView
-          className="bg-[#0b0e11]"
-          defaultEdgeOptions={defaultEdgeOptions}
-        >
-          <Background color="#ffffff10" gap={16} />
-          <Controls className="bg-[#1a1a2e] border border-white/10 rounded-lg" />
-          <MiniMap
-            className="bg-[#1a1a2e] border border-white/10 rounded-lg"
-            nodeColor={nodeColor}
-          />
-
-          {/* Agent Templates Panel */}
-          <Panel position="top-left" className="bg-[#1a1a2e] border border-white/10 rounded-xl p-4 m-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-white/80 mb-3">Agent Templates</h3>
-            <div className="space-y-2">
-              <button
-                onClick={() => addNode('Lyricist')}
-                className="w-full flex items-center gap-2 px-3 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 rounded-lg text-xs font-bold uppercase tracking-wider text-cyan-400 transition-colors"
-              >
-                <FileText size={14} />
-                Lyricist
-              </button>
-              <button
-                onClick={() => addNode('Composer')}
-                className="w-full flex items-center gap-2 px-3 py-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 rounded-lg text-xs font-bold uppercase tracking-wider text-purple-400 transition-colors"
-              >
-                <Music size={14} />
-                Composer
-              </button>
-              <button
-                onClick={() => addNode('Critic')}
-                className="w-full flex items-center gap-2 px-3 py-2 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 rounded-lg text-xs font-bold uppercase tracking-wider text-orange-400 transition-colors"
-              >
-                <MessageSquare size={14} />
-                Critic
-              </button>
-              <button
-                onClick={() => addNode('Producer')}
-                className="w-full flex items-center gap-2 px-3 py-2 bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 rounded-lg text-xs font-bold uppercase tracking-wider text-green-400 transition-colors"
-              >
-                <CheckCircle size={14} />
-                Producer
-              </button>
-            </div>
-          </Panel>
-
-          {/* Workflow Info Panel */}
-          <Panel position="top-right" className="bg-[#1a1a2e] border border-white/10 rounded-xl p-4 m-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-white/80 mb-3">Workflow Stats</h3>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between gap-4">
-                <span className="text-white/50">Nodes:</span>
-                <span className="font-bold text-cyan-400">{nodes.length}</span>
-              </div>
-              <div className="flex justify-between gap-4">
-                <span className="text-white/50">Connections:</span>
-                <span className="font-bold text-purple-400">{edges.length}</span>
-              </div>
-              <div className="flex justify-between gap-4">
-                <span className="text-white/50">Status:</span>
-                <span className={`font-bold ${isExecuting ? 'text-orange-400' : 'text-emerald-400'}`}>
-                  {isExecuting ? 'Running' : 'Ready'}
-                </span>
-              </div>
-            </div>
-          </Panel>
-        </ReactFlow>
-      </div>
-    </div>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </PageLayout>
   );
 }

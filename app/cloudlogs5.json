@@ -1,0 +1,441 @@
+[
+  {
+    "insertId": "hiov5rdrhc0",
+    "logName": "projects/new-dlx/logs/cloudaudit.googleapis.com%2Fsystem_event",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "methodName": "/Services.ReplaceService",
+      "resourceName": "namespaces/new-dlx/revisions/nexus-cloud-00005-xjl",
+      "response": {
+        "@type": "type.googleapis.com/google.cloud.run.v1.Revision",
+        "apiVersion": "serving.knative.dev/v1",
+        "kind": "Revision",
+        "metadata": {
+          "annotations": {
+            "autoscaling.knative.dev/maxScale": "20",
+            "run.googleapis.com/build-source-location": "{\"nexus-cloud-1\":\"gs://run-sources-new-dlx-us-central1/services/nexus-cloud/1773473803.933742-d9ad29e9dac3426ba8ad26d49b9184c0.zip#1773474491876539\"}",
+            "run.googleapis.com/client-name": "gcloud",
+            "run.googleapis.com/client-version": "560.0.0",
+            "run.googleapis.com/operation-id": "5086f86f-bd9d-4ae3-9bd9-63612141445f",
+            "run.googleapis.com/startup-cpu-boost": "true",
+            "serving.knative.dev/creator": "Dunker007@gmail.com"
+          },
+          "creationTimestamp": "2026-03-14T07:52:30.738130Z",
+          "generation": 1,
+          "labels": {
+            "client.knative.dev/nonce": "ksfqwilawq",
+            "cloud.googleapis.com/location": "us-central1",
+            "run.googleapis.com/startupProbeType": "Default",
+            "serving.knative.dev/configuration": "nexus-cloud",
+            "serving.knative.dev/configurationGeneration": "5",
+            "serving.knative.dev/route": "nexus-cloud",
+            "serving.knative.dev/service": "nexus-cloud",
+            "serving.knative.dev/serviceUid": "a1757e4f-1e17-437a-be96-b0634498351e"
+          },
+          "name": "nexus-cloud-00005-xjl",
+          "namespace": "50841896985",
+          "ownerReferences": [
+            {
+              "apiVersion": "serving.knative.dev/v1",
+              "blockOwnerDeletion": true,
+              "controller": true,
+              "kind": "Configuration",
+              "name": "nexus-cloud",
+              "uid": "b659c82f-ceb9-4023-b3ef-3e49402afb1e"
+            }
+          ],
+          "resourceVersion": "AAZM90b6y4U",
+          "selfLink": "/apis/serving.knative.dev/v1/namespaces/50841896985/revisions/nexus-cloud-00005-xjl",
+          "uid": "a15d9e50-19bd-4028-87a4-9ca86b92f18a"
+        },
+        "spec": {
+          "containerConcurrency": 80,
+          "containers": [
+            {
+              "image": "us-central1-docker.pkg.dev/new-dlx/cloud-run-source-deploy/nexus-cloud@sha256:cc8dfd1b16f42d6409047b6774879e7cb9e70711fa56df6cb2aa07973d5d0107",
+              "name": "nexus-cloud-1",
+              "ports": [
+                {
+                  "containerPort": 8080,
+                  "name": "http1"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              },
+              "startupProbe": {
+                "failureThreshold": 1,
+                "periodSeconds": 240,
+                "tcpSocket": {
+                  "port": 8080
+                },
+                "timeoutSeconds": 240
+              }
+            }
+          ],
+          "serviceAccountName": "50841896985-compute@developer.gserviceaccount.com",
+          "timeoutSeconds": 300
+        },
+        "status": {
+          "conditions": [
+            {
+              "lastTransitionTime": "2026-03-14T07:53:11.738245Z",
+              "message": "The user-provided container failed to start and listen on the port defined provided by the PORT=8080 environment variable within the allocated timeout. This can happen when the container port is misconfigured or if the timeout is too short. The health check timeout can be extended. Logs for this revision might contain more information.\n\nLogs URL: https://console.cloud.google.com/logs/viewer?project=new-dlx&resource=cloud_run_revision/service_name/nexus-cloud/revision_name/nexus-cloud-00005-xjl&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22nexus-cloud%22%0Aresource.labels.revision_name%3D%22nexus-cloud-00005-xjl%22 \nFor more troubleshooting guidance, see https://cloud.google.com/run/docs/troubleshooting#container-failed-to-start",
+              "reason": "HealthCheckContainerError",
+              "status": "False",
+              "type": "Ready"
+            },
+            {
+              "lastTransitionTime": "2026-03-14T07:53:11.738245Z",
+              "message": "The user-provided container failed to start and listen on the port defined provided by the PORT=8080 environment variable within the allocated timeout. This can happen when the container port is misconfigured or if the timeout is too short. The health check timeout can be extended. Logs for this revision might contain more information.\n\nLogs URL: https://console.cloud.google.com/logs/viewer?project=new-dlx&resource=cloud_run_revision/service_name/nexus-cloud/revision_name/nexus-cloud-00005-xjl&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22nexus-cloud%22%0Aresource.labels.revision_name%3D%22nexus-cloud-00005-xjl%22 \nFor more troubleshooting guidance, see https://cloud.google.com/run/docs/troubleshooting#container-failed-to-start",
+              "reason": "HealthCheckContainerError",
+              "status": "False",
+              "type": "ContainerHealthy"
+            },
+            {
+              "lastTransitionTime": "2026-03-14T07:52:51.910131Z",
+              "message": "Container image import completed in 20.61s.",
+              "status": "True",
+              "type": "ContainerReady"
+            },
+            {
+              "lastTransitionTime": "2026-03-14T07:53:00.104515Z",
+              "message": "Provisioning imported containers completed in 8.19s. Checking container health. This will wait for up to 4m for the configured startup probe, including an initial delay of 0s.",
+              "status": "True",
+              "type": "ResourcesAvailable"
+            },
+            {
+              "lastTransitionTime": "2026-03-14T07:53:00.104515Z",
+              "message": "System will retry after 00:00 from lastTransitionTime for attempt 0.",
+              "reason": "ImmediateRetry",
+              "severity": "Info",
+              "status": "True",
+              "type": "Retry"
+            }
+          ],
+          "containerStatuses": [
+            {
+              "imageDigest": "us-central1-docker.pkg.dev/new-dlx/cloud-run-source-deploy/nexus-cloud@sha256:cc8dfd1b16f42d6409047b6774879e7cb9e70711fa56df6cb2aa07973d5d0107",
+              "name": "nexus-cloud-1"
+            }
+          ],
+          "imageDigest": "us-central1-docker.pkg.dev/new-dlx/cloud-run-source-deploy/nexus-cloud@sha256:cc8dfd1b16f42d6409047b6774879e7cb9e70711fa56df6cb2aa07973d5d0107",
+          "logUrl": "https://console.cloud.google.com/logs/viewer?project=new-dlx&resource=cloud_run_revision/service_name/nexus-cloud/revision_name/nexus-cloud-00005-xjl&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22nexus-cloud%22%0Aresource.labels.revision_name%3D%22nexus-cloud-00005-xjl%22",
+          "observedGeneration": 1
+        }
+      },
+      "serviceName": "run.googleapis.com",
+      "status": {
+        "code": 9,
+        "message": "Ready condition status changed to False for Revision nexus-cloud-00005-xjl with message: The user-provided container failed to start and listen on the port defined provided by the PORT=8080 environment variable within the allocated timeout. This can happen when the container port is misconfigured or if the timeout is too short. The health check timeout can be extended. Logs for this revision might contain more information.\n\nLogs URL: https://console.cloud.google.com/logs/viewer?project=new-dlx&resource=cloud_run_revision/service_name/nexus-cloud/revision_name/nexus-cloud-00005-xjl&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22nexus-cloud%22%0Aresource.labels.revision_name%3D%22nexus-cloud-00005-xjl%22 \nFor more troubleshooting guidance, see https://cloud.google.com/run/docs/troubleshooting#container-failed-to-start"
+      }
+    },
+    "receiveTimestamp": "2026-03-14T07:53:11.775599310Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "ERROR",
+    "timestamp": "2026-03-14T07:53:11.745832Z"
+  },
+  {
+    "insertId": "69b513e7000b453c21daa043",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fvarlog%2Fsystem",
+    "receiveTimestamp": "2026-03-14T07:53:11.778582289Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "ERROR",
+    "textPayload": "Default STARTUP TCP probe failed 1 time consecutively for container \"nexus-cloud-1\" on port 8080. The instance was not started.\nConnection failed with status CANCELLED.",
+    "timestamp": "2026-03-14T07:53:11.738620Z"
+  },
+  {
+    "insertId": "69b513e70006bf8488b8b23e",
+    "labels": {
+      "container_name": "nexus-cloud-1",
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fvarlog%2Fsystem",
+    "receiveTimestamp": "2026-03-14T07:53:11.447797520Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "WARNING",
+    "textPayload": "Container called exit(0).",
+    "timestamp": "2026-03-14T07:53:11.442124941Z"
+  },
+  {
+    "insertId": "69b513e70001e8b9b0993561",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-14T07:53:11.174696123Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "}",
+    "timestamp": "2026-03-14T07:53:11.125113Z"
+  },
+  {
+    "insertId": "69b513e70001e8b5a182c3c3",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-14T07:53:11.174696123Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "  originalPath: '*'",
+    "timestamp": "2026-03-14T07:53:11.125109Z"
+  },
+  {
+    "errorGroups": [
+      {
+        "id": "CIKCu_33xLrmTw"
+      }
+    ],
+    "insertId": "69b513e70001e8a37ef83640",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-14T07:53:11.174696123Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "ERROR",
+    "textPayload": "PathError [TypeError]: Missing parameter name at index 1: *; visit https://git.new/pathToRegexpError for info\n    at name (/usr/src/app/node_modules/path-to-regexp/src/index.ts:225:13)\n    at parse (/usr/src/app/node_modules/path-to-regexp/src/index.ts:242:62)\n    at pathToRegexp (/usr/src/app/node_modules/path-to-regexp/src/index.ts:480:54)\n    at Object.match (/usr/src/app/node_modules/path-to-regexp/src/index.ts:438:28)\n    at matcher (/usr/src/app/node_modules/router/lib/layer.js:86:23)\n    at new Layer (/usr/src/app/node_modules/router/lib/layer.js:93:62)\n    at Function.route (/usr/src/app/node_modules/router/index.js:428:17)\n    at Function.route (/usr/src/app/node_modules/express/lib/application.js:257:22)\n    at app.<computed> [as get] (/usr/src/app/node_modules/express/lib/application.js:478:22)\n    at startServer (/usr/src/app/server.ts:104:9) {",
+    "timestamp": "2026-03-14T07:53:11.125091Z"
+  },
+  {
+    "insertId": "69b513e70001b6b468bfd887",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-14T07:53:11.174696123Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "[DB] Missing Cloud SQL environment variables. Skipping auto-migration.",
+    "timestamp": "2026-03-14T07:53:11.112308Z"
+  },
+  {
+    "insertId": "69b513e70001b68411a12d5b",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-14T07:53:11.301767702Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "[DB] Running in Cloud deployment. Verifying remote Postgres schema...",
+    "timestamp": "2026-03-14T07:53:11.112260Z"
+  },
+  {
+    "insertId": "69b513e70001b5d06e7b928f",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-14T07:53:11.174696123Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "[GCP] Could not load secret GOOGLE_SERVICE_ACCOUNT_JSON: 7 PERMISSION_DENIED: Permission 'secretmanager.versions.access' denied for resource 'projects/new-dlx/secrets/GOOGLE_SERVICE_ACCOUNT_JSON/versions/latest' (or it may not exist).",
+    "timestamp": "2026-03-14T07:53:11.112080Z"
+  },
+  {
+    "insertId": "69b513e700002e9cef431ad1",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-14T07:53:11.174696123Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "[GCP] Could not load secret GOOGLE_REFRESH_TOKEN: 7 PERMISSION_DENIED: Permission 'secretmanager.versions.access' denied for resource 'projects/new-dlx/secrets/GOOGLE_REFRESH_TOKEN/versions/latest' (or it may not exist).",
+    "timestamp": "2026-03-14T07:53:11.011932Z"
+  },
+  {
+    "insertId": "69b513e6000de580ff6b24ff",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-14T07:53:11.174696123Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "[GCP] Could not load secret GOOGLE_CLIENT_SECRET: 7 PERMISSION_DENIED: Permission 'secretmanager.versions.access' denied for resource 'projects/new-dlx/secrets/GOOGLE_CLIENT_SECRET/versions/latest' (or it may not exist).",
+    "timestamp": "2026-03-14T07:53:10.910720Z"
+  },
+  {
+    "insertId": "69b513e6000cc02fd5f545af",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-14T07:53:10.840806525Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "[GCP] Could not load secret GOOGLE_CLIENT_ID: 7 PERMISSION_DENIED: Permission 'secretmanager.versions.access' denied for resource 'projects/new-dlx/secrets/GOOGLE_CLIENT_ID/versions/latest' (or it may not exist).",
+    "timestamp": "2026-03-14T07:53:10.835631Z"
+  },
+  {
+    "insertId": "69b513e60001bfcc8dae6488",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-14T07:53:10.303444981Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "[GCP] Loading secrets from Secret Manager...",
+    "timestamp": "2026-03-14T07:53:10.114636Z"
+  },
+  {
+    "insertId": "69b513e4000eb7029fe23c4b",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2026-03-14T07:53:08.969222756Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "[DB] SQLite connected: /usr/src/app/nexus.db",
+    "timestamp": "2026-03-14T07:53:08.964354Z"
+  },
+  {
+    "insertId": "69b513dc0002c4c2eb01a235",
+    "labels": {
+      "instanceId": "00da6cd2c4b627f22dc355948ec9f35955e04700f419117886aee1add749c488cfbd6bd88df20540237a897e313456b123e781edc8d96e61c399f4c056acb6e68f919a933dfffb22aafe1643075218",
+      "scaling_reason": "DEPLOYMENT_ROLLOUT"
+    },
+    "logName": "projects/new-dlx/logs/run.googleapis.com%2Fvarlog%2Fsystem",
+    "receiveTimestamp": "2026-03-14T07:53:00.187379548Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "nexus-cloud",
+        "location": "us-central1",
+        "project_id": "new-dlx",
+        "revision_name": "nexus-cloud-00005-xjl",
+        "service_name": "nexus-cloud"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "INFO",
+    "textPayload": "Starting new instance. Reason: DEPLOYMENT_ROLLOUT - Instance started due to traffic shifting between revisions due to deployment, traffic split adjustment, or deployment health check.",
+    "timestamp": "2026-03-14T07:53:00.181442Z"
+  }
+]

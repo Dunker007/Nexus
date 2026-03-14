@@ -1,16 +1,71 @@
 import 'dotenv/config';
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
+import { createServer } from 'http';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { setupRoutes } from './server/routes.js';
+import { loadSecrets, requireIAP } from './server/gcp.js';
+import { autoMigrateCloud } from './server/migrate-cloud.js';
+import { initSocket } from './server/socket.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const isDev = process.env.NODE_ENV !== 'production';
 
 async function startServer() {
+  // Phase 4: Secret Manager Initialization
+  await loadSecrets();
+  
+  // Phase 5: DB Cloud Migration
+  await autoMigrateCloud();
+
   const app = express();
+  
+  app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
+
+  const httpServer = createServer(app);
+  
+  // Phase 6: Initialize WebSockets
+  initSocket(httpServer);
+  
+  // Phase 3: Security & Hardening
+  app.use(helmet({
+    contentSecurityPolicy: false // Disable CSP locally so Vite HMR + Inline styles don't break
+  }));
+
+  const apiLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, 
+    max: 200, // 200 requests per minute to stop infinite loops
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests from this IP, please try again later.' }
+  });
+  app.use('/api/', apiLimiter);
+
+  // Phase 4: Google Identity-Aware Proxy Validation
+  app.use('/api/', requireIAP);
+
+  // Filter non-authorized traffic to secure the network binding
+  app.use((req, res, next) => {
+    const ip = req.socket.remoteAddress || '';
+    if (ip && !ip.includes('127.0.0.1') && !ip.includes('::1') && !ip.includes('100.') && !ip.includes('::ffff:127.') && !ip.includes('::ffff:100.')) {
+      if (isDev || !!process.env.K_SERVICE) {
+        // Log in dev or Cloud Run
+        console.warn(`[API] Unrecognized IP attempted access: ${ip}`);
+      } else {
+        return res.status(403).json({ error: 'Access denied: Network not authorized' });
+      }
+    }
+    next();
+  });
+
   app.use(express.json({ limit: '10mb' }));
 
   // Request logger — always logs method + path + status + duration
@@ -37,6 +92,7 @@ async function startServer() {
 
   if (isDev) {
     // Vite dev middleware (HMR, fast refresh, etc.)
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -45,10 +101,10 @@ async function startServer() {
   } else {
     const distPath = path.join(__dirname, 'dist');
     app.use(express.static(distPath));
-    app.get('*', (_req, res) => res.sendFile(path.join(distPath, 'index.html')));
+    app.get(/.*/, (_req, res) => res.sendFile(path.join(distPath, 'index.html')));
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  httpServer.listen(PORT, '0.0.0.0', () => {
     console.log(`\n🚀 Nexus running on http://localhost:${PORT}`);
     console.log(`   Network: http://0.0.0.0:${PORT}  (Tailscale-accessible)`);
     console.log(`   Mode: ${isDev ? 'development' : 'production'}\n`);

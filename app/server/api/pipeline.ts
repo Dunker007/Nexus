@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { db } from '../db.js';
+import { getIO } from '../socket.js';
 
 const router = Router();
 
@@ -41,6 +42,9 @@ router.post('/', (req, res) => {
     `).run(id, title, artist, genre, bpm, key, status, progress, notes);
 
     const track = db.prepare('SELECT * FROM pipeline_tracks WHERE id = ?').get(id);
+    
+    try { getIO().emit('pipeline_update', { type: 'create', track }); } catch(e) {}
+    
     res.json(track);
   } catch (error) {
     console.error('Pipeline create error:', error);
@@ -60,6 +64,9 @@ router.put('/:id', (req, res) => {
     `).run(title, artist, genre, bpm, key, status, progress, notes, req.params.id);
 
     const track = db.prepare('SELECT * FROM pipeline_tracks WHERE id = ?').get(req.params.id);
+    
+    try { getIO().emit('pipeline_update', { type: 'update', track }); } catch(e) {}
+    
     res.json(track);
   } catch (error) {
     console.error('Pipeline update error:', error);
@@ -71,6 +78,9 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   try {
     db.prepare('DELETE FROM pipeline_tracks WHERE id = ?').run(req.params.id);
+    
+    try { getIO().emit('pipeline_update', { type: 'delete', id: req.params.id }); } catch(e) {}
+
     res.json({ success: true });
   } catch (error) {
     console.error('Pipeline delete error:', error);

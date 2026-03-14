@@ -22,17 +22,17 @@ if %ERRORLEVEL% NEQ 0 (
 echo.
 echo [0/3] Configuring Environment...
 if exist "luxrig_params.env" (
-    copy /Y "luxrig_params.env" "webapp\.env"
+    copy /Y "luxrig_params.env" "app\.env"
     echo [OK] Applied LuxRig environment configuration.
 ) else (
     echo [WARNING] 'luxrig_params.env' not found. Using defaults.
 )
 
-if exist "webapp" (
-    cd webapp
-    echo [OK] Entering webapp directory...
+if exist "app" (
+    cd app
+    echo [OK] Entering app directory...
 ) else (
-    echo [ERROR] Could not find 'webapp' directory!
+    echo [ERROR] Could not find 'app' directory!
     pause
     exit /b
 )
@@ -43,14 +43,7 @@ call npm install
 if %ERRORLEVEL% NEQ 0 goto error
 
 echo.
-echo [2/3] Setting up Database...
-:: Verify schema validity first
-call npx prisma validate
-if %ERRORLEVEL% NEQ 0 (
-    echo [WARNING] Prisma schema validation failed. Attempting migrate anyway...
-)
-call npx prisma migrate deploy
-if %ERRORLEVEL% NEQ 0 goto error
+echo [2/3] Skipping Database (SQLite Native) ...
 
 echo.
 echo [3/3] Building Application...

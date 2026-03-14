@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useState } from 'react';
-import { LayoutGrid, Grid3X3, List } from 'lucide-react';
+import { LayoutGrid, Grid3X3, List, Sparkles } from 'lucide-react';
+import PageLayout, { PageHeader, StatPill } from '../components/PageLayout';
 
 interface Studio {
   id: string;
@@ -107,230 +108,210 @@ const studios: Studio[] = [
   }
 ];
 
-const getStatusBadge = (status: Studio['status']) => {
-  switch (status) {
-    case 'live':
-      return <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-bold uppercase tracking-wider border border-green-500/30">● Live</span>;
-    case 'beta':
-      return <span className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs font-bold uppercase tracking-wider border border-cyan-500/30">◐ Beta</span>;
-    case 'coming-soon':
-      return <span className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs font-bold uppercase tracking-wider border border-purple-500/30">◌ Coming Soon</span>;
-  }
-};
-
 export function Studios() {
   const [viewMode, setViewMode] = useState<'grid' | 'compact' | 'list'>('grid');
 
   return (
-    <div className="flex-1 overflow-y-auto w-full custom-scrollbar bg-[#0b0e11] relative text-gray-200">
-      {/* Background Effect */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[100px] opacity-50 mix-blend-screen" />
-          <div className="absolute top-1/2 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] opacity-50 mix-blend-screen" />
-      </div>
+    <PageLayout color="cyan" noPadding>
+      <div className="max-w-7xl mx-auto px-6 py-10 pb-32">
+        <PageHeader
+          title="AI Studios"
+          subtitle="CREATIVE COMMAND CENTER • NEURAL WORKSPACES"
+          icon={<Sparkles size={24} className="text-cyan-400" />}
+          actions={
+            <div className="flex items-center gap-4">
+               <div className="flex bg-white/5 border border-white/5 p-1 rounded-xl backdrop-blur-md">
+                <button 
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white/10 text-white' : 'text-white/20 hover:text-white/40'}`}
+                >
+                  <LayoutGrid size={16} />
+                </button>
+                <button 
+                  onClick={() => setViewMode('compact')}
+                  className={`p-2 rounded-lg transition-all ${viewMode === 'compact' ? 'bg-white/10 text-white' : 'text-white/20 hover:text-white/40'}`}
+                >
+                  <Grid3X3 size={16} />
+                </button>
+                <button 
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white/10 text-white' : 'text-white/20 hover:text-white/40'}`}
+                >
+                  <List size={16} />
+                </button>
+              </div>
+              <StatPill label={`${studios.length} Nodes`} color="cyan" />
+            </div>
+          }
+        />
 
-      <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto z-10 relative">
-          {/* Compact Command Header */}
-          <section className="py-6 border-b border-white/5 relative z-10">
+        {/* Tactical HUD Statistics */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+           {[
+             { label: 'Operational', val: studios.filter(s => s.status === 'live').length, color: 'text-emerald-400', bg: 'bg-emerald-500/5' },
+             { label: 'Evaluation', val: studios.filter(s => s.status === 'beta').length, color: 'text-cyan-400', bg: 'bg-cyan-500/5' },
+             { label: 'Researching', val: studios.filter(s => s.status === 'coming-soon').length, color: 'text-purple-400', bg: 'bg-purple-500/5' },
+             { label: 'Uplink', val: 'ACTIVE', color: 'text-white/40', bg: 'bg-white/5' },
+           ].map((stat, i) => (
+             <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className={`px-6 py-4 rounded-2xl border border-white/5 ${stat.bg} flex flex-col items-center justify-center text-center`}
+             >
+                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/10 mb-1">{stat.label}</span>
+                <span className={`text-xl font-black ${stat.color} tracking-tighter`}>{stat.val}</span>
+             </motion.div>
+           ))}
+        </div>
+
+        <AnimatePresence mode="wait">
+          {viewMode === 'grid' && (
             <motion.div
-              className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-              initial={{ opacity: 0, y: 10 }}
+              key="grid"
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6"
             >
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-xl border border-white/10">
-                  <span className="text-2xl">🎨</span>
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold flex items-center gap-2">
-                    AI <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Studios</span>
-                  </h1>
-                  <p className="text-xs text-gray-500">Your creative command center</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 flex-wrap">
-                <div className="flex items-center bg-white/5 rounded-lg p-0.5 border border-white/10">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${viewMode === 'grid' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-500 hover:text-white'}`}
+              {studios.map((studio, idx) => {
+                const isLocked = studio.status === 'coming-soon';
+                return (
+                  <motion.div
+                    key={studio.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: idx * 0.03 }}
                   >
-                    <LayoutGrid size={12} /> Grid
-                  </button>
-                  <button
-                    onClick={() => setViewMode('compact')}
-                    className={`px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${viewMode === 'compact' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-500 hover:text-white'}`}
-                  >
-                    <Grid3X3 size={12} /> Compact
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${viewMode === 'list' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-500 hover:text-white'}`}
-                  >
-                    <List size={12} /> List
-                  </button>
-                </div>
-
-                {/* Live Stats */}
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                  <span className="text-xs font-medium text-green-400">{studios.filter(s => s.status === 'live').length} Live</span>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
-                  <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full" />
-                  <span className="text-xs font-medium text-cyan-400">{studios.filter(s => s.status === 'beta').length} Beta</span>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                  <span className="w-1.5 h-1.5 bg-purple-400 rounded-full" />
-                  <span className="text-xs font-medium text-purple-400">{studios.filter(s => s.status === 'coming-soon').length} Coming</span>
-                </div>
-              </div>
+                    <Link
+                      to={isLocked ? '#' : studio.href}
+                      className={`block group h-full relative ${isLocked ? 'cursor-not-allowed opacity-40' : ''}`}
+                    >
+                      <div className="h-full glass-card border-white/5 bg-black/40 p-6 flex flex-col group-hover:border-cyan-500/40 transition-all group-hover:bg-cyan-500/[0.02] shadow-xl group-hover:shadow-cyan-900/10">
+                        <div className="flex items-start justify-between mb-6">
+                           <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                             {studio.icon}
+                           </div>
+                           <StatPill 
+                             label={studio.status.replace('-', ' ').toUpperCase()} 
+                             color={studio.status === 'live' ? 'green' : studio.status === 'beta' ? 'cyan' : 'purple'} 
+                           />
+                        </div>
+                        <h3 className="text-sm font-black text-white uppercase tracking-tight mb-2 group-hover:text-cyan-400 transition-colors">{studio.name}</h3>
+                        <p className="text-[10px] text-white/20 font-black leading-relaxed uppercase tracking-widest mb-6 flex-1">{studio.description}</p>
+                        <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
+                           {studio.features.slice(0, 2).map(f => (
+                             <span key={f} className="text-[8px] font-black uppercase tracking-widest text-white/10 bg-white/5 px-2 py-1 rounded-md">{f}</span>
+                           ))}
+                           {studio.features.length > 2 && (
+                             <span className="text-[8px] font-black uppercase tracking-widest text-white/5 px-2 py-1">+{studio.features.length - 2}</span>
+                           )}
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </motion.div>
-          </section>
+          )}
 
-          {/* Studios - View Mode Aware */}
-          <section className="mt-8">
-            {viewMode === 'grid' && (
-              <motion.div
-                className="grid md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6"
-                initial="hidden"
-                animate="visible"
-                variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
-              >
-                {studios.map((studio) => {
-                  const isDisabled = studio.status === 'coming-soon';
-                  return (
-                    <motion.div
-                      key={studio.id}
-                      variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
-                    >
-                      <Link
-                        to={isDisabled ? '#' : studio.href}
-                        className={`block h-full group ${isDisabled ? 'cursor-not-allowed opacity-60' : ''}`}
-                      >
-                        <div className="bg-[#12121a] border border-white/5 h-full min-h-[200px] p-5 rounded-xl transition-all group-hover:-translate-y-1 group-hover:border-cyan-500/30 flex flex-col">
-                          <div className="flex items-start gap-3 mb-3">
-                            <span className="text-3xl">{studio.icon}</span>
-                            {getStatusBadge(studio.status)}
-                          </div>
-                          <h2 className="text-lg font-bold mb-2 group-hover:text-cyan-400 transition-colors">{studio.name}</h2>
-                          <p className="text-gray-500 text-sm line-clamp-3 mb-4">{studio.description}</p>
-                          <div className="flex flex-wrap gap-2 mt-auto">
-                            {studio.features.slice(0, 2).map(f => (
-                              <span key={f} className="px-2 py-0.5 text-[10px] bg-white/5 rounded text-gray-500">{f}</span>
-                            ))}
-                            {studio.features.length > 2 && (
-                              <span className="px-2 py-0.5 text-[10px] bg-white/5 rounded text-gray-500">+{studio.features.length - 2}</span>
-                            )}
-                          </div>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
-            )}
-
-            {viewMode === 'compact' && (
-              <motion.div
-                className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2"
-                initial="hidden"
-                animate="visible"
-                variants={{ visible: { transition: { staggerChildren: 0.02 } } }}
-              >
-                {studios.map((studio) => {
-                  const isDisabled = studio.status === 'coming-soon';
-                  return (
-                    <motion.div
-                      key={studio.id}
-                      variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1 } }}
-                    >
-                      <Link
-                        to={isDisabled ? '#' : studio.href}
-                        className={`block group ${isDisabled ? 'cursor-not-allowed opacity-60' : ''}`}
-                      >
-                        <div className="bg-[#12121a] border border-white/5 p-3 rounded-xl text-center transition-all group-hover:scale-105 group-hover:border-cyan-500/30">
-                          <span className="text-2xl block mb-1">{studio.icon}</span>
-                          <h3 className="text-[10px] font-semibold truncate">{studio.name.replace('DLX ', '')}</h3>
-                          <span className={`text-[8px] ${studio.status === 'live' ? 'text-green-400' : studio.status === 'beta' ? 'text-cyan-400' : 'text-purple-400'}`}>
-                            {studio.status === 'live' ? '● Live' : studio.status === 'beta' ? '◐ Beta' : '◌ Soon'}
-                          </span>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
-            )}
-
-            {viewMode === 'list' && (
-              <motion.div
-                className="space-y-2"
-                initial="hidden"
-                animate="visible"
-                variants={{ visible: { transition: { staggerChildren: 0.02 } } }}
-              >
-                {studios.map((studio) => {
-                  const isDisabled = studio.status === 'coming-soon';
-                  return (
-                    <motion.div
-                      key={studio.id}
-                      variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}
-                    >
-                      <Link
-                        to={isDisabled ? '#' : studio.href}
-                        className={`block group ${isDisabled ? 'cursor-not-allowed opacity-60' : ''}`}
-                      >
-                        <div className="flex items-center gap-4 px-4 py-3 rounded-lg bg-[#12121a] border border-white/5 hover:bg-white/5 hover:border-cyan-500/30 transition-all">
-                          <span className="text-xl">{studio.icon}</span>
-                          <div className="w-40 flex-shrink-0">
-                            <h3 className="font-semibold text-sm">{studio.name}</h3>
-                          </div>
-                          <p className="flex-1 text-xs text-gray-500 truncate hidden md:block">{studio.description}</p>
-                          <div className="hidden lg:flex gap-1">
-                            {studio.features.slice(0, 3).map(f => (
-                              <span key={f} className="px-2 py-0.5 text-[10px] bg-white/5 rounded text-gray-500">{f}</span>
-                            ))}
-                          </div>
-                          {getStatusBadge(studio.status)}
-                        </div>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
-            )}
-          </section>
-
-          {/* Quick Stats */}
-          <section className="mt-16 pb-20">
+          {viewMode === 'compact' && (
             <motion.div
-              className="bg-gradient-to-br from-[#12121a] to-black/50 border border-white/5 rounded-2xl p-10"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              key="compact"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3"
             >
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                <div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">6</div>
-                  <div className="text-sm text-gray-500 uppercase tracking-widest">AI Studios</div>
-                </div>
-                <div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">2</div>
-                  <div className="text-sm text-gray-500 uppercase tracking-widest">Active Now</div>
-                </div>
-                <div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">12+</div>
-                  <div className="text-sm text-gray-500 uppercase tracking-widest">AI Agents</div>
-                </div>
-                <div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">∞</div>
-                  <div className="text-sm text-gray-500 uppercase tracking-widest">Possibilities</div>
-                </div>
-              </div>
+              {studios.map((studio) => (
+                <Link
+                  key={studio.id}
+                  to={studio.status === 'coming-soon' ? '#' : studio.href}
+                  className={`group relative ${studio.status === 'coming-soon' ? 'cursor-not-allowed opacity-30 shadow-none' : ''}`}
+                >
+                  <div className="glass-card p-4 border-white/5 bg-black/40 text-center flex flex-col items-center gap-3 hover:border-cyan-500/30 transition-all hover:bg-cyan-500/[0.05] hover:scale-105">
+                     <span className="text-3xl filter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{studio.icon}</span>
+                     <div className="min-w-0 w-full">
+                        <div className="text-[9px] font-black text-white uppercase tracking-tighter truncate">{studio.name.replace('DLX ', '')}</div>
+                        <div className={`text-[7px] font-black uppercase tracking-widest mt-1 ${studio.status === 'live' ? 'text-green-500' : studio.status === 'beta' ? 'text-cyan-500' : 'text-purple-500'}`}>
+                           {studio.status.replace('-', ' ')}
+                        </div>
+                     </div>
+                  </div>
+                </Link>
+              ))}
             </motion.div>
-          </section>
+          )}
+
+          {viewMode === 'list' && (
+            <motion.div
+              key="list"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="space-y-3"
+            >
+              {studios.map((studio) => (
+                <Link
+                  key={studio.id}
+                  to={studio.status === 'coming-soon' ? '#' : studio.href}
+                  className={`group block ${studio.status === 'coming-soon' ? 'cursor-not-allowed opacity-30' : ''}`}
+                >
+                  <div className="glass-card px-8 py-5 border-white/5 bg-black/40 hover:border-cyan-500/30 transition-all hover:bg-cyan-500/[0.02] flex items-center gap-8">
+                     <span className="text-2xl w-10 flex-shrink-0 group-hover:scale-110 transition-transform">{studio.icon}</span>
+                     <div className="w-48 flex-shrink-0">
+                        <h3 className="text-sm font-black text-white uppercase tracking-tight group-hover:text-cyan-400 transition-colors uppercase">{studio.name}</h3>
+                     </div>
+                     <p className="flex-1 text-[10px] text-white/20 font-black uppercase tracking-widest truncate">{studio.description}</p>
+                     <div className="hidden lg:flex items-center gap-3">
+                        {studio.features.slice(0, 3).map(f => (
+                          <span key={f} className="text-[8px] font-black uppercase tracking-widest text-white/10 px-3 py-1 bg-white/5 rounded-full">{f}</span>
+                        ))}
+                     </div>
+                     <div className="w-24 flex justify-end">
+                        <StatPill 
+                          label={studio.status.toUpperCase()} 
+                          color={studio.status === 'live' ? 'green' : studio.status === 'beta' ? 'cyan' : 'purple'} 
+                        />
+                     </div>
+                  </div>
+                </Link>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Global Capability Matrix Footer */}
+        <section className="mt-20">
+           <motion.div 
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ delay: 0.5 }}
+             className="glass-card p-10 border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent relative overflow-hidden"
+           >
+              <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
+              <div className="relative z-10 grid md:grid-cols-4 gap-12 text-center">
+                 <div>
+                    <div className="text-4xl font-black text-white mb-2 tracking-tighter">6</div>
+                    <div className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em]">Integrated Studios</div>
+                 </div>
+                 <div>
+                    <div className="text-4xl font-black text-cyan-400 mb-2 tracking-tighter">12+</div>
+                    <div className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em]">Active Agents</div>
+                 </div>
+                 <div>
+                    <div className="text-4xl font-black text-purple-400 mb-2 tracking-tighter">2</div>
+                    <div className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em]">Local Clusters</div>
+                 </div>
+                 <div>
+                    <div className="text-4xl font-black text-emerald-400 mb-2 tracking-tighter">∞</div>
+                    <div className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em]">Synthetic Nodes</div>
+                 </div>
+              </div>
+           </motion.div>
+        </section>
       </div>
-    </div>
+    </PageLayout>
   );
 }

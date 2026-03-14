@@ -11,7 +11,13 @@
       "Bash(git commit:*)",
       "Bash(npm install:*)",
       "Bash(netstat:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(git pull:*)",
+      "Bash(git checkout:*)",
+      "Bash(git fetch:*)",
+      "Bash(gh pr list:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(powershell:*)"
     ]
   }
 }

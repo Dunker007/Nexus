@@ -27,14 +27,14 @@ export function SmartFolioHub() {
     };
 
     return (
-        <div className="relative flex-1 overflow-y-auto h-full w-full custom-scrollbar bg-[#0b0e11] selection:bg-emerald-500/30">
-            {/* Atmospheric Background replacing PageBackground */}
+        <div className="relative flex-1 overflow-y-auto h-full w-full custom-scrollbar bg-[var(--bg-void)] selection:bg-emerald-500/30">
+            {/* Atmospheric Background */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-[120px] mix-blend-screen overflow-hidden" />
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] mix-blend-screen overflow-hidden" />
             </div>
 
-            <div className="max-w-[1600px] mx-auto px-6 py-8 space-y-8 text-gray-200 font-sans relative z-10 pb-16">
+            <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 text-gray-200 font-sans relative z-10 pb-16">
 
                 {/* ─── 1. Enhanced Header & Controls ─── */}
                 <motion.div
@@ -101,13 +101,13 @@ export function SmartFolioHub() {
                     {/* Top: Visualization (Allocation & Curve) */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[400px]">
                         {/* Allocation */}
-                        <motion.div variants={itemVariants} className="bg-[#0b0e11]/40 backdrop-blur-2xl rounded-3xl border border-white/5 p-6 shadow-2xl relative overflow-hidden group hover:border-blue-500/20 transition-all duration-500">
+                        <motion.div variants={itemVariants} className="glass-card bg-[var(--bg-void)]/40 p-6 hover:border-blue-500/20">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-blue-500/10 transition-all duration-1000"></div>
                             <AllocationChart />
                         </motion.div>
 
                         {/* Equity Curve */}
-                        <motion.div variants={itemVariants} className="bg-[#0b0e11]/40 backdrop-blur-2xl rounded-3xl border border-white/5 p-1 shadow-2xl relative overflow-hidden group hover:border-emerald-500/20 transition-all duration-500 flex flex-col">
+                        <motion.div variants={itemVariants} className="glass-card bg-[var(--bg-void)]/40 p-1 hover:border-emerald-500/20 flex flex-col">
                             <div className="absolute bottom-0 left-0 w-full h-32 bg-emerald-500/5 blur-[80px] pointer-events-none group-hover:bg-emerald-500/10 transition-all duration-1000"></div>
                             <EquityCurve accountId={activeAccount} currentValue={totalValue} />
                         </motion.div>

@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model agents {
+  id            String    @id
+  name          String
+  role          String
+  description   String?   @default("")
+  status        String?   @default("active")
+  system_prompt String?   @default("")
+  created_at    DateTime? @default(now())
+  updated_at    DateTime? @default(now())
+}
+
+model chat_history {
+  id        Int       @id @default(autoincrement())
+  role      String
+  content   String
+  timestamp DateTime? @default(now())
+  agent_id  String?
+}
+
+model news_items {
+  id         String    @id
+  title      String?
+  source     String?
+  type       String?
+  url        String?
+  summary    String?
+  bias       String?
+  time       String?
+  impact     String?
+  feed       String?   @default("nexus")
+  created_at DateTime? @default(now())
+}
+
+model pipeline_tracks {
+  id          String    @id
+  artist      String?
+  title       String?
+  status      String?   @default("in-progress")
+  progress    Int?      @default(0)
+  steps       String?   @default("[]")
+  target_date String?
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+  genre       String?
+  bpm         Int?
+  key         String?
+  notes       String?
+}
+
+model portfolio_accounts {
+  id                  String                @id
+  name                String?
+  description         String?
+  balance             Float?                @default(0)
+  cash_percent        Float?                @default(0)
+  pnl                 Float?                @default(0)
+  pnl_percent         Float?                @default(0)
+  portfolio_positions portfolio_positions[]
+}
+
+model portfolio_positions {
+  id                 String              @id
+  account_id         String?
+  asset              String?
+  allocation_percent Float?              @default(0)
+  pnl                Float?              @default(0)
+  value              Float?              @default(0)
+  units              Float?              @default(0)
+  spot_price         Float?              @default(0)
+  cost_basis         Float?              @default(0)
+  portfolio_accounts portfolio_accounts? @relation(fields: [account_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model songs {
+  id          String    @id
+  title       String?
+  artist      String?
+  genre       String?
+  mood        String?
+  lyrics      String?
+  suno_prompt String?
+  status      String?   @default("draft")
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+}
+
+model tasks {
+  id         String    @id
+  title      String
+  completed  Int?      @default(0)
+  category   String?   @default("general")
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+}
