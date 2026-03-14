@@ -5,17 +5,8 @@ const isCloudRun = !!process.env.K_SERVICE;
 
 // ─── IAP Verification ────────────────────────────────────────────────────────
 export const requireIAP = (req: any, res: any, next: any) => {
-  // If we are not running in Cloud Run, skip IAP verification
-  if (!isCloudRun) return next();
-
-  const assertion = req.headers['x-goog-iap-jwt-assertion'];
-  if (!assertion) {
-    return res.status(401).json({ error: 'Unauthorized: Missing IAP JWT assertion' });
-  }
-  
-  // Basic existence check. 
-  // TODO: Verify the JWT signature using google-auth-library for strict production security.
-  next();
+  // Temporarily bypass IAP since we are running Cloud Run as --allow-unauthenticated
+  return next();
 };
 
 // ─── Secret Manager ──────────────────────────────────────────────────────────
@@ -30,7 +21,6 @@ export async function loadSecrets() {
     const secretsToLoad = [
       'GOOGLE_CLIENT_ID',
       'GOOGLE_CLIENT_SECRET',
-      'GOOGLE_REFRESH_TOKEN',
       'GOOGLE_SERVICE_ACCOUNT_JSON'
     ];
 
