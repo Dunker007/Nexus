@@ -1,9 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MemoryProvider } from './contexts/MemoryContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { AuthProvider } from './contexts/AuthContext';
 import { PortfolioProvider } from './contexts/labs/smartfolio/PortfolioContext';
 import { ToastStack } from './components/ToastStack';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
+import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Chat } from './pages/Chat';
 import { Agents } from './pages/Agents';
@@ -37,12 +40,14 @@ export default function App() {
     <ThemeProvider>
       <VibeProvider>
         <ToastProvider>
-          <MemoryProvider>
-            <PortfolioProvider>
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Layout />}>
-                    <Route index element={<Navigate to="/dashboard" replace />} />
+          <AuthProvider>
+            <MemoryProvider>
+              <PortfolioProvider>
+                <BrowserRouter>
+                  <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                      <Route index element={<Navigate to="/dashboard" replace />} />
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="studios" element={<Studios />} />
                     <Route path="studios/dev" element={<DevStudio />} />
@@ -68,12 +73,13 @@ export default function App() {
                     <Route path="agentflow" element={<AgentFlow />} />
                     <Route path="drive" element={<Drive />} />
                     <Route path="settings" element={<Settings />} />
-                  </Route>
-                </Routes>
-                <ToastStack />
-              </BrowserRouter>
-            </PortfolioProvider>
-          </MemoryProvider>
+                    </Route>
+                  </Routes>
+                  <ToastStack />
+                </BrowserRouter>
+              </PortfolioProvider>
+            </MemoryProvider>
+          </AuthProvider>
         </ToastProvider>
       </VibeProvider>
     </ThemeProvider>

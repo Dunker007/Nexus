@@ -12,6 +12,7 @@ import { songsRouter } from './api/songs.js';
 import { tasksRouter } from './api/tasks.js';
 import { portfolioRouter } from './api/portfolio.js';
 import { pipelineRouter } from './api/pipeline.js';
+import { authRouter } from './auth.js';
 // ─── Google Auth Helper ───────────────────────────────────────────────────────
 
 const getGoogleAuth = (scopes: string[]) => {
@@ -371,6 +372,7 @@ export function setupRoutes(app: Express) {
 
   // ─── Agents ───────────────────────────────────────────────────────────────
 
+  app.use('/api/auth', authRouter);
   app.use('/api/agents', agentsRouter);
   app.use('/api/chat', chatRouter);
   app.use('/api/news', newsRouter);

@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, MessageSquare, Users, HardDrive, GitBranch, 
-  Music, Newspaper, Wifi, WifiOff, Settings, Beaker, 
-  UsersRound, Command as CommandIcon, Palette, Menu, X, Workflow 
+import {
+  LayoutDashboard, MessageSquare, Users, HardDrive, GitBranch,
+  Music, Newspaper, Wifi, WifiOff, Settings, Beaker,
+  UsersRound, Command as CommandIcon, Palette, Menu, X, Workflow, LogOut
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { useMemory } from '../contexts/MemoryContext';
 import { useVibe } from '../contexts/VibeContext';
@@ -33,9 +34,23 @@ const navItems = [
 export function Layout() {
   const { loading, error } = useMemory();
   const { mode, setMode } = useVibe();
+  const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+
+  // Close profile menu on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -123,15 +138,42 @@ export function Layout() {
                 <span>Ctrl+K</span>
             </button>
 
-            <div className="relative group p-0.5 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-white/10 hover:border-cyan-500/40 transition-all cursor-pointer">
+            <div ref={profileRef} className="relative">
+              <button
+                onClick={() => setShowProfileMenu(v => !v)}
+                className="relative p-0.5 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-white/10 hover:border-cyan-500/40 transition-all"
+              >
                 <div className="w-9 h-9 rounded-[14px] bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center font-black text-black overflow-hidden">
-                    <img 
-                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Dunker" 
-                        alt="Profile" 
-                        className="w-full h-full object-cover"
-                    />
+                  {user?.picture
+                    ? <img src={user.picture} alt={user.name} className="w-full h-full object-cover" />
+                    : <span className="text-sm">{(user?.name?.[0] || 'U').toUpperCase()}</span>
+                  }
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0a0a0f] shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+              </button>
+
+              <AnimatePresence>
+                {showProfileMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                    className="absolute right-0 top-12 w-52 bg-[var(--bg-deep)]/95 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-50"
+                  >
+                    <div className="px-4 py-3 border-b border-white/5">
+                      <div className="text-[9px] font-black text-white/60 uppercase tracking-widest truncate">{user?.name}</div>
+                      <div className="text-[8px] text-white/30 truncate mt-0.5">{user?.email}</div>
+                    </div>
+                    <button
+                      onClick={() => { setShowProfileMenu(false); logout(); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                    >
+                      <LogOut size={13} />
+                      Sign out
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Mobile Menu Toggle */}

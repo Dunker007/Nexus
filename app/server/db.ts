@@ -122,6 +122,9 @@ safeAlter(`ALTER TABLE news_items    ADD COLUMN created_at DATETIME DEFAULT CURR
 // Add agent_id to chat_history for per-agent thread scoping
 safeAlter(`ALTER TABLE chat_history  ADD COLUMN agent_id TEXT DEFAULT NULL`);
 
+// Add user_id to chat_history for multi-user scoping
+safeAlter(`ALTER TABLE chat_history  ADD COLUMN user_id TEXT DEFAULT NULL`);
+
 // Add pipeline track fields for enhanced tracking
 safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN genre TEXT DEFAULT NULL`);
 safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN bpm INTEGER DEFAULT NULL`);
@@ -141,6 +144,18 @@ db.exec(`
     positions  TEXT NOT NULL DEFAULT '[]',
     journal    TEXT NOT NULL DEFAULT '[]',
     last_sync  DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
+// ─── Users table (Google OAuth) ───────────────────────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id         TEXT PRIMARY KEY,
+    email      TEXT UNIQUE NOT NULL,
+    name       TEXT,
+    picture    TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_seen  DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 `);
 

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import type { AccountState } from '@/contexts/labs/smartfolio/PortfolioContext';
 import { TRADE_FEE_PERCENT } from '@/lib/smartfolio/store/strategy';
-import type { AccountId } from '@/lib/smartfolio/store/portfolio';
+import type { AccountId, JournalEntry } from '@/lib/smartfolio/store/portfolio';
 
 interface UseTradeExecutionProps {
     activeAccount: AccountId;
@@ -71,11 +71,11 @@ export function useTradeExecution({ activeAccount, accountsState, updateActive }
         }));
     }, [updateActive]);
 
-    const addJournalEntry = useCallback((entry: JournalEntry & { silent?: boolean }) => {
-        const { silent, ...entryData } = entry;
-        const newEntry = {
-            id: entry.id || Date.now().toString(36),
-            timestamp: entry.timestamp || new Date().toISOString(),
+    const addJournalEntry = useCallback((entry: Omit<JournalEntry, 'id' | 'timestamp'> & { id?: string; timestamp?: string; silent?: boolean }) => {
+        const { silent, id, timestamp, ...entryData } = entry;
+        const newEntry: JournalEntry = {
+            id: id || Date.now().toString(36),
+            timestamp: timestamp || new Date().toISOString(),
             ...entryData,
         };
 
@@ -186,9 +186,9 @@ export function useTradeExecution({ activeAccount, accountsState, updateActive }
 
             // Recalc Allocations (immutable map, no in-place mutation)
             const total = nextAssets.reduce((s, a) => s + a.currentValue, 0);
-            nextAssets = nextAssets.map(a => ({ ...a, allocation: total > 0 ? (a.currentValue / total) * 100 : 0 }));
+            const rebalanced = nextAssets.map(a => ({ ...a, allocation: total > 0 ? (a.currentValue / total) * 100 : 0 }));
 
-            return { ...prev, assets: nextAssets };
+            return { ...prev, assets: rebalanced };
         });
     }, [updateActive]);
 

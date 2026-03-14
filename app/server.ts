@@ -4,6 +4,7 @@ import { createServer } from 'http';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { setupRoutes } from './server/routes.js';
@@ -82,6 +83,7 @@ async function startServer() {
   }
 
   app.use(express.json({ limit: '10mb' }));
+  app.use(cookieParser());
 
   // Request logger — always logs method + path + status + duration
   app.use((req, res, next) => {
