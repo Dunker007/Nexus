@@ -1,5 +1,5 @@
 import { Express } from 'express';
-import { z } from 'zod';
+import { z } from 'genkit';
 import { db } from './db.js';
 import { google } from 'googleapis';
 import { driveConfig, ollamaConfig, lmStudioConfig } from './config.js';

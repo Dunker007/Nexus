@@ -12,7 +12,7 @@ RUN npm install --legacy-peer-deps
 # Copy the rest of the app source code
 COPY . .
 
-# First, build Vite (produces the static assets in /dist)
+# Build Vite frontend + compile server TypeScript
 RUN npm run build
 
 # Stage 2: Production environment
@@ -27,10 +27,8 @@ COPY package*.json ./
 COPY prisma/schema.postgres.prisma ./prisma/schema.prisma
 RUN npm install --omit=dev --legacy-peer-deps
 
-# We do not strictly need the src/ directory for the Vite frontend since it's built into dist/, 
-# but we do need server.ts and its related dependencies.
-COPY --from=builder /usr/src/app/server ./server
-COPY --from=builder /usr/src/app/server.ts ./server.ts
+# Copy compiled server output and Vite frontend build
+COPY --from=builder /usr/src/app/dist-server ./dist-server
 COPY --from=builder /usr/src/app/dist ./dist
 
 # Vite relies on "type": "module" in package.json
@@ -42,10 +40,6 @@ EXPOSE 8080
 ENV PORT=8080
 ENV NODE_ENV=production
 
-# tsx server.ts or regular node execution. Since server.ts is TS, we keep tsx dependency or compile it.
-# To keep this lightweight, we install tsx globally or locally in prod.
-RUN npm install tsx -g
-
 # SQLite requires a directory for storing data. For Cloud Run, /usr/src/app is ephemeral.
 # If persistent data is required, a volume must be mapped or Cloud SQL enabled.
-CMD ["tsx", "server.ts"]
+CMD ["node", "dist-server/server.js"]

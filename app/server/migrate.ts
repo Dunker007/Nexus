@@ -22,7 +22,7 @@ console.log('🔄 Starting Migration from old Next.js DB to new Nexus DB...');
 const migrateData = newDb.transaction(() => {
   try {
     // 1. Migrate Chat History
-    const oldChats = oldDb.prepare('SELECT * FROM ChatMessage').all();
+    const oldChats = oldDb.prepare('SELECT * FROM ChatMessage').all() as any[];
     const insertChat = newDb.prepare('INSERT OR REPLACE INTO chat_history (id, role, content, timestamp) VALUES (?, ?, ?, ?)');
     let chatCount = 0;
     for (const chat of oldChats) {
@@ -36,7 +36,7 @@ const migrateData = newDb.transaction(() => {
     // 2. Migrate Agents
     const oldAgentsObj = oldDb.prepare("SELECT * FROM sqlite_master WHERE type='table' AND name='Agent'").get();
     if (oldAgentsObj) {
-      const agents = oldDb.prepare('SELECT * FROM Agent').all();
+      const agents = oldDb.prepare('SELECT * FROM Agent').all() as any[];
       const insertAgent = newDb.prepare('INSERT OR REPLACE INTO agents (id, name, role, description, status, system_prompt) VALUES (?, ?, ?, ?, ?, ?)');
       let count = 0;
       for (const a of agents) {
@@ -51,7 +51,7 @@ const migrateData = newDb.transaction(() => {
     // 3. Migrate Pipeline
     const pipelineExists = oldDb.prepare("SELECT * FROM sqlite_master WHERE type='table' AND name='PipelineTrack'").get();
     if (pipelineExists) {
-      const tracks = oldDb.prepare('SELECT * FROM PipelineTrack').all();
+      const tracks = oldDb.prepare('SELECT * FROM PipelineTrack').all() as any[];
       const insertTrack = newDb.prepare('INSERT OR REPLACE INTO pipeline_tracks (id, artist, title, status, progress, steps, target_date) VALUES (?, ?, ?, ?, ?, ?, ?)');
       let count = 0;
       for (const t of tracks) {
