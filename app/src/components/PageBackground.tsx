@@ -1,16 +1,10 @@
-import { useVibe } from '../contexts/VibeContext';
-
 interface PageBackgroundProps {
   color?: 'cyan' | 'green' | 'purple' | 'amber' | 'pink' | 'emerald' | 'orange' | 'indigo' | 'red' | 'blue' | 'auto';
   useTheme?: boolean;
 }
 
-export default function PageBackground({ color, useTheme = false }: PageBackgroundProps) {
-  const { theme } = useVibe();
-  const themeColor = theme?.floodlightColor;
-
-  // Determine final color: explicit prop > theme > default cyan
-  const finalColor = color === 'auto' || useTheme ? (themeColor || 'cyan') : (color || 'cyan');
+export default function PageBackground({ color }: PageBackgroundProps) {
+  const finalColor = color === 'auto' ? 'cyan' : (color || 'cyan');
 
   // Hex/rgba mapping for style injection
   const colorMap: Record<string, string> = {

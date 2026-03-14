@@ -3,14 +3,11 @@ import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, MessageSquare, Users, HardDrive, GitBranch,
   Music, Newspaper, Wifi, WifiOff, Settings, Beaker,
-  UsersRound, Command as CommandIcon, Palette, Menu, X, Workflow, LogOut
+  UsersRound, Command as CommandIcon, Menu, X, Workflow, LogOut
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { useMemory } from '../contexts/MemoryContext';
-import { useVibe } from '../contexts/VibeContext';
-import VoiceControl from './VoiceControl';
-import VibeController from './VibeController';
 import KeyboardShortcuts from './KeyboardShortcuts';
 import CommandPalette from './CommandPalette';
 import { ThemeToggle } from './ThemeToggle';
@@ -33,7 +30,6 @@ const navItems = [
 
 export function Layout() {
   const { loading, error } = useMemory();
-  const { mode, setMode } = useVibe();
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -57,21 +53,14 @@ export function Layout() {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  const toggleVibeMode = () => {
-    const modes: ('normal' | 'high-load' | 'crisis' | 'focus')[] = ['normal', 'high-load', 'crisis', 'focus'];
-    const currentIndex = modes.indexOf(mode);
-    const nextIndex = (currentIndex + 1) % modes.length;
-    setMode(modes[nextIndex]);
-  };
-
   return (
     <div className="flex flex-col h-screen bg-[var(--bg-void)] text-white overflow-hidden font-sans selection:bg-cyan-500/30">
       <KeyboardShortcuts />
       <CommandPalette />
 
       {/* Top Navigation Bar */}
-      <nav className="flex-none h-16 border-b border-white/5 bg-[var(--glass-bg)] backdrop-blur-2xl relative z-50 px-4 md:px-8">
-        <div className="h-full flex items-center justify-between">
+      <nav className="flex-none h-16 border-b border-white/5 bg-[var(--glass-bg)] backdrop-blur-2xl relative z-50 px-4 md:px-6">
+        <div className="h-full max-w-[1600px] mx-auto flex items-center justify-between">
           
           {/* Logo Section */}
           <div className="flex items-center gap-4 shrink-0 group">
@@ -121,13 +110,6 @@ export function Layout() {
 
             <div className="hidden md:flex items-center gap-2">
                 <ThemeToggle />
-                <button 
-                  onClick={toggleVibeMode}
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-purple-400/40 hover:text-purple-400 hover:bg-purple-500/10 transition-all" 
-                  title={`Vibe Mode: ${mode}`}
-                >
-                    <Palette className={`w-4 h-4 ${mode !== 'normal' ? 'animate-pulse' : ''}`} />
-                </button>
             </div>
             
             <button 
@@ -222,15 +204,12 @@ export function Layout() {
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full overflow-auto relative z-10 custom-scrollbar">
+      <main className="flex-1 w-full overflow-x-hidden overflow-y-auto relative z-10 custom-scrollbar">
         <PageTransition>
           <Outlet />
         </PageTransition>
       </main>
 
-      {/* Global Overlays */}
-      <VoiceControl />
-      <VibeController />
     </div>
   );
 }

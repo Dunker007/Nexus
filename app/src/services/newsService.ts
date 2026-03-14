@@ -62,6 +62,7 @@ export interface NewsArticle {
       bias: string;
   };
   category: 'national' | 'local' | 'alternative' | 'center' | 'left';
+  image?: string;
   region?: string;
   factCheck?: {
       status: 'verified' | 'disputed' | 'unverified' | 'mixed';

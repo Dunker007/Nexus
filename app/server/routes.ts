@@ -192,6 +192,38 @@ export function setupRoutes(app: Express) {
     }
   });
 
+  // ─── Debate Pundits — Gemini Free Tier ───────────────────────────────────
+  app.post('/api/debate', async (req, res) => {
+    const apiKey = process.env.GEMINI_FREE_KEY || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(503).json({ error: 'No Gemini key found — set GEMINI_FREE_KEY in .env' });
+    }
+    try {
+      const { prompt, systemPrompt } = z.object({
+        prompt: z.string().min(1),
+        systemPrompt: z.string().optional(),
+      }).parse(req.body);
+
+      const body = {
+        system_instruction: systemPrompt ? { parts: [{ text: systemPrompt }] } : undefined,
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 300 },
+      };
+
+      const r = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+      );
+      const data: any = await r.json();
+      if (!r.ok) throw new Error(data?.error?.message || 'Gemini API error');
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response.';
+      res.json({ text });
+    } catch (e: any) {
+      console.error('[debate] Error:', e.message);
+      res.status(500).json({ error: e.message });
+    }
+  });
+
   // LLM status check
   app.get('/api/llm/status', async (_req, res) => {
     const status = { ollama: false, lmStudio: false, activeModel: null as string | null };

@@ -170,7 +170,8 @@ export function SmartFolioAUM() {
                 </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 pb-20 relative z-10 scroll-smooth custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-6 pb-20 relative z-10 scroll-smooth custom-scrollbar">
+              <div className="max-w-[1600px] mx-auto space-y-6">
                 {/* ═══ TOP METRICS ROW ═══ */}
                 <section className="animate-fade-in-up">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -396,6 +397,7 @@ export function SmartFolioAUM() {
                 )}
 
                 <div className="h-10"></div>
+              </div>
             </div>
         </>
     );

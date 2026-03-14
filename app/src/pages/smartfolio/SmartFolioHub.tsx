@@ -34,7 +34,7 @@ export function SmartFolioHub() {
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] mix-blend-screen overflow-hidden" />
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 text-gray-200 font-sans relative z-10 pb-16">
+            <div className="max-w-[1600px] mx-auto px-6 py-8 space-y-8 text-gray-200 font-sans relative z-10 pb-16">
 
                 {/* ─── 1. Enhanced Header & Controls ─── */}
                 <motion.div

@@ -68,7 +68,7 @@ export default function VibeController() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.18 }}
-                        className="mb-3 glass-card border-white/10 backdrop-blur-2xl shadow-2xl min-w-[220px] overflow-hidden"
+                        className="mb-3 glass-card border-white/10 backdrop-blur-2xl shadow-2xl w-[220px] overflow-hidden"
                     >
                         {/* Header */}
                         <div className="px-4 py-3 border-b border-white/5">

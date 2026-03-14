@@ -41,7 +41,7 @@ export function BlogStudio() {
 
     return (
         <PageLayout color="green">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-8">
                 <PageHeader
                     title="Blog Studio"
                     subtitle="CONTENT COMMAND CENTER • SEO • WORDPRESS"

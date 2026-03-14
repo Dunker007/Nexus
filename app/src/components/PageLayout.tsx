@@ -204,7 +204,7 @@ export default function PageLayout({
   const orbs = orbColorMap[color];
 
   return (
-    <div className={`w-full min-h-screen relative overflow-hidden text-white ${className}`}>
+    <div className={`w-full min-h-full relative overflow-hidden text-white ${className}`}>
       <PageBackground color={color} />
 
       {/* Decorative floating orbs */}
@@ -218,7 +218,7 @@ export default function PageLayout({
 
       {/* Main content — full width, centered */}
       <div
-         className={`relative z-10 w-full ${noPadding ? 'overflow-hidden' : 'py-8 px-6 max-w-7xl mx-auto'} ${containerClass}`}
+         className={`relative z-10 w-full ${noPadding ? 'h-full overflow-hidden' : 'py-8 px-6 max-w-[1600px] mx-auto'} ${containerClass}`}
       >
         {children}
       </div>

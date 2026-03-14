@@ -31,14 +31,12 @@ import { DevStudio } from './pages/studios/DevStudio';
 import { VideoStudio } from './pages/studios/VideoStudio';
 import { ArtStudio } from './pages/studios/ArtStudio';
 import { BlogStudio } from './pages/studios/BlogStudio';
+import { LabStub } from './pages/labs/LabStub';
 
 import { ThemeProvider } from './contexts/ThemeContext';
-import { VibeProvider } from './contexts/VibeContext';
-
 export default function App() {
   return (
     <ThemeProvider>
-      <VibeProvider>
         <ToastProvider>
           <AuthProvider>
             <MemoryProvider>
@@ -66,6 +64,19 @@ export default function App() {
                       <Route path="settings" element={<SmartFolioSettings />} />
                       <Route path="aum" element={<SmartFolioAUM />} />
                     </Route>
+                    <Route path="labs/voice-command" element={<LabStub name="Voice Command" icon="🎙️" category="Operations" description="Natural language voice control for the entire Nexus OS." />} />
+                    <Route path="labs/automation" element={<LabStub name="Automation Lab" icon="⚡" category="Operations" description="Workflow automation, triggers, and scheduled agent tasks." />} />
+                    <Route path="labs/smart-home" element={<LabStub name="Smart Home" icon="🏠" category="Operations" description="IoT integration and intelligent home automation hub." />} />
+                    <Route path="labs/analytics" element={<LabStub name="Analytics" icon="📊" category="Intelligence" description="Deep data analytics, dashboards, and business intelligence." />} />
+                    <Route path="labs/knowledge-base" element={<LabStub name="Knowledge Base" icon="🧠" category="Intelligence" description="AI-powered knowledge management and retrieval system." />} />
+                    <Route path="labs/data-weave" element={<LabStub name="Data Weave" icon="🕸️" category="Intelligence" description="Unified data pipeline weaving sources into structured insights." />} />
+                    <Route path="labs/code-generator" element={<LabStub name="Code Generator" icon="💻" category="Creation" description="AI-assisted code generation, scaffolding, and refactoring." />} />
+                    <Route path="labs/vision" element={<LabStub name="Vision Lab" icon="👁️" category="Creation" description="Computer vision models, image analysis, and visual AI tools." />} />
+                    <Route path="labs/passive-income" element={<LabStub name="Passive Income Engine" icon="💰" category="Capital" description="Automated income streams, monetization strategies, and revenue tracking." />} />
+                    <Route path="labs/crypto" element={<LabStub name="Crypto Lab" icon="₿" category="Capital" description="Crypto portfolio tracking, DeFi strategies, and market signals." />} />
+                    <Route path="labs/aura" element={<LabStub name="Aura" icon="✨" category="Experimental" description="Ambient intelligence layer — mood, context, and environmental awareness." />} />
+                    <Route path="labs/pc-optimizer" element={<LabStub name="PC Optimizer" icon="🖥️" category="Experimental" description="System performance monitoring, optimization, and automation." />} />
+                    <Route path="labs/llm" element={<LabStub name="LLM Lab" icon="🤖" category="Experimental" description="Fine-tuning, prompt engineering, and model evaluation playground." />} />
                     <Route path="meeting" element={<Meeting />} />
                     <Route path="pipeline" element={<Pipeline />} />
                     <Route path="music" element={<MusicStudio />} />
@@ -81,7 +92,6 @@ export default function App() {
             </MemoryProvider>
           </AuthProvider>
         </ToastProvider>
-      </VibeProvider>
     </ThemeProvider>
   );
 }

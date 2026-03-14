@@ -388,3 +388,25 @@ body {
   right: 0;
   cursor: se-resize;
 }
+
+/* ── BREAKING NEWS TICKER ─────────────────────────────────────────────── */
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 550s linear infinite;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── NEWS IMAGE UTILITIES ─────────────────────────────────────────────── */
+.news-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}

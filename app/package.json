@@ -17,6 +17,7 @@
     "sync:db": "tsx server/sync-state.ts"
   },
   "dependencies": {
+    "@genkit-ai/googleai": "^1.28.0",
     "@google-cloud/cloud-sql-connector": "^1.9.1",
     "@google-cloud/secret-manager": "^6.1.1",
     "@google-cloud/storage": "^7.19.0",

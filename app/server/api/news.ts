@@ -3,7 +3,15 @@ import { db } from '../db.js';
 import Parser from 'rss-parser';
 
 export const newsRouter = Router();
-const parser = new Parser();
+const parser = new Parser({
+    customFields: {
+        item: [
+            ['media:content', 'media:content'],
+            ['media:thumbnail', 'media:thumbnail'],
+            ['content:encoded', 'content:encoded'],
+        ]
+    }
+});
 
 const NEWS_SOURCES = {
   national: [
@@ -52,6 +60,7 @@ function mapRow(row: any) {
         description: row.summary,
         link: row.url,
         pubDate: row.time,
+        image: row.image || null,
         source: {
             id: row.source.toLowerCase().replace(/\s+/g, '-'),
             name: row.source,
@@ -63,6 +72,34 @@ function mapRow(row: any) {
     };
 }
 
+// Extract best available image from an RSS item
+function extractImage(item: any): string | null {
+    // Standard RSS enclosure
+    if (item.enclosure?.url) {
+        const url = decodeURIComponent(item.enclosure.url);
+        if (/\.(jpg|jpeg|png|webp|gif)/i.test(url)) return url;
+    }
+    // media:content
+    const mc = item['media:content'];
+    if (mc) {
+        const url = Array.isArray(mc) ? mc[0]?.['$']?.url : mc?.['$']?.url;
+        if (url) return decodeURIComponent(url);
+    }
+    // media:thumbnail
+    const mt = item['media:thumbnail'];
+    if (mt) {
+        const url = Array.isArray(mt) ? mt[0]?.['$']?.url : mt?.['$']?.url;
+        if (url) return decodeURIComponent(url);
+    }
+    // itunes image
+    if (item.itunes?.image) return item.itunes.image;
+    // Scrape first <img> from content:encoded or content
+    const html = item['content:encoded'] || item.content || '';
+    const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (match?.[1] && /^https?:\/\//.test(match[1])) return match[1];
+    return null;
+}
+
 newsRouter.get('/', (req, res) => {
   try {
     const rows = db.prepare('SELECT * FROM news_items ORDER BY created_at DESC LIMIT 100').all();
@@ -72,9 +109,10 @@ newsRouter.get('/', (req, res) => {
 
 const insertItem = db.prepare(`
     INSERT OR IGNORE INTO news_items
-    (id, title, source, type, url, summary, bias, time, impact, feed)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (id, title, source, type, url, summary, bias, time, impact, feed, image)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
+const backfillImage = db.prepare(`UPDATE news_items SET image = ? WHERE id = ? AND (image IS NULL OR image = '')`);
 
 newsRouter.post('/refresh', async (req, res) => {
     const allFeeds = Object.values(NEWS_SOURCES).flat();
@@ -98,8 +136,9 @@ newsRouter.post('/refresh', async (req, res) => {
         const { source, feedData } = result.value;
         for (const item of feedData.items.slice(0, 10)) {
             const id = item.guid || item.link || Math.random().toString(36);
+            const image = extractImage(item);
             try {
-                insertItem.run(
+                const result = insertItem.run(
                     id,
                     item.title || 'No Title',
                     source.name,
@@ -109,9 +148,12 @@ newsRouter.post('/refresh', async (req, res) => {
                     source.bias,
                     item.pubDate || new Date().toISOString(),
                     source.logo,
-                    (source as any).priority ? 'priority' : 'nexus'
+                    (source as any).priority ? 'priority' : 'nexus',
+                    image
                 );
-                addedCount++;
+                if (result.changes > 0) addedCount++;
+                // Backfill image on existing rows that were skipped by INSERT OR IGNORE
+                else if (image) backfillImage.run(image, id);
             } catch { /* duplicate GUID */ }
         }
     }

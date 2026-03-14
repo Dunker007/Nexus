@@ -175,7 +175,7 @@ export function Dashboard() {
 
   return (
     <PageLayout color="cyan" noPadding>
-      <div className="max-w-7xl mx-auto px-6 py-10 pb-20">
+      <div className="max-w-[1600px] mx-auto px-6 py-10 pb-20">
         <PageHeader
           title={`${greeting}, Dunker`}
           subtitle="COMMAND CENTER • NEURAL INTERFACE v4.0"

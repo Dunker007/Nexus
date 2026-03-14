@@ -118,6 +118,7 @@ safeAlter(`ALTER TABLE tasks         ADD COLUMN updated_at DATETIME DEFAULT CURR
 safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP`);
 safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP`);
 safeAlter(`ALTER TABLE news_items    ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP`);
+safeAlter(`ALTER TABLE news_items    ADD COLUMN image TEXT DEFAULT NULL`);
 
 // Add agent_id to chat_history for per-agent thread scoping
 safeAlter(`ALTER TABLE chat_history  ADD COLUMN agent_id TEXT DEFAULT NULL`);

@@ -18,7 +18,7 @@ export function Settings() {
 
   return (
     <PageLayout color="purple" noPadding>
-      <div className="max-w-7xl mx-auto px-6 py-10 pb-32">
+      <div className="max-w-[1600px] mx-auto px-6 py-10 pb-32">
         <PageHeader
           title="Kernel Settings"
           subtitle="CONFIGURATION ENGINE • DLX STUDIOS LOCAL v4.2"

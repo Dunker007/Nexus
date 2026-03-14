@@ -21,7 +21,7 @@ export function Meeting() {
 
   return (
     <PageLayout color="purple" noPadding>
-      <div className="max-w-4xl mx-auto px-6 py-10 pb-32">
+      <div className="max-w-[1600px] mx-auto px-6 py-10 pb-32">
         <PageHeader
           title="AI Staff Meeting"
           subtitle="MULTI-AGENT DELIBERATION CHAMBER"
