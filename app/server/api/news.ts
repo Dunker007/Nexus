@@ -44,20 +44,6 @@ const NEWS_SOURCES = {
   ]
 };
 
-// Helper to extract image from RSS item
-function getRSSImage(item: any): string | null {
-    if (item.enclosure && item.enclosure.url && item.enclosure.type?.startsWith('image/')) return item.enclosure.url;
-    if (item['media:content'] && item['media:content'].$ && item['media:content'].$.url) return item['media:content'].$.url;
-    if (item['media:thumbnail'] && item['media:thumbnail'].$ && item['media:thumbnail'].$.url) return item['media:thumbnail'].$.url;
-    
-    // Try to find image in description/content
-    const desc = item.content || item.description || '';
-    const imgMatch = desc.match(/<img[^>]+src="([^">]+)"/);
-    if (imgMatch) return imgMatch[1];
-    
-    return null;
-}
-
 // Helper to map DB row to Frontend Article
 function mapRow(row: any) {
     return {
@@ -66,7 +52,6 @@ function mapRow(row: any) {
         description: row.summary,
         link: row.url,
         pubDate: row.time,
-        image: row.image,
         source: {
             id: row.source.toLowerCase().replace(/\s+/g, '-'),
             name: row.source,
@@ -95,12 +80,11 @@ newsRouter.post('/refresh', async (req, res) => {
                 const feedData = await parser.parseURL(source.rss);
                 for (const item of feedData.items.slice(0, 10)) {
                     const id = item.guid || item.link || Math.random().toString(36);
-                    const image = getRSSImage(item);
                     try {
                         db.prepare(`
                             INSERT OR IGNORE INTO news_items 
-                            (id, title, source, type, url, summary, bias, time, impact, feed, image) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            (id, title, source, type, url, summary, bias, time, impact, feed) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         `).run(
                             id,
                             item.title || 'No Title',
@@ -111,8 +95,7 @@ newsRouter.post('/refresh', async (req, res) => {
                             source.bias,
                             item.pubDate || new Date().toISOString(),
                             source.logo,
-                            (source as any).priority ? 'priority' : 'nexus',
-                            image
+                            (source as any).priority ? 'priority' : 'nexus'
                         );
                         addedCount++;
                     } catch (err) {

@@ -427,20 +427,14 @@ export function News() {
                                         transition={{ delay: idx * 0.1 }}
                                         className="group relative flex-1 rounded-[1.5rem] overflow-hidden border border-white/5 shadow-xl transition-all hover:border-red-500/20 bg-black/40 p-4 flex flex-col justify-center"
                                     >
-                                        {article.image && (
-                                            <div className="absolute inset-0 z-0">
-                                                <img src={article.image} alt="" className="w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity" />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                                            </div>
-                                        )}
                                         <div className="flex items-center justify-between mb-2 relative z-10">
                                             <div className="flex items-center gap-2">
                                                 <span className="text-base">{article.source.logo}</span>
                                                 <span className="text-[7px] font-black text-white/20 uppercase tracking-widest truncate max-w-[80px]">{article.source.name}</span>
                                             </div>
-                                            <div className={`w-1 h-1 rounded-full ${ article.priority ? 'bg-red-500 animate-pulse' : 'bg-white/10'}`} />
+                                            <div className={`w-1 h-1 rounded-full ${ (article as any).priority ? 'bg-red-500 animate-pulse' : 'bg-white/10'}`} />
                                         </div>
-                                        <h3 className="relative z-10 text-[10px] font-black text-white/70 leading-tight group-hover:text-red-400 transition-colors uppercase line-clamp-2 tracking-tighter">
+                                        <h3 className="text-[10px] font-black text-white/70 leading-tight group-hover:text-red-400 transition-colors uppercase line-clamp-2 tracking-tighter">
                                             {article.title}
                                         </h3>
                                     </motion.a>
@@ -457,17 +451,8 @@ export function News() {
                                 className="lg:col-span-6 group relative rounded-[2.5rem] overflow-hidden border border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.5)] transition-all hover:border-red-500/30 flex flex-col order-1 lg:order-2"
                             >
                                 <div className="absolute inset-0 z-0 bg-neutral-950">
-                                    {filteredArticles[0].image ? (
-                                        <>
-                                            <img src={filteredArticles[0].image} alt="" className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-transparent z-10" />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent z-10" />
-                                            <div className={`absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity ${filteredArticles[0].priority ? 'bg-mesh-red' : 'bg-mesh-purple'}`} />
-                                        </>
-                                    )}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent z-10" />
+                                    <div className={`absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity ${(filteredArticles[0] as any).priority ? 'bg-mesh-red' : 'bg-mesh-purple'}`} />
                                 </div>
 
                                 <div className="mt-auto p-10 z-20 space-y-4">
@@ -504,12 +489,6 @@ export function News() {
                                         transition={{ delay: (idx + 3) * 0.1 }}
                                         className="group relative flex-1 rounded-[1.5rem] overflow-hidden border border-white/5 shadow-xl transition-all hover:border-cyan-500/20 bg-black/40 p-4 flex flex-col justify-center"
                                     >
-                                        {article.image && (
-                                            <div className="absolute inset-0 z-0">
-                                                <img src={article.image} alt="" className="w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity" />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                                            </div>
-                                        )}
                                         <div className="flex items-center justify-between mb-2 relative z-10">
                                             <div className="flex items-center gap-2">
                                                 <span className="text-base">{article.source.logo}</span>
@@ -517,7 +496,7 @@ export function News() {
                                             </div>
                                             <div className="w-1 h-1 rounded-full bg-white/10" />
                                         </div>
-                                        <h3 className="relative z-10 text-[10px] font-black text-white/70 leading-tight group-hover:text-cyan-400 transition-colors uppercase line-clamp-2 tracking-tighter">
+                                        <h3 className="text-[10px] font-black text-white/70 leading-tight group-hover:text-cyan-400 transition-colors uppercase line-clamp-2 tracking-tighter">
                                             {article.title}
                                         </h3>
                                     </motion.a>
@@ -527,30 +506,32 @@ export function News() {
                         </div>
                     )}
 
-                    {/* Tactical Status HUD (Center-Justified Vertical Matrix) */}
+                    {/* Tactical Status HUD / Integrated Control Bar */}
                     {!isLoading && activeTab === 'all' && !searchQuery && (
-                        <div className="mb-12 relative z-30 flex justify-center">
-                            <div className="bg-black/60 border border-white/10 p-6 rounded-[2.5rem] backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,0.8)] flex flex-wrap items-center justify-center gap-10">
-                                
-                                {/* System Status */}
-                                <div className="flex flex-col items-center gap-1 px-6 border-r border-white/5">
-                                    <span className="text-[10px] font-bold text-red-500 animate-pulse uppercase tracking-[0.3em]">System Online</span>
-                                    <div className="flex items-center gap-2">
+                        <div className="mb-12 relative z-30">
+                            <div className="bg-black/60 border border-white/10 p-4 rounded-[2rem] backdrop-blur-2xl shadow-2xl flex flex-wrap items-center gap-6">
+                                <div className="flex items-center gap-3 pr-6 border-r border-white/10">
+                                    <div className="w-10 h-10 rounded-2xl bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-500">
                                         <span className="text-xl">📡</span>
-                                        <span className="text-[11px] font-black text-white/40 uppercase tracking-widest">Nexus Intelligence</span>
+                                    </div>
+                                    <div>
+                                        <div className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] leading-tight">Nexus Intelligence</div>
+                                        <div className="text-[14px] font-black text-red-500 uppercase tracking-tighter leading-tight">System Online</div>
                                     </div>
                                 </div>
 
-                                {/* Active Nodes */}
-                                <div className="flex flex-col items-center gap-1 px-6 border-r border-white/5">
-                                    <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em]">Operational Scan</span>
-                                    <span className="text-[12px] font-black text-cyan-500 uppercase tracking-tighter">8 SOURCES ACTIVE</span>
+                                <div className="flex items-center gap-4 px-6 border-r border-white/10">
+                                    <div className="flex flex-col">
+                                        <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.3em]">Operational Scan</span>
+                                        <span className="text-[12px] font-black text-white/60 tracking-tight">8 SOURCES ACTIVE</span>
+                                    </div>
+                                    <div className="h-6 w-[1px] bg-white/10" />
                                 </div>
 
                                 {/* Integrated Tactical Filters */}
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2 bg-white/[0.03] p-1.5 rounded-2xl border border-white/5">
                                     {[
-                                        { id: 'all', name: 'All', icon: '🌐' },
+                                        { id: 'all', name: 'All', icon: '' },
                                         { id: 'local', name: 'Local', icon: '🏠' },
                                         { id: 'national', name: 'National', icon: '🇺🇸' },
                                         { id: 'alternative', name: 'Alternative', icon: '👀' },
@@ -559,40 +540,31 @@ export function News() {
                                         <button
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id as FilterTab)}
-                                            className={`flex flex-col items-center gap-1.5 px-4 py-2 rounded-2xl transition-all ${
+                                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
                                                 activeTab === tab.id 
-                                                    ? "bg-red-600/20 text-red-500 border border-red-500/30 scale-105" 
-                                                    : "text-white/30 hover:text-white/60 hover:bg-white/5"
+                                                    ? "bg-red-600 text-white shadow-lg shadow-red-600/20" 
+                                                    : "text-white/30 hover:text-white hover:bg-white/5"
                                             }`}
                                         >
-                                            <span className="text-xl">{tab.icon}</span>
-                                            <span className="text-[9px] font-black uppercase tracking-widest">{tab.name}</span>
+                                            {tab.icon && <span>{tab.icon}</span>}
+                                            {tab.name}
                                         </button>
                                     ))}
                                 </div>
 
-                                <div className="h-10 w-[1px] bg-white/5" />
-
                                 {/* HUD Action Pack */}
-                                <div className="flex items-center gap-6">
-                                    <button onClick={() => fetchNews()} className="flex flex-col items-center gap-1.5 p-3 text-white/20 hover:text-red-500 transition-all group">
-                                        <RefreshCw className={`w-5 h-5 group-hover:rotate-180 transition-transform duration-700 ${isRefreshing ? "animate-spin" : ""}`} />
-                                        <span className="text-[9px] font-black uppercase tracking-widest">Refresh</span>
+                                <div className="ml-auto flex items-center gap-3">
+                                    <button onClick={() => fetchNews()} className="p-3 bg-white/5 border border-white/10 rounded-2xl text-white/40 hover:text-red-500 hover:border-red-500/50 transition-all group">
+                                        <RefreshCw className={`w-4 h-4 group-hover:rotate-180 transition-transform duration-500 ${isRefreshing ? "animate-spin" : ""}`} />
                                     </button>
-                                    
-                                    <button className="flex flex-col items-center gap-1.5 px-3 text-white/20 hover:text-cyan-400 transition-all">
-                                        <span className="text-xl text-white/40">🔍</span>
-                                        <span className="text-[9px] font-black uppercase tracking-widest">Fact Check</span>
+                                    <button className="flex items-center gap-2 px-5 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-cyan-400 hover:border-cyan-500/50 transition-all">
+                                        <span>🔍</span> Fact Check
                                     </button>
-                                    
-                                    <button className="flex flex-col items-center gap-1.5 px-3 text-white/20 hover:text-purple-400 transition-all">
-                                        <span className="text-xl text-white/40">📚</span>
-                                        <span className="text-[9px] font-black uppercase tracking-widest">Research</span>
+                                    <button className="flex items-center gap-2 px-5 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-purple-400 hover:border-purple-500/50 transition-all">
+                                        <span>📚</span> Research
                                     </button>
-                                    
-                                    <button className="flex flex-col items-center gap-1.5 px-6 py-2 bg-red-600/10 border border-red-500/30 rounded-2xl text-red-500 hover:bg-red-600 hover:text-white transition-all scale-105">
-                                        <Target className="w-5 h-5 mb-0.5" />
-                                        <span className="text-[9px] font-black uppercase tracking-[0.2em]">Radar</span>
+                                    <button className="flex items-center gap-2 px-5 py-3 bg-red-600/20 border border-red-500/30 rounded-2xl text-[10px] font-black text-red-500 uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all">
+                                        Radar
                                     </button>
                                 </div>
                             </div>
@@ -617,7 +589,7 @@ export function News() {
                             {(activeTab === 'all' && !searchQuery ? filteredArticles.slice(7) : filteredArticles).map((article, i) => {
                                 const biasInfo = BIAS_COLORS[article.source.bias as keyof typeof BIAS_COLORS] || { text: 'text-gray-400', bg: 'bg-white/5', border: 'border-white/10', label: 'Unknown' };
                                 const isSaved = savedArticles.has(article.id);
-                                const isHot = article.priority || article.title.toLowerCase().includes('breaking');
+                                const isHot = (article as any).priority || article.title.toLowerCase().includes('breaking');
 
                                 return (
                                     <motion.a
@@ -630,19 +602,10 @@ export function News() {
                                         key={article.id}
                                         className={`group block glass-card p-0 border-white/5 hover:border-red-500/40 relative overflow-hidden flex flex-col min-h-[420px] shadow-2xl transition-all ${isHot ? 'shadow-red-950/10 border-red-950/20' : ''}`}
                                     >
-                                        {/* Visual Lead (Image container) */}
-                                        <div className="h-44 relative bg-black/80 overflow-hidden">
-                                             {article.image ? (
-                                                <>
-                                                    <img src={article.image} alt="" className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-700" />
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
-                                                </>
-                                             ) : (
-                                                <>
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
-                                                    <div className={`absolute inset-0 opacity-10 group-hover:scale-110 transition-transform duration-700 ${isHot ? 'bg-mesh-red' : 'bg-mesh-purple'}`} />
-                                                </>
-                                             )}
+                                        {/* Visual Lead (Pseudo-Image area for tactical feel) */}
+                                        <div className="h-40 relative bg-black/80 overflow-hidden">
+                                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
+                                             <div className={`absolute inset-0 opacity-10 group-hover:scale-110 transition-transform duration-700 ${isHot ? 'bg-mesh-red' : 'bg-mesh-purple'}`} />
                                              
                                              <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
                                                  <div className="px-3 py-1 bg-black/60 backdrop-blur-xl border border-white/10 rounded-lg text-[9px] font-black text-white uppercase tracking-widest leading-none">
