@@ -25,6 +25,7 @@ export function News() {
   const [showFactChecker, setShowFactChecker] = useState(false);
   const [factCheckQuery, setFactCheckQuery] = useState('');
   const [factCheckResult, setFactCheckResult] = useState<any>(null);
+  const [isFactChecking, setIsFactChecking] = useState(false);
 
   // Subject Radar
   const [showRadar, setShowRadar] = useState(false);
@@ -150,18 +151,35 @@ export function News() {
 
   const runFactCheck = async () => {
     if (!factCheckQuery.trim()) return;
-    setIsLoading(true);
-    setTimeout(() => {
+    setIsFactChecking(true);
+    setFactCheckResult(null);
+    try {
+      const res = await fetch('/api/brain-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: `Fact-check the following claim or headline. Assess its accuracy, provide context, identify potential bias, and give a clear rating (True / Mostly True / Misleading / False / Unverifiable). Claim: "${factCheckQuery}"`,
+          systemPrompt: 'You are a professional fact-checker and media analyst. Be concise, objective, and cite your reasoning.'
+        })
+      });
+      const data = await res.json();
+      const aiAnalysis = res.ok ? (data.text || data.response || JSON.stringify(data)) : 'LLM unavailable — ensure Ollama or LM Studio is running.';
       setFactCheckResult({
         query: factCheckQuery,
         status: 'analyzed',
-        findings: [
-          { source: 'Nexus AI', rating: 'Context Needed', url: '#' }
-        ],
-        aiAnalysis: 'Local LLM analysis suggests this claim requires broader context. Consider verifying the source\'s direct quotations.'
+        findings: [{ source: 'Nexus AI', rating: 'Analyzed', url: '#' }],
+        aiAnalysis
       });
-      setIsLoading(false);
-    }, 1200);
+    } catch {
+      setFactCheckResult({
+        query: factCheckQuery,
+        status: 'error',
+        findings: [{ source: 'Nexus AI', rating: 'Error', url: '#' }],
+        aiAnalysis: 'Failed to reach the AI inference engine. Ensure Ollama or LM Studio is running.'
+      });
+    } finally {
+      setIsFactChecking(false);
+    }
   };
 
   const toggleSave = (id: string) => {
@@ -322,10 +340,10 @@ export function News() {
                   />
                   <button
                     onClick={runFactCheck}
-                    disabled={isLoading}
+                    disabled={isFactChecking}
                     className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white font-black uppercase tracking-[0.2em] rounded-xl shadow-lg hover:brightness-110 active:scale-95 transition-all text-[9px] disabled:opacity-50"
                   >
-                    {isLoading ? 'WORKING...' : 'ANALYZE'}
+                    {isFactChecking ? 'WORKING...' : 'ANALYZE'}
                   </button>
                 </div>
                 {factCheckResult && (

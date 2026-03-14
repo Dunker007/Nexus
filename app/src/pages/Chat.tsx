@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Shield, Terminal, Layout,
   Activity, Zap, MessageSquare,
@@ -106,7 +106,7 @@ export function Chat() {
   // Model Mode State
   const [localModels, setLocalModels] = useState<{ lmstudio: DiscoveredModel[], ollama: DiscoveredModel[] }>({ lmstudio: [], ollama: [] });
   const [selectedModel, setSelectedModel] = useState<{ provider: 'lmstudio' | 'ollama', id: string } | null>(null);
-  const [customSystemPrompt] = useState('You are a helpful AI assistant connected to the Nexus Neural Hub.');
+  const [customSystemPrompt, setCustomSystemPrompt] = useState('You are a helpful AI assistant connected to the Nexus Neural Hub.');
   const [showPromptEditor, setShowPromptEditor] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -399,6 +399,29 @@ export function Chat() {
                 </button>
              </div>
           </div>
+
+          {/* System Prompt Editor */}
+          <AnimatePresence>
+            {showPromptEditor && viewMode === 'models' && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden border-b border-white/5"
+              >
+                <div className="px-6 py-4 bg-purple-500/5">
+                  <label className="text-[8px] font-black text-purple-400 uppercase tracking-[0.3em] mb-2 block">System Prompt</label>
+                  <textarea
+                    value={customSystemPrompt}
+                    onChange={e => setCustomSystemPrompt(e.target.value)}
+                    rows={4}
+                    className="w-full glass-input border-purple-500/20 text-xs resize-none font-mono"
+                    placeholder="You are a helpful AI assistant..."
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Buffer Message Field */}
           <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8 custom-scrollbar pb-40">
