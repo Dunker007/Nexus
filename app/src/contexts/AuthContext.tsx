@@ -23,17 +23,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     fetch('/api/auth/me', { credentials: 'include' })
-      .then(r => r.json())
-      .then(data => setUser(data.user || null))
+      .then(r => r.ok ? r.json() : null)
+      .then(data => setUser(data?.user || null))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
 
   const login = () => {
-    fetch('/api/auth/url')
-      .then(r => r.json())
+    fetch('/api/auth/url', { credentials: 'include' })
+      .then(r => {
+        if (!r.ok) throw new Error(`auth/url returned ${r.status}`);
+        const ct = r.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) throw new Error('auth/url returned non-JSON');
+        return r.json();
+      })
       .then(({ url }) => { window.location.href = url; })
-      .catch(console.error);
+      .catch(err => console.error('[Auth] login failed:', err));
   };
 
   const logout = async () => {

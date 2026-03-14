@@ -9,7 +9,7 @@ export const authRouter = Router();
 const client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3001/auth/callback'
+  process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3001/api/auth/callback'
 );
 
 const JWT_SECRET = process.env.JWT_SECRET || 'nexus-dev-secret-change-in-prod';
