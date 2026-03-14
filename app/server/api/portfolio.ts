@@ -3,14 +3,23 @@ import { db } from '../db.js';
 
 export const portfolioRouter = Router();
 
-// In-memory portfolio store for dashboard summary & lab bridge
-const portfolioStore = new Map<string, any>();
+// ─── DB helpers ───────────────────────────────────────────────────────────────
+const getSyncRow = (accountId: string) => {
+  const row = db.prepare('SELECT * FROM portfolio_sync WHERE account_id = ?').get(accountId) as any;
+  if (!row) return null;
+  return {
+    positions: JSON.parse(row.positions),
+    journal: JSON.parse(row.journal),
+    pendingOrders: [],
+    lastSync: row.last_sync,
+  };
+};
 
 // Portfolio summary for dashboard widget
 portfolioRouter.get('/summary', (_req, res) => {
   try {
-    const suiData = portfolioStore.get('sui');
-    const altsData = portfolioStore.get('alts');
+    const suiData = getSyncRow('sui');
+    const altsData = getSyncRow('alts');
 
     // Calculate totals from both accounts
     const calculateTotal = (data: any) => {
@@ -72,7 +81,7 @@ portfolioRouter.get('/accounts', (_req, res) => {
 // Retrieve specific account data (Bridge)
 portfolioRouter.get('/:accountId', (req, res) => {
   const { accountId } = req.params;
-  const data = portfolioStore.get(accountId.toLowerCase());
+  const data = getSyncRow(accountId.toLowerCase());
   res.json(data || { positions: [], journal: [], pendingOrders: [] });
 });
 
@@ -81,12 +90,14 @@ portfolioRouter.post('/:accountId/sync', (req, res) => {
   const { accountId } = req.params;
   const { assets, journal } = req.body;
 
-  portfolioStore.set(accountId.toLowerCase(), {
-    positions: assets || [],
-    journal: journal || [],
-    pendingOrders: [],
-    lastSync: new Date().toISOString()
-  });
+  db.prepare(`
+    INSERT INTO portfolio_sync (account_id, positions, journal, last_sync)
+    VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+    ON CONFLICT(account_id) DO UPDATE SET
+      positions  = excluded.positions,
+      journal    = excluded.journal,
+      last_sync  = excluded.last_sync
+  `).run(accountId.toLowerCase(), JSON.stringify(assets || []), JSON.stringify(journal || []));
 
   res.json({ success: true });
 });

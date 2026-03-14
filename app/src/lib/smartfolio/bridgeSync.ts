@@ -8,9 +8,7 @@ const BRIDGE_URL = '/api/smartfolio';
 export async function fetchAccountState(accountId: AccountId): Promise<AccountState> {
     const seed = ACCOUNTS[accountId];
     try {
-        const res = await fetch(`${BRIDGE_URL}/${accountId}`, {
-            headers: { 'x-api-key': import.meta.env.VITE_BRIDGE_API_KEY || '' }
-        });
+        const res = await fetch(`${BRIDGE_URL}/${accountId}`);
 
         if (!res.ok) {
             throw new Error(`Bridge returned ${res.status}: ${res.statusText}`);
@@ -99,7 +97,6 @@ export async function saveAccountStateToBridge(accountId: AccountId, assets: Ass
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': import.meta.env.VITE_BRIDGE_API_KEY || ''
             },
             body: JSON.stringify({
                 assets: assets.map(a => ({

@@ -35,10 +35,12 @@ const getGoogleAuth = (scopes: string[]) => {
   }
 };
 
+const DRIVE_ID_RE = /^[a-zA-Z0-9_\-]{10,}$/;
 const resolveFolderId = (id?: string) => {
   let folderId = id || process.env.GDRIVE_FOLDER_ID || 'root';
   if (folderId) folderId = folderId.replace(/['"]/g, '').trim().split('?')[0];
   if (!folderId || folderId === '.') return 'root';
+  if (folderId !== 'root' && !DRIVE_ID_RE.test(folderId)) return 'root';
   return folderId;
 };
 

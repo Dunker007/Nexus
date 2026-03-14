@@ -7,7 +7,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '..', 'nexus.db');
 
 export const db = new Database(DB_PATH);
-export const prisma = new PrismaClient();
+
+// Lazy Prisma init — DATABASE_URL may not be set until migrate-cloud.ts runs
+let _prisma: PrismaClient | null = null;
+export const getPrisma = () => {
+  if (!_prisma) _prisma = new PrismaClient();
+  return _prisma;
+};
+// Back-compat alias for any existing imports of `prisma`
+export const prisma = new Proxy({} as PrismaClient, {
+  get: (_t, prop) => (getPrisma() as any)[prop],
+});
 
 // Enable WAL mode for better concurrent performance
 db.pragma('journal_mode = WAL');
@@ -117,6 +127,22 @@ safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN genre TEXT DEFAULT NULL`);
 safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN bpm INTEGER DEFAULT NULL`);
 safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN key TEXT DEFAULT NULL`);
 safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN notes TEXT DEFAULT NULL`);
+
+// ─── Indexes for frequently queried columns ──────────────────────────────────
+const safeIndex = (sql: string) => { try { db.exec(sql); } catch { /* already exists */ } };
+safeIndex(`CREATE INDEX IF NOT EXISTS idx_news_items_created_at    ON news_items(created_at DESC)`);
+safeIndex(`CREATE INDEX IF NOT EXISTS idx_chat_history_timestamp   ON chat_history(timestamp ASC)`);
+safeIndex(`CREATE INDEX IF NOT EXISTS idx_portfolio_sync_account   ON portfolio_sync(account_id)`);
+
+// ─── Portfolio sync table (persists bridge state across restarts) ─────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS portfolio_sync (
+    account_id TEXT PRIMARY KEY,
+    positions  TEXT NOT NULL DEFAULT '[]',
+    journal    TEXT NOT NULL DEFAULT '[]',
+    last_sync  DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
 
 console.log(`[DB] SQLite connected: ${DB_PATH}`);
 
