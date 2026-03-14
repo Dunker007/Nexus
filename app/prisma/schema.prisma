@@ -2,9 +2,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// DB_PROVIDER: "postgresql" in production (Cloud Run), "sqlite" in dev
+// DATABASE_URL: set by migrate-cloud.ts in prod, or uses file:../nexus.db in dev
 datasource db {
-  provider = "sqlite"
-  url      = "file:../nexus.db"
+  provider = env("DB_PROVIDER")
+  url      = env("DATABASE_URL")
 }
 
 model agents {

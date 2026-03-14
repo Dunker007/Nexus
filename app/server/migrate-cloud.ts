@@ -22,6 +22,7 @@ export async function autoMigrateCloud() {
     // Set DATABASE_URL to use the Unix socket for the connection via the Cloud Run proxy
     // Standard Prisma connection pattern for Cloud SQL:
     process.env.DATABASE_URL = `postgresql://${DB_USER}:${DB_PASS}@localhost/${DB_NAME}?host=/cloudsql/${CLOUD_SQL_CONNECTION_NAME}`;
+    process.env.DB_PROVIDER = 'postgresql';
 
     // Push the schema to ensuring the database matches prisma/schema.prisma (now our postgres schema)
     execSync('npx prisma db push', { stdio: 'inherit' });
