@@ -127,4 +127,15 @@ async function startServer() {
   });
 }
 
+// ─── Global error handlers (feeds GCP Error Reporting via Cloud Logging) ──────
+process.on('uncaughtException', (err) => {
+  logger.error('uncaughtException', { message: err.message, stack: err.stack });
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  const err = reason instanceof Error ? reason : new Error(String(reason));
+  logger.error('unhandledRejection', { message: err.message, stack: err.stack });
+});
+
 startServer().catch(err => logger.error('Fatal startup error', { message: err.message, stack: err.stack }));

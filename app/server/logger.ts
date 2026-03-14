@@ -1,6 +1,9 @@
 /**
  * Structured logger — emits JSON in production (Cloud Logging compatible),
  * human-readable in development.
+ *
+ * In production, error entries include a `stack` field which GCP Error Reporting
+ * automatically picks up from Cloud Logging without needing the separate SDK.
  */
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';

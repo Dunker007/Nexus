@@ -92,7 +92,7 @@ export function Chat() {
 
   // --- State ---
   const [viewMode, setViewMode] = useState<'agents' | 'models'>('agents');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 768);
 
   // Chat State
   const [messages, setMessages] = useState<Message[]>([]);

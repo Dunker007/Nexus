@@ -201,10 +201,10 @@ export function Pipeline() {
 
   return (
     <PageLayout color="purple" noPadding>
-      <div className="flex h-[calc(100vh-64px)] relative overflow-hidden">
-        
+      <div className="flex flex-col md:flex-row h-[calc(100vh-64px)] relative overflow-hidden">
+
         {/* Sidebar: Pipeline Stack */}
-        <aside className="w-80 border-r border-white/5 bg-black/40 backdrop-blur-xl flex flex-col shrink-0 relative z-20 shadow-2xl">
+        <aside className="w-full md:w-80 border-b md:border-b-0 md:border-r border-white/5 bg-black/40 backdrop-blur-xl flex flex-col shrink-0 relative z-20 shadow-2xl max-h-64 md:max-h-none overflow-y-auto md:overflow-visible">
           <div className="p-8 border-b border-white/5 bg-gradient-to-br from-purple-500/5 to-transparent flex items-center justify-between">
             <div>
               <h2 className="text-[10px] uppercase font-black tracking-[0.4em] text-purple-400 mb-2">Vector Tracking</h2>
