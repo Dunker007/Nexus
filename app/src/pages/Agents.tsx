@@ -91,109 +91,160 @@ export function Agents() {
   if (loading) return <div className="flex items-center justify-center h-full"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cyan-400" /></div>;
 
   return (
-    <div className="flex h-full bg-[#0a0a0f]">
-      <aside className="w-64 border-r border-white/5 bg-[#0d0d14] flex flex-col shrink-0">
-        <div className="p-5 border-b border-white/5 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-            <Users className="w-4 h-4 text-cyan-400" />
+    <div className="flex h-full bg-[#0a0a0f] bg-mesh-purple overflow-hidden">
+      {/* Background Ambient Glow */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[120px] mix-blend-screen" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-cyan-600/5 rounded-full blur-[120px] mix-blend-screen" />
+      </div>
+
+      <aside className="w-80 glass-sidebar flex flex-col shrink-0 relative z-10">
+        <div className="p-8 border-b border-white/5 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shadow-lg shadow-purple-500/5">
+            <Users className="w-5 h-4 text-purple-400" />
           </div>
           <div>
-            <h1 className="font-bold text-white text-sm">Agent Roster</h1>
-            <p className="text-[10px] text-cyan-400 font-mono tracking-widest">NEXUS</p>
+            <h1 className="font-black text-white text-base tracking-tight leading-none">Agent Roster</h1>
+            <p className="text-[10px] text-purple-400/60 font-black uppercase tracking-[0.2em] mt-1.5">Command Center</p>
           </div>
         </div>
-        <div className="p-3 space-y-1 overflow-y-auto flex-1">
-          {agents.map(agent => (
-            <div key={agent.id} onClick={() => { setSelectedAgent(agent); setIsCreating(false); setIsEditing(false); }}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all ${selectedAgent?.id === agent.id && !isCreating ? 'bg-cyan-500/10 border border-cyan-500/20 text-white' : 'text-white/40 hover:text-white hover:bg-white/5 border border-transparent'}`}>
-              <div className="flex items-center gap-2 overflow-hidden">
-                <Bot className={`w-4 h-4 shrink-0 ${agent.status === 'active' ? 'text-cyan-400' : 'text-white/20'}`} />
+
+        <div className="p-4 space-y-2 overflow-y-auto flex-1 custom-scrollbar">
+          {agents.map((agent, idx) => (
+            <motion.div 
+              key={agent.id} 
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.05 }}
+              onClick={() => { setSelectedAgent(agent); setIsCreating(false); setIsEditing(false); }}
+              className={`group flex items-center justify-between px-4 py-3.5 rounded-xl cursor-pointer transition-all duration-300 relative overflow-hidden ${selectedAgent?.id === agent.id && !isCreating 
+                ? 'bg-white/5 border border-white/10 text-white shadow-xl' 
+                : 'text-white/40 hover:text-white hover:bg-white/[0.02] border border-transparent'}`}
+            >
+              {selectedAgent?.id === agent.id && !isCreating && (
+                <motion.div layoutId="active-agent" className="absolute left-0 top-0 bottom-0 w-1 bg-purple-500" />
+              )}
+              
+              <div className="flex items-center gap-3 overflow-hidden relative z-10">
+                <div className={`p-2 rounded-lg transition-colors ${selectedAgent?.id === agent.id ? 'bg-purple-500/20' : 'bg-white/5 group-hover:bg-white/10'}`}>
+                  <Bot className={`w-4 h-4 shrink-0 transition-colors ${agent.status === 'active' ? 'text-cyan-400' : 'text-white/20'}`} />
+                </div>
                 <div className="overflow-hidden">
-                  <div className="text-sm font-medium truncate">{agent.name}</div>
-                  <div className="text-[10px] font-mono text-white/30 truncate">{agent.role}</div>
+                  <div className="text-[13px] font-bold truncate tracking-tight">{agent.name}</div>
+                  <div className="text-[10px] font-black uppercase tracking-wider text-white/20 group-hover:text-white/40 transition-colors">{agent.role}</div>
                 </div>
               </div>
-              <button onClick={e => handleToggleStatus(agent, e)} className={`p-1 rounded transition-colors ${agent.status === 'active' ? 'text-emerald-400 hover:bg-emerald-400/10' : 'text-white/20 hover:text-white/60'}`}>
-                {agent.status === 'active' ? <Power className="w-3 h-3" /> : <PowerOff className="w-3 h-3" />}
+
+              <button 
+                onClick={e => handleToggleStatus(agent, e)} 
+                className={`p-2 rounded-lg transition-all relative z-10 ${agent.status === 'active' ? 'text-emerald-400/60 hover:text-emerald-400 hover:bg-emerald-400/10' : 'text-white/20 hover:text-white/60 hover:bg-white/5'}`}
+              >
+                {agent.status === 'active' ? <Power className="w-3.5 h-3.5" /> : <PowerOff className="w-3.5 h-3.5" />}
               </button>
-            </div>
+            </motion.div>
           ))}
+          
           <button onClick={() => { setSelectedAgent(null); setIsCreating(true); setIsEditing(true); setEditForm({ name: '', role: '', description: '', status: 'active', system_prompt: '' }); }}
-            className={`w-full mt-3 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm border border-dashed transition-all ${isCreating ? 'border-cyan-500/50 text-cyan-400 bg-cyan-500/10' : 'border-white/10 text-white/30 hover:text-white/60 hover:border-white/20'}`}>
-            <Plus className="w-4 h-4" /><span className="font-mono text-xs">NEW AGENT</span>
+            className={`w-full mt-6 flex items-center justify-center gap-2 px-4 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border border-dashed transition-all active:scale-[0.98] ${isCreating 
+              ? 'border-purple-500/50 text-purple-400 bg-purple-500/10' 
+              : 'border-white/10 text-white/30 hover:text-white/60 hover:border-white/20 hover:bg-white/[0.02]'}`}>
+            <Plus className="w-4 h-4" /> New AI Construct
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto p-8">
-        <div className="max-w-3xl mx-auto">
+      <main className="flex-1 overflow-y-auto relative z-10">
+        <div className="max-w-4xl mx-auto px-10 py-12">
           {(selectedAgent || isCreating) ? (
-            <motion.div key={isCreating ? 'create' : selectedAgent?.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+            <motion.div key={isCreating ? 'create' : selectedAgent?.id} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
               <div className="flex items-start justify-between">
                 {isEditing ? (
-                  <div className="flex-1 mr-4 space-y-2">
+                  <div className="flex-1 mr-8 space-y-4">
                     <input type="text" value={editForm.name || ''} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} placeholder="Agent Name"
-                      className="text-2xl font-bold text-white bg-transparent border-b border-white/10 focus:border-cyan-500 focus:outline-none w-full pb-1 transition-colors" />
-                    <div className="flex gap-2">
-                      <input type="text" value={editForm.role || ''} onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))} placeholder="Role"
-                        className="px-2 py-1 rounded bg-white/5 text-xs font-mono text-white border border-white/10 focus:border-cyan-500 focus:outline-none" />
-                      <select value={editForm.status || 'active'} onChange={e => setEditForm(p => ({ ...p, status: e.target.value }))}
-                        className="px-2 py-1 rounded bg-white/5 text-xs font-mono text-white border border-white/10 focus:border-cyan-500 focus:outline-none">
-                        <option value="active">ACTIVE</option>
-                        <option value="inactive">INACTIVE</option>
-                        <option value="development">DEVELOPMENT</option>
-                      </select>
+                      className="text-4xl font-black text-white bg-transparent border-b-2 border-white/5 focus:border-purple-500 focus:outline-none w-full pb-2 transition-all tracking-tight placeholder:text-white/10" />
+                    <div className="flex gap-3">
+                      <div className="flex-1 max-w-[200px] relative">
+                        <input type="text" value={editForm.role || ''} onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))} placeholder="Role"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white/5 text-[10px] font-black uppercase tracking-widest text-white border border-white/5 focus:border-purple-500/50 focus:outline-none focus:ring-4 focus:ring-purple-500/10 transition-all" />
+                      </div>
+                      <div className="relative">
+                        <select value={editForm.status || 'active'} onChange={e => setEditForm(p => ({ ...p, status: e.target.value }))}
+                          className="appearance-none px-4 py-2.5 rounded-xl bg-white/5 text-[10px] font-black uppercase tracking-widest text-white border border-white/5 focus:border-cyan-500/50 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 transition-all pr-10">
+                          <option value="active">ONLINE / ALPHA</option>
+                          <option value="inactive">OFFLINE</option>
+                          <option value="development">LABS / DEV</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 ) : (
                   <div>
-                    <h2 className="text-2xl font-bold text-white mb-2">{selectedAgent?.name}</h2>
-                    <div className="flex items-center gap-3">
-                      <span className="px-2 py-1 rounded bg-white/5 text-xs font-mono text-white border border-white/10">{selectedAgent?.role}</span>
-                      <span className={`flex items-center gap-1 text-xs font-mono ${selectedAgent?.status === 'active' ? 'text-emerald-400' : 'text-amber-400'}`}>
-                        <Activity className="w-3 h-3" />{selectedAgent?.status.toUpperCase()}
+                    <h2 className="text-4xl font-black text-white mb-3 tracking-tight">
+                      <span className="text-gradient-purple">{selectedAgent?.name}</span>
+                    </h2>
+                    <div className="flex items-center gap-2">
+                      <span className="px-3 py-1.5 rounded-lg bg-white/5 text-[10px] font-black uppercase tracking-[0.15em] text-white/50 border border-white/5">{selectedAgent?.role}</span>
+                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] border ${selectedAgent?.status === 'active' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${selectedAgent?.status === 'active' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                        {selectedAgent?.status.toUpperCase()}
                       </span>
                     </div>
                   </div>
                 )}
-                <div className="flex gap-2 shrink-0">
+                
+                <div className="flex gap-3 shrink-0 pt-2">
                   {isEditing ? (
                     <>
                       <button onClick={() => { setIsEditing(false); if (isCreating) { setIsCreating(false); if (agents.length) setSelectedAgent(agents[0]); } }}
-                        className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-colors">Cancel</button>
+                        className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/50 text-[10px] font-black uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all active:scale-95">Discard</button>
                       <button onClick={handleSave}
-                        className="px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-sm hover:bg-cyan-500/20 transition-colors flex items-center gap-2">
-                        <Save className="w-3 h-3" />Save
+                        className="px-6 py-2.5 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-400 text-[10px] font-black uppercase tracking-widest hover:bg-purple-500/30 transition-all flex items-center gap-2 shadow-lg shadow-purple-500/10 active:scale-95">
+                        <Save className="w-4 h-4" /> Commit Changes
                       </button>
                     </>
                   ) : (
                     <button onClick={() => { setIsEditing(true); setEditForm(selectedAgent!); }}
-                      className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-colors flex items-center gap-2">
-                      <Settings className="w-3 h-3" />Configure
+                      className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/60 text-[10px] font-black uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all flex items-center gap-2 active:scale-95">
+                      <Settings className="w-4 h-4" /> Parameters
                     </button>
                   )}
                 </div>
               </div>
 
-              <div className="rounded-xl border border-white/5 bg-white/3 p-5">
-                <h3 className="text-xs font-mono font-bold tracking-widest text-white/30 mb-3">DESCRIPTION</h3>
-                {isEditing
-                  ? <textarea value={editForm.description || ''} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))} placeholder="Brief description..." className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-cyan-500 min-h-[80px] transition-colors" />
-                  : <p className="text-white/70 text-sm leading-relaxed">{selectedAgent?.description || 'No description.'}</p>}
-              </div>
+              <div className="grid grid-cols-1 gap-8">
+                <div className="glass-card p-8 border-white/5 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity">
+                    <Activity className="w-32 h-32" />
+                  </div>
+                  <h3 className="text-[10px] font-black tracking-[0.3em] text-white/20 mb-4 uppercase">Directives & Identity</h3>
+                  {isEditing
+                    ? <textarea value={editForm.description || ''} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))} placeholder="Brief description of agent's purpose..." 
+                        className="w-full bg-white/5 border border-white/10 rounded-xl p-5 text-white text-sm focus:outline-none focus:border-purple-500/50 min-h-[100px] transition-all placeholder:text-white/10 focus:ring-4 focus:ring-purple-500/5" />
+                    : <p className="text-white/80 text-base leading-relaxed tracking-tight">{selectedAgent?.description || 'No operational description provided.'}</p>}
+                </div>
 
-              <div className="rounded-xl border border-white/5 bg-white/3 p-5">
-                <h3 className="text-xs font-mono font-bold tracking-widest text-white/30 mb-3">SYSTEM PROMPT</h3>
-                {isEditing
-                  ? <textarea value={editForm.system_prompt || ''} onChange={e => setEditForm(p => ({ ...p, system_prompt: e.target.value }))} placeholder="You are..." className="w-full bg-white/5 border border-white/10 rounded-lg p-3 font-mono text-sm text-white focus:outline-none focus:border-cyan-500 min-h-[240px] transition-colors" />
-                  : <pre className="p-4 rounded-lg bg-black/30 border border-white/5 font-mono text-xs text-white/70 whitespace-pre-wrap">{selectedAgent?.system_prompt || 'No system prompt configured.'}</pre>}
+                <div className="glass-card p-1 border-white/5">
+                  <div className="p-7">
+                    <h3 className="text-[10px] font-black tracking-[0.3em] text-white/20 mb-4 uppercase">Neural Configuration (System Prompt)</h3>
+                  </div>
+                  <div className="px-1 pb-1">
+                    {isEditing
+                      ? <textarea value={editForm.system_prompt || ''} onChange={e => setEditForm(p => ({ ...p, system_prompt: e.target.value }))} placeholder="The core logic defining this agent's personality and constraints..." 
+                          className="w-full bg-black/40 border-t border-white/5 rounded-b-2xl p-6 font-mono text-sm text-cyan-400/80 focus:outline-none focus:text-cyan-400 min-h-[400px] transition-all custom-scrollbar placeholder:text-white/5" />
+                      : <div className="bg-black/40 border-t border-white/5 rounded-b-2xl p-8 font-mono text-[13px] text-cyan-400/70 whitespace-pre-wrap leading-relaxed max-h-[600px] overflow-y-auto custom-scrollbar">
+                          {selectedAgent?.system_prompt || 'No neural pattern established.'}
+                        </div>}
+                  </div>
+                </div>
               </div>
             </motion.div>
           ) : (
-            <div className="h-96 rounded-xl border border-dashed border-white/10 flex flex-col items-center justify-center text-center">
-              <Bot className="w-10 h-10 text-white/10 mb-3" />
-              <h3 className="text-lg font-bold text-white/30">No Agent Selected</h3>
-              <p className="text-xs text-white/20 mt-1">Pick an agent from the roster or create one</p>
+            <div className="h-[60vh] rounded-3xl border border-dashed border-white/5 bg-white/[0.01] flex flex-col items-center justify-center text-center p-12">
+              <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6 border border-white/5 shadow-inner">
+                <Bot className="w-10 h-10 text-white/10" />
+              </div>
+              <h3 className="text-2xl font-black text-white/30 tracking-tight">System Idle</h3>
+              <p className="text-sm text-white/20 mt-2 max-w-xs uppercase font-black tracking-widest leading-loose">Initialize an agent from the roster to begin diagnostic or parameter adjustment</p>
             </div>
           )}
         </div>

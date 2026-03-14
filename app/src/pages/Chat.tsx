@@ -270,42 +270,53 @@ export function Chat() {
     };
 
     return (
-        <div className="flex h-full overflow-hidden text-gray-100 bg-[#0a0a0f]">
+        <div className="flex h-full overflow-hidden text-gray-100 bg-[#0a0a0f] bg-mesh-cyan relative">
+            {/* Ambient Background Glows */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[120px] mix-blend-screen" />
+                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-600/5 rounded-full blur-[120px] mix-blend-screen" />
+            </div>
+
             {/* Sidebar */}
             <motion.div
                 animate={{ width: sidebarOpen ? 300 : 80 }}
-                className="border-r border-white/5 bg-[#0d0d14] flex flex-col z-20 h-full shrink-0 hidden md:flex"
+                className="glass-sidebar flex flex-col z-20 h-full shrink-0 hidden md:flex"
             >
                 {/* Brand */}
-                <div className="p-6 flex items-center gap-3 border-b border-white/5">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-black shrink-0">
+                <div className="p-8 flex items-center gap-4 border-b border-white/5">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center font-black text-black shrink-0 shadow-lg shadow-cyan-500/20">
                         N
                     </div>
-                    {sidebarOpen && <span className="font-bold text-lg tracking-tight whitespace-nowrap">Neural<span className="text-cyan-400">Hub</span></span>}
+                    {sidebarOpen && (
+                        <div className="flex flex-col">
+                            <span className="font-black text-lg tracking-tight whitespace-nowrap leading-none">Neural<span className="text-cyan-400">Hub</span></span>
+                            <span className="text-[10px] text-white/30 font-black uppercase tracking-[0.2em] mt-1.5 leading-none">Core Interface</span>
+                        </div>
+                    )}
 
                     <button
                         onClick={() => setSidebarOpen(!sidebarOpen)}
-                        className="ml-auto w-6 h-6 rounded-md bg-white/5 hover:bg-white/10 flex items-center justify-center shrink-0 transition-colors"
+                        className={`ml-auto w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center shrink-0 transition-all border border-white/5 ${!sidebarOpen && 'mx-auto'}`}
                     >
-                        <ChevronRight className={`w-4 h-4 transition-transform ${sidebarOpen ? 'rotate-180' : ''}`} />
+                        <ChevronRight className={`w-4 h-4 text-white/40 transition-transform ${sidebarOpen ? 'rotate-180' : ''}`} />
                     </button>
                 </div>
 
                 {/* Mode Switcher */}
                 {sidebarOpen && (
-                    <div className="p-4 border-b border-white/5">
-                        <div className="flex bg-black/40 rounded-lg p-1 border border-white/5">
+                    <div className="p-5">
+                        <div className="flex bg-black/40 rounded-xl p-1.5 border border-white/5 shadow-inner">
                             <button
                                 onClick={() => setViewMode('agents')}
-                                className={`flex-1 py-1.5 text-xs font-bold uppercase tracking-wider rounded-md transition-all ${viewMode === 'agents' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-gray-500 hover:text-white'}`}
+                                className={`flex-1 py-2 text-[10px] font-black uppercase tracking-[0.15em] rounded-lg transition-all ${viewMode === 'agents' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-white/30 hover:text-white'}`}
                             >
-                                Agents
+                                Personas
                             </button>
                             <button
                                 onClick={() => setViewMode('models')}
-                                className={`flex-1 py-1.5 text-xs font-bold uppercase tracking-wider rounded-md transition-all ${viewMode === 'models' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 'text-gray-500 hover:text-white'}`}
+                                className={`flex-1 py-2 text-[10px] font-black uppercase tracking-[0.15em] rounded-lg transition-all ${viewMode === 'models' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 'text-white/30 hover:text-white'}`}
                             >
-                                Models
+                                Engines
                             </button>
                         </div>
                     </div>
@@ -316,30 +327,35 @@ export function Chat() {
                     {/* --- AGENTS LIST --- */}
                     {viewMode === 'agents' && (
                         <>
-                            {sidebarOpen && <div className="px-2 pb-2 text-[10px] font-bold text-white/30 uppercase tracking-widest">Active Personas</div>}
-                            {AGENTS.map(agent => {
+                            {sidebarOpen && <div className="px-3 pb-3 text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Neural Constructs</div>}
+                            {AGENTS.map((agent, idx) => {
                                 const Icon = agent.icon;
                                 const isActive = activeAgentId === agent.id;
                                 return (
-                                    <button
+                                    <motion.button
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
                                         key={agent.id}
                                         onClick={() => setActiveAgentId(agent.id)}
-                                        className={`w-full flex items-center gap-3 p-2.5 rounded-xl transition-all ${isActive
-                                            ? 'bg-white/5 border border-white/10 shadow-lg'
+                                        className={`group w-full flex items-center gap-4 p-3 rounded-2xl transition-all relative overflow-hidden ${isActive
+                                            ? 'bg-white/5 border border-white/10 shadow-xl'
                                             : 'hover:bg-white/[0.02] border border-transparent'
                                             }`}
                                     >
-                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border ${isActive ? agent.color.replace('text-', 'bg-') + '/10 ' + agent.color.replace('text-', 'border-') + '/30' : 'bg-black/40 border-white/5'}`}>
-                                            <Icon size={18} className={isActive ? agent.color : 'text-white/40'} />
+                                        {isActive && <motion.div layoutId="active-chat-sidebar" className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500" />}
+                                        
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-all ${isActive ? agent.color.replace('text-', 'bg-') + '/20 ' + agent.color.replace('text-', 'border-') + '/40' : 'bg-black/40 border-white/5 group-hover:border-white/10'}`}>
+                                            <Icon size={18} className={isActive ? agent.color : 'text-white/20 transition-colors group-hover:text-white/40'} />
                                         </div>
                                         {sidebarOpen && (
                                             <div className="text-left flex-1 min-w-0">
-                                                <div className={`font-bold text-sm truncate ${isActive ? 'text-white' : 'text-white/60'}`}>{agent.name}</div>
-                                                <div className="text-xs text-white/30 font-mono truncate">{agent.role}</div>
+                                                <div className={`font-bold text-sm truncate tracking-tight transition-colors ${isActive ? 'text-white' : 'text-white/40 group-hover:text-white/60'}`}>{agent.name}</div>
+                                                <div className="text-[10px] text-white/20 font-black uppercase tracking-wider truncate leading-tight mt-0.5">{agent.role}</div>
                                             </div>
                                         )}
                                         {isActive && sidebarOpen && <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />}
-                                    </button>
+                                    </motion.button>
                                 );
                             })}
                         </>
@@ -351,7 +367,7 @@ export function Chat() {
                             {/* LM Studio */}
                             {localModels.lmstudio.length > 0 && (
                                 <div>
-                                    {sidebarOpen && <div className="px-2 pb-2 text-[10px] font-bold text-purple-400 uppercase tracking-widest flex items-center gap-2"><Server size={12} /> LM Studio</div>}
+                                    {sidebarOpen && <div className="px-3 pb-3 text-[10px] font-black text-purple-400/60 uppercase tracking-[0.2em] flex items-center gap-2 px-1"><Server size={12} /> LM Studio</div>}
                                     {localModels.lmstudio.map(model => (
                                         <button
                                             key={model.id}
@@ -359,18 +375,18 @@ export function Chat() {
                                                 setSelectedModel({ provider: 'lmstudio', id: model.id });
                                                 setMessages([]);
                                             }}
-                                            className={`w-full flex items-center gap-3 p-2.5 rounded-xl transition-all mb-1 ${selectedModel?.id === model.id
-                                                ? 'bg-purple-500/10 border border-purple-500/30'
+                                            className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-all mb-1 ${selectedModel?.id === model.id
+                                                ? 'bg-purple-500/10 border border-purple-500/30 shadow-xl shadow-purple-500/5'
                                                 : 'hover:bg-white/[0.02] border border-transparent'
                                                 }`}
                                         >
-                                            <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-black/40 border border-white/5">
-                                                <Database size={16} className={selectedModel?.id === model.id ? 'text-purple-400' : 'text-white/40'} />
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-black/40 border ${selectedModel?.id === model.id ? 'border-purple-500/30' : 'border-white/5'}`}>
+                                                <Database size={16} className={selectedModel?.id === model.id ? 'text-purple-400' : 'text-white/20'} />
                                             </div>
                                             {sidebarOpen && (
                                                 <div className="text-left flex-1 min-w-0">
-                                                    <div className="font-bold text-sm truncate text-white/80">{model.id.split('/').pop()}</div>
-                                                    <div className="text-xs text-white/30 truncate font-mono">{getModelSize(model.size) || 'Local'}</div>
+                                                    <div className="font-bold text-sm truncate text-white/80 tracking-tight">{model.id.split('/').pop()}</div>
+                                                    <div className="text-[10px] text-white/30 truncate font-black uppercase tracking-widest mt-0.5">{getModelSize(model.size) || 'Local Build'}</div>
                                                 </div>
                                             )}
                                         </button>
@@ -381,7 +397,7 @@ export function Chat() {
                             {/* Ollama */}
                             {localModels.ollama.length > 0 && (
                                 <div>
-                                    {sidebarOpen && <div className="px-2 pb-2 text-[10px] font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2"><Box size={12} /> Ollama Engine</div>}
+                                    {sidebarOpen && <div className="px-3 pb-3 text-[10px] font-black text-cyan-400/60 uppercase tracking-[0.2em] flex items-center gap-2 px-1"><Box size={12} /> Ollama</div>}
                                     {localModels.ollama.map(model => (
                                         <button
                                             key={model.id}
@@ -389,18 +405,18 @@ export function Chat() {
                                                 setSelectedModel({ provider: 'ollama', id: model.id });
                                                 setMessages([]);
                                             }}
-                                            className={`w-full flex items-center gap-3 p-2.5 rounded-xl transition-all mb-1 ${selectedModel?.id === model.id
-                                                ? 'bg-orange-500/10 border border-orange-500/30'
+                                            className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-all mb-1 ${selectedModel?.id === model.id
+                                                ? 'bg-cyan-500/10 border border-cyan-500/30 shadow-xl shadow-cyan-500/5'
                                                 : 'hover:bg-white/[0.02] border border-transparent'
                                                 }`}
                                         >
-                                            <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-black/40 border border-white/5">
-                                                <Terminal size={16} className={selectedModel?.id === model.id ? 'text-orange-400' : 'text-white/40'} />
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-black/40 border ${selectedModel?.id === model.id ? 'border-cyan-500/30' : 'border-white/5'}`}>
+                                                <Terminal size={16} className={selectedModel?.id === model.id ? 'text-cyan-400' : 'text-white/20'} />
                                             </div>
                                             {sidebarOpen && (
                                                 <div className="text-left flex-1 min-w-0">
-                                                    <div className="font-bold text-sm truncate text-white/80">{model.name || model.id}</div>
-                                                    <div className="text-xs text-white/30 truncate font-mono">{getModelSize(model.size) || 'Local'}</div>
+                                                    <div className="font-bold text-sm truncate text-white/80 tracking-tight">{model.name || model.id}</div>
+                                                    <div className="text-[10px] text-white/30 truncate font-black uppercase tracking-widest mt-0.5">{getModelSize(model.size) || 'Neural Engine'}</div>
                                                 </div>
                                             )}
                                         </button>
@@ -414,75 +430,85 @@ export function Chat() {
 
             {/* Main Chat Area */}
             <div className="flex-1 flex flex-col relative z-10 w-full">
-                {/* Header */}
-                <header className="border-b border-white/5 bg-[#0d0d14] p-4 shrink-0 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        {viewMode === 'agents' ? (
-                            <>
-                                <div className={`w-10 h-10 rounded-lg border flex items-center justify-center shrink-0 ${activeAgent.color.replace('text-', 'bg-')}/10 ${activeAgent.color.replace('text-', 'border-')}/30`}>
-                                    <activeAgent.icon className={activeAgent.color} size={20} />
-                                </div>
-                                <div className="hidden sm:block">
-                                    <div className="flex items-center gap-2">
-                                        <h1 className="text-lg font-bold text-white tracking-tight">{activeAgent.name}</h1>
+                {/* Header Container */}
+                <div className="px-8 pt-8 pb-4 shrink-0">
+                    <header className="glass-panel px-6 py-4 flex items-center justify-between border-white/5 shadow-2xl">
+                        <div className="flex items-center gap-5">
+                            {viewMode === 'agents' ? (
+                                <>
+                                    <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0 shadow-lg ${activeAgent.color.replace('text-', 'bg-')}/10 ${activeAgent.color.replace('text-', 'border-')}/40`}>
+                                        <activeAgent.icon className={activeAgent.color} size={24} />
                                     </div>
-                                    <p className="text-[11px] text-white/40 uppercase tracking-widest font-bold">{activeAgent.role}</p>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div className="w-10 h-10 rounded-lg border bg-purple-500/10 border-purple-500/30 flex items-center justify-center shrink-0">
-                                    <Database className="text-purple-400" size={20} />
-                                </div>
-                                <div className="hidden sm:block">
-                                    <h1 className="text-lg font-bold text-white tracking-tight">{selectedModel?.id || 'Select a Model'}</h1>
-                                    <p className="text-[11px] text-white/40 uppercase tracking-widest font-bold font-mono">{selectedModel?.provider}</p>
-                                </div>
-                            </>
-                        )}
-                    </div>
+                                    <div className="hidden sm:block">
+                                        <div className="flex items-center gap-3">
+                                            <h1 className="text-xl font-black text-white tracking-tight">{activeAgent.name}</h1>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                        </div>
+                                        <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-black mt-1">Operational Persona • {activeAgent.role}</p>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="w-12 h-12 rounded-2xl border bg-purple-500/10 border-purple-500/30 flex items-center justify-center shrink-0 shadow-lg">
+                                        <Database className="text-purple-400" size={24} />
+                                    </div>
+                                    <div className="hidden sm:block">
+                                        <h1 className="text-xl font-black text-white tracking-tight leading-none">{selectedModel?.id || 'Initializing...'}</h1>
+                                        <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-black mt-2 font-mono">{selectedModel?.provider} Engine Native</p>
+                                    </div>
+                                </>
+                            )}
+                        </div>
 
-                    <div className="flex items-center gap-2">
-                        {viewMode === 'models' && selectedModel && (
+                        <div className="flex items-center gap-3">
+                            {viewMode === 'models' && selectedModel && (
+                                <button
+                                    onClick={() => setShowPromptEditor(!showPromptEditor)}
+                                    className={`px-5 py-2.5 rounded-xl border transition-all text-[10px] font-black uppercase tracking-widest shadow-lg ${showPromptEditor ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' : 'bg-white/5 text-white/40 border-white/5 hover:text-white hover:bg-white/10'}`}
+                                >
+                                    <Settings size={14} className="inline mr-2" /> <span className="hidden sm:inline">Tuning</span>
+                                </button>
+                            )}
                             <button
-                                onClick={() => setShowPromptEditor(!showPromptEditor)}
-                                className={`px-3 py-1.5 rounded-lg border transition-colors flex items-center gap-1.5 text-xs font-bold ${showPromptEditor ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' : 'bg-transparent text-white/40 border-transparent hover:text-white/80 hover:bg-white/5'}`}
+                                onClick={clearChat}
+                                className="px-5 py-2.5 rounded-xl border border-white/5 bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-red-400 hover:bg-red-400/10 hover:border-red-400/20 active:scale-95"
                             >
-                                <Settings size={14} /> <span className="hidden sm:inline">Prompt</span>
+                                <Trash2 size={14} className="inline mr-2" /> <span className="hidden sm:inline">Purge Buffer</span>
                             </button>
-                        )}
-                        <button
-                            onClick={clearChat}
-                            className="px-3 py-1.5 rounded-lg border border-transparent transition-colors flex items-center gap-1.5 text-xs font-bold text-white/40 hover:text-red-400 hover:bg-red-400/10"
-                        >
-                            <Trash2 size={14} /> <span className="hidden sm:inline">Clear</span>
-                        </button>
-                    </div>
-                </header>
+                        </div>
+                    </header>
+                </div>
 
                 <AnimatePresence>
                     {showPromptEditor && viewMode === 'models' && (
-                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="bg-[#12121a] border-b border-white/5 p-4 shrink-0 overflow-hidden">
-                            <label className="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2">System Instruction Override</label>
-                            <textarea
-                                value={customSystemPrompt}
-                                onChange={(e) => setCustomSystemPrompt(e.target.value)}
-                                className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white/80 focus:border-purple-500/50 focus:outline-none h-20 resize-none font-mono"
-                            />
+                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="px-8 mb-4">
+                            <div className="glass-card p-6 border-purple-500/20">
+                                <label className="block text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-4">Neural Constraint Override</label>
+                                <textarea
+                                    value={customSystemPrompt}
+                                    onChange={(e) => setCustomSystemPrompt(e.target.value)}
+                                    className="w-full bg-black/40 border border-white/5 rounded-xl p-5 text-sm text-cyan-400/80 focus:text-cyan-400 focus:border-purple-500/40 focus:outline-none h-32 resize-none font-mono custom-scrollbar transition-all"
+                                    placeholder="Enter system instructions to override default model behavior..."
+                                />
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
 
                 {/* Messages Container */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto w-full px-8 pb-32 space-y-10 custom-scrollbar mt-4">
                     {messages.length === 0 && !streaming && (
                         <div className="flex flex-col items-center justify-center h-full text-center pb-20">
-                            <div className="w-16 h-16 rounded-2xl bg-cyan-500/5 border border-cyan-500/20 flex items-center justify-center mb-4">
-                                <Bot className="w-8 h-8 text-cyan-400/50" />
-                            </div>
-                            <h2 className="text-xl font-bold text-white/50 mb-2">Nexus Brain Active</h2>
-                            <p className="text-sm text-white/30 max-w-sm">
-                                {viewMode === 'agents' ? `Communicate securely with the local ${activeAgent.name} agent.` : 'Send direct inference commands to the selected local model.'}
+                            <motion.div 
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                className="w-24 h-24 rounded-[2rem] bg-cyan-500/5 border border-cyan-500/20 flex items-center justify-center mb-8 shadow-[inset_0_0_20px_rgba(34,211,238,0.05)]"
+                            >
+                                <Bot className="w-10 h-10 text-cyan-400/40" />
+                            </motion.div>
+                            <h2 className="text-3xl font-black text-white/60 mb-3 tracking-tight">Neural Hub <span className="text-gradient-cyan uppercase tracking-widest text-xl">Active</span></h2>
+                            <p className="text-xs text-white/20 font-black uppercase tracking-[0.2em] max-w-sm leading-relaxed">
+                                {viewMode === 'agents' ? `Encrypted uplink established with the ${activeAgent.name} construct. Secure peer-to-peer session ready.` : `Direct neural bridge established with local ${selectedModel?.id} engine. Proceed with inference commands.`}
                             </p>
                         </div>
                     )}
@@ -494,64 +520,79 @@ export function Chat() {
                         const Icon = isUser ? User : isSystem ? Shield : agent.icon;
 
                         return (
-                            <div key={msg.id} className={`flex gap-3 sm:gap-4 max-w-4xl mx-auto w-full ${isUser ? 'flex-row-reverse' : ''}`}>
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 }}
+                                key={msg.id} 
+                                className={`flex gap-4 sm:gap-6 max-w-5xl mx-auto w-full ${isUser ? 'flex-row-reverse' : ''}`}
+                            >
                                 {/* Avatar */}
-                                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 border mt-1 shadow-sm ${isUser ? 'bg-white/5 text-white/50 border-white/10' : isSystem ? 'bg-red-500/10 text-red-400 border-red-500/30' : `${agent.color.replace('text-', 'bg-')}/10 ${agent.color.replace('text-', 'border-')}/30 ${agent.color}`}`}>
-                                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 border mt-1 shadow-2xl transition-all ${isUser ? 'bg-white/5 text-white/50 border-white/10' : isSystem ? 'bg-red-500/10 text-red-400 border-red-500/30' : `${agent.color.replace('text-', 'bg-')}/10 ${agent.color.replace('text-', 'border-')}/40 ${agent.color}`}`}>
+                                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </div>
                                 {/* Bubble */}
-                                <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} max-w-[85%]`}>
-                                    <div className={`flex items-center gap-2 mb-1.5 px-1 ${isUser ? 'flex-row-reverse' : ''}`}>
-                                        <span className={`text-xs font-bold uppercase tracking-widest ${isUser ? 'text-white/40' : isSystem ? 'text-red-400' : agent.color}`}>
-                                            {isUser ? 'You' : isSystem ? 'System' : agent.name}
+                                <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} max-w-[85%] min-w-0`}>
+                                    <div className={`flex items-center gap-3 mb-2.5 px-1 ${isUser ? 'flex-row-reverse' : ''}`}>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest ${isUser ? 'text-white/20' : isSystem ? 'text-red-400' : agent.color}`}>
+                                            {isUser ? 'Dunker (Local)' : isSystem ? 'Kernel Output' : agent.name}
                                         </span>
-                                        <span className="text-[10px] text-white/20 font-mono">
+                                        <span className="text-[10px] text-white/10 font-black tracking-widest">
                                             {msg.timestamp?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || ''}
                                         </span>
                                     </div>
-                                    <div className={`rounded-2xl p-4 sm:p-5 text-[15px] leading-relaxed relative ${isUser ? 'bg-cyan-600 font-medium text-white border border-cyan-500 rounded-tr-sm shadow-lg shadow-cyan-900/20' : isSystem ? 'bg-red-500/10 border border-red-500/20 text-red-200 rounded-tl-sm' : 'bg-[#12121a] border border-white/5 text-white/90 rounded-tl-sm shadow-md'}`}>
+                                    <div className={`rounded-3xl p-5 sm:p-7 text-[15px] leading-relaxed relative w-full ${isUser ? 'bg-gradient-to-br from-cyan-600/90 to-cyan-700 font-medium text-white border border-cyan-400/30 rounded-tr-sm shadow-2xl shadow-cyan-900/40 translate-x-1' : isSystem ? 'bg-red-500/10 border border-red-500/20 text-red-200 rounded-tl-sm' : 'glass-card border-white/5 text-white/90 rounded-tl-sm shadow-2xl overflow-hidden'}`}>
+                                        {!isUser && !isSystem && (
+                                            <div className="absolute top-0 right-0 p-8 opacity-[0.02] pointer-events-none">
+                                                <Bot className="w-32 h-32" />
+                                            </div>
+                                        )}
                                         {isUser || isSystem ? (
                                             <p className="whitespace-pre-wrap">{msg.content}</p>
                                         ) : (
-                                            <div className="prose prose-invert prose-p:leading-relaxed prose-pre:bg-black/50 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-xl max-w-none">
+                                            <div className="prose prose-invert prose-p:leading-relaxed prose-pre:bg-black/50 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-2xl prose-pre:p-6 prose-code:text-cyan-400 max-w-none relative z-10">
                                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                                             </div>
                                         )}
                                     </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         );
                     })}
 
                     {/* Streaming Output */}
                     {streaming && (
-                        <div className="flex gap-4 max-w-4xl mx-auto w-full">
-                            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 border mt-1 shadow-sm ${viewMode === 'agents' ? `${activeAgent.color.replace('text-', 'bg-')}/10 ${activeAgent.color.replace('text-', 'border-')}/30 ${activeAgent.color}` : 'bg-purple-500/10 border-purple-500/30 text-purple-400'}`}>
-                                {viewMode === 'agents' ? <activeAgent.icon className="w-5 h-5" /> : <Database className="w-5 h-5" />}
+                        <div className="flex gap-6 max-w-5xl mx-auto w-full">
+                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border mt-1 shadow-2xl ${viewMode === 'agents' ? `${activeAgent.color.replace('text-', 'bg-')}/10 ${activeAgent.color.replace('text-', 'border-')}/40 ${activeAgent.color}` : 'bg-purple-500/10 border-purple-500/40 text-purple-400'}`}>
+                                {viewMode === 'agents' ? <activeAgent.icon className="w-6 h-6" /> : <Database className="w-6 h-6" />}
                             </div>
-                            <div className="flex flex-col items-start max-w-[85%]">
-                                <div className="flex items-center gap-2 mb-1.5 px-1">
-                                    <span className={`text-xs font-bold uppercase tracking-widest ${viewMode === 'agents' ? activeAgent.color : 'text-purple-400'}`}>
-                                        {viewMode === 'agents' ? activeAgent.name : selectedModel?.id}
+                            <div className="flex flex-col items-start max-w-[85%] min-w-0">
+                                <div className="flex items-center gap-3 mb-2.5 px-1">
+                                    <span className={`text-[10px] font-black uppercase tracking-widest ${viewMode === 'agents' ? activeAgent.color : 'text-purple-400'}`}>
+                                        {viewMode === 'agents' ? activeAgent.name : selectedModel?.id} • <span className="animate-pulse">STREAMING...</span>
                                     </span>
                                 </div>
-                                <div className="rounded-2xl p-4 sm:p-5 text-[15px] leading-relaxed bg-[#12121a] border border-white/5 text-white/90 rounded-tl-sm shadow-md">
+                                <div className="glass-card p-7 text-[15px] leading-relaxed text-white/90 rounded-tl-sm shadow-2xl w-full">
                                     <div className="prose prose-invert prose-p:leading-relaxed max-w-none">
                                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{streaming}</ReactMarkdown>
                                     </div>
-                                    <span className="inline-block w-2 h-4 bg-white/50 ml-1 mt-1 animate-pulse" />
+                                    <motion.div 
+                                        animate={{ opacity: [0, 1, 0] }}
+                                        transition={{ duration: 0.8, repeat: Infinity }}
+                                        className="inline-block w-2.5 h-5 bg-cyan-400/60 ml-2 mt-2" 
+                                    />
                                 </div>
                             </div>
                         </div>
                     )}
                     
                     {loading && !streaming && (
-                        <div className="flex gap-4 max-w-4xl mx-auto w-full opacity-60">
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-1">
-                                <Loader2 className="w-5 h-5 animate-spin text-white/40" />
+                        <div className="flex gap-6 max-w-5xl mx-auto w-full">
+                            <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-1">
+                                <Loader2 className="w-6 h-6 animate-spin text-white/20" />
                             </div>
-                            <div className="flex items-center mt-3 text-sm text-white/40 font-mono tracking-widest pl-2">
-                                COMPUTING...
+                            <div className="flex items-center mt-4 text-[10px] text-white/20 font-black tracking-[0.3em] uppercase pl-2">
+                                Calibrating Neural Weights...
                             </div>
                         </div>
                     )}
@@ -560,30 +601,32 @@ export function Chat() {
                 </div>
 
                 {/* Input Area */}
-                <div className="p-4 sm:p-6 bg-[#0a0a0f] shrink-0 border-t border-white/5 z-20">
-                    <div className="max-w-4xl mx-auto">
-                        <div className={`flex items-end gap-3 bg-[#12121a] border rounded-2xl p-2 sm:p-3 transition-colors ${viewMode === 'models' ? 'border-purple-500/30 focus-within:border-purple-500' : 'border-cyan-500/30 focus-within:border-cyan-500'}`}>
-                            <textarea
-                                ref={inputRef}
-                                value={input}
-                                onChange={e => setInput(e.target.value)}
-                                onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())}
-                                placeholder={viewMode === 'models' && !selectedModel ? "Select a model first..." : `Message ${viewMode === 'agents' ? activeAgent.name : selectedModel?.id}... (Shift+Enter for newline)`}
-                                disabled={loading || (viewMode === 'models' && !selectedModel)}
-                                rows={1}
-                                className="flex-1 bg-transparent text-white placeholder-white/20 text-sm sm:text-base outline-none resize-none max-h-40 overflow-y-auto disabled:opacity-40 py-2 sm:py-3 px-2 sm:px-3 mb-1"
-                                style={{ fieldSizing: 'content' } as any}
-                            />
-                            <button
-                                onClick={sendMessage}
-                                disabled={!input.trim() || loading || (viewMode === 'models' && !selectedModel)}
-                                className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white shrink-0 transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${viewMode === 'models' ? 'bg-purple-600 hover:bg-purple-500' : 'bg-cyan-600 hover:bg-cyan-500'}`}
-                            >
-                                {loading && !streaming ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 ml-1" />}
-                            </button>
+                <div className="px-8 pb-10 absolute bottom-0 left-0 right-0 z-30 pointer-events-none">
+                    <div className="max-w-4xl mx-auto w-full pointer-events-auto">
+                        <div className={`glass-card p-2 sm:p-3 transition-all duration-500 border-white/10 group focus-within:border-cyan-500/50 shadow-2xl ${viewMode === 'models' ? 'focus-within:shadow-purple-500/10' : 'focus-within:shadow-cyan-500/10'}`}>
+                            <div className="flex items-end gap-3 px-3">
+                                <textarea
+                                    ref={inputRef}
+                                    value={input}
+                                    onChange={e => setInput(e.target.value)}
+                                    onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())}
+                                    placeholder={viewMode === 'models' && !selectedModel ? "ERROR: Core Select Offline..." : `Direct uplink to ${viewMode === 'agents' ? activeAgent.name : selectedModel?.id}...`}
+                                    disabled={loading || (viewMode === 'models' && !selectedModel)}
+                                    rows={1}
+                                    className="flex-1 bg-transparent text-white placeholder-white/10 text-base sm:text-lg outline-none resize-none max-h-40 overflow-y-auto disabled:opacity-40 py-4 font-medium tracking-tight"
+                                    style={{ fieldSizing: 'content' } as any}
+                                />
+                                <button
+                                    onClick={sendMessage}
+                                    disabled={!input.trim() || loading || (viewMode === 'models' && !selectedModel)}
+                                    className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-white shrink-0 transition-all duration-300 disabled:grayscale disabled:opacity-20 shadow-xl mb-1.5 ${viewMode === 'models' ? 'bg-gradient-to-br from-purple-500 to-purple-700 hover:shadow-purple-500/20 active:scale-90' : 'bg-gradient-to-br from-cyan-500 to-blue-600 hover:shadow-cyan-500/20 active:scale-90 font-black'}`}
+                                >
+                                    {loading && !streaming ? <Loader2 className="w-6 h-6 animate-spin" /> : <Send className="w-6 h-6 ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />}
+                                </button>
+                            </div>
                         </div>
-                        <p className="text-center text-[10px] text-white/20 mt-3 font-mono tracking-widest">
-                            LOCAL INFERENCE ENABLED • NO CLOUD TELEMETRY
+                        <p className="text-center text-[10px] text-white/10 mt-4 font-black uppercase tracking-[0.4em] drop-shadow-sm">
+                            DLX Studios • Neural Bridge Native • v4.2 Local
                         </p>
                     </div>
                 </div>

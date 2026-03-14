@@ -9,7 +9,9 @@
       "Bash(git push:*)",
       "Bash(timeout 10 tail:*)",
       "Bash(git commit:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)"
     ]
   }
 }

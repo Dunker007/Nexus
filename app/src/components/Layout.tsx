@@ -30,25 +30,33 @@ export function Layout() {
   }, [location.pathname]);
 
   return (
-    <div className="flex flex-col h-screen bg-[#060809] text-white overflow-hidden font-sans">
+    <div className="flex flex-col h-screen bg-[#07070a] text-white overflow-hidden font-sans selection:bg-cyan-500/30">
+      {/* Background Ambience */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-32 bg-cyan-500/5 blur-[120px] rounded-full" />
+      </div>
+
       {/* Top Navigation Bar */}
-      <nav className="flex-none h-14 border-b border-white/5 bg-[#0a0a0f]/95 backdrop-blur-md relative z-50">
-        <div className="h-full px-4 md:px-6 flex items-center justify-between">
+      <nav className="flex-none h-16 border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-2xl relative z-50 px-4 md:px-8">
+        <div className="h-full flex items-center justify-between">
           
           {/* Logo Section */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-4 shrink-0 group">
             <motion.div 
-                whileHover={{ scale: 1.05, rotate: 5 }}
+                whileHover={{ scale: 1.05, rotate: [0, -5, 5, 0] }}
                 whileTap={{ scale: 0.95 }}
-                className="w-7 h-7 rounded bg-[#5b8eff] flex items-center justify-center font-bold text-sm text-white shadow-lg"
+                className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center font-black text-black shadow-xl shadow-cyan-500/20 cursor-pointer"
             >
-              D
+              N
             </motion.div>
-            <span className="font-bold tracking-widest text-[#e2e8f0] text-sm md:text-sm hidden sm:block uppercase">DLX STUDIO</span>
+            <div className="flex flex-col">
+                <span className="font-black tracking-[0.2em] text-white text-sm leading-none uppercase">NEXUS</span>
+                <span className="text-[10px] text-white/30 font-black tracking-widest uppercase mt-1">Local Interface</span>
+            </div>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-1 xl:gap-2 mx-4 overflow-x-auto custom-scrollbar flex-1 justify-center">
+          <div className="hidden lg:flex items-center gap-2 px-6 overflow-x-auto custom-scrollbar flex-1 justify-center max-w-5xl">
             {navItems.map((item) => {
               const { to, icon: Icon, label } = item;
               return (
@@ -56,46 +64,75 @@ export function Layout() {
                   key={to}
                   to={to}
                   className={({ isActive }) =>
-                    `flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all relative group whitespace-nowrap ${
+                    `flex items-center gap-2.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all relative group whitespace-nowrap border ${
                       isActive
-                        ? 'text-cyan-400 bg-cyan-500/10'
-                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        ? 'text-cyan-400 bg-white/5 border-white/10 shadow-lg shadow-black/20'
+                        : 'text-white/30 border-transparent hover:text-white hover:bg-white/[0.02]'
                     }`
                   }
                 >
-                  <Icon className="w-4 h-4 shrink-0" />
-                  <span>{label}</span>
+                  {({ isActive }) => (
+                    <>
+                      <Icon className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-cyan-400' : ''}`} />
+                      <span>{label}</span>
+                      {isActive && (
+                        <motion.div 
+                            layoutId="nav-active-pill"
+                            className="absolute -bottom-[21px] left-1/2 -translate-x-1/2 w-12 h-1 bg-cyan-500 rounded-full shadow-[0_0_12px_rgba(6,182,212,0.8)]" 
+                        />
+                      )}
+                    </>
+                  )}
                 </NavLink>
               );
             })}
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-4 shrink-0">
              {/* Drive Status Indicator */}
-             <div className="hidden md:flex items-center gap-2 px-2 py-1 rounded-md text-[10px] font-mono border border-white/5" title={loading ? 'Drive Connecting...' : error ? 'Drive Error' : 'Drive Online'}>
-               {error ? <WifiOff className="w-3 h-3 text-red-500" /> : <Wifi className={`w-3 h-3 ${loading ? 'text-amber-500' : 'text-emerald-500'}`} />}
+             <div className="hidden xl:flex items-center gap-3 px-4 py-2 rounded-xl bg-black/20 border border-white/5" title={loading ? 'Uplink Synchronizing...' : error ? 'Neural Bridge Offline' : 'Neural Bridge Secure'}>
+               <div className="relative">
+                  {error ? <WifiOff className="w-3.5 h-3.5 text-red-500" /> : <Wifi className={`w-3.5 h-3.5 ${loading ? 'text-amber-500' : 'text-emerald-500'}`} />}
+                  {!loading && !error && <div className="absolute inset-0 bg-emerald-500/20 blur-sm rounded-full animate-pulse" />}
+               </div>
+               <span className={`text-[10px] font-black uppercase tracking-widest hidden 2xl:block ${error ? 'text-red-400' : loading ? 'text-amber-400' : 'text-white/40'}`}>
+                 {loading ? 'Sycing' : error ? 'Error' : 'Verified'}
+               </span>
              </div>
 
-             <div className="w-px h-4 bg-white/10 mx-1 hidden md:block"></div>
+             <div className="w-px h-6 bg-white/5 mx-1 hidden lg:block"></div>
 
-            <button className="text-gray-400 hover:text-white transition-colors" title="Dark Mode">
-                <Moon className="w-4 h-4" />
-            </button>
-            <button className="text-purple-400 hover:text-purple-300 transition-colors" title="Theme">
-                <Palette className="w-4 h-4" />
-            </button>
+            <div className="hidden md:flex items-center gap-2">
+                <button className="w-10 h-10 rounded-xl flex items-center justify-center text-white/20 hover:text-white hover:bg-white/5 transition-all" title="Kernel Display">
+                    <Moon className="w-4 h-4" />
+                </button>
+                <button className="w-10 h-10 rounded-xl flex items-center justify-center text-purple-400/40 hover:text-purple-400 hover:bg-purple-500/10 transition-all" title="Interface Matrix">
+                    <Palette className="w-4 h-4" />
+                </button>
+            </div>
+            
             <button 
-                className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-colors text-xs font-mono"
+                className="hidden xl:flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 transition-all text-[10px] font-black uppercase tracking-widest"
             >
-                <Command className="w-3 h-3" />
-                <span>Cmd+K</span>
+                <Command className="w-3.5 h-3.5" />
+                <span>Quick Access</span>
             </button>
-            <div className="w-7 h-7 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 border border-white/20 ml-2" />
+
+            <div className="relative group p-0.5 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-white/10 hover:border-cyan-500/40 transition-all cursor-pointer">
+                <div className="w-9 h-9 rounded-[14px] bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center font-black text-black overflow-hidden">
+                    <img 
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Dunker" 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0a0a0f] shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            </div>
 
             {/* Mobile Menu Toggle */}
             <button 
-                className="lg:hidden p-2 text-gray-400 hover:text-white ml-1"
+                className="lg:hidden w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-all border border-white/5"
                 onClick={() => setMobileOpen(!mobileOpen)}
             >
                 {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -108,12 +145,12 @@ export function Layout() {
       <AnimatePresence>
         {mobileOpen && (
             <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="lg:hidden flex-none bg-[#0a0a0f] border-b border-white/5 overflow-hidden z-40"
+                initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                className="lg:hidden absolute top-20 left-4 right-4 bg-[#0d0d14]/95 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden z-[60] shadow-2xl p-4"
             >
-                <div className="p-4 grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                     {navItems.map((item) => {
                         const { to, icon: Icon, label } = item;
                         return (
@@ -121,10 +158,10 @@ export function Layout() {
                                 key={to}
                                 to={to}
                                 className={({ isActive }) =>
-                                    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                                    `flex items-center gap-3 px-4 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
                                         isActive
-                                        ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                                        : 'text-gray-400 bg-white/5 hover:text-white hover:bg-white/10'
+                                        ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shadow-lg'
+                                        : 'text-white/30 bg-white/[0.02] border border-white/5 hover:text-white'
                                     }`
                                 }
                             >
@@ -139,12 +176,14 @@ export function Layout() {
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-auto relative">
+      <main className="flex-1 overflow-auto relative z-10 custom-scrollbar">
         <Outlet />
       </main>
 
       {/* Global Overlays */}
-      <VoiceControl />
+      <div className="fixed bottom-8 right-8 z-[100]">
+        <VoiceControl />
+      </div>
     </div>
   );
 }

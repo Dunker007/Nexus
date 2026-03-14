@@ -7,7 +7,7 @@ import EquityCurve from '@/components/labs/smartfolio/EquityCurve';
 import PriceTicker from '@/components/labs/smartfolio/PriceTicker';
 import { Activity, Wifi } from 'lucide-react';
 
-export function SmartFolio() {
+export function SmartFolioHub() {
     const { activeAccount, switchAccount, refreshPrices, isRefreshing, totalValue } = usePortfolio();
 
     const containerVariants: any = {

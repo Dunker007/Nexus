@@ -30,7 +30,7 @@ const studios: Studio[] = [
     name: 'DLX Music Studio',
     description: 'AI-powered songwriting with collaborative agents. Create lyrics, compose melodies, and generate Suno-ready prompts.',
     icon: '🎵',
-    href: '/studios',
+    href: '/music',
     color: 'pink',
     status: 'live',
     features: ['Songwriter Agents', 'Newsician Rap Guo', 'Midwest Sentinel', 'Suno Integration']
@@ -192,7 +192,7 @@ export function Studios() {
           <section className="mt-8">
             {viewMode === 'grid' && (
               <motion.div
-                className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                className="grid md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6"
                 initial="hidden"
                 animate="visible"
                 variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
@@ -208,14 +208,14 @@ export function Studios() {
                         to={isDisabled ? '#' : studio.href}
                         className={`block h-full group ${isDisabled ? 'cursor-not-allowed opacity-60' : ''}`}
                       >
-                        <div className="bg-[#12121a] border border-white/5 h-full p-4 rounded-xl transition-all group-hover:-translate-y-1 group-hover:border-cyan-500/30">
+                        <div className="bg-[#12121a] border border-white/5 h-full min-h-[200px] p-5 rounded-xl transition-all group-hover:-translate-y-1 group-hover:border-cyan-500/30 flex flex-col">
                           <div className="flex items-start gap-3 mb-3">
-                            <span className="text-2xl">{studio.icon}</span>
+                            <span className="text-3xl">{studio.icon}</span>
                             {getStatusBadge(studio.status)}
                           </div>
-                          <h2 className="text-lg font-bold mb-1 group-hover:text-cyan-400 transition-colors">{studio.name}</h2>
-                          <p className="text-gray-500 text-xs line-clamp-2 mb-3">{studio.description}</p>
-                          <div className="flex flex-wrap gap-1">
+                          <h2 className="text-lg font-bold mb-2 group-hover:text-cyan-400 transition-colors">{studio.name}</h2>
+                          <p className="text-gray-500 text-sm line-clamp-3 mb-4">{studio.description}</p>
+                          <div className="flex flex-wrap gap-2 mt-auto">
                             {studio.features.slice(0, 2).map(f => (
                               <span key={f} className="px-2 py-0.5 text-[10px] bg-white/5 rounded text-gray-500">{f}</span>
                             ))}

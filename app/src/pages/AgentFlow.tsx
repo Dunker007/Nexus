@@ -17,6 +17,9 @@ import { Play, Plus, Save, Sparkles, Music, FileText, MessageSquare, CheckCircle
 import { useToast } from '../contexts/ToastContext';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 
+// Note: Custom nodes or edge definitions removed because we only use default types and
+// empty types objects trigger dev warnings in Strict Mode due to HMR reference changes.
+
 const initialNodes: Node[] = [
   {
     id: '1',
@@ -135,6 +138,10 @@ export function AgentFlow() {
     return '#06b6d4';
   }, []);
 
+  // Memoize empty nodeTypes and edgeTypes to resolve React Flow warnings in Strict Mode
+  const nodeTypes = useMemo(() => ({}), []);
+  const edgeTypes = useMemo(() => ({}), []);
+
   const handleExecute = useCallback(async () => {
     setIsExecuting(true);
     toast.info('Executing workflow...');
@@ -228,6 +235,8 @@ export function AgentFlow() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           fitView
           className="bg-[#0b0e11]"
           defaultEdgeOptions={defaultEdgeOptions}

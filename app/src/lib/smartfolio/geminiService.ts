@@ -93,7 +93,7 @@ export interface AIResponse {
     data?: AIData;
 }
 
-const BRIDGE_URL = '/api/bridge/smartfolio/analyze';
+const BRIDGE_URL = '/api/brain-link';
 
 // ─── API Calls ───
 
@@ -110,14 +110,12 @@ export async function sendMessage(
         const response = await fetch(BRIDGE_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': ''
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                snapshot,
-                persona,
-                history,
-                message
+                prompt: message,
+                context: JSON.stringify({ snapshot, history }, null, 2),
+                systemPrompt: `You are the ${persona.toUpperCase()} AI for the SmartFolio system. Analyze the portfolio data. Format your response clearly. If you have specific actions, alerts, or psychological feedback, you MUST append a JSON block at the very end of your message in this exact format: \`\`\`json\n{\n  "directive": { "title": "...", "desc": "...", "type": "info" },\n  "psychology": { "sentiment": "...", "score": 85, "feedback": "..." },\n  "actions": [ { "label": "...", "type": "buy", "symbol": "BTC", "units": 0, "price": 0, "reason": "..." } ]\n}\n\`\`\``
             })
         });
 
@@ -128,9 +126,8 @@ export async function sendMessage(
 
         const data = await response.json();
 
-        // Parse Result: The bridge returns { result: string }
-        // The string might contain markdown + JSON block at end.
-        const rawText = data.result;
+        // Parse Result: The local brain-link returns { text: string }
+        const rawText = data.text || '';
 
         // Regex to extract JSON block: ```json ... ```
         const jsonMatch = rawText.match(/```json\s*([\s\S]*?)\s*```/);

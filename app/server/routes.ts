@@ -124,6 +124,9 @@ export function setupRoutes(app: Express) {
     res.json({ status: 'ok', message: 'Nexus Backend Online', timestamp: new Date().toISOString() });
   });
 
+  // ─── AI Inference ────────────────────────────────────────────────────────
+
+
   // LLM inference (Ollama / LM Studio — no Gemini)
   app.post('/api/brain-link', async (req, res) => {
     try {
@@ -310,6 +313,7 @@ export function setupRoutes(app: Express) {
   app.use('/api/songs', songsRouter);
   app.use('/api/tasks', tasksRouter);
   app.use('/api/portfolio', portfolioRouter);
+  app.use('/api/smartfolio', portfolioRouter); // Alias for laboratory bridge
   app.use('/api/pipeline', pipelineRouter);
 
   // ─── Google Sheets (Pipeline Sync) ────────────────────────────────────────

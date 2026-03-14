@@ -3,31 +3,28 @@ import { db } from '../db.js';
 
 export const portfolioRouter = Router();
 
-// Bridge endpoints for SmartFolio sync
+// In-memory portfolio store for dashboard summary & lab bridge
 const portfolioStore = new Map<string, any>();
 
-portfolioRouter.get('/bridge/smartfolio/:accountId', (req, res) => {
+// Retrieve specific account data (Bridge)
+portfolioRouter.get('/:accountId', (req, res) => {
   const { accountId } = req.params;
-  const data = portfolioStore.get(accountId);
-
-  if (!data) {
-    res.json({ positions: [], journal: [], pendingOrders: [] });
-  } else {
-    res.json(data);
-  }
+  const data = portfolioStore.get(accountId.toLowerCase());
+  res.json(data || { positions: [], journal: [], pendingOrders: [] });
 });
 
-portfolioRouter.post('/bridge/smartfolio/:accountId/sync', (req, res) => {
+// Sync account data from local agent (Bridge)
+portfolioRouter.post('/:accountId/sync', (req, res) => {
   const { accountId } = req.params;
   const { assets, journal } = req.body;
-
-  portfolioStore.set(accountId, {
+  
+  portfolioStore.set(accountId.toLowerCase(), {
     positions: assets || [],
     journal: journal || [],
     pendingOrders: [],
     lastSync: new Date().toISOString()
   });
-
+  
   res.json({ success: true });
 });
 

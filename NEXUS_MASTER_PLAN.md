@@ -96,7 +96,8 @@ Every module that exists or could exist. Honest status only.
 
 | Module | Status | Inside Reality | Notes |
 |--------|--------|----------------|-------|
-| **Music Studio** | 🟡 Stub | Songwriter agents (Lyricist, Composer, Critic, Producer), Suno prompt generation | Primary focus. Real pipeline to YouTube/Spotify. |
+| **Music Studio** | 🟡 Stub | Songwriter agents (Lyricist, Composer, Critic, Producer), Suno prompt generation | Primary focus (#1). Real pipeline to YouTube/Spotify. |
+| **Personal Finance** | 🟢 Active | SmartFolio, Crypto APIs, Income Tracking | Secondary focus (#2). Live bridge syncing and portfolio management. |
 | **Dev Studio** | 🟡 Stub | Code agent, basic scaffolding | Rises with the tide as we build Nexus itself |
 | **Agents Hub** | 🟡 Stub | 15+ agents defined in bridge/services/ | Core infrastructure, enables everything else |
 
@@ -109,32 +110,18 @@ Every module that exists or could exist. Honest status only.
 | **Chat** | 🟢 Built | LM Studio integration, streaming | Core utility, working |
 | **Settings** | 🟡 Stub | Config management | Needs work |
 | **Terminal** | 🟢 Built | Command interface | Working |
+| **Calendar/Files** | 🔘 Stub | Google Calendar API / File browser | Minor utility |
 
-### Active Revenue (Growth Phase)
+### Locked Doors / TBD (Parking Lot)
+
+Everything here stays frozen or text-only until priority shifts back:
 
 | Module | Status | Inside Reality | Notes |
 |--------|--------|----------------|-------|
-| **Content Pipeline** | 🟢 Active | PowerShell: LM Studio → WordPress/HTML | UNFROZEN for Growth Phase |
-
-### Front Doors Only (Stub/Idea)
-
-| Module | Status | Inside Reality | Revenue Path | Verified? |
-|--------|--------|----------------|--------------|-----------|
-| Calendar | 🔘 Stub | Google Calendar API ready | None | N/A |
-| Files | 🔘 Stub | Basic file browser | None | N/A |
-| Income Tracker | 🔘 Stub | UI exists | Tracking only | N/A |
-| Crypto | 🔘 Stub | CoinGecko API | Monitoring only | N/A |
-| **Etsy/Print-on-Demand** | 💡 Idea | Nothing built | POD margins | ⚠️ Needs research |
-| **CafePress** | 💡 Idea | Nothing built | POD margins | ⚠️ Needs research |
-| Blogs/AdSense | 💡 Idea | Content Pipeline ready | AdSense | ✅ Proven but boring |
-
-### Locked Doors (No Code Until Validated)
-
-Everything marked 💡 Idea stays text-only until:
-1. Income Seeker researches viability
-2. Legal Advisor flags risks
-3. Planning Meeting approves
-4. You give the GO
+| **Etsy/Print-on-Demand** | 💡 Idea | Nothing built | Parked. Needs research later. |
+| **CafePress** | 💡 Idea | Nothing built | Parked. Needs research later. |
+| **Blogs/AdSense** | ⏸️ Frozen | Content Pipeline ready but suspended | Proven but boring. Moved to end. |
+| **Content Pipeline** | ⏸️ Frozen | PowerShell automation | Suspended while focusing on Music/Finance. |
 
 ---
 
@@ -234,12 +221,13 @@ Suno Prompt + Lyrics
     ↓
 Suno (external) → Audio
     ↓
-Neural Frames → Video
+Google Vids (Video Studio) → Video 
     ↓
 YouTube / Spotify / Streaming
     ↓
 Revenue (slow, real)
 ```
+*(Note: Placed on roadmap to wire up the Video Studio directly with Google Vids. May require mapping out additional Workspace/Drive APIs).*
 
 **Reality Check:**
 - Streaming pays ~$0.003-0.005 per stream
@@ -256,7 +244,19 @@ Revenue (slow, real)
 
 ---
 
-### 2. Dev Studio / Agents (Rises with the Tide)
+### 2. Personal Finance / SmartFolio (Secondary Focus)
+
+**Purpose:** Live tracking, bridge syncing, portfolio monitoring, and risk assessment across Crypto, Alts, and traditional markets (Schwab).
+
+**Agents Involved:**
+- Financial Agents (Alto, Schwab Advisor)
+- Revenue Agent (crypto monitoring, passive income)
+
+**Status:** Bridge sync established. UI rendering correctly. Focus on hardening and dynamic trade calculations next.
+
+---
+
+### 3. Dev Studio / Agents (Rises with the Tide)
 
 **Purpose:** As we build Nexus, the dev tools improve. Self-reinforcing.
 
@@ -271,14 +271,14 @@ Revenue (slow, real)
 
 ---
 
-### 3. TBD Slot (Watching)
+### 4. TBD Slot (Parking Lot)
 
 **Candidates:**
-- Etsy/Print-on-Demand — needs Income Seeker research
-- CafePress — same
-- Blog/AdSense — proven but boring, Content Pipeline ready
+- Etsy/Print-on-Demand (Parked)
+- CafePress (Parked)
+- Blog/AdSense via Content Pipeline (Frozen)
 
-**Rule:** Nothing moves here until researched and approved through Planning Meeting.
+**Rule:** Nothing moves here until Music and Finance hit their milestones, and it's approved through Planning Meeting.
 
 ---
 

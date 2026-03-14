@@ -3,7 +3,7 @@ import { loadFromStorage, storageKey } from './storage';
 import { bridgeError, bridgeWarning } from './errorNotificationService';
 import type { AccountState } from '@/contexts/labs/smartfolio/PortfolioContext';
 
-const BRIDGE_URL = '/api/portfolio/bridge/smartfolio';
+const BRIDGE_URL = '/api/smartfolio';
 
 export async function fetchAccountState(accountId: AccountId): Promise<AccountState> {
     const seed = ACCOUNTS[accountId];
@@ -11,7 +11,17 @@ export async function fetchAccountState(accountId: AccountId): Promise<AccountSt
         const res = await fetch(`${BRIDGE_URL}/${accountId}`, {
             headers: { 'x-api-key': import.meta.env.VITE_BRIDGE_API_KEY || '' }
         });
-        if (!res.ok) throw new Error('Failed to fetch from bridge');
+
+        if (!res.ok) {
+            throw new Error(`Bridge returned ${res.status}: ${res.statusText}`);
+        }
+
+        // Check if response is actually JSON before parsing
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error(`Bridge returned ${contentType} instead of JSON - check server routes`);
+        }
+
         const data = await res.json();
 
         if ((!data.positions || data.positions.length === 0) && (!data.journal || data.journal.length === 0)) {

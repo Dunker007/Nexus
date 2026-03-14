@@ -15,8 +15,19 @@ import { Studios } from './pages/Studios';
 import { Labs } from './pages/Labs';
 import { Meeting } from './pages/Meeting';
 import { Settings } from './pages/Settings';
-import { SmartFolio } from './pages/SmartFolio';
+import { SmartFolioLayout } from './pages/smartfolio/SmartFolioLayout';
+import { SmartFolioHub } from './pages/smartfolio/SmartFolioHub';
+import { SmartFolioReport } from './pages/smartfolio/SmartFolioReport';
+import { SmartFolioMarket } from './pages/smartfolio/SmartFolioMarket';
+import { SmartFolioOrders } from './pages/smartfolio/SmartFolioOrders';
+import { SmartFolioRisk } from './pages/smartfolio/SmartFolioRisk';
+import { SmartFolioSettings } from './pages/smartfolio/SmartFolioSettings';
+import { SmartFolioAUM } from './pages/smartfolio/SmartFolioAUM';
 import { AgentFlow } from './pages/AgentFlow';
+import { DevStudio } from './pages/studios/DevStudio';
+import { VideoStudio } from './pages/studios/VideoStudio';
+import { ArtStudio } from './pages/studios/ArtStudio';
+import { BlogStudio } from './pages/studios/BlogStudio';
 
 export default function App() {
   return (
@@ -29,10 +40,22 @@ export default function App() {
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="studios" element={<Studios />} />
+                <Route path="studios/dev" element={<DevStudio />} />
+                <Route path="studios/video" element={<VideoStudio />} />
+                <Route path="studios/art" element={<ArtStudio />} />
+                <Route path="studios/blog" element={<BlogStudio />} />
                 <Route path="chat" element={<Chat />} />
                 <Route path="news" element={<News />} />
                 <Route path="labs" element={<Labs />} />
-                <Route path="labs/smartfolio" element={<SmartFolio />} />
+                <Route path="labs/smartfolio" element={<SmartFolioLayout />}>
+                  <Route index element={<SmartFolioHub />} />
+                  <Route path="report" element={<SmartFolioReport />} />
+                  <Route path="market" element={<SmartFolioMarket />} />
+                  <Route path="orders" element={<SmartFolioOrders />} />
+                  <Route path="risk" element={<SmartFolioRisk />} />
+                  <Route path="settings" element={<SmartFolioSettings />} />
+                  <Route path="aum" element={<SmartFolioAUM />} />
+                </Route>
               <Route path="meeting" element={<Meeting />} />
               <Route path="pipeline" element={<Pipeline />} />
               <Route path="music" element={<MusicStudio />} />

@@ -214,45 +214,47 @@ export function Dashboard() {
     }
 
     return (
-        <div className="flex-1 overflow-y-auto w-full custom-scrollbar bg-[#0b0e11] relative text-gray-200 pb-12">
+        <div className="flex-1 overflow-y-auto w-full custom-scrollbar bg-[#0a0a0f] bg-mesh-cyan relative text-gray-200 pb-12">
             
-            {/* Background Details */}
+            {/* Ambient Background Glows */}
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-[120px] mix-blend-screen overflow-hidden" />
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] mix-blend-screen overflow-hidden" />
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[120px] mix-blend-screen" />
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[120px] mix-blend-screen" />
             </div>
 
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 z-10 relative">
+            <div className="max-w-[1600px] mx-auto px-6 py-10 z-10 relative">
                 {/* Header */}
-                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-12">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold mb-1 flex items-center gap-2 tracking-tight">
-                            {greeting}, <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Dunker</span> 👋
+                        <h1 className="text-3xl md:text-4xl font-black mb-2 flex items-center gap-3 tracking-tight">
+                            {greeting}, <span className="text-gradient-cyan">Dunker</span> <span className="animate-bounce-slow">👋</span>
                         </h1>
-                        <p className="text-white/40 text-xs font-bold uppercase tracking-widest">
-                            {time.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
-                            <span className="mx-2 text-white/20">|</span>
-                            <span className="font-mono text-cyan-400">{time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
-                        </p>
+                        <div className="flex items-center gap-3 text-white/30 text-[10px] font-black uppercase tracking-[0.2em]">
+                            <span className="flex items-center gap-1.5"><Settings size={12}/> {time.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</span>
+                            <span className="w-1 h-1 bg-white/20 rounded-full" />
+                            <span className="font-mono text-cyan-400 tracking-normal">{time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                         <button
                             onClick={() => setEditMode(!editMode)}
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${editMode ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' : 'bg-[#12121a] text-white/50 border-white/5 hover:text-white hover:border-white/10'}`}
+                            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all border shadow-lg ${editMode 
+                                ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30 shadow-cyan-500/10' 
+                                : 'bg-white/5 text-white/50 border-white/5 hover:text-white hover:bg-white/10 hover:border-white/20'}`}
                         >
                             <Settings size={14} />
-                            {editMode ? 'Done Editing' : 'Edit OS'}
+                            {editMode ? 'Lock Layout' : 'Personalize OS'}
                         </button>
 
                         {editMode && (
                             <AnimatePresence>
-                                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex gap-2 text-xs font-bold uppercase tracking-wider">
-                                    <button onClick={() => setShowWidgetPicker(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition-colors">
-                                        <Plus size={14} /> Widget
+                                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex gap-2">
+                                    <button onClick={() => setShowWidgetPicker(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/10 active:scale-95">
+                                        <Plus size={14} /> New Module
                                     </button>
-                                    <button onClick={resetLayout} className="px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors">
-                                        Reset
+                                    <button onClick={resetLayout} className="px-5 py-2.5 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-all text-[10px] font-black uppercase tracking-widest active:scale-95">
+                                        Factory Reset
                                     </button>
                                 </motion.div>
                             </AnimatePresence>
@@ -261,7 +263,7 @@ export function Dashboard() {
                 </div>
 
                 {/* Grid Area */}
-                <div ref={containerRef} className="dashboard-grid-container min-h-[600px] border border-transparent rounded-2xl p-1 bg-white/[0.01]">
+                <div ref={containerRef} className="dashboard-grid-container min-h-[600px] relative">
                     <ResponsiveGridLayout
                         className="layout"
                         layouts={layouts}
@@ -273,33 +275,34 @@ export function Dashboard() {
                         isResizable={editMode}
                         onLayoutChange={onLayoutChange}
                         draggableHandle=".drag-handle"
-                        margin={[16, 16]}
+                        margin={[24, 24]}
                         useCSSTransforms={true}
                     >
                         {widgets.map((widget, index) => (
-                            <div
-                                key={widget.i}
-                                className={`rounded-2xl border border-white/10 bg-[#0d0d14] backdrop-blur-md flex flex-col group transition-colors shadow-lg ${editMode ? 'ring-2 ring-cyan-500/30 ring-offset-2 ring-offset-[#0b0e11] cursor-move' : 'hover:border-cyan-500/20'}`}
-                                style={{
-                                    animation: `fadeInUp 0.3s ease-out ${index * 0.05}s backwards`
-                                }}
-                            >
-                                {/* Widget Header */}
-                                <div className={`flex items-center justify-between p-3 shrink-0 border-b border-white/5 bg-white/[0.02] rounded-t-2xl ${editMode ? 'drag-handle bg-cyan-500/10' : ''}`}>
-                                    <h3 className="font-bold text-xs uppercase tracking-wider flex items-center gap-2 text-white/80">
-                                        {editMode && <Move size={12} className="text-cyan-400" />}
-                                        <span className="opacity-80 group-hover:opacity-100">{widget.icon}</span> {widget.title}
-                                    </h3>
-                                    {editMode && (
-                                        <button onClick={() => removeWidget(widget.i)} className="p-1 rounded bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors">
-                                            <X size={12} />
-                                        </button>
-                                    )}
-                                </div>
+                            <div key={widget.i}>
+                                <div
+                                    className={`h-full flex flex-col group transition-all duration-500 glass-card border-white/5 ${editMode ? 'ring-2 ring-cyan-500/40 ring-offset-4 ring-offset-[#0a0a0f] cursor-move scale-[0.98]' : 'hover:border-white/20 hover:shadow-2xl hover:shadow-cyan-500/5'}`}
+                                    style={{
+                                        animation: `fadeInUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) ${index * 0.05}s backwards`
+                                    }}
+                                >
+                                    {/* Widget Header */}
+                                    <div className={`flex items-center justify-between px-5 py-3.5 shrink-0 border-b border-white/5 transition-colors ${editMode ? 'drag-handle bg-cyan-500/10' : 'bg-white/[0.01]'}`}>
+                                        <h3 className="font-black text-[10px] uppercase tracking-[0.2em] flex items-center gap-3 text-white/60 group-hover:text-white transition-colors">
+                                            {editMode && <Move size={12} className="text-cyan-400 animate-pulse" />}
+                                            <span className="text-sm scale-110 grayscale group-hover:grayscale-0 transition-all filter">{widget.icon}</span> {widget.title}
+                                        </h3>
+                                        {editMode && (
+                                            <button onClick={() => removeWidget(widget.i)} className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all hover:scale-110 active:scale-90">
+                                                <X size={14} />
+                                            </button>
+                                        )}
+                                    </div>
 
-                                {/* Widget Content Area */}
-                                <div className="flex-1 overflow-hidden p-3 relative bg-gradient-to-br from-white/[0.01] to-transparent rounded-b-2xl">
-                                    {renderWidgetContent(widget)}
+                                    {/* Widget Content Area */}
+                                    <div className="flex-1 overflow-hidden p-5 relative bg-gradient-to-br from-white/[0.01] to-transparent">
+                                        {renderWidgetContent(widget)}
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -314,38 +317,53 @@ export function Dashboard() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-xl z-50 flex items-center justify-center p-4"
                         onClick={() => setShowWidgetPicker(false)}
                     >
                         <motion.div
-                            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                            initial={{ scale: 0.9, opacity: 0, y: 30 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                            className="bg-[#12121a] border border-white/10 rounded-2xl max-w-2xl w-full shadow-2xl p-6 relative overflow-hidden"
+                            exit={{ scale: 0.9, opacity: 0, y: 30 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            className="glass-card max-w-2xl w-full border-white/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] p-8 relative overflow-hidden"
                             onClick={e => e.stopPropagation()}
                         >
-                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 pointer-events-none" />
+                            {/* Accent Glow */}
+                            <div className="absolute -top-24 -right-24 w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px]" />
                             
-                            <div className="flex items-center justify-between mb-6 relative z-10">
-                                <h2 className="text-xl font-bold flex items-center gap-2">
-                                    <Plus className="text-cyan-400" />
-                                    Add Module
-                                </h2>
-                                <button onClick={() => setShowWidgetPicker(false)} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors">
+                            <div className="flex items-center justify-between mb-10 relative z-10">
+                                <div>
+                                    <h2 className="text-2xl font-black flex items-center gap-3 tracking-tight">
+                                        <Plus className="text-cyan-400 w-6 h-6" />
+                                        Nexus <span className="text-gradient-cyan uppercase tracking-widest text-lg">Modules</span>
+                                    </h2>
+                                    <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.2em] mt-1">Select capability to hot-swap into local OS</p>
+                                </div>
+                                <button onClick={() => setShowWidgetPicker(false)} className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/30 hover:text-white transition-all transform hover:rotate-90">
                                     <X size={20} />
                                 </button>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 relative z-10 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
-                                {Object.entries(WIDGET_CATALOG).map(([type, config]) => (
-                                    <button
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 relative z-10 max-h-[60vh] overflow-y-auto custom-scrollbar pr-4">
+                                {Object.entries(WIDGET_CATALOG).map(([type, config], idx) => (
+                                    <motion.button
                                         key={type}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.03 }}
                                         onClick={() => addWidget(type as WidgetType)}
-                                        className="p-4 rounded-xl border border-white/5 bg-black/40 hover:bg-cyan-500/10 hover:border-cyan-500/30 text-left transition-all group flex flex-col items-center justify-center text-center gap-3"
+                                        className="p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-cyan-500/10 hover:border-cyan-500/40 text-left transition-all group flex flex-col items-center justify-center text-center gap-4 relative overflow-hidden"
                                     >
-                                        <div className="text-3xl bg-white/5 p-3 rounded-lg group-hover:scale-110 transition-transform">{config.icon}</div>
-                                        <div className="text-xs font-bold uppercase tracking-wider text-white/70 group-hover:text-cyan-400">{config.title.replace(/^.+\s/, '')}</div>
-                                    </button>
+                                        <div className="text-4xl bg-black/40 p-4 rounded-2xl group-hover:scale-110 group-hover:bg-cyan-500/20 transition-all duration-300 shadow-xl group-hover:shadow-cyan-500/10">
+                                            {config.icon}
+                                        </div>
+                                        <div className="text-[10px] font-black uppercase tracking-[0.1em] text-white/50 group-hover:text-cyan-400 transition-colors">
+                                            {config.title.split(' ').pop()}
+                                        </div>
+                                        
+                                        {/* Hover Indicator */}
+                                        <div className="absolute inset-x-0 bottom-0 h-1 bg-cyan-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+                                    </motion.button>
                                 ))}
                             </div>
                         </motion.div>
