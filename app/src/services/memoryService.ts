@@ -40,6 +40,17 @@ export const memoryService = {
   },
 
   async ensureStructure(): Promise<Record<string, string>> {
+    const CACHE_KEY = 'nexus-drive-structure';
+    const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { structure, ts } = JSON.parse(cached) as { structure: Record<string, string>; ts: number };
+        if (Date.now() - ts < CACHE_TTL_MS) return structure;
+      }
+    } catch { /* ignore parse errors */ }
+
     const rootFiles = await this.listFiles();
     const structure: Record<string, string> = {};
 
@@ -63,6 +74,10 @@ export const memoryService = {
     const luxFiles = await this.listFiles(luxId);
     const memoryFolder = luxFiles.find(f => f.name === 'Memory' && f.mimeType === 'application/vnd.google-apps.folder');
     structure['Memory'] = memoryFolder?.id ?? (await this.createFolder('Memory', luxId)).id;
+
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ structure, ts: Date.now() }));
+    } catch { /* quota exceeded — skip caching */ }
 
     return structure;
   },

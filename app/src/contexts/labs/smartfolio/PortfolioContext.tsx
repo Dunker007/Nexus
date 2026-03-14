@@ -105,6 +105,8 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     // Initial Load (Boot Sequence)
     useEffect(() => {
+        let cancelled = false;
+
         const savedAccount = loadFromStorage<AccountId>(`${STORAGE_PREFIX}activeAccount`, 'sui');
         setActiveAccount(savedAccount);
         const savedMarket = loadFromStorage<'accumulation' | 'bull' | 'bear' | 'distribution' | 'choppiness'>(`${STORAGE_PREFIX}marketCondition`, 'accumulation');
@@ -112,6 +114,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
         // Load BOTH accounts in parallel
         Promise.all([fetchAccountState('sui'), fetchAccountState('alts')]).then(([suiState, altsState]) => {
+            if (cancelled) return;
 
             // ─── RECONCILIATION LOGIC ───
             const events: any[] = [];
@@ -159,6 +162,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             fetch('https://api.alternative.me/fng/?limit=1')
                 .then(res => res.json())
                 .then(json => {
+                    if (cancelled) return;
                     if (json?.data && json.data.length > 0) {
                         setFearGreed({ value: parseInt(json.data[0].value), classification: json.data[0].value_classification });
                     }
@@ -167,7 +171,10 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         };
         fetchFng();
         const interval = setInterval(fetchFng, 3600000); // Poll hourly
-        return () => clearInterval(interval);
+        return () => {
+            cancelled = true;
+            clearInterval(interval);
+        };
     }, []);
 
     // ─── Persistence ───

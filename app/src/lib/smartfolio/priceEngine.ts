@@ -84,27 +84,29 @@ export async function fetchPrices(symbols: string[]): Promise<PriceMap> {
 }
 
 // ─── Polling Engine ───
-let _pollInterval: ReturnType<typeof setInterval> | null = null;
-let _isPolling = false;
+// Each startPolling call is self-contained; state is local, not module-level.
+// This prevents double-start from React StrictMode double-invoking useEffect.
 
 export function startPolling(config: PriceEngineConfig): () => void {
-    stopPolling(); // Clean up any existing
-
     const { symbols, intervalMs, onPriceUpdate, onError, onSyncComplete } = config;
 
+    let cancelled = false;
+    let isRunning = false;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
     const poll = async () => {
-        if (_isPolling) return; // Skip if previous poll still running
-        _isPolling = true;
+        if (cancelled || isRunning) return;
+        isRunning = true;
         try {
             const prices = await fetchPrices(symbols);
-            if (Object.keys(prices).length > 0) {
+            if (!cancelled && Object.keys(prices).length > 0) {
                 onPriceUpdate(prices);
                 onSyncComplete?.(new Date());
             }
         } catch (err) {
-            onError?.(err instanceof Error ? err : new Error(String(err)));
+            if (!cancelled) onError?.(err instanceof Error ? err : new Error(String(err)));
         } finally {
-            _isPolling = false;
+            isRunning = false;
         }
     };
 
@@ -112,20 +114,22 @@ export function startPolling(config: PriceEngineConfig): () => void {
     poll();
 
     // Then poll on interval
-    _pollInterval = setInterval(poll, intervalMs);
+    intervalId = setInterval(poll, intervalMs);
 
     // Return cleanup function
-    return stopPolling;
+    return () => {
+        cancelled = true;
+        if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+        }
+    };
 }
 
 export function stopPolling(): void {
-    if (_pollInterval) {
-        clearInterval(_pollInterval);
-        _pollInterval = null;
-    }
-    _isPolling = false;
+    // No-op — kept for backwards compatibility; callers should use the cleanup fn returned by startPolling
 }
 
 export function isPolling(): boolean {
-    return _pollInterval !== null;
+    return false; // No global state — use the returned cleanup fn to manage lifecycle
 }
