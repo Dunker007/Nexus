@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Bot, Settings, Activity, Plus, Save, Power, PowerOff, Cpu } from 'lucide-react';
+import { Bot, Settings, Activity, Plus, Save, Power, PowerOff, Cpu, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useToast } from '../contexts/ToastContext';
 import PageLayout, { StatPill } from '../components/PageLayout';
@@ -30,7 +30,7 @@ export function Agents() {
         setAgents(data);
         if (data.length > 0 && !selectedAgent && !isCreating) setSelectedAgent(data[0]);
       }
-    } catch (err) { console.error(err); } finally { setLoading(false); }
+    } catch { toast.error('Failed to load agents'); } finally { setLoading(false); }
   };
 
   useEffect(() => { fetchAgents(); }, []);
@@ -87,6 +87,19 @@ export function Agents() {
         } else { toast.error('Failed to save agent'); }
       } catch { toast.error('Server unreachable'); }
     }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedAgent) return;
+    if (!window.confirm(`Delete agent "${selectedAgent.name}"? This cannot be undone.`)) return;
+    try {
+      const res = await fetch(`/api/agents/${selectedAgent.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setAgents(a => a.filter(x => x.id !== selectedAgent.id));
+        setSelectedAgent(agents.find(a => a.id !== selectedAgent.id) || null);
+        toast.success(`"${selectedAgent.name}" deleted`);
+      } else { toast.error('Failed to delete agent'); }
+    } catch { toast.error('Server unreachable'); }
   };
 
   if (loading) return (
@@ -216,10 +229,16 @@ export function Agents() {
                         </button>
                       </>
                     ) : (
-                      <button onClick={() => { setIsEditing(true); setEditForm(selectedAgent!); }}
-                        className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/50 text-[10px] font-black uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all flex items-center gap-2">
-                        <Settings size={14} /> Reconfigure
-                      </button>
+                      <>
+                        <button onClick={() => { setIsEditing(true); setEditForm(selectedAgent!); }}
+                          className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/50 text-[10px] font-black uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all flex items-center gap-2">
+                          <Settings size={14} /> Reconfigure
+                        </button>
+                        <button onClick={handleDelete}
+                          className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/20 text-[10px] font-black uppercase tracking-widest hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30 transition-all">
+                          <Trash2 size={14} />
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>

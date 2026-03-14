@@ -177,6 +177,7 @@ export function Chat() {
   }, [messages, streaming]);
 
   const clearChat = () => {
+    if (!window.confirm('Clear all chat history? This cannot be undone.')) return;
     setMessages([]);
     localStorage.removeItem('nexus-chat-messages');
     fetch('/api/chat', { method: 'DELETE' }).catch(console.error);

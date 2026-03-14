@@ -139,9 +139,32 @@ export const llmInferenceFlow = ai.defineFlow(
 
 export function setupRoutes(app: Express) {
 
-  // Health check
-  app.get('/api/health', (_req, res) => {
-    res.json({ status: 'ok', message: 'Nexus Backend Online', timestamp: new Date().toISOString() });
+  // Health check — includes DB ping and LLM reachability
+  app.get('/api/health', async (_req, res) => {
+    const checks: Record<string, string> = {};
+
+    // DB ping
+    try {
+      db.prepare('SELECT 1').get();
+      checks.db = 'ok';
+    } catch (e: any) {
+      checks.db = `error: ${e.message}`;
+    }
+
+    // Ollama ping
+    try {
+      const r = await fetch(`${ollamaConfig.baseUrl}/api/tags`, { signal: AbortSignal.timeout(2000) });
+      checks.ollama = r.ok ? 'ok' : `http ${r.status}`;
+    } catch {
+      checks.ollama = 'unreachable';
+    }
+
+    const allOk = Object.values(checks).every(v => v === 'ok');
+    res.status(allOk ? 200 : 207).json({
+      status: allOk ? 'ok' : 'degraded',
+      checks,
+      timestamp: new Date().toISOString()
+    });
   });
 
   // ─── AI Inference ────────────────────────────────────────────────────────
