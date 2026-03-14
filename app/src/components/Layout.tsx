@@ -98,7 +98,7 @@ export function Layout() {
                   {!loading && !error && <div className="absolute inset-0 bg-emerald-500/20 blur-sm rounded-full animate-pulse" />}
                </div>
                <span className={`text-[10px] font-black uppercase tracking-widest hidden 2xl:block ${error ? 'text-red-400' : loading ? 'text-amber-400' : 'text-white/40'}`}>
-                 {loading ? 'Sycing' : error ? 'Error' : 'Verified'}
+                 {loading ? 'Syncing' : error ? 'Error' : 'Verified'}
                </span>
              </div>
 

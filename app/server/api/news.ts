@@ -70,47 +70,52 @@ newsRouter.get('/', (req, res) => {
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
+const insertItem = db.prepare(`
+    INSERT OR IGNORE INTO news_items
+    (id, title, source, type, url, summary, bias, time, impact, feed)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`);
+
 newsRouter.post('/refresh', async (req, res) => {
-    try {
-        const allFeeds = Object.values(NEWS_SOURCES).flat();
-        let addedCount = 0;
+    const allFeeds = Object.values(NEWS_SOURCES).flat();
 
-        for (const source of allFeeds) {
-            try {
-                const feedData = await parser.parseURL(source.rss);
-                for (const item of feedData.items.slice(0, 10)) {
-                    const id = item.guid || item.link || Math.random().toString(36);
-                    try {
-                        db.prepare(`
-                            INSERT OR IGNORE INTO news_items 
-                            (id, title, source, type, url, summary, bias, time, impact, feed) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        `).run(
-                            id,
-                            item.title || 'No Title',
-                            source.name,
-                            source.category,
-                            item.link || '',
-                            item.contentSnippet || item.description || '',
-                            source.bias,
-                            item.pubDate || new Date().toISOString(),
-                            source.logo,
-                            (source as any).priority ? 'priority' : 'nexus'
-                        );
-                        addedCount++;
-                    } catch (err) {
-                        // Probably duplicate GUID
-                    }
-                }
-            } catch (err) {
-                console.error(`Failed to fetch ${source.name}:`, err);
-            }
+    // Respond immediately — run fetches in background
+    res.json({ success: true, message: 'Refresh started', total: allFeeds.length });
+
+    // Fetch all feeds in parallel with a 15s per-feed timeout
+    const results = await Promise.allSettled(
+        allFeeds.map(source =>
+            parser.parseURL(source.rss).then(feedData => ({ source, feedData }))
+        )
+    );
+
+    let addedCount = 0;
+    for (const result of results) {
+        if (result.status === 'rejected') {
+            console.error(`[News] Feed failed:`, result.reason?.message || result.reason);
+            continue;
         }
-
-        res.json({ success: true, added: addedCount });
-    } catch (e: any) {
-        res.status(500).json({ error: e.message });
+        const { source, feedData } = result.value;
+        for (const item of feedData.items.slice(0, 10)) {
+            const id = item.guid || item.link || Math.random().toString(36);
+            try {
+                insertItem.run(
+                    id,
+                    item.title || 'No Title',
+                    source.name,
+                    source.category,
+                    item.link || '',
+                    item.contentSnippet || item.description || '',
+                    source.bias,
+                    item.pubDate || new Date().toISOString(),
+                    source.logo,
+                    (source as any).priority ? 'priority' : 'nexus'
+                );
+                addedCount++;
+            } catch { /* duplicate GUID */ }
+        }
     }
+    console.log(`[News] Refresh complete — ${addedCount} items added from ${allFeeds.length} feeds`);
 });
 
 newsRouter.delete('/:id', (req, res) => {

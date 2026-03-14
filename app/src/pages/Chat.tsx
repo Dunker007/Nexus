@@ -152,7 +152,11 @@ export function Chat() {
 
   useEffect(() => {
     if (messages.length > 0) {
-      localStorage.setItem('nexus-chat-messages', JSON.stringify(messages));
+      // Keep last 100 messages to avoid localStorage quota exhaustion
+      const trimmed = messages.slice(-100);
+      try {
+        localStorage.setItem('nexus-chat-messages', JSON.stringify(trimmed));
+      } catch { /* quota exceeded — skip */ }
     }
   }, [messages]);
 

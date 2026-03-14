@@ -218,7 +218,7 @@ export default function PageLayout({
 
       {/* Main content — full width, centered */}
       <div
-         className={`relative z-10 w-full mx-auto ${noPadding ? 'overflow-hidden' : 'py-8 px-6 max-w-7xl'} ${containerClass}`}
+         className={`relative z-10 w-full ${noPadding ? 'overflow-hidden' : 'py-8 px-6 max-w-7xl mx-auto'} ${containerClass}`}
       >
         {children}
       </div>
