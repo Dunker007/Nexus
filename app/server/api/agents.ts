@@ -11,9 +11,10 @@ agentsRouter.get('/', (_req, res) => {
 
 agentsRouter.post('/', required(['name', 'role']), (req, res) => {
   try {
-    const { id, name, role, description, status, system_prompt } = req.body;
+    const { name, role, description, status, system_prompt } = req.body;
+    const id = crypto.randomUUID();
     db.prepare('INSERT INTO agents (id, name, role, description, status, system_prompt) VALUES (?, ?, ?, ?, ?, ?)')
-      .run(id, name, role, description, status, system_prompt);
+      .run(id, name, role, description ?? '', status ?? 'active', system_prompt ?? '');
     res.json(db.prepare('SELECT * FROM agents WHERE id = ?').get(id));
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });

@@ -1,6 +1,7 @@
 import { genkit, z } from 'genkit';
 import { ollama } from 'genkitx-ollama';
 import { ollamaConfig } from './config.js';
+import { db } from './db.js';
 
 export const ai = genkit({
   plugins: [
@@ -20,8 +21,8 @@ export const getPipelineTracksTool = ai.defineTool(
   },
   async () => {
     try {
-      // Typically imported from db.ts but keeping it simple for the example tool
-      return { status: 'success', message: 'Pipeline query available via socket emission or db directly.' };
+      const tracks = db.prepare('SELECT * FROM pipeline_tracks ORDER BY created_at DESC').all();
+      return { status: 'success', tracks };
     } catch (err: any) {
       return { error: err.message };
     }

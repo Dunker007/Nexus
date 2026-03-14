@@ -1,4 +1,3 @@
-"use client";
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { ACCOUNTS } from '@/lib/smartfolio/store/portfolio';
 import { STRATEGIES } from '@/lib/smartfolio/store/strategy';
@@ -445,7 +444,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             cashBalance,
             pendingOrders: activeState.pendingOrders,
             recycledToSui: activeState.recycledToSui,
-            marketTrends: ACCOUNTS.sui.marketTrends, // Legacy?
+            marketTrends: ACCOUNTS[activeAccount].marketTrends,
             journal: activeState.journal,
             mounted,
 

@@ -71,7 +71,7 @@ export function useTradeExecution({ activeAccount, accountsState, updateActive }
         }));
     }, [updateActive]);
 
-    const addJournalEntry = useCallback((entry: any) => {
+    const addJournalEntry = useCallback((entry: JournalEntry & { silent?: boolean }) => {
         const { silent, ...entryData } = entry;
         const newEntry = {
             id: entry.id || Date.now().toString(36),
@@ -126,9 +126,9 @@ export function useTradeExecution({ activeAccount, accountsState, updateActive }
                             totalCost: (asset.totalCost || 0) * unitRatio
                         };
                     }
-                    // Recalc Allocations
+                    // Recalc Allocations (immutable map, no in-place mutation)
                     const total = nextAssets.reduce((s, a) => s + a.currentValue, 0);
-                    nextAssets.forEach(a => { a.allocation = total > 0 ? (a.currentValue / total) * 100 : 0 });
+                    nextAssets = nextAssets.map(a => ({ ...a, allocation: total > 0 ? (a.currentValue / total) * 100 : 0 }));
                 }
             }
 
@@ -184,9 +184,9 @@ export function useTradeExecution({ activeAccount, accountsState, updateActive }
                 totalCost: newCost
             };
 
-            // Recalc Allocations
+            // Recalc Allocations (immutable map, no in-place mutation)
             const total = nextAssets.reduce((s, a) => s + a.currentValue, 0);
-            nextAssets.forEach(a => { a.allocation = total > 0 ? (a.currentValue / total) * 100 : 0 });
+            nextAssets = nextAssets.map(a => ({ ...a, allocation: total > 0 ? (a.currentValue / total) * 100 : 0 }));
 
             return { ...prev, assets: nextAssets };
         });

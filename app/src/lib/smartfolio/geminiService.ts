@@ -180,8 +180,18 @@ export async function analyzePortfolio(
 /**
  * Legacy support for existing components
  */
+export async function isBridgeAvailable(): Promise<boolean> {
+    try {
+        const res = await fetch('/api/health', { signal: AbortSignal.timeout(2000) });
+        return res.ok;
+    } catch {
+        return false;
+    }
+}
+
+/** @deprecated Use isBridgeAvailable() instead */
 export function hasGeminiKey(): boolean {
-    return true; // We assume Bridge has it
+    return true;
 }
 
 // ─── Quick Health Check ───

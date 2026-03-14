@@ -6,11 +6,13 @@ export const chatRouter = Router();
 
 chatRouter.get('/', (req, res) => {
   try {
-    const { agentId } = req.query as Record<string, string>;
+    const { agentId, limit = '200', offset = '0' } = req.query as Record<string, string>;
+    const lim = Math.min(parseInt(limit) || 200, 500);
+    const off = parseInt(offset) || 0;
     if (agentId) {
-      res.json(db.prepare('SELECT * FROM chat_history WHERE agent_id = ? ORDER BY timestamp ASC').all(agentId));
+      res.json(db.prepare('SELECT * FROM chat_history WHERE agent_id = ? ORDER BY timestamp ASC LIMIT ? OFFSET ?').all(agentId, lim, off));
     } else {
-      res.json(db.prepare('SELECT * FROM chat_history ORDER BY timestamp ASC').all());
+      res.json(db.prepare('SELECT * FROM chat_history ORDER BY timestamp ASC LIMIT ? OFFSET ?').all(lim, off));
     }
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
