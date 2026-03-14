@@ -425,6 +425,12 @@ export function Chat() {
 
           {/* Buffer Message Field */}
           <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8 custom-scrollbar pb-40">
+            {messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full text-center opacity-40 select-none">
+                <div className="text-[8px] font-black uppercase tracking-[0.4em] text-white/30 mb-2">NEURAL LINK READY</div>
+                <div className="text-[9px] text-white/20">Send a message to begin.</div>
+              </div>
+            )}
             {messages.map((msg) => {
               const isUser = msg.role === 'user';
               const isSystem = msg.role === 'system';

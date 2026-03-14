@@ -114,6 +114,12 @@ export function Agents() {
           </div>
 
           <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1">
+            {agents.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-40 text-center px-4">
+                <div className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em] mb-2">NO AGENTS</div>
+                <div className="text-[9px] text-white/30">Create your first agent with the + button above.</div>
+              </div>
+            )}
             {agents.map((agent, idx) => (
               <motion.div
                 key={agent.id}

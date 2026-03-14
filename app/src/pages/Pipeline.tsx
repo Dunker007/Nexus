@@ -221,6 +221,12 @@ export function Pipeline() {
           </div>
 
           <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1">
+            {tracks.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-40 text-center px-4">
+                <div className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em] mb-2">NO TRACKS</div>
+                <div className="text-[9px] text-white/30">Add your first release to the pipeline.</div>
+              </div>
+            )}
             {tracks.map((track, idx) => {
               const statusInfo = STATUS_CONFIG[track.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.planning;
               return (
