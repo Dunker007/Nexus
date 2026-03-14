@@ -3,6 +3,9 @@ import { ollama } from 'genkitx-ollama';
 import { ollamaConfig } from './config.js';
 import { db } from './db.js';
 
+// Genkit AI instance with Ollama plugin.
+// Dev tracing UI: run `npm run genkit:start` then open http://localhost:4000
+// Traces are automatically captured for all defineFlow calls.
 export const ai = genkit({
   plugins: [
     ollama({

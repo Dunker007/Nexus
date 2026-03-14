@@ -13,6 +13,7 @@
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "genkit:start": "genkit start -- tsx server.ts",
+    "lighthouse": "lhci autorun",
     "sync:db": "tsx server/sync-state.ts"
   },
   "dependencies": {
