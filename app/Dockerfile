@@ -22,10 +22,9 @@ WORKDIR /usr/src/app
 
 RUN apk add --no-cache openssl
 
-# Only install production dependencies
+# Only install production dependencies (single pass — prisma generate runs via postinstall)
 COPY package*.json ./
 COPY prisma/schema.postgres.prisma ./prisma/schema.prisma
-RUN npm install prisma@5 @prisma/client@5 --omit=dev --legacy-peer-deps && npx prisma generate
 RUN npm install --omit=dev --legacy-peer-deps
 
 # We do not strictly need the src/ directory for the Vite frontend since it's built into dist/, 
@@ -37,9 +36,7 @@ COPY --from=builder /usr/src/app/dist ./dist
 # Vite relies on "type": "module" in package.json
 COPY package.json ./
 
-# Copy optional .env to seed defaults (though Secret Manager should override in Cloud Run)
-COPY .env.example .env
-
+# Do NOT copy .env — Cloud Run injects secrets via environment variables
 # Start the server (Cloud Run defaults to port 8080)
 EXPOSE 8080
 ENV PORT=8080
