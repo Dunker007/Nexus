@@ -212,7 +212,7 @@ export function Chat() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           prompt: userMsg.content,
-          system: reqSystem
+          systemPrompt: reqSystem
         }),
       });
 

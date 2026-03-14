@@ -30,7 +30,7 @@ export async function loadSecrets() {
           const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
           const [version] = await client.accessSecretVersion({ name });
           if (version.payload?.data) {
-            process.env[secretName] = version.payload.data.toString();
+            process.env[secretName] = Buffer.from(version.payload.data).toString('utf-8');
           }
         } catch (e: any) {
           console.warn(`[GCP] Could not load secret ${secretName}:`, e.message);

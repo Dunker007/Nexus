@@ -6,28 +6,6 @@ export const portfolioRouter = Router();
 // In-memory portfolio store for dashboard summary & lab bridge
 const portfolioStore = new Map<string, any>();
 
-// Retrieve specific account data (Bridge)
-portfolioRouter.get('/:accountId', (req, res) => {
-  const { accountId } = req.params;
-  const data = portfolioStore.get(accountId.toLowerCase());
-  res.json(data || { positions: [], journal: [], pendingOrders: [] });
-});
-
-// Sync account data from local agent (Bridge)
-portfolioRouter.post('/:accountId/sync', (req, res) => {
-  const { accountId } = req.params;
-  const { assets, journal } = req.body;
-  
-  portfolioStore.set(accountId.toLowerCase(), {
-    positions: assets || [],
-    journal: journal || [],
-    pendingOrders: [],
-    lastSync: new Date().toISOString()
-  });
-  
-  res.json({ success: true });
-});
-
 // Portfolio summary for dashboard widget
 portfolioRouter.get('/summary', (_req, res) => {
   try {
@@ -89,4 +67,26 @@ portfolioRouter.get('/accounts', (_req, res) => {
   } catch (e: any) {
     res.status(500).json({ error: e.message });
   }
+});
+
+// Retrieve specific account data (Bridge)
+portfolioRouter.get('/:accountId', (req, res) => {
+  const { accountId } = req.params;
+  const data = portfolioStore.get(accountId.toLowerCase());
+  res.json(data || { positions: [], journal: [], pendingOrders: [] });
+});
+
+// Sync account data from local agent (Bridge)
+portfolioRouter.post('/:accountId/sync', (req, res) => {
+  const { accountId } = req.params;
+  const { assets, journal } = req.body;
+
+  portfolioStore.set(accountId.toLowerCase(), {
+    positions: assets || [],
+    journal: journal || [],
+    pendingOrders: [],
+    lastSync: new Date().toISOString()
+  });
+
+  res.json({ success: true });
 });

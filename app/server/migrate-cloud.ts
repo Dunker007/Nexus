@@ -24,7 +24,7 @@ export async function autoMigrateCloud() {
     process.env.DATABASE_URL = `postgresql://${DB_USER}:${DB_PASS}@localhost/${DB_NAME}?host=/cloudsql/${CLOUD_SQL_CONNECTION_NAME}`;
 
     // Push the schema to ensuring the database matches prisma/schema.prisma (now our postgres schema)
-    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+    execSync('npx prisma db push', { stdio: 'inherit' });
     console.log('[DB] PostgreSQL schema successfully synced.');
   } catch (err: any) {
     console.error('[DB] Auto-migration failed:', err.message);
