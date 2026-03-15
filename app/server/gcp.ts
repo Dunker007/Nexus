@@ -21,7 +21,8 @@ export async function loadSecrets() {
     const secretsToLoad = [
       'GOOGLE_CLIENT_ID',
       'GOOGLE_CLIENT_SECRET',
-      'GOOGLE_SERVICE_ACCOUNT_JSON'
+      'GOOGLE_SERVICE_ACCOUNT_JSON',
+      'DATABASE_URL'
     ];
 
     for (const secretName of secretsToLoad) {
@@ -30,7 +31,7 @@ export async function loadSecrets() {
           const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
           const [version] = await client.accessSecretVersion({ name });
           if (version.payload?.data) {
-            process.env[secretName] = Buffer.from(version.payload.data).toString('utf-8');
+            process.env[secretName] = Buffer.from(version.payload.data).toString('utf-8').trim();
           }
         } catch (e: any) {
           console.warn(`[GCP] Could not load secret ${secretName}:`, e.message);

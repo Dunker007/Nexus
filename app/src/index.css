@@ -23,7 +23,13 @@
    BASE STYLES
    ======================================== */
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 :root {
   font-family: var(--font-sans);
@@ -43,21 +49,50 @@ body {
   overflow: hidden;
 }
 
-#root { height: 100vh; display: flex; flex-direction: column; }
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
 /* ========================================
    SCROLLBAR
    ======================================== */
 
-::-webkit-scrollbar { width: 8px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--bg-dark); }
-::-webkit-scrollbar-thumb { background: var(--cyan-dim); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+::-webkit-scrollbar {
+  width: 8px;
+  height: 4px;
+}
 
-.custom-scrollbar::-webkit-scrollbar { width: 5px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cyan-dim);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cyan);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
 
 /* ========================================
    ANIMATED BACKGROUND
@@ -72,8 +107,13 @@ body {
 }
 
 @keyframes grid-move {
-  0% { background-position: 0 0; }
-  100% { background-position: 50px 50px; }
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 50px 50px;
+  }
 }
 
 /* ========================================
@@ -89,18 +129,25 @@ body {
 }
 
 .glass-card {
-  background: var(--glass-bg);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(10, 14, 26, 0.9) 100%);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 24px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.5),
+    0 8px 10px -6px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
 }
 
 .glass-card:hover {
   border-color: var(--cyan);
-  box-shadow: var(--glow-cyan);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.6),
+    0 10px 10px -5px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(0, 245, 212, 0.1);
   transform: translateY(-2px);
 }
 
@@ -163,12 +210,12 @@ body {
 
 .bg-mesh-purple {
   background-image: radial-gradient(at 0% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
-                    radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+    radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
 }
 
 .bg-mesh-cyan {
   background-image: radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
-                    radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%);
+    radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%);
 }
 
 /* ========================================
@@ -243,28 +290,59 @@ body {
    ======================================== */
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 @keyframes infinite-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* ========================================
@@ -302,9 +380,17 @@ body {
 }
 
 /* Delay utilities for staggered animations */
-.delay-500 { animation-delay: 0.5s; }
-.delay-1000 { animation-delay: 1s; }
-.delay-1500 { animation-delay: 1.5s; }
+.delay-500 {
+  animation-delay: 0.5s;
+}
+
+.delay-1000 {
+  animation-delay: 1s;
+}
+
+.delay-1500 {
+  animation-delay: 1.5s;
+}
 
 /* ========================================
    UTILITIES
@@ -362,13 +448,13 @@ body {
   visibility: hidden;
 }
 
-.react-grid-item > .react-resizable-handle {
+.react-grid-item>.react-resizable-handle {
   position: absolute;
   width: 20px;
   height: 20px;
 }
 
-.react-grid-item > .react-resizable-handle::after {
+.react-grid-item>.react-resizable-handle::after {
   content: "";
   position: absolute;
   right: 3px;
@@ -379,11 +465,11 @@ body {
   border-bottom: 2px solid rgba(0, 245, 212, 0.5);
 }
 
-.react-resizable-hide > .react-resizable-handle {
+.react-resizable-hide>.react-resizable-handle {
   display: none;
 }
 
-.react-grid-item > .react-resizable-handle.react-resizable-handle-se {
+.react-grid-item>.react-resizable-handle.react-resizable-handle-se {
   bottom: 0;
   right: 0;
   cursor: se-resize;
@@ -391,14 +477,21 @@ body {
 
 /* ── BREAKING NEWS TICKER ─────────────────────────────────────────────── */
 @keyframes ticker-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
+
 .ticker-track {
   display: flex;
   width: max-content;
   animation: ticker-scroll 550s linear infinite;
 }
+
 .ticker-track:hover {
   animation-play-state: paused;
 }

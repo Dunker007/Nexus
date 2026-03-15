@@ -1,6 +1,6 @@
 import { Express } from 'express';
 import { z } from 'genkit';
-import { db } from './db.js';
+import { getPrisma } from './db.js';
 import { google } from 'googleapis';
 import { driveConfig, ollamaConfig, lmStudioConfig } from './config.js';
 import { required } from './middleware/validate.js';
@@ -84,7 +84,7 @@ async function callLocalLLM(prompt: string, systemPrompt?: string): Promise<stri
         stream: false,
       }),
     }, 30000); // 30s for actual generation
-    
+
     if (res.ok) {
       const data = await res.json() as any;
       if (data.response) return data.response;
@@ -146,7 +146,7 @@ export function setupRoutes(app: Express) {
 
     // DB ping
     try {
-      db.prepare('SELECT 1').get();
+      await getPrisma().$queryRaw`SELECT 1`;
       checks.db = 'ok';
     } catch (e: any) {
       checks.db = `error: ${e.message}`;
@@ -181,10 +181,10 @@ export function setupRoutes(app: Express) {
       });
       const { prompt, context, systemPrompt } = schema.parse(req.body);
       const fullPrompt = context ? `${prompt}\n\nContext: ${context}` : prompt;
-      
+
       // Execute through Genkit flow instead of raw function to generate tracing data
       const text = await llmInferenceFlow({ prompt: fullPrompt, systemPrompt });
-      
+
       res.json({ text });
     } catch (error: any) {
       console.error('[brain-link] Error:', error.message);
@@ -199,15 +199,33 @@ export function setupRoutes(app: Express) {
       return res.status(503).json({ error: 'No Gemini key found — set GEMINI_FREE_KEY in .env' });
     }
     try {
-      const { prompt, systemPrompt } = z.object({
-        prompt: z.string().min(1),
+      const { messages, systemPrompt } = z.object({
+        messages: z.array(z.object({
+          role: z.enum(['user', 'assistant']),
+          content: z.string()
+        })).min(1),
         systemPrompt: z.string().optional(),
       }).parse(req.body);
 
+      const geminiContents: { role: string; parts: { text: string }[] }[] = [];
+      messages.forEach(msg => {
+        const role = msg.role === 'assistant' ? 'model' : 'user';
+        if (geminiContents.length > 0 && geminiContents[geminiContents.length - 1].role === role) {
+          geminiContents[geminiContents.length - 1].parts[0].text += '\n\n' + msg.content;
+        } else {
+          geminiContents.push({ role, parts: [{ text: msg.content }] });
+        }
+      });
+
+      // Explicitly define the system instruction properly
+      const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\n`;
+      const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
+
       const body = {
-        system_instruction: systemPrompt ? { parts: [{ text: systemPrompt }] } : undefined,
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 300 },
+        system_instruction: { parts: [{ text: finalSystemPrompt }] },
+        contents: geminiContents,
+        generationConfig: { temperature: 0.9, maxOutputTokens: 4000 },
+        tools: [{ googleSearch: {} }],
       };
 
       const r = await fetch(
@@ -216,7 +234,7 @@ export function setupRoutes(app: Express) {
       );
       const data: any = await r.json();
       if (!r.ok) throw new Error(data?.error?.message || 'Gemini API error');
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response.';
+      const text = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join('\n') || 'No response.';
       res.json({ text });
     } catch (e: any) {
       console.error('[debate] Error:', e.message);
@@ -230,11 +248,11 @@ export function setupRoutes(app: Express) {
     try {
       const r = await fetchWithTimeout(`${ollamaConfig.baseUrl}/api/tags`, {}, 2000);
       if (r.ok) { status.ollama = true; status.activeModel = ollamaConfig.defaultModel; }
-    } catch {}
+    } catch { }
     try {
       const r = await fetchWithTimeout(`${lmStudioConfig.baseUrl}/v1/models`, {}, 2000);
       if (r.ok) { status.lmStudio = true; if (!status.activeModel) status.activeModel = lmStudioConfig.defaultModel; }
-    } catch {}
+    } catch { }
     res.json(status);
   });
 

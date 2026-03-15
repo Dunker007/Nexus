@@ -1,15 +1,15 @@
 import { Router } from 'express';
-import { db } from '../db.js';
+import { getPrisma } from '../db.js';
 import { getIO } from '../socket.js';
 
 const router = Router();
 
 // Get all pipeline tracks
-router.get('/', (_req, res) => {
+router.get('/', async (_req, res) => {
   try {
-    const tracks = db.prepare(`
-      SELECT * FROM pipeline_tracks ORDER BY created_at DESC
-    `).all();
+    const tracks = await getPrisma().pipeline_tracks.findMany({
+      orderBy: { created_at: 'desc' }
+    });
     res.json(tracks);
   } catch (error) {
     console.error('Pipeline fetch error:', error);
@@ -18,9 +18,9 @@ router.get('/', (_req, res) => {
 });
 
 // Get single track
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const track = db.prepare('SELECT * FROM pipeline_tracks WHERE id = ?').get(req.params.id);
+    const track = await getPrisma().pipeline_tracks.findUnique({ where: { id: req.params.id } });
     if (!track) {
       return res.status(404).json({ error: 'Track not found' });
     }
@@ -32,16 +32,15 @@ router.get('/:id', (req, res) => {
 });
 
 // Create track
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { id, title, artist, genre, bpm, key, status, progress, notes } = req.body;
 
-    db.prepare(`
-      INSERT INTO pipeline_tracks (id, title, artist, genre, bpm, key, status, progress, notes, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
-    `).run(id, title, artist, genre, bpm, key, status, progress, notes);
-
-    const track = db.prepare('SELECT * FROM pipeline_tracks WHERE id = ?').get(id);
+    const track = await getPrisma().pipeline_tracks.create({
+      data: {
+        id, title, artist, genre, bpm: bpm != null ? Number(bpm) : null, key, status, progress: progress != null ? Number(progress) : 0, notes
+      }
+    });
     
     try { getIO().emit('pipeline_update', { type: 'create', track }); } catch(e) {}
     
@@ -53,17 +52,16 @@ router.post('/', (req, res) => {
 });
 
 // Update track
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const { title, artist, genre, bpm, key, status, progress, notes } = req.body;
 
-    db.prepare(`
-      UPDATE pipeline_tracks
-      SET title = ?, artist = ?, genre = ?, bpm = ?, key = ?, status = ?, progress = ?, notes = ?, updated_at = datetime('now')
-      WHERE id = ?
-    `).run(title, artist, genre, bpm, key, status, progress, notes, req.params.id);
-
-    const track = db.prepare('SELECT * FROM pipeline_tracks WHERE id = ?').get(req.params.id);
+    const track = await getPrisma().pipeline_tracks.update({
+      where: { id: req.params.id },
+      data: {
+        title, artist, genre, bpm: bpm != null ? Number(bpm) : null, key, status, progress: progress != null ? Number(progress) : 0, notes
+      }
+    });
     
     try { getIO().emit('pipeline_update', { type: 'update', track }); } catch(e) {}
     
@@ -75,9 +73,9 @@ router.put('/:id', (req, res) => {
 });
 
 // Delete track
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    db.prepare('DELETE FROM pipeline_tracks WHERE id = ?').run(req.params.id);
+    await getPrisma().pipeline_tracks.delete({ where: { id: req.params.id } });
     
     try { getIO().emit('pipeline_update', { type: 'delete', id: req.params.id }); } catch(e) {}
 

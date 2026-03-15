@@ -8,28 +8,28 @@
    ======================================== */
 
 .glass-premium {
-  background: linear-gradient(
-    135deg,
-    rgba(10, 14, 26, 0.9) 0%,
-    rgba(13, 17, 23, 0.85) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(13, 17, 23, 0.95) 0%,
+      rgba(10, 14, 26, 0.92) 100%);
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid rgba(0, 245, 212, 0.15);
+  border: 1px solid rgba(0, 245, 212, 0.2);
   border-radius: 20px;
   box-shadow:
-    0 8px 32px 0 rgba(0, 0, 0, 0.37),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+    0 10px 40px -10px rgba(0, 0, 0, 0.7),
+    0 20px 25px -5px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-premium:hover {
-  border-color: rgba(0, 245, 212, 0.4);
+  border-color: rgba(0, 245, 212, 0.5);
   box-shadow:
-    0 8px 32px 0 rgba(0, 245, 212, 0.2),
-    0 0 40px rgba(0, 245, 212, 0.15),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-  transform: translateY(-4px) scale(1.01);
+    0 20px 50px -12px rgba(0, 0, 0, 0.8),
+    0 0 30px rgba(0, 245, 212, 0.1),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
 }
 
 /* ========================================
@@ -37,19 +37,25 @@
    ======================================== */
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
 }
 
 @keyframes glow-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     filter: brightness(1);
   }
+
   50% {
     opacity: 0.8;
     filter: brightness(1.2);
@@ -61,6 +67,7 @@
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -72,6 +79,7 @@
     transform: translateY(30px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -83,6 +91,7 @@
     transform: scale(0.9);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -198,18 +207,20 @@
    ======================================== */
 
 .card-premium {
-  background: linear-gradient(
-    135deg,
-    rgba(10, 14, 26, 0.95) 0%,
-    rgba(13, 17, 23, 0.9) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(15, 23, 42, 0.98) 0%,
+      rgba(10, 14, 26, 0.95) 100%);
   backdrop-filter: blur(40px);
-  border: 1px solid rgba(0, 245, 212, 0.1);
+  border: 1px solid rgba(0, 245, 212, 0.15);
   border-radius: 24px;
   padding: 32px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  box-shadow:
+    0 15px 35px -5px rgba(0, 0, 0, 0.8),
+    0 5px 15px -3px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .card-premium::before {
@@ -220,7 +231,8 @@
   right: 0;
   height: 2px;
   background: linear-gradient(90deg, transparent, #00f5d4, transparent);
-  opacity: 0;
+  opacity: 0.3;
+  /* Always slightly visible to ground the top edge */
   transition: opacity 0.3s;
 }
 
@@ -229,12 +241,12 @@
 }
 
 .card-premium:hover {
-  border-color: rgba(0, 245, 212, 0.3);
+  border-color: rgba(0, 245, 212, 0.4);
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 25px 50px -12px rgba(0, 0, 0, 0.9),
     0 0 40px rgba(0, 245, 212, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transform: translateY(-8px) scale(1.02);
+  transform: translateY(-4px);
 }
 
 /* ========================================
@@ -369,12 +381,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent);
   animation: shimmer 2s infinite;
 }
 
@@ -431,16 +441,21 @@
    ======================================== */
 
 @keyframes particle-float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0, 0) rotate(0deg);
     opacity: 0;
   }
+
   10% {
     opacity: 1;
   }
+
   90% {
     opacity: 1;
   }
+
   100% {
     transform: translate(100px, -100px) rotate(360deg);
     opacity: 0;
@@ -464,14 +479,12 @@
 
 .divider-gradient {
   height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    #00f5d4 20%,
-    #7b2ff7 50%,
-    #c77dff 80%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      #00f5d4 20%,
+      #7b2ff7 50%,
+      #c77dff 80%,
+      transparent 100%);
   margin: 40px 0;
   opacity: 0.5;
 }
@@ -506,6 +519,7 @@
    ======================================== */
 
 @media (max-width: 768px) {
+
   .glass-premium,
   .card-premium {
     padding: 20px;
