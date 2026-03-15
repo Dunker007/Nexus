@@ -1,4 +1,3 @@
-const key = process.env.GEMINI_FREE_KEY || 'AIzaSyCO_mawwHyyH575iStpmapxEtzSnu2JRUM';
 fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + key, {
   method: 'POST',
   headers: {'Content-Type': 'application/json'},
