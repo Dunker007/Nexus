@@ -140,7 +140,7 @@ export function MusicStudio() {
       <div className="max-w-[1600px] mx-auto px-6 py-10 pb-32">
         <PageHeader
           title="Music Studio"
-          subtitle="NEURAL COMPOSITION ENGINE"
+          subtitle="AI COMPOSITION WORKSPACE"
           icon={<Music size={24} className="text-purple-400" />}
           actions={
             <div className="flex gap-1 p-1 bg-white/5 border border-white/5 rounded-2xl backdrop-blur-md">
@@ -205,12 +205,12 @@ export function MusicStudio() {
                 <div className="glass-card p-8 min-h-[600px] flex flex-col border-white/5 bg-white/[0.01]">
                    <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-8 flex items-center gap-3">
                      <Activity size={14} className="text-purple-400" />
-                     Symmetry Configuration
+                     Configuration
                    </h2>
 
                    <div className="space-y-8 flex-1 flex flex-col">
                       <div>
-                        <label className="block text-[9px] font-black text-white/20 uppercase tracking-[0.3em] mb-4 ml-1">Theme / Narrative Signal</label>
+                        <label className="block text-[9px] font-black text-white/20 uppercase tracking-[0.3em] mb-4 ml-1">Theme / Narrative</label>
                         <textarea
                           value={theme}
                           onChange={e => setTheme(e.target.value)}
@@ -261,7 +261,7 @@ export function MusicStudio() {
                              <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400">
                                <UserCog size={20} />
                              </div>
-                             <p className="text-[11px] text-purple-200 font-black uppercase tracking-[0.2em]">Autonomous Protocol Active</p>
+                             <p className="text-[11px] text-purple-200 font-black uppercase tracking-[0.2em]">Autonomous Mode Active</p>
                            </div>
                            <p className="text-xs text-purple-200/40 leading-relaxed font-medium uppercase tracking-tight">
                              The {MODES.find(m => m.id === mode)?.name} construct will execute full creative dominance. Lyrics, prosody, and Suno parameters are optimized for thematic impact.
@@ -276,7 +276,7 @@ export function MusicStudio() {
                           className="w-full py-5 rounded-2xl font-black text-white shadow-2xl bg-gradient-to-r from-purple-600 to-indigo-700 hover:brightness-110 active:scale-[0.98] transition-all duration-300 disabled:opacity-30 disabled:grayscale flex items-center justify-center gap-4 text-xs uppercase tracking-[0.3em]"
                         >
                           {generating ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
-                          {generating ? 'Transmitting...' : 'INITIATE COMPOSITION'}
+                          {generating ? 'Generating...' : 'GENERATE COMPOSITION'}
                         </button>
                       </div>
                    </div>
@@ -293,7 +293,7 @@ export function MusicStudio() {
                        </div>
                        <h3 className="text-xl font-black text-white/30 uppercase tracking-widest">Studio Idle</h3>
                        <p className="text-[10px] text-white/10 mt-2 max-w-xs uppercase font-black tracking-[0.2em] leading-loose">
-                         Define signal parameters to begin neural composition flux
+                         Define parameters to begin AI composition
                        </p>
                     </div>
                   )}
@@ -305,7 +305,7 @@ export function MusicStudio() {
                          <div className="absolute inset-0 bg-purple-500/20 blur-2xl animate-pulse" />
                        </div>
                        <p className="text-white text-sm font-black uppercase tracking-[0.3em] mb-2 animate-pulse">Composing...</p>
-                       <p className="text-[10px] text-white/20 font-black uppercase tracking-widest">Extracting Neural Harmonics</p>
+                       <p className="text-[10px] text-white/20 font-black uppercase tracking-widest">Generating Concepts</p>
                     </div>
                   )}
 
@@ -363,7 +363,7 @@ export function MusicStudio() {
 
                       <div className="p-6 border-t border-white/5">
                          <button onClick={() => { setDraft(null); setSaved(false); }} className="w-full py-3 flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[0.4em] text-white/10 hover:text-white/40 transition-all">
-                            <RefreshCw size={12} /> Purge Buffer
+                            <RefreshCw size={12} /> Clear Draft
                          </button>
                       </div>
                     </motion.div>
@@ -407,8 +407,8 @@ function SongLibrary() {
   if (songs.length === 0) return (
     <div className="flex flex-col items-center justify-center py-40 grayscale opacity-40">
       <Library className="w-16 h-16 text-white/10 mb-6" />
-      <h3 className="text-lg font-black text-white/20 uppercase tracking-widest">Vault Empty</h3>
-      <p className="text-[10px] text-white/10 mt-2 uppercase tracking-[0.3em]">No neural tracks archived</p>
+      <h3 className="text-lg font-black text-white/20 uppercase tracking-widest">Library Empty</h3>
+      <p className="text-[10px] text-white/10 mt-2 uppercase tracking-[0.3em]">No tracks archived</p>
     </div>
   );
 
@@ -456,7 +456,7 @@ function SongLibrary() {
         ) : (
           <div className="h-full flex flex-col items-center justify-center text-white/5">
              <Library size={48} className="mb-4" />
-             <span className="text-[10px] font-black uppercase tracking-[0.5em]">Select Archive Node</span>
+             <span className="text-[10px] font-black uppercase tracking-[0.5em]">Select Track</span>
           </div>
         )}
       </main>
@@ -498,12 +498,12 @@ function ReleaseBoard() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ...songToUpdate, status: newStatus }),
          });
-         toast.success('Vector Update Complete');
+         toast.success('Track Updated');
       }
     } catch(e) {
       console.error(e);
       setSongs(previousSongs);
-      toast.error('Vector Update Failed');
+      toast.error('Update Failed');
     }
   };
 

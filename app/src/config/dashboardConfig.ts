@@ -2,7 +2,8 @@ import type { WidgetConfig, WidgetType } from '../types/dashboard';
 
 // Available Widgets
 export const WIDGET_CATALOG: Record<WidgetType, { title: string; icon: string; defaultW: number; defaultH: number; minW: number; minH: number }> = {
-    quick_ai: { title: '⚡ Quick AI', icon: '⚡', defaultW: 2, defaultH: 3, minW: 2, minH: 2 },
+    quick_ai: { title: '🤖 Gemini 3 Flash', icon: '🤖', defaultW: 2, defaultH: 3, minW: 2, minH: 2 },
+    basic_ai: { title: '🤖 Basic Gemini', icon: '🤖', defaultW: 2, defaultH: 3, minW: 2, minH: 2 },
     calendar: { title: '📅 Calendar', icon: '📅', defaultW: 1, defaultH: 3, minW: 1, minH: 2 },
     news: { title: '📰 News', icon: '📰', defaultW: 2, defaultH: 3, minW: 1, minH: 2 },
     tasks: { title: '✅ Tasks', icon: '✅', defaultW: 1, defaultH: 3, minW: 1, minH: 2 },
@@ -23,29 +24,31 @@ export const WIDGET_CATALOG: Record<WidgetType, { title: string; icon: string; d
 // Row 1: News (2w)    | Calendar (1w)| Scratchpad (1w)
 // Row 2: Tasks (1w)   | Quote (1w)   | Quick Links (1w) | Recent (1w)
 export const DEFAULT_LAYOUT: any[] = [
-    { i: 'quick_ai-1',   x: 0, y: 0, w: 2, h: 3 },
-    { i: 'system-1',     x: 2, y: 0, w: 1, h: 2 },
-    { i: 'music-1',      x: 3, y: 0, w: 1, h: 3 },
-    { i: 'news-1',       x: 0, y: 3, w: 2, h: 3 },
-    { i: 'calendar-1',   x: 2, y: 3, w: 1, h: 3 },
+    { i: 'quick_ai-1', x: 0, y: 0, w: 2, h: 3 },
+    { i: 'system-1', x: 2, y: 0, w: 1, h: 2 },
+    { i: 'music-1', x: 3, y: 0, w: 1, h: 3 },
+    { i: 'news-1', x: 0, y: 3, w: 2, h: 3 },
+    { i: 'calendar-1', x: 2, y: 3, w: 1, h: 3 },
     { i: 'scratchpad-1', x: 3, y: 3, w: 1, h: 3 },
-    { i: 'tasks-1',      x: 0, y: 6, w: 1, h: 3 },
-    { i: 'quote-1',      x: 1, y: 6, w: 1, h: 2 },
+    { i: 'tasks-1', x: 0, y: 6, w: 1, h: 3 },
+    { i: 'quote-1', x: 1, y: 6, w: 1, h: 2 },
     { i: 'quicklinks-1', x: 2, y: 6, w: 1, h: 2 },
-    { i: 'recent-1',     x: 3, y: 6, w: 1, h: 2 },
+    { i: 'recent-1', x: 3, y: 6, w: 1, h: 2 },
+    { i: 'basic_ai-1', x: 0, y: 9, w: 2, h: 3 },
 ];
 
 export const DEFAULT_WIDGETS: WidgetConfig[] = [
-    { i: 'quick_ai-1',   type: 'quick_ai',   title: '⚡ Quick AI',    icon: '⚡' },
-    { i: 'system-1',     type: 'system',     title: '🖥️ System',      icon: '🖥️' },
-    { i: 'music-1',      type: 'music',      title: '🎵 Music',       icon: '🎵' },
-    { i: 'news-1',       type: 'news',       title: '📰 News',        icon: '📰' },
-    { i: 'calendar-1',   type: 'calendar',   title: '📅 Calendar',    icon: '📅' },
-    { i: 'scratchpad-1', type: 'scratchpad', title: '📝 Scratchpad',  icon: '📝' },
-    { i: 'tasks-1',      type: 'tasks',      title: '✅ Tasks',       icon: '✅' },
-    { i: 'quote-1',      type: 'quote',      title: '✨ Quote',       icon: '✨' },
+    { i: 'quick_ai-1', type: 'quick_ai', title: '⚡ Lux', icon: '⚡' },
+    { i: 'system-1', type: 'system', title: '🖥️ System', icon: '🖥️' },
+    { i: 'music-1', type: 'music', title: '🎵 Music', icon: '🎵' },
+    { i: 'news-1', type: 'news', title: '📰 News', icon: '📰' },
+    { i: 'calendar-1', type: 'calendar', title: '📅 Calendar', icon: '📅' },
+    { i: 'scratchpad-1', type: 'scratchpad', title: '📝 Scratchpad', icon: '📝' },
+    { i: 'tasks-1', type: 'tasks', title: '✅ Tasks', icon: '✅' },
+    { i: 'quote-1', type: 'quote', title: '✨ Quote', icon: '✨' },
     { i: 'quicklinks-1', type: 'quicklinks', title: '🔗 Quick Links', icon: '🔗' },
-    { i: 'recent-1',     type: 'recent',     title: '🕐 Recent',      icon: '🕐' },
+    { i: 'recent-1', type: 'recent', title: '🕐 Recent', icon: '🕐' },
+    { i: 'basic_ai-1', type: 'basic_ai', title: '🤖 Basic Gemini', icon: '🤖' },
 ];
 
 // Sample Data

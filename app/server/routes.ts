@@ -1,6 +1,6 @@
 import { Express } from 'express';
 import { z } from 'genkit';
-import { db } from './db.js';
+import { getPrisma } from './db.js';
 import { google } from 'googleapis';
 import { driveConfig, ollamaConfig, lmStudioConfig } from './config.js';
 import { required } from './middleware/validate.js';
@@ -84,7 +84,7 @@ async function callLocalLLM(prompt: string, systemPrompt?: string): Promise<stri
         stream: false,
       }),
     }, 30000); // 30s for actual generation
-    
+
     if (res.ok) {
       const data = await res.json() as any;
       if (data.response) return data.response;
@@ -146,7 +146,7 @@ export function setupRoutes(app: Express) {
 
     // DB ping
     try {
-      db.prepare('SELECT 1').get();
+      await getPrisma().$queryRaw`SELECT 1`;
       checks.db = 'ok';
     } catch (e: any) {
       checks.db = `error: ${e.message}`;
@@ -181,10 +181,10 @@ export function setupRoutes(app: Express) {
       });
       const { prompt, context, systemPrompt } = schema.parse(req.body);
       const fullPrompt = context ? `${prompt}\n\nContext: ${context}` : prompt;
-      
+
       // Execute through Genkit flow instead of raw function to generate tracing data
       const text = await llmInferenceFlow({ prompt: fullPrompt, systemPrompt });
-      
+
       res.json({ text });
     } catch (error: any) {
       console.error('[brain-link] Error:', error.message);
@@ -199,24 +199,57 @@ export function setupRoutes(app: Express) {
       return res.status(503).json({ error: 'No Gemini key found — set GEMINI_FREE_KEY in .env' });
     }
     try {
-      const { prompt, systemPrompt } = z.object({
-        prompt: z.string().min(1),
+      const { messages, systemPrompt, agentName } = z.object({
+        messages: z.array(z.object({
+          role: z.enum(['user', 'assistant']),
+          content: z.string()
+        })).min(1),
         systemPrompt: z.string().optional(),
+        agentName: z.string().optional()
       }).parse(req.body);
 
+      const geminiContents: { role: string; parts: { text: string }[] }[] = [];
+      messages.forEach(msg => {
+        const role = msg.role === 'assistant' ? 'model' : 'user';
+        if (geminiContents.length > 0 && geminiContents[geminiContents.length - 1].role === role) {
+          geminiContents[geminiContents.length - 1].parts[0].text += '\n\n' + msg.content;
+        } else {
+          geminiContents.push({ role, parts: [{ text: msg.content }] });
+        }
+      });
+
+      const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file. To save a note, include it in your response wrapped exactly like this:\n<save_note>Your specific finding or note here</save_note>\n\n`;
+      const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
+
       const body = {
-        system_instruction: systemPrompt ? { parts: [{ text: systemPrompt }] } : undefined,
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 300 },
+        system_instruction: { parts: [{ text: finalSystemPrompt }] },
+        contents: geminiContents,
+        generationConfig: { temperature: 0.9, maxOutputTokens: 4000 },
+        tools: [{ googleSearch: {} }],
       };
 
       const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
         { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
       );
       const data: any = await r.json();
       if (!r.ok) throw new Error(data?.error?.message || 'Gemini API error');
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response.';
+      const text = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join('\n') || 'No response.';
+
+      // Extract and save notes
+      const noteMatch = text.match(/<save_note>([\s\S]*?)<\/save_note>/i);
+      if (noteMatch) {
+         const noteContent = noteMatch[1].trim();
+         
+         let fallbackAgentName = 'AI Agent';
+         if (systemPrompt?.includes('You are Lux')) fallbackAgentName = 'Lux';
+         else if (systemPrompt?.includes('You are Newsician')) fallbackAgentName = 'Newsician';
+         else if (systemPrompt?.includes('You are QPL')) fallbackAgentName = 'QPL';
+         
+         const finalAgentName = agentName || fallbackAgentName;
+         appendMasterNotes(finalAgentName, noteContent).catch(console.error);
+      }
+
       res.json({ text });
     } catch (e: any) {
       console.error('[debate] Error:', e.message);
@@ -230,11 +263,11 @@ export function setupRoutes(app: Express) {
     try {
       const r = await fetchWithTimeout(`${ollamaConfig.baseUrl}/api/tags`, {}, 2000);
       if (r.ok) { status.ollama = true; status.activeModel = ollamaConfig.defaultModel; }
-    } catch {}
+    } catch { }
     try {
       const r = await fetchWithTimeout(`${lmStudioConfig.baseUrl}/v1/models`, {}, 2000);
       if (r.ok) { status.lmStudio = true; if (!status.activeModel) status.activeModel = lmStudioConfig.defaultModel; }
-    } catch {}
+    } catch { }
     res.json(status);
   });
 
@@ -328,6 +361,51 @@ export function setupRoutes(app: Express) {
       res.status(500).json({ error: error.message });
     }
   });
+
+  // ─── Master Notes ─────────────────────────────────────────────────────────
+
+  async function appendMasterNotes(agentName: string, noteContent: string) {
+    try {
+      const auth = getGoogleAuth(['https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/drive.readonly']);
+      const drive = google.drive({ version: 'v3', auth });
+      const folderId = resolveFolderId();
+      
+      const search = await drive.files.list({
+        q: `name = 'MASTER_NOTES.md' and '${folderId}' in parents and trashed = false`,
+        fields: 'files(id)', pageSize: 1,
+        supportsAllDrives: true, includeItemsFromAllDrives: true,
+      });
+      
+      let fileId = (search.data as any).files?.[0]?.id;
+      let currentContent = '';
+      
+      if (fileId) {
+        const exportRes = await drive.files.export({ fileId, mimeType: 'text/plain' }).catch(() => null);
+        if (exportRes) currentContent = exportRes.data as string;
+        else {
+          const response = await drive.files.get({ fileId, alt: 'media', supportsAllDrives: true }).catch(() => null);
+          if (response) currentContent = response.data as string;
+        }
+      }
+      
+      const timestamp = new Date().toLocaleString('en-US', { timeZoneName: 'short' });
+      const newEntry = `\n\n### [${timestamp}] Finding from ${agentName}\n${noteContent}\n`;
+      const updatedContent = (currentContent + newEntry).trim() + '\n';
+      
+      if (fileId) {
+        await drive.files.update({ fileId, supportsAllDrives: true, media: { mimeType: 'text/plain', body: updatedContent } });
+      } else {
+        await drive.files.create({
+          requestBody: { name: 'MASTER_NOTES.md', parents: [folderId] },
+          media: { mimeType: 'text/plain', body: `# NEXUS MASTER NOTES\n\nShared memory and findings from all DLX agents.${newEntry}` },
+          supportsAllDrives: true,
+        });
+      }
+      console.log(`[Master Notes] Appended note from ${agentName}`);
+    } catch (error: any) {
+      console.error(`[Master Notes] Failed to append note:`, error.message);
+    }
+  }
 
   // ─── Shared Memory (CURRENT_OPS.md) ───────────────────────────────────────
 

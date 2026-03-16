@@ -9,6 +9,7 @@ import PageLayout, { PageHeader, StatPill } from '../components/PageLayout';
 
 // Lazy load widgets
 const QuickAIWidget = lazy(() => import('../components/dashboard/widgets/QuickAIWidget').then(m => ({ default: m.QuickAIWidget })));
+const BasicAIWidget = lazy(() => import('../components/dashboard/widgets/BasicAIWidget').then(m => ({ default: m.BasicAIWidget })));
 const CalendarWidget = lazy(() => import('../components/dashboard/widgets/CalendarWidget').then(m => ({ default: m.CalendarWidget })));
 const NewsWidget = lazy(() => import('../components/dashboard/widgets/NewsWidget').then(m => ({ default: m.NewsWidget })));
 const TasksWidget = lazy(() => import('../components/dashboard/widgets/TasksWidget').then(m => ({ default: m.TasksWidget })));
@@ -40,7 +41,7 @@ export function Dashboard() {
   const [editMode, setEditMode] = useState(false);
   const [showWidgetPicker, setShowWidgetPicker] = useState(false);
 
-  const LAYOUT_VERSION = 'v3-phase3'; // update for layout reset
+  const LAYOUT_VERSION = 'v4-phase2'; // update for layout reset
 
   const [layouts, setLayouts] = useState<{ lg: any[] }>({ lg: DEFAULT_LAYOUT });
   const [widgets, setWidgets] = useState<WidgetConfig[]>(DEFAULT_WIDGETS);
@@ -143,6 +144,7 @@ export function Dashboard() {
     const widgetComponent = (() => {
       switch (widget.type) {
         case 'quick_ai': return <QuickAIWidget />;
+        case 'basic_ai': return <BasicAIWidget />;
         case 'calendar': return <CalendarWidget />;
         case 'news': return <NewsWidget />;
         case 'tasks': return <TasksWidget />;

@@ -1,34 +1,56 @@
 import { Router } from 'express';
-import { db } from '../db.js';
+import { getPrisma } from '../db.js';
 import { required } from '../middleware/validate.js';
 
 export const tasksRouter = Router();
 
-tasksRouter.get('/', (_req, res) => {
-  try { res.json(db.prepare('SELECT * FROM tasks ORDER BY completed ASC, id DESC').all()); }
+tasksRouter.get('/', async (_req, res) => {
+  try { 
+    res.json(await getPrisma().tasks.findMany({
+      orderBy: [
+        { completed: 'asc' },
+        { id: 'desc' }
+      ]
+    })); 
+  }
   catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-tasksRouter.post('/', required(['id', 'title']), (req, res) => {
+tasksRouter.post('/', required(['id', 'title']), async (req, res) => {
   try {
     const { id, title, completed, category } = req.body;
-    db.prepare('INSERT INTO tasks (id, title, completed, category) VALUES (?, ?, ?, ?)').run(id, title, completed ? 1 : 0, category);
-    res.json(db.prepare('SELECT * FROM tasks WHERE id = ?').get(id));
+    const task = await getPrisma().tasks.create({
+      data: {
+        id, 
+        title, 
+        completed: completed ? 1 : 0, 
+        category
+      }
+    });
+    res.json(task);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-tasksRouter.put('/:id', (req, res) => {
+tasksRouter.put('/:id', async (req, res) => {
   try {
     const { title, completed, category } = req.body;
-    db.prepare('UPDATE tasks SET title = COALESCE(?, title), completed = COALESCE(?, completed), category = COALESCE(?, category) WHERE id = ?')
-      .run(title ?? null, completed !== undefined ? (completed ? 1 : 0) : null, category ?? null, req.params.id);
-    res.json(db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id));
+    
+    const updateData: any = {};
+    if (title !== undefined) updateData.title = title;
+    if (completed !== undefined) updateData.completed = completed ? 1 : 0;
+    if (category !== undefined) updateData.category = category;
+    
+    const task = await getPrisma().tasks.update({
+      where: { id: req.params.id },
+      data: updateData
+    });
+    res.json(task);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-tasksRouter.delete('/:id', (req, res) => {
+tasksRouter.delete('/:id', async (req, res) => {
   try {
-    db.prepare('DELETE FROM tasks WHERE id = ?').run(req.params.id);
+    await getPrisma().tasks.delete({ where: { id: req.params.id } });
     res.json({ success: true });
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });

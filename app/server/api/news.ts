@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { db } from '../db.js';
+import { getPrisma } from '../db.js';
 import Parser from 'rss-parser';
 
 export const newsRouter = Router();
@@ -100,19 +100,15 @@ function extractImage(item: any): string | null {
     return null;
 }
 
-newsRouter.get('/', (req, res) => {
+newsRouter.get('/', async (req, res) => {
   try {
-    const rows = db.prepare('SELECT * FROM news_items ORDER BY created_at DESC LIMIT 100').all();
+    const rows = await getPrisma().news_items.findMany({
+      orderBy: { created_at: 'desc' },
+      take: 100
+    });
     res.json(rows.map(mapRow));
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
-
-const insertItem = db.prepare(`
-    INSERT OR IGNORE INTO news_items
-    (id, title, source, type, url, summary, bias, time, impact, feed, image)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-`);
-const backfillImage = db.prepare(`UPDATE news_items SET image = ? WHERE id = ? AND (image IS NULL OR image = '')`);
 
 newsRouter.post('/refresh', async (req, res) => {
     const allFeeds = Object.values(NEWS_SOURCES).flat();
@@ -138,31 +134,39 @@ newsRouter.post('/refresh', async (req, res) => {
             const id = item.guid || item.link || Math.random().toString(36);
             const image = extractImage(item);
             try {
-                const result = insertItem.run(
-                    id,
-                    item.title || 'No Title',
-                    source.name,
-                    source.category,
-                    item.link || '',
-                    item.contentSnippet || item.description || '',
-                    source.bias,
-                    item.pubDate || new Date().toISOString(),
-                    source.logo,
-                    (source as any).priority ? 'priority' : 'nexus',
-                    image
-                );
-                if (result.changes > 0) addedCount++;
-                // Backfill image on existing rows that were skipped by INSERT OR IGNORE
-                else if (image) backfillImage.run(image, id);
-            } catch { /* duplicate GUID */ }
+                const existing = await getPrisma().news_items.findUnique({ where: { id } });
+                if (!existing) {
+                    await getPrisma().news_items.create({
+                        data: {
+                            id,
+                            title: item.title || 'No Title',
+                            source: source.name,
+                            type: source.category,
+                            url: item.link || '',
+                            summary: item.contentSnippet || (item as any).description || '',
+                            bias: source.bias,
+                            time: item.pubDate || new Date().toISOString(),
+                            impact: source.logo,
+                            feed: (source as any).priority ? 'priority' : 'nexus',
+                            image
+                        }
+                    });
+                    addedCount++;
+                } else if (image && (!existing.image || existing.image === '')) {
+                    await getPrisma().news_items.update({
+                        where: { id },
+                        data: { image }
+                    });
+                }
+            } catch (e) { /* duplicate GUID or other error */ }
         }
     }
     console.log(`[News] Refresh complete — ${addedCount} items added from ${allFeeds.length} feeds`);
 });
 
-newsRouter.delete('/:id', (req, res) => {
+newsRouter.delete('/:id', async (req, res) => {
   try {
-    db.prepare('DELETE FROM news_items WHERE id = ?').run(req.params.id);
+    await getPrisma().news_items.delete({ where: { id: req.params.id } });
     res.json({ success: true });
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });

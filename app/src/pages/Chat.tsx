@@ -11,6 +11,8 @@ import remarkGfm from 'remark-gfm';
 import PageLayout from '../components/PageLayout';
 import { useToast } from '../contexts/ToastContext';
 
+import { useLocation } from 'react-router-dom';
+
 // --- Types ---
 interface Message {
   id: string;
@@ -47,25 +49,7 @@ const AGENTS: AgentProfile[] = [
     icon: Zap,
     color: 'text-cyan-400',
     description: 'Your primary AI assistant and orchestrator.',
-    systemPrompt: 'You are Lux, the primary AI interface for the DLX Studio platform. You are helpful, precise, and highly intelligent. You orchestrate other agents when needed.'
-  },
-  {
-    id: 'architect',
-    name: 'Architect',
-    role: 'System Design',
-    icon: Layout,
-    color: 'text-purple-400',
-    description: 'High-level system design and patterns.',
-    systemPrompt: 'You are the Architect Agent. You focus on system design, data modeling, scalability, and clean architecture patterns. You prefer robust, scalable solutions over quick hacks.'
-  },
-  {
-    id: 'code',
-    name: 'Dev',
-    role: 'Implementation',
-    icon: Terminal,
-    color: 'text-blue-400',
-    description: 'Full-stack code generation and refactoring.',
-    systemPrompt: 'You are the Coding Agent. You write clean, modern, type-safe code. You follow best practices and "vibe coding" principles. You prefer functional patterns and immutable state.'
+    systemPrompt: 'You are Lux, the primary AI interface for the DLX Studio platform. You are helpful, precise, and highly intelligent. You orchestrate other agents when needed.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags. Example:\n<think>\nChris is asking for a summary of the tasks. I should check the tracker or outline the moves.\n</think>\nHere\'s what I\'m thinking...'
   },
   {
     id: 'newsician',
@@ -74,7 +58,7 @@ const AGENTS: AgentProfile[] = [
     icon: Activity,
     color: 'text-red-400',
     description: 'Edgy, hard-hitting political lyrics.',
-    systemPrompt: 'You are Newsician. Your tone is edgy, intense, and overtly political. Focus on raw lyrics and hard-hitting concepts.'
+    systemPrompt: 'You are Newsician. Your tone is edgy, intense, and overtly political. Focus on raw lyrics and hard-hitting concepts.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
   },
   {
     id: 'qpl',
@@ -83,12 +67,58 @@ const AGENTS: AgentProfile[] = [
     icon: (props: any) => <MessageSquare {...props} />, 
     color: 'text-amber-400',
     description: 'Quiet Part Loud. Deep, mellow, thoughtful.',
-    systemPrompt: 'You are QPL (Quiet Part Loud). You write mellow, introspective, deeply philosophical and political lyrics.'
+    systemPrompt: 'You are QPL (Quiet Part Loud). You write mellow, introspective, deeply philosophical and political lyrics.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
+  },
+  {
+    id: 'mic',
+    name: 'Mic',
+    role: 'STUDIO MANAGER',
+    icon: Settings,
+    color: 'text-indigo-400',
+    description: 'Protects sustainable momentum. Manages distribution, visuals, and release cadence for DLX and QPL.',
+    systemPrompt: 'You are Mic, the Studio Manager. You protect sustainable momentum. You manage distribution, visuals, and release cadence for DLX and QPL.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
+  },
+  {
+    id: 'alto',
+    name: 'Alto',
+    role: 'IRA ADVISOR',
+    icon: Activity, // mapped visually
+    color: 'text-amber-400',
+    description: 'Dedicated financial parsing agent for Alto Crypto and Alternative Assets IRA accounts.',
+    systemPrompt: 'You are Alto, the IRA Advisor. You parse financial data and provide cross-account views.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
+  },
+  {
+    id: 'schwab',
+    name: 'Schwab Advisor',
+    role: 'PORTFOLIO ADVISOR',
+    icon: Activity, // mapped visually
+    color: 'text-blue-400',
+    description: 'Personal Schwab portfolio advisor and financial analyst. Monitors holdings, performance, and market context.',
+    systemPrompt: 'You are Schwab Advisor. You monitor holdings, performance, and market context.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
+  },
+  {
+    id: 'architect',
+    name: 'Architect',
+    role: 'System Design',
+    icon: Layout,
+    color: 'text-purple-400',
+    description: 'High-level system design and patterns.',
+    systemPrompt: 'You are the Architect Agent. You focus on system design, data modeling, scalability, and clean architecture patterns. You prefer robust, scalable solutions over quick hacks.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
+  },
+  {
+    id: 'code',
+    name: 'Dev',
+    role: 'Implementation',
+    icon: Terminal,
+    color: 'text-blue-400',
+    description: 'Full-stack code generation and refactoring.',
+    systemPrompt: 'You are the Coding Agent. You write clean, modern, type-safe code. You follow best practices and "vibe coding" principles. You prefer functional patterns and immutable state.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
   }
 ];
 
 export function Chat() {
   const { toast } = useToast();
+  const location = useLocation();
 
   // --- State ---
   const [viewMode, setViewMode] = useState<'agents' | 'models'>('agents');
@@ -101,7 +131,7 @@ export function Chat() {
   const [streaming, setStreaming] = useState('');
 
   // Agent Mode State
-  const [activeAgentId, setActiveAgentId] = useState('lux');
+  const [activeAgentId, setActiveAgentId] = useState(location.state?.agentId || 'lux');
 
   // Model Mode State
   const [localModels, setLocalModels] = useState<{ lmstudio: DiscoveredModel[], ollama: DiscoveredModel[] }>({ lmstudio: [], ollama: [] });
@@ -212,12 +242,21 @@ export function Chat() {
 
       const reqSystem = viewMode === 'agents' ? activeAgent.systemPrompt : customSystemPrompt;
 
-      const res = await fetch('/api/brain-link', {
+      let res;
+      // In cloud, always use Gemini for debate. So just use it for models too.
+      const debateMessages = [...messages, userMsg]
+        .filter(m => m.role === 'user' || m.role === 'agent')
+        .map(m => ({
+          role: m.role === 'user' ? 'user' : 'assistant',
+          content: m.content
+        }));
+      res = await fetch('/api/debate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          prompt: userMsg.content,
-          systemPrompt: reqSystem
+          messages: debateMessages,
+          systemPrompt: reqSystem,
+          agentName: viewMode === 'agents' ? activeAgent?.name : selectedModel?.id
         }),
       });
 
@@ -425,7 +464,7 @@ export function Chat() {
           </AnimatePresence>
 
           {/* Buffer Message Field */}
-          <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8 custom-scrollbar pb-40">
+          <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8 custom-scrollbar relative">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center opacity-40 select-none">
                 <div className="text-[8px] font-black uppercase tracking-[0.4em] text-white/30 mb-2">NEURAL LINK READY</div>
@@ -453,12 +492,44 @@ export function Chat() {
                       <span>{isUser ? 'LOCAL_USER' : isSystem ? 'KERNEL' : agent.name}</span>
                       <span>{msg.timestamp?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
-                    <div className={`rounded-2xl p-4 text-sm leading-relaxed relative w-full border ${isUser ? 'bg-cyan-500/10 border-cyan-500/30 text-white' : 'bg-white/[0.03] border-white/5 text-white/80'}`}>
+                    <div className={`rounded-2xl p-4 text-sm leading-relaxed relative w-full border overflow-hidden ${isUser ? 'bg-cyan-500/10 border-cyan-500/30 text-white' : 'bg-white/[0.03] border-white/5 text-white/80'}`}>
                        {isUser || isSystem ? (
                          <p className="whitespace-pre-wrap">{msg.content}</p>
                        ) : (
-                         <div className="prose prose-invert prose-p:leading-relaxed prose-pre:bg-black/50 prose-pre:p-4 prose-pre:rounded-xl prose-code:text-cyan-400 max-w-none">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                         <div className="flex flex-col gap-2">
+                           {msg.content.split(/(<think>[\s\S]*?<\/think>|<save_note>[\s\S]*?<\/save_note>)/gi).map((token, i) => {
+                              if (/^<think>([\s\S]*)<\/think>$/i.test(token)) {
+                                const inner = token.replace(/^<think>/i, '').replace(/<\/think>$/i, '').trim();
+                                return (
+                                  <details key={i} className="group my-2 bg-black/20 rounded-lg border border-white/5 overflow-hidden">
+                                    <summary className="cursor-pointer text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500/50 hover:text-cyan-400 select-none p-3 flex items-center gap-2 bg-white/[0.02]">
+                                       <span className="w-1.5 h-1.5 rounded-full bg-cyan-500/30 group-open:bg-cyan-500 animate-pulse" />
+                                       Neural Processing Stream
+                                    </summary>
+                                    <div className="p-4 text-xs font-mono text-cyan-500/60 whitespace-pre-wrap border-t border-white/5">
+                                       {inner}
+                                    </div>
+                                  </details>
+                                );
+                              }
+                              if (/^<save_note>([\s\S]*)<\/save_note>$/i.test(token)) {
+                                const inner = token.replace(/^<save_note>/i, '').replace(/<\/save_note>$/i, '').trim();
+                                return (
+                                  <div key={i} className="my-2 p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 flex gap-3 items-start text-emerald-400 shadow-lg shadow-emerald-500/5">
+                                     <Database size={16} className="shrink-0 mt-0.5 opacity-80" />
+                                     <div>
+                                       <div className="text-[9px] font-black uppercase tracking-widest mb-1 opacity-60">Auto-Synced to Master Notes</div>
+                                       <div className="text-sm italic">{inner}</div>
+                                     </div>
+                                  </div>
+                                );
+                              }
+                              return token.trim() ? (
+                                <div key={i} className="prose prose-invert prose-p:leading-relaxed prose-pre:bg-black/50 prose-pre:p-4 prose-pre:rounded-xl prose-code:text-cyan-400 max-w-none">
+                                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{token}</ReactMarkdown>
+                                </div>
+                              ) : null;
+                           })}
                          </div>
                        )}
                     </div>
@@ -492,6 +563,8 @@ export function Chat() {
                   </div>
                </div>
             )}
+            
+            <div className="h-32 w-full shrink-0" /> {/* Spacer to prevent UI overlap with absolute input box */}
             <div ref={messagesEndRef} />
           </div>
 
@@ -500,7 +573,7 @@ export function Chat() {
             <div className="max-w-3xl mx-auto w-full pointer-events-auto">
                <div className="glass-card p-1.5 border-white/10 group focus-within:border-cyan-500/40 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] bg-[#0d0d14]/80 backdrop-blur-xl">
                   <div className="flex items-end gap-2 px-2">
-                    <textarea
+                      <textarea
                       ref={inputRef}
                       value={input}
                       onChange={e => setInput(e.target.value)}
@@ -508,13 +581,13 @@ export function Chat() {
                       placeholder={`TRANSMIT COMMAND TO ${viewMode === 'agents' ? activeAgent.name.toUpperCase() : 'ENGINE'}...`}
                       disabled={loading}
                       rows={1}
-                      className="flex-1 bg-transparent text-white placeholder-white/10 text-sm outline-none resize-none py-4 font-medium tracking-tight min-h-[56px] max-h-40 overflow-y-auto"
+                      className="flex-1 bg-transparent text-white placeholder-white/10 text-sm outline-none resize-none py-3 font-medium tracking-tight min-h-[44px] max-h-32 overflow-y-auto"
                       style={{ fieldSizing: 'content' } as any}
                     />
                     <button
                       onClick={sendMessage}
                       disabled={!input.trim() || loading}
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shrink-0 transition-all shadow-xl mb-1 ${viewMode === 'models' ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/20' : 'bg-cyan-600 hover:bg-cyan-500 shadow-cyan-500/20'} active:scale-95 disabled:opacity-20 disabled:grayscale`}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 transition-all shadow-xl mb-1 ${viewMode === 'models' ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/20' : 'bg-cyan-600 hover:bg-cyan-500 shadow-cyan-500/20'} active:scale-95 disabled:opacity-20 disabled:grayscale`}
                     >
                       <Send size={18} />
                     </button>

@@ -1,0 +1,10 @@
+[     388ms] Error: Minified React error #418; visit https://react.dev/errors/418?args[]=text&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at rK (https://www.powerplaypress.org/_next/static/chunks/dbfd00e0321556dc.js?dpl=dpl_tgfrcEjJQx29ibzQNS2wvRXrWfEN:1:46819)
+    at https://www.powerplaypress.org/_next/static/chunks/dbfd00e0321556dc.js?dpl=dpl_tgfrcEjJQx29ibzQNS2wvRXrWfEN:1:143176
+    at sp (https://www.powerplaypress.org/_next/static/chunks/dbfd00e0321556dc.js?dpl=dpl_tgfrcEjJQx29ibzQNS2wvRXrWfEN:1:146741)
+    at sc (https://www.powerplaypress.org/_next/static/chunks/dbfd00e0321556dc.js?dpl=dpl_tgfrcEjJQx29ibzQNS2wvRXrWfEN:1:138081)
+    at https://www.powerplaypress.org/_next/static/chunks/dbfd00e0321556dc.js?dpl=dpl_tgfrcEjJQx29ibzQNS2wvRXrWfEN:1:132910
+    at u9 (https://www.powerplaypress.org/_next/static/chunks/dbfd00e0321556dc.js?dpl=dpl_tgfrcEjJQx29ibzQNS2wvRXrWfEN:1:133011)
+    at sV (https://www.powerplaypress.org/_next/static/chunks/dbfd00e0321556dc.js?dpl=dpl_tgfrcEjJQx29ibzQNS2wvRXrWfEN:1:159393)
+    at MessagePort.O (https://www.powerplaypress.org/_next/static/chunks/dbfd00e0321556dc.js?dpl=dpl_tgfrcEjJQx29ibzQNS2wvRXrWfEN:1:8323)
+[     428ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.powerplaypress.org/_vercel/insights/script.js:0

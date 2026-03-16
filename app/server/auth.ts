@@ -1,20 +1,23 @@
 import { Router } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
-import { db } from './db.js';
+import { getPrisma } from './db.js';
 import { logger } from './logger.js';
 
 export const authRouter = Router();
 
-const client = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3001/api/auth/callback'
-);
-
 const JWT_SECRET = process.env.JWT_SECRET || 'nexus-dev-secret-change-in-prod';
 const JWT_EXPIRY = '7d';
 const IS_PROD = process.env.NODE_ENV === 'production';
+
+function getOAuthClient() {
+  const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || (IS_PROD ? 'https://dlxstudios.ai/api/auth/callback' : 'http://localhost:3001/api/auth/callback');
+  return new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    REDIRECT_URI
+  );
+}
 
 // ─── Token helpers ────────────────────────────────────────────────────────────
 
@@ -32,6 +35,7 @@ export function verifyToken(token: string): { id: string; email: string; name: s
 
 // ─── GET /api/auth/url — returns Google OAuth consent URL ────────────────────
 authRouter.get('/url', (_req, res) => {
+  const client = getOAuthClient();
   const url = client.generateAuthUrl({
     access_type: 'offline',
     scope: ['openid', 'email', 'profile'],
@@ -46,6 +50,7 @@ authRouter.get('/callback', async (req, res) => {
   if (!code) return res.status(400).json({ error: 'Missing code' });
 
   try {
+    const client = getOAuthClient();
     const { tokens } = await client.getToken(code);
     client.setCredentials(tokens);
 
@@ -61,11 +66,11 @@ authRouter.get('/callback', async (req, res) => {
     const picture = payload.picture || '';
 
     // Upsert user
-    db.prepare(`
-      INSERT INTO users (id, email, name, picture, last_seen)
-      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-      ON CONFLICT(id) DO UPDATE SET name=excluded.name, picture=excluded.picture, last_seen=CURRENT_TIMESTAMP
-    `).run(userId, email, name, picture);
+    await getPrisma().users.upsert({
+      where: { id: userId },
+      update: { name, picture, last_seen: new Date() },
+      create: { id: userId, email, name, picture, last_seen: new Date() }
+    });
 
     const token = signToken({ id: userId, email, name });
 

@@ -5,8 +5,8 @@ generator client {
 // DB_PROVIDER: "postgresql" in production (Cloud Run), "sqlite" in dev
 // DATABASE_URL: set by migrate-cloud.ts in prod, or uses file:../nexus.db in dev
 datasource db {
-  provider = env("DB_PROVIDER")
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:../nexus.db"
 }
 
 model agents {
@@ -26,6 +26,7 @@ model chat_history {
   content   String
   timestamp DateTime? @default(now())
   agent_id  String?
+  user_id   String?
 }
 
 model news_items {
@@ -40,6 +41,7 @@ model news_items {
   impact     String?
   feed       String?   @default("nexus")
   created_at DateTime? @default(now())
+  image      String?
 }
 
 model pipeline_tracks {
@@ -102,4 +104,21 @@ model tasks {
   category   String?   @default("general")
   created_at DateTime? @default(now())
   updated_at DateTime? @default(now())
+}
+
+model portfolio_sync {
+  account_id  String    @id
+  positions   String    @default("[]") // Stored as JSON string
+  journal     String    @default("[]") // Stored as JSON string
+  last_sync   DateTime? @default(now())
+  user_id     String    @default("default")
+}
+
+model users {
+  id         String    @id
+  email      String    @unique
+  name       String?
+  picture    String?
+  created_at DateTime? @default(now())
+  last_seen  DateTime? @default(now())
 }

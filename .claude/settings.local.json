@@ -17,24 +17,7 @@
       "Bash(git fetch:*)",
       "Bash(gh pr list:*)",
       "WebFetch(domain:github.com)",
-      "Bash(powershell:*)",
-      "Read(//c//**)",
-      "Bash(grep -l \"isLoading\\\\|loading\\\\|setLoading\" \"c:/Repos GIT/Nexus/app/src/pages/\"*.tsx)",
-      "Bash(grep -rL \"loading\\\\|isLoading\\\\|spinner\\\\|skeleton\" \"c:/Repos GIT/Nexus/app/src/pages/\"*.tsx)",
-      "Bash(node -e \"import\\(''./server/auth.js''\\).then\\(\\(\\) => console.log\\(''OK''\\)\\).catch\\(e => console.error\\(''FAIL:'', e.message\\)\\)\")",
-      "Bash(find 'c:/Repos GIT/Nexus/app/src/components' -name PageLayout*)",
-      "Bash(for f:*)",
-      "Bash(do)",
-      "Bash(sed -i 's/max-w-7xl/max-w-\\\\[1600px\\\\]/g' \"$f\")",
-      "Bash(echo \"Updated: $f\")",
-      "Bash(done)",
-      "Bash(grep -v \"^\\\\s*//\")",
-      "mcp__plugin_playwright_playwright__browser_navigate",
-      "Bash(node -e \":*)",
-      "Bash(timeout 12 cat \"C:\\\\Users\\\\dunke\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Repos-GIT-Nexus\\\\1a4f5936-e7bd-4dd9-b7a9-9fdccdb8e10c\\\\tasks\\\\bdvzoldy0.output\")",
-      "Bash(grep -r \"llmInferenceFlow\\\\|genkit\\\\|gemini\\\\|GEMINI_KEY\\\\|GOOGLE\" 'c:/Repos GIT/Nexus/app/server' --include=*.ts -l)",
-      "Bash(grep -r llmInferenceFlow 'c:/Repos GIT/Nexus/app/server' --include=*.ts -A 10)",
-      "Bash(\"c:/Repos GIT/Nexus/app/.env\")"
+      "Bash(powershell:*)"
     ]
   }
 }

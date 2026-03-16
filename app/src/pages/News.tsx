@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Target, RefreshCw, Search, ShieldAlert, Cpu, X, Send } from 'lucide-react';
+import { Plus, Target, RefreshCw, ShieldAlert, Cpu, X, Send } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
 import {
   NEWS_SOURCES,
@@ -120,7 +120,6 @@ export function News() {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [savedArticles, setSavedArticles] = useState<Set<string>>(new Set());
-  const [searchQuery, setSearchQuery] = useState('');
   const [radarInput, setRadarInput] = useState('');
   const [selectedBias, setSelectedBias] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -244,14 +243,6 @@ export function News() {
     // Bias filter
     if (selectedBias && article.source.bias !== selectedBias) return false;
 
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return article.title.toLowerCase().includes(query) ||
-        (article.description || '').toLowerCase().includes(query) ||
-        article.source.name.toLowerCase().includes(query);
-    }
-
     return true;
   });
 
@@ -310,21 +301,6 @@ export function News() {
   const isRecent = (dateStr: string) => {
     if (!dateStr) return false;
     return Date.now() - new Date(dateStr).getTime() < 2 * 60 * 60 * 1000;
-  };
-
-  const getBiasGradient = (bias: string): string => {
-    const map: Record<string, string> = {
-      'far-right':         'linear-gradient(135deg,#7f1d1d,#450a0a)',
-      'right':             'linear-gradient(135deg,#991b1b,#3b0a0a)',
-      'right-center':      'linear-gradient(135deg,#92400e,#431407)',
-      'right-libertarian': 'linear-gradient(135deg,#713f12,#3d1f00)',
-      'center-right':      'linear-gradient(135deg,#78350f,#3d1f00)',
-      'center':            'linear-gradient(135deg,#1f2937,#111827)',
-      'center-left':       'linear-gradient(135deg,#1e3a5f,#0c1a33)',
-      'left-center':       'linear-gradient(135deg,#1e3a8a,#0d1f4a)',
-      'left':              'linear-gradient(135deg,#1d4ed8,#0f2a6e)',
-    };
-    return map[bias] || 'linear-gradient(135deg,#18181b,#09090b)';
   };
 
   const LEFT_BIASES   = new Set(['left', 'left-center', 'center-left']);

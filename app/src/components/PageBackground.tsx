@@ -57,6 +57,15 @@ export default function PageBackground({ color }: PageBackgroundProps) {
             filter: 'blur(80px)',
           }}
         />
+
+        {/* 4. Floor Glow (Grounding) */}
+        <div
+          className="absolute bottom-0 w-full h-[30%] opacity-20 mix-blend-screen"
+          style={{
+            background: `linear-gradient(to top, rgba(${rgb}, 0.5), transparent)`,
+            filter: 'blur(100px)',
+          }}
+        />
       </div>
     </div>
   );

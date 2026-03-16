@@ -1,7 +1,7 @@
 import { genkit, z } from 'genkit';
 import { ollama } from 'genkitx-ollama';
 import { ollamaConfig } from './config.js';
-import { db } from './db.js';
+import { getPrisma } from './db.js';
 
 // Genkit AI instance with Ollama plugin.
 // Dev tracing UI: run `npm run genkit:start` then open http://localhost:4000
@@ -24,7 +24,7 @@ export const getPipelineTracksTool = ai.defineTool(
   },
   async () => {
     try {
-      const tracks = db.prepare('SELECT * FROM pipeline_tracks ORDER BY created_at DESC').all();
+      const tracks = await getPrisma().pipeline_tracks.findMany({ orderBy: { created_at: 'desc' } });
       return { status: 'success', tracks };
     } catch (err: any) {
       return { error: err.message };

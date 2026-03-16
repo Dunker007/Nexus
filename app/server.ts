@@ -25,11 +25,14 @@ async function startServer() {
   await autoMigrateCloud();
 
   const app = express();
+  app.set('trust proxy', 1); // Phase 3: Allow Rate Limiter behind Cloud Run proxy
   
   const allowedOrigins = [
     'http://localhost:3001',
     'http://localhost:3000',
     'https://nexus-cloud-50841896985.us-central1.run.app',
+    'https://dlxstudios.ai',
+    'https://www.dlxstudios.ai',
     process.env.ALLOWED_ORIGIN,
   ].filter(Boolean) as string[];
 
@@ -100,13 +103,7 @@ async function startServer() {
   // API routes first
   setupRoutes(app);
 
-  // ─── Global error handler ────────────────────────────────────────────────
-  // Must have 4 args so Express recognises it as an error handler
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  app.use((err: any, _req: any, res: any, _next: any) => {
-    logger.error('Unhandled error', { message: err.message, stack: err.stack });
-    res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
-  });
+
 
   if (isDev) {
     // Vite dev middleware (HMR, fast refresh, etc.)
@@ -117,10 +114,18 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(__dirname, 'dist');
+    const distPath = path.join(__dirname, '../dist');
     app.use(express.static(distPath));
     app.get(/.*/, (_req, res) => res.sendFile(path.join(distPath, 'index.html')));
   }
+
+  // ─── Global error handler ────────────────────────────────────────────────
+  // Must have 4 args so Express recognises it as an error handler
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((err: any, _req: any, res: any, _next: any) => {
+    logger.error('Unhandled error', { message: err.message, stack: err.stack });
+    res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
+  });
 
   httpServer.listen(PORT, '0.0.0.0', () => {
     logger.info('Nexus started', { port: PORT, mode: isDev ? 'development' : 'production' });

@@ -81,7 +81,9 @@ export function Pipeline() {
 
     // Phase 6: Subscribing to Socket.IO events for live UI updates
     const LOCAL_BACKEND = (window as any).NEXUS_API_BASE || '';
-    const socket = io(LOCAL_BACKEND); // Connects dynamically (Tauri uses port 3001, normal web uses relative origin)
+    const socket = io(LOCAL_BACKEND, {
+      transports: ['websocket'], // Force websockets to prevent Cloud Run load balancer from breaking the polling handshake
+    }); // Connects dynamically (Tauri uses port 3001, normal web uses relative origin)
 
     socket.on('pipeline_update', () => {
       // When the backend or an autonomous agent updates a track, automatically refresh the list
@@ -167,7 +169,7 @@ export function Pipeline() {
 
   const handleSync = async () => {
     setSyncing(true);
-    toast.info('Syncing Trace Signal…');
+    toast.info('Syncing Pipeline…');
     try {
       const res = await fetch('/api/pipeline/sync', { method: 'POST' });
       if (res.ok) {
@@ -178,7 +180,7 @@ export function Pipeline() {
              const updatedCurrent = data.tracks.find((t: PipelineTrack) => t.id === selectedTrack.id);
              if (updatedCurrent) setSelectedTrack(updatedCurrent);
            }
-           toast.success('Pipeline Vector Synchronized');
+           toast.success('Pipeline Synchronized');
         }
       } else {
         const err = await res.json();
@@ -207,7 +209,7 @@ export function Pipeline() {
         <aside className="w-full md:w-80 border-b md:border-b-0 md:border-r border-white/5 bg-black/40 backdrop-blur-xl flex flex-col shrink-0 relative z-20 shadow-2xl max-h-64 md:max-h-none overflow-y-auto md:overflow-visible">
           <div className="p-8 border-b border-white/5 bg-gradient-to-br from-purple-500/5 to-transparent flex items-center justify-between">
             <div>
-              <h2 className="text-[10px] uppercase font-black tracking-[0.4em] text-purple-400 mb-2">Vector Tracking</h2>
+              <h2 className="text-[10px] uppercase font-black tracking-[0.4em] text-purple-400 mb-2">Active Projects</h2>
               <span className="text-xl font-black text-white tracking-tighter uppercase">Pipeline</span>
             </div>
             <button
@@ -265,7 +267,7 @@ export function Pipeline() {
                className="w-full mt-4 p-4 rounded-xl border border-dashed border-white/10 text-white/20 hover:text-white/50 hover:border-white/20 hover:bg-white/[0.02] transition-all flex items-center justify-center gap-3"
             >
                <Plus size={16} />
-               <span className="text-[10px] font-black uppercase tracking-[0.2em]">Deploy Track</span>
+               <span className="text-[10px] font-black uppercase tracking-[0.2em]">New Track</span>
             </button>
           </div>
         </aside>
@@ -285,25 +287,25 @@ export function Pipeline() {
                            {isEditing ? (
                              <div className="space-y-6 w-full">
                                 <div className="space-y-1">
-                                   <label className="text-[9px] font-black text-white/10 uppercase tracking-[0.3em]">Track Manifest // Title</label>
+                                   <label className="text-[9px] font-black text-white/10 uppercase tracking-[0.3em]">Track Title</label>
                                    <input type="text" value={editForm.title || ''} onChange={e => setEditForm(p => ({ ...p, title: e.target.value }))}
                                       className="text-4xl font-black text-white bg-transparent border-0 focus:ring-0 w-full p-0 tracking-tighter uppercase placeholder:text-white/5" />
                                 </div>
                                 <div className="space-y-1">
-                                   <label className="text-[9px] font-black text-white/10 uppercase tracking-[0.3em]">Artist Profile</label>
+                                   <label className="text-[9px] font-black text-white/10 uppercase tracking-[0.3em]">Artist</label>
                                    <input type="text" value={editForm.artist || ''} onChange={e => setEditForm(p => ({ ...p, artist: e.target.value }))}
                                       className="text-lg font-black text-white/40 bg-transparent border-0 focus:ring-0 w-full p-0 tracking-[0.2em] uppercase placeholder:text-white/5" />
                                 </div>
                                 <div className="flex flex-wrap gap-4 pt-4">
                                    <div className="space-y-2">
-                                      <label className="text-[9px] font-black text-white/10 uppercase tracking-[0.3em]">Lifecycle State</label>
+                                      <label className="text-[9px] font-black text-white/10 uppercase tracking-[0.3em]">Status</label>
                                       <select value={editForm.status || 'planning'} onChange={e => setEditForm(p => ({ ...p, status: e.target.value as any }))}
                                          className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-[10px] font-black uppercase text-purple-400 outline-none">
                                          {Object.keys(STATUS_CONFIG).map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)}
                                       </select>
                                    </div>
                                    <div className="space-y-2">
-                                      <label className="text-[9px] font-black text-white/10 uppercase tracking-[0.3em]">Target Sector Date</label>
+                                      <label className="text-[9px] font-black text-white/10 uppercase tracking-[0.3em]">Target Date</label>
                                       <input type="date" value={editForm.target_date || ''} onChange={e => setEditForm(p => ({ ...p, target_date: e.target.value }))}
                                          className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-[10px] font-black text-white outline-none" style={{ colorScheme: 'dark' }} />
                                    </div>
@@ -340,7 +342,7 @@ export function Pipeline() {
                            ) : (
                              <button onClick={() => { setIsEditing(true); setEditForm(selectedTrack!); }}
                                className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/50 text-[10px] font-black uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all flex items-center gap-2">
-                               <Edit3 size={14} /> Reconfigure
+                               <Edit3 size={14} /> Edit Properties
                              </button>
                            )}
                         </div>
@@ -353,10 +355,10 @@ export function Pipeline() {
                        <div className="flex items-center justify-between px-2">
                           <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 flex items-center gap-4">
                             <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
-                            Deployment Sub-Routines
+                            Production Steps
                           </h3>
                           <div className="flex items-center gap-4">
-                             <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Phase Progress</span>
+                             <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Progress</span>
                              <div className="flex items-center gap-3">
                                 <div className="w-40 h-1.5 bg-white/5 rounded-full overflow-hidden">
                                    <motion.div initial={{ width: 0 }} animate={{ width: `${selectedTrack?.progress}%` }} className="h-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.3)]" />
@@ -383,9 +385,9 @@ export function Pipeline() {
                       <Music className="w-8 h-8 text-white/10 group-hover:text-purple-400 transition-all" />
                       <div className="absolute inset-0 bg-purple-500/10 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-all" />
                    </div>
-                   <h3 className="text-xl font-black text-white/20 uppercase tracking-widest">Neural Buffer Idle</h3>
+                   <h3 className="text-xl font-black text-white/20 uppercase tracking-widest">No Track Selected</h3>
                    <p className="text-[10px] text-white/10 mt-2 max-w-xs uppercase font-black tracking-[0.2em] leading-loose">
-                      Select a vector from the pipeline stack or initialize a new track manifest
+                      Select a track from the pipeline stack or initialize a new project
                    </p>
                 </div>
               )}

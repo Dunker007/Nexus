@@ -1,36 +1,39 @@
 import { Router } from 'express';
-import { db } from '../db.js';
+import { getPrisma } from '../db.js';
 import { required } from '../middleware/validate.js';
 
 export const agentsRouter = Router();
 
-agentsRouter.get('/', (_req, res) => {
-  try { res.json(db.prepare('SELECT * FROM agents').all()); }
+agentsRouter.get('/', async (_req, res) => {
+  try { res.json(await getPrisma().agents.findMany()); }
   catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-agentsRouter.post('/', required(['name', 'role']), (req, res) => {
+agentsRouter.post('/', required(['name', 'role']), async (req, res) => {
   try {
     const { name, role, description, status, system_prompt } = req.body;
     const id = crypto.randomUUID();
-    db.prepare('INSERT INTO agents (id, name, role, description, status, system_prompt) VALUES (?, ?, ?, ?, ?, ?)')
-      .run(id, name, role, description ?? '', status ?? 'active', system_prompt ?? '');
-    res.json(db.prepare('SELECT * FROM agents WHERE id = ?').get(id));
+    const result = await getPrisma().agents.create({
+      data: { id, name, role, description: description ?? '', status: status ?? 'active', system_prompt: system_prompt ?? '' }
+    });
+    res.json(result);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-agentsRouter.put('/:id', (req, res) => {
+agentsRouter.put('/:id', async (req, res) => {
   try {
     const { name, role, description, status, system_prompt } = req.body;
-    db.prepare('UPDATE agents SET name = ?, role = ?, description = ?, status = ?, system_prompt = ? WHERE id = ?')
-      .run(name, role, description, status, system_prompt, req.params.id);
-    res.json(db.prepare('SELECT * FROM agents WHERE id = ?').get(req.params.id));
+    const result = await getPrisma().agents.update({
+      where: { id: req.params.id },
+      data: { name, role, description, status, system_prompt }
+    });
+    res.json(result);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-agentsRouter.delete('/:id', (req, res) => {
+agentsRouter.delete('/:id', async (req, res) => {
   try {
-    db.prepare('DELETE FROM agents WHERE id = ?').run(req.params.id);
+    await getPrisma().agents.delete({ where: { id: req.params.id } });
     res.json({ success: true });
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });

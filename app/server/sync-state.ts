@@ -21,10 +21,17 @@ async function syncTable(tableName: string, prismaModel: any) {
       
       const id = row.id;
       if (id !== undefined) {
+          const queryId = tableName === 'chat_history' ? Number(id) : String(id);
+          
+          let createPayload = { ...row };
+          if (tableName === 'chat_history') {
+             delete createPayload.id;
+          }
+
           await prismaModel.upsert({
-            where: { id },
+            where: { id: queryId },
             update: row,
-            create: row,
+            create: createPayload,
           });
           count++;
       }
