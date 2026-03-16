@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
+import { useChat } from '@ai-sdk/react';
 import { LUXRIG_BRIDGE_URL, storage, fetchWithTimeout } from '@/lib/utils';
 import { useSettings } from '@/components/SettingsContext';
 import PageBackground from '@/components/PageBackground';
@@ -15,7 +16,7 @@ import {
 const BRIDGE_URL = LUXRIG_BRIDGE_URL;
 
 // --- Types ---
-interface Message {
+interface LocalMessage {
     id: string;
     role: 'user' | 'assistant' | 'system' | 'agent';
     content: string;
@@ -108,9 +109,17 @@ export default function ChatPage() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
     // Chat State
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState('');
-    const [loading, setLoading] = useState(false);
+    // const [messages, setMessages] = useState<LocalMessage[]>([]);
+    // const [input, setInput] = useState('');
+    // const [loading, setLoading] = useState(false);
+    
+    const { messages, input, handleInputChange, handleSubmit, isLoading: loading, setMessages, setInput, append } = useChat({
+        api: '/api/chat',
+        body: {
+            agentId: activeAgentId,
+            customSystemPrompt: customSystemPrompt
+        }
+    });
 
     // Agent Mode State
     const [activeAgentId, setActiveAgentId] = useState('lux');
@@ -194,7 +203,8 @@ export default function ChatPage() {
         setMessages([]);
     };
 
-    async function sendMessage() {
+    async function sendMessage(e?: any) {
+        if (e) e.preventDefault();
         if (!input.trim() || loading) return;
 
         if (viewMode === 'models' && !selectedModel) {
@@ -202,78 +212,7 @@ export default function ChatPage() {
             return;
         }
 
-        const userMsg: Message = {
-            id: Date.now().toString(),
-            role: 'user',
-            content: input,
-            timestamp: new Date()
-        };
-
-        setMessages(prev => [...prev, userMsg]);
-        setInput('');
-        setLoading(true);
-
-        try {
-            // Include message history
-            const history = messages.slice(-10).map(m => ({
-                role: m.role === 'agent' ? 'assistant' : m.role,
-                content: m.content
-            }));
-
-            // Determine Request Params
-            let reqProvider = settings.defaultProvider;
-            let reqModel = settings.defaultModel;
-            let reqSystem = activeAgent.systemPrompt;
-            let reqTemp = settings.temperature;
-            let reqMaxTokens = settings.maxTokens;
-
-            if (viewMode === 'models' && selectedModel) {
-                reqProvider = selectedModel.provider;
-                reqModel = selectedModel.id;
-                reqSystem = customSystemPrompt;
-            }
-
-            const res = await fetchWithTimeout(`${BRIDGE_URL}/llm/chat`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    provider: reqProvider,
-                    model: reqModel,
-                    temperature: reqTemp,
-                    max_tokens: reqMaxTokens,
-                    messages: [
-                        { role: 'system', content: reqSystem },
-                        ...history,
-                        { role: 'user', content: userMsg.content }
-                    ]
-                })
-            }, 30000);
-
-            const data = await res.json();
-            const reply = data.content || data.error || "No response.";
-
-            setMessages(prev => [...prev, {
-                id: (Date.now() + 1).toString(),
-                role: 'agent',
-                content: reply,
-                timestamp: new Date(),
-                agentId: viewMode === 'agents' ? activeAgentId : selectedModel?.id
-            }]);
-
-            if (settings.notifyOnComplete) {
-                // Play sound or notification (not implemented yet, but hook is there)
-            }
-
-        } catch (e) {
-            setMessages(prev => [...prev, {
-                id: (Date.now() + 1).toString(),
-                role: 'system',
-                content: "❌ Connection to LuxRig failed.",
-                timestamp: new Date()
-            }]);
-        } finally {
-            setLoading(false);
-        }
+        handleSubmit(e);
     }
 
     // --- Render Helpers ---

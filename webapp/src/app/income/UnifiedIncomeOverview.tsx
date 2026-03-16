@@ -68,7 +68,7 @@ export default function UnifiedIncomeOverview() {
 
     const fetchData = useCallback(async () => {
         try {
-            const res = await fetch(`${LUXRIG_BRIDGE_URL}/income/summary`);
+            const res = await fetch(`/api/income/summary`);
             const data = await res.json();
             if (data.success) {
                 setSummary(data.summary);
