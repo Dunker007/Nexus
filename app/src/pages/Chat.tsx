@@ -496,8 +496,40 @@ export function Chat() {
                        {isUser || isSystem ? (
                          <p className="whitespace-pre-wrap">{msg.content}</p>
                        ) : (
-                         <div className="prose prose-invert prose-p:leading-relaxed prose-pre:bg-black/50 prose-pre:p-4 prose-pre:rounded-xl prose-code:text-cyan-400 max-w-none">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                         <div className="flex flex-col gap-2">
+                           {msg.content.split(/(<think>[\s\S]*?<\/think>|<save_note>[\s\S]*?<\/save_note>)/gi).map((token, i) => {
+                              if (/^<think>([\s\S]*)<\/think>$/i.test(token)) {
+                                const inner = token.replace(/^<think>/i, '').replace(/<\/think>$/i, '').trim();
+                                return (
+                                  <details key={i} className="group my-2 bg-black/20 rounded-lg border border-white/5 overflow-hidden">
+                                    <summary className="cursor-pointer text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500/50 hover:text-cyan-400 select-none p-3 flex items-center gap-2 bg-white/[0.02]">
+                                       <span className="w-1.5 h-1.5 rounded-full bg-cyan-500/30 group-open:bg-cyan-500 animate-pulse" />
+                                       Neural Processing Stream
+                                    </summary>
+                                    <div className="p-4 text-xs font-mono text-cyan-500/60 whitespace-pre-wrap border-t border-white/5">
+                                       {inner}
+                                    </div>
+                                  </details>
+                                );
+                              }
+                              if (/^<save_note>([\s\S]*)<\/save_note>$/i.test(token)) {
+                                const inner = token.replace(/^<save_note>/i, '').replace(/<\/save_note>$/i, '').trim();
+                                return (
+                                  <div key={i} className="my-2 p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 flex gap-3 items-start text-emerald-400 shadow-lg shadow-emerald-500/5">
+                                     <Database size={16} className="shrink-0 mt-0.5 opacity-80" />
+                                     <div>
+                                       <div className="text-[9px] font-black uppercase tracking-widest mb-1 opacity-60">Auto-Synced to Master Notes</div>
+                                       <div className="text-sm italic">{inner}</div>
+                                     </div>
+                                  </div>
+                                );
+                              }
+                              return token.trim() ? (
+                                <div key={i} className="prose prose-invert prose-p:leading-relaxed prose-pre:bg-black/50 prose-pre:p-4 prose-pre:rounded-xl prose-code:text-cyan-400 max-w-none">
+                                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{token}</ReactMarkdown>
+                                </div>
+                              ) : null;
+                           })}
                          </div>
                        )}
                     </div>
