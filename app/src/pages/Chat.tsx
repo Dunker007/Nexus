@@ -11,6 +11,8 @@ import remarkGfm from 'remark-gfm';
 import PageLayout from '../components/PageLayout';
 import { useToast } from '../contexts/ToastContext';
 
+import { useLocation } from 'react-router-dom';
+
 // --- Types ---
 interface Message {
   id: string;
@@ -47,25 +49,7 @@ const AGENTS: AgentProfile[] = [
     icon: Zap,
     color: 'text-cyan-400',
     description: 'Your primary AI assistant and orchestrator.',
-    systemPrompt: 'You are Lux, the primary AI interface for the DLX Studio platform. You are helpful, precise, and highly intelligent. You orchestrate other agents when needed.'
-  },
-  {
-    id: 'architect',
-    name: 'Architect',
-    role: 'System Design',
-    icon: Layout,
-    color: 'text-purple-400',
-    description: 'High-level system design and patterns.',
-    systemPrompt: 'You are the Architect Agent. You focus on system design, data modeling, scalability, and clean architecture patterns. You prefer robust, scalable solutions over quick hacks.'
-  },
-  {
-    id: 'code',
-    name: 'Dev',
-    role: 'Implementation',
-    icon: Terminal,
-    color: 'text-blue-400',
-    description: 'Full-stack code generation and refactoring.',
-    systemPrompt: 'You are the Coding Agent. You write clean, modern, type-safe code. You follow best practices and "vibe coding" principles. You prefer functional patterns and immutable state.'
+    systemPrompt: 'You are Lux, the primary AI interface for the DLX Studio platform. You are helpful, precise, and highly intelligent. You orchestrate other agents when needed.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags. Example:\n<think>\nChris is asking for a summary of the tasks. I should check the tracker or outline the moves.\n</think>\nHere\'s what I\'m thinking...'
   },
   {
     id: 'newsician',
@@ -74,7 +58,7 @@ const AGENTS: AgentProfile[] = [
     icon: Activity,
     color: 'text-red-400',
     description: 'Edgy, hard-hitting political lyrics.',
-    systemPrompt: 'You are Newsician. Your tone is edgy, intense, and overtly political. Focus on raw lyrics and hard-hitting concepts.'
+    systemPrompt: 'You are Newsician. Your tone is edgy, intense, and overtly political. Focus on raw lyrics and hard-hitting concepts.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
   },
   {
     id: 'qpl',
@@ -83,12 +67,58 @@ const AGENTS: AgentProfile[] = [
     icon: (props: any) => <MessageSquare {...props} />, 
     color: 'text-amber-400',
     description: 'Quiet Part Loud. Deep, mellow, thoughtful.',
-    systemPrompt: 'You are QPL (Quiet Part Loud). You write mellow, introspective, deeply philosophical and political lyrics.'
+    systemPrompt: 'You are QPL (Quiet Part Loud). You write mellow, introspective, deeply philosophical and political lyrics.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
+  },
+  {
+    id: 'mic',
+    name: 'Mic',
+    role: 'STUDIO MANAGER',
+    icon: Settings,
+    color: 'text-indigo-400',
+    description: 'Protects sustainable momentum. Manages distribution, visuals, and release cadence for DLX and QPL.',
+    systemPrompt: 'You are Mic, the Studio Manager. You protect sustainable momentum. You manage distribution, visuals, and release cadence for DLX and QPL.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
+  },
+  {
+    id: 'alto',
+    name: 'Alto',
+    role: 'IRA ADVISOR',
+    icon: Activity, // mapped visually
+    color: 'text-amber-400',
+    description: 'Dedicated financial parsing agent for Alto Crypto and Alternative Assets IRA accounts.',
+    systemPrompt: 'You are Alto, the IRA Advisor. You parse financial data and provide cross-account views.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
+  },
+  {
+    id: 'schwab',
+    name: 'Schwab Advisor',
+    role: 'PORTFOLIO ADVISOR',
+    icon: Activity, // mapped visually
+    color: 'text-blue-400',
+    description: 'Personal Schwab portfolio advisor and financial analyst. Monitors holdings, performance, and market context.',
+    systemPrompt: 'You are Schwab Advisor. You monitor holdings, performance, and market context.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
+  },
+  {
+    id: 'architect',
+    name: 'Architect',
+    role: 'System Design',
+    icon: Layout,
+    color: 'text-purple-400',
+    description: 'High-level system design and patterns.',
+    systemPrompt: 'You are the Architect Agent. You focus on system design, data modeling, scalability, and clean architecture patterns. You prefer robust, scalable solutions over quick hacks.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
+  },
+  {
+    id: 'code',
+    name: 'Dev',
+    role: 'Implementation',
+    icon: Terminal,
+    color: 'text-blue-400',
+    description: 'Full-stack code generation and refactoring.',
+    systemPrompt: 'You are the Coding Agent. You write clean, modern, type-safe code. You follow best practices and "vibe coding" principles. You prefer functional patterns and immutable state.\nYou MUST "think out loud" before replying to prompts. Wrap your internal reasoning in <think> tags.'
   }
 ];
 
 export function Chat() {
   const { toast } = useToast();
+  const location = useLocation();
 
   // --- State ---
   const [viewMode, setViewMode] = useState<'agents' | 'models'>('agents');
@@ -101,7 +131,7 @@ export function Chat() {
   const [streaming, setStreaming] = useState('');
 
   // Agent Mode State
-  const [activeAgentId, setActiveAgentId] = useState('lux');
+  const [activeAgentId, setActiveAgentId] = useState(location.state?.agentId || 'lux');
 
   // Model Mode State
   const [localModels, setLocalModels] = useState<{ lmstudio: DiscoveredModel[], ollama: DiscoveredModel[] }>({ lmstudio: [], ollama: [] });
@@ -212,14 +242,35 @@ export function Chat() {
 
       const reqSystem = viewMode === 'agents' ? activeAgent.systemPrompt : customSystemPrompt;
 
-      const res = await fetch('/api/brain-link', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          prompt: userMsg.content,
-          systemPrompt: reqSystem
-        }),
-      });
+      let res;
+      if (viewMode === 'agents') {
+        // Map messages history for Gemini debate API
+        const debateMessages = [...messages, userMsg]
+          .filter(m => m.role === 'user' || m.role === 'agent')
+          .map(m => ({
+            role: m.role === 'user' ? 'user' : 'assistant',
+            content: m.content
+          }));
+        
+        res = await fetch('/api/debate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            messages: debateMessages,
+            systemPrompt: reqSystem
+          }),
+        });
+      } else {
+        // Use local LLM for non-agent model engine
+        res = await fetch('/api/brain-link', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            prompt: userMsg.content,
+            systemPrompt: reqSystem
+          }),
+        });
+      }
 
       if (!res.ok) throw new Error('LLM request failed');
 

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Plus, Search, LayoutList, LayoutGrid, ExternalLink } from 'lucide-react';
-import PageLayout from '../components/PageLayout';
+import { Plus, Search, LayoutList, LayoutGrid, ExternalLink, Beaker } from 'lucide-react';
+import PageLayout, { PageHeader, StatPill } from '../components/PageLayout';
 
 type Status = 'active' | 'preview' | 'concept';
 type Category = 'Operations' | 'Intelligence' | 'Creation' | 'Capital' | 'Experimental';
@@ -15,7 +15,6 @@ interface Lab {
   category: Category;
   owner: string;
   progress: number;
-  // bar start/end as month index 0-11
   barStart: number;
   barEnd: number;
   route: string;
@@ -43,22 +42,19 @@ const LABS: Lab[] = [
   { id: 'llm-lab',         name: 'LLM Lab',                   icon: '🧠', status: 'concept',  category: 'Experimental',   owner: 'A', progress: 0,  barStart: 2,  barEnd: 6,  route: '/labs/llm',           description: 'Local LLM benchmarking, fine-tuning, and model management.' },
 ];
 
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const CATEGORIES: Array<'All' | Category> = ['All','Operations','Intelligence','Creation','Capital','Experimental'];
 
-const STATUS_COLORS: Record<Status, { bar: string; dot: string; label: string }> = {
-  active:  { bar: 'bg-cyan-500',   dot: 'bg-emerald-400', label: 'text-emerald-400' },
-  preview: { bar: 'bg-amber-500',  dot: 'bg-amber-400',   label: 'text-amber-400' },
-  concept: { bar: 'bg-white/20',   dot: 'bg-white/30',    label: 'text-white/30' },
+const STATUS_COLORS: Record<Status, { bar: string; dot: string; label: string; bg: string }> = {
+  active:  { bar: 'bg-emerald-500',   dot: 'bg-emerald-400', label: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+  preview: { bar: 'bg-amber-500',  dot: 'bg-amber-400',   label: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20' },
+  concept: { bar: 'bg-white/20',   dot: 'bg-white/30',    label: 'text-white/40', bg: 'bg-white/5 border-white/10' },
 };
-
-const currentMonth = new Date().getMonth(); // 0-indexed
 
 export function Labs() {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<'All' | Category>('All');
   const [search, setSearch] = useState('');
-  const [view, setView] = useState<'gantt' | 'grid'>('gantt');
+  const [view, setView] = useState<'list' | 'grid'>('grid');
 
   const filtered = LABS.filter(l => {
     if (activeCategory !== 'All' && l.category !== activeCategory) return false;
@@ -72,200 +68,194 @@ export function Labs() {
 
   return (
     <PageLayout color="cyan" noPadding>
-      <div className="flex flex-col h-full overflow-hidden">
-
-        {/* ── HEADER ─────────────────────────────────────────────────────── */}
-        <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-white/5">
-          <div>
-            <h1 className="text-xl font-black text-white tracking-tight">
-              🧪 Labs <span className="text-cyan-400">Hub</span>
-            </h1>
-            <p style={{ fontSize: '9px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.25em', marginTop: '2px' }}>
-              Experimental feature roadmap &amp; agent assignments
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Static data / sync pills */}
-            <div style={{ display: 'flex', gap: '6px' }}>
-              <span style={{ fontSize: '7px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.2em', border: '1px solid rgba(255,255,255,0.1)', padding: '3px 8px' }}>Static Data</span>
-              <span style={{ fontSize: '7px', fontWeight: 900, color: 'rgba(6,182,212,0.7)', textTransform: 'uppercase', letterSpacing: '0.2em', border: '1px solid rgba(6,182,212,0.2)', padding: '3px 8px', background: 'rgba(6,182,212,0.05)' }}>Sync to DB</span>
-            </div>
-            {/* View toggles */}
-            <div className="flex border border-white/10">
-              {[{ v: 'gantt' as const, Icon: LayoutList }, { v: 'grid' as const, Icon: LayoutGrid }].map(({ v, Icon }) => (
-                <button key={v} onClick={() => setView(v)}
-                  style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: view === v ? 'rgba(255,255,255,0.07)' : 'transparent', color: view === v ? '#fff' : 'rgba(255,255,255,0.25)', cursor: 'pointer', border: 'none' }}>
-                  <Icon size={13} />
+      <div className="max-w-[1600px] mx-auto px-6 py-10 pb-32 flex flex-col min-h-screen">
+        
+        <PageHeader
+          title="Labs Hub"
+          subtitle="Experimental feature roadmap & agent assignments"
+          icon={<Beaker size={24} className="text-cyan-400" />}
+          actions={
+            <div className="flex items-center gap-4">
+              <StatPill label="Static Data" />
+              <div className="flex bg-white/5 border border-white/5 p-1 rounded-xl">
+                <button 
+                  onClick={() => setView('grid')}
+                  className={`p-2 rounded-lg transition-all ${view === 'grid' ? 'bg-white/10 text-white' : 'text-white/20 hover:text-white/40'}`}
+                >
+                  <LayoutGrid size={16} />
                 </button>
-              ))}
+                <button 
+                  onClick={() => setView('list')}
+                  className={`p-2 rounded-lg transition-all ${view === 'list' ? 'bg-white/10 text-white' : 'text-white/20 hover:text-white/40'}`}
+                >
+                  <LayoutList size={16} />
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
+          }
+        />
 
-        {/* ── FILTER BAR ──────────────────────────────────────────────────── */}
-        <div className="shrink-0 flex items-center justify-between px-6 py-2 border-b border-white/5" style={{ background: '#08080c' }}>
-          <div className="flex items-center gap-1">
-            {CATEGORIES.map(cat => (
-              <button key={cat} onClick={() => setActiveCategory(cat)}
-                style={{ padding: '4px 12px', fontSize: '8px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', cursor: 'pointer', fontFamily: 'inherit', border: activeCategory === cat ? '1px solid rgba(6,182,212,0.4)' : '1px solid transparent', background: activeCategory === cat ? 'rgba(6,182,212,0.1)' : 'transparent', color: activeCategory === cat ? '#22d3ee' : 'rgba(255,255,255,0.3)', borderRadius: '4px' }}>
-                {cat}
+        {/* Filters */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+           <div className="flex flex-wrap items-center gap-2 p-1.5 bg-white/5 rounded-xl border border-white/5">
+               {CATEGORIES.map(cat => (
+                 <button 
+                   key={cat} 
+                   onClick={() => setActiveCategory(cat)}
+                   className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeCategory === cat ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-lg shadow-cyan-500/10' : 'text-white/40 hover:text-white hover:bg-white/5 border border-transparent'}`}
+                  >
+                   {cat}
+                 </button>
+               ))}
+           </div>
+
+           <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl">
+                 <Search size={16} className="text-white/20" />
+                 <input 
+                    type="text" 
+                    placeholder="Search labs..." 
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="bg-transparent border-none outline-none text-sm text-white font-medium placeholder:text-white/20 w-48"
+                 />
+              </div>
+              <button className="flex items-center gap-2 px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+                 <Plus size={16} /> New Idea
               </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-3">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid rgba(255,255,255,0.08)', padding: '4px 10px', background: 'rgba(255,255,255,0.02)' }}>
-              <Search size={10} style={{ color: 'rgba(255,255,255,0.2)' }} />
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search labs..."
-                style={{ background: 'none', border: 'none', outline: 'none', fontSize: '9px', color: 'rgba(255,255,255,0.6)', fontFamily: 'inherit', width: '120px' }} />
-            </div>
-            <button style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 14px', background: 'rgba(6,182,212,0.15)', border: '1px solid rgba(6,182,212,0.3)', color: '#22d3ee', fontSize: '8px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', cursor: 'pointer', fontFamily: 'inherit' }}>
-              <Plus size={11} /> New Idea
-            </button>
-          </div>
+           </div>
         </div>
 
-        {/* ── CONTENT ─────────────────────────────────────────────────────── */}
-        <div className="flex-1 overflow-auto custom-scrollbar">
+        {/* Content Area */}
+        <div className="flex-1">
+           {view === 'grid' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                 {filtered.map((lab, idx) => {
+                    const sc = STATUS_COLORS[lab.status];
+                    return (
+                       <motion.div 
+                          key={lab.id}
+                          initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}
+                          onClick={() => navigate(lab.route)}
+                          className="glass-card p-6 border-white/5 cursor-pointer hover:border-cyan-500/30 transition-all hover:bg-cyan-500/[0.02] flex flex-col shadow-xl group"
+                       >
+                          <div className="flex justify-between items-start mb-6">
+                             <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform group-hover:bg-cyan-500/10 group-hover:border-cyan-500/20">
+                                {lab.icon}
+                             </div>
+                             <div className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg border flex items-center gap-1.5 ${sc.bg} ${sc.label}`}>
+                                <div className={`w-1.5 h-1.5 rounded-full ${sc.dot} animate-pulse`} />
+                                {lab.status}
+                             </div>
+                          </div>
 
-          {view === 'gantt' ? (
-            <div style={{ minWidth: '900px' }}>
-              {/* Gantt header */}
-              <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', position: 'sticky', top: 0, background: '#08080c', borderBottom: '1px solid rgba(255,255,255,0.06)', zIndex: 10 }}>
-                <div style={{ padding: '6px 16px', fontSize: '7px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '0.3em', borderRight: '1px solid rgba(255,255,255,0.06)' }}>PROJECT</div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12,1fr)' }}>
-                  {MONTHS.map((m, i) => (
-                    <div key={m} style={{ padding: '6px 4px', fontSize: '7px', fontWeight: 900, color: i === currentMonth ? 'rgba(6,182,212,0.7)' : 'rgba(255,255,255,0.15)', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.03)', background: i === currentMonth ? 'rgba(6,182,212,0.04)' : 'transparent' }}>
-                      {m}
-                    </div>
-                  ))}
-                </div>
+                          <div className="text-[10px] font-bold text-cyan-400/60 uppercase tracking-widest mb-1.5">{lab.category}</div>
+                          <h3 className="text-lg font-bold text-white mb-2 leading-tight group-hover:text-cyan-400 transition-colors uppercase">{lab.name}</h3>
+                          <p className="text-sm text-white/40 leading-relaxed max-w-sm mb-6 flex-1 line-clamp-2">{lab.description}</p>
+
+                          <div className="mt-auto">
+                             <div className="flex justify-between items-center text-xs font-bold text-white/50 mb-2 uppercase tracking-wide">
+                                <span>Progress</span>
+                                <span className={lab.progress === 100 ? 'text-emerald-400' : ''}>{lab.progress}%</span>
+                             </div>
+                             <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden border border-white/5">
+                                <motion.div 
+                                   initial={{ width: 0 }} animate={{ width: `${lab.progress}%` }} transition={{ duration: 1 }}
+                                   className={`h-full rounded-full ${sc.bar}`}
+                                />
+                             </div>
+                          </div>
+                          
+                          <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all text-white/20 hover:text-cyan-400">
+                             <ExternalLink size={16} />
+                          </div>
+                       </motion.div>
+                    );
+                 })}
               </div>
-
-              {/* Rows */}
-              {filtered.map((lab, idx) => {
-                const sc = STATUS_COLORS[lab.status];
-                const barCols = lab.barEnd - lab.barStart + 1;
-                return (
-                  <motion.div key={lab.id}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.03 }}
-                    onClick={() => navigate(lab.route)}
-                    style={{ display: 'grid', gridTemplateColumns: '260px 1fr', borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer', background: 'transparent' }}
-                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.02)'}
-                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}>
-                    {/* Label */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 16px', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
-                      <span style={{ fontSize: '16px', flexShrink: 0 }}>{lab.icon}</span>
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
-                          <h3 style={{ fontSize: '11px', fontWeight: 800, color: 'rgba(255,255,255,0.85)', letterSpacing: '-0.01em', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lab.name}</h3>
-                          <ExternalLink size={8} style={{ color: 'rgba(255,255,255,0.15)', flexShrink: 0 }} />
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ fontSize: '6px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em' }} className={sc.label}>{lab.status}</span>
-                          <span style={{ width: '3px', height: '3px', borderRadius: '50%', display: 'inline-block', background: 'rgba(255,255,255,0.1)' }} />
-                          <span style={{ fontSize: '6px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{lab.owner}</span>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Gantt bar */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12,1fr)', position: 'relative' }}>
-                      {MONTHS.map((_, i) => (
-                        <div key={i} style={{ borderRight: '1px solid rgba(255,255,255,0.03)', background: i === currentMonth ? 'rgba(6,182,212,0.02)' : 'transparent' }} />
-                      ))}
-                      {/* Bar overlay */}
-                      <div style={{
-                        position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-                        left: `${(lab.barStart / 12) * 100}%`,
-                        width: `${(barCols / 12) * 100}%`,
-                        padding: '0 4px',
-                        height: '20px',
-                        display: 'flex', alignItems: 'center',
-                      }}>
-                        <div style={{ width: '100%', height: '100%', position: 'relative', borderRadius: '2px', overflow: 'hidden', background: 'rgba(255,255,255,0.05)' }}>
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${lab.progress}%` }}
-                            transition={{ duration: 1.2, delay: idx * 0.04, ease: 'easeOut' }}
-                            className={sc.bar}
-                            style={{ height: '100%', opacity: 0.75 }}
-                          />
-                          {lab.progress > 10 && (
-                            <span style={{ position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)', fontSize: '7px', fontWeight: 900, color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap' }}>
-                              {lab.progress}%
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-
-              {/* Legend */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderTop: '1px solid rgba(255,255,255,0.06)', background: '#08080c' }}>
-                <div style={{ display: 'flex', gap: '16px' }}>
-                  {(['active','preview','concept'] as Status[]).map(s => (
-                    <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', display: 'inline-block' }} className={STATUS_COLORS[s].dot} />
-                      <span style={{ fontSize: '7px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em' }} className={STATUS_COLORS[s].label}>{s}</span>
-                    </div>
-                  ))}
-                </div>
-                <span style={{ fontSize: '7px', color: 'rgba(255,255,255,0.2)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-                  {filtered.length} projects • Click to open
-                </span>
+           ) : (
+              <div className="glass-card border-white/5 overflow-hidden">
+                 <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                       <thead>
+                          <tr className="border-b border-white/5 bg-white/[0.02]">
+                             <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-white/40">Project</th>
+                             <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-white/40">Category</th>
+                             <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-white/40">Status</th>
+                             <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-white/40">Progress</th>
+                             <th className="px-6 py-4 text-right"></th>
+                          </tr>
+                       </thead>
+                       <tbody className="divide-y divide-white/5">
+                          {filtered.map(lab => {
+                             const sc = STATUS_COLORS[lab.status];
+                             return (
+                                <tr key={lab.id} onClick={() => navigate(lab.route)} className="group hover:bg-white/[0.02] cursor-pointer transition-colors">
+                                   <td className="px-6 py-4">
+                                      <div className="flex items-center gap-4">
+                                         <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-lg">{lab.icon}</div>
+                                         <div>
+                                            <div className="font-bold text-white group-hover:text-cyan-400 transition-colors">{lab.name}</div>
+                                            <div className="text-xs text-white/40">{lab.description}</div>
+                                         </div>
+                                      </div>
+                                   </td>
+                                   <td className="px-6 py-4">
+                                      <span className="text-xs font-medium text-white/50">{lab.category}</span>
+                                   </td>
+                                   <td className="px-6 py-4">
+                                      <div className={`inline-flex items-center gap-2 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg border flex items-center gap-1.5 ${sc.bg} ${sc.label}`}>
+                                         <div className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
+                                         {lab.status}
+                                      </div>
+                                   </td>
+                                   <td className="px-6 py-4 min-w-[200px]">
+                                      <div className="flex items-center gap-3">
+                                         <div className="flex-1 h-1.5 bg-black/60 rounded-full border border-white/5 overflow-hidden">
+                                            <div className={`h-full rounded-full ${sc.bar}`} style={{ width: `${lab.progress}%` }} />
+                                         </div>
+                                         <span className="text-xs font-bold text-white/50 w-8">{lab.progress}%</span>
+                                      </div>
+                                   </td>
+                                   <td className="px-6 py-4 text-right">
+                                      <button className="p-2 text-white/20 hover:text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                         <ExternalLink size={16} />
+                                      </button>
+                                   </td>
+                                </tr>
+                             );
+                          })}
+                       </tbody>
+                    </table>
+                 </div>
               </div>
-            </div>
+           )}
 
-          ) : (
-            /* GRID VIEW */
-            <div style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '12px' }}>
-              {filtered.map((lab, idx) => {
-                const sc = STATUS_COLORS[lab.status];
-                return (
-                  <motion.div key={lab.id}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.04 }}
-                    onClick={() => navigate(lab.route)}
-                    style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)', cursor: 'pointer', transition: 'border-color 0.15s' }}
-                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.14)'}
-                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '24px' }}>{lab.icon}</span>
-                      <span style={{ fontSize: '6px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em' }} className={sc.label}>{lab.status}</span>
-                    </div>
-                    <div style={{ fontSize: '7px', fontWeight: 900, color: 'rgba(6,182,212,0.5)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '4px' }}>{lab.category}</div>
-                    <h3 style={{ fontSize: '14px', fontWeight: 900, color: '#fff', letterSpacing: '-0.01em', margin: '0 0 6px' }}>{lab.name}</h3>
-                    <p style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', lineHeight: 1.5, margin: '0 0 12px' }}>{lab.description}</p>
-                    <div style={{ height: '2px', background: 'rgba(255,255,255,0.05)', marginBottom: '6px' }}>
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${lab.progress}%` }}
-                        transition={{ duration: 1, delay: idx * 0.04 }}
-                        className={sc.bar}
-                        style={{ height: '100%' }}
-                      />
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: '7px', color: 'rgba(255,255,255,0.2)', fontWeight: 900, textTransform: 'uppercase' }}>{lab.progress}%</span>
-                      <span style={{ fontSize: '7px', color: 'rgba(255,255,255,0.2)', fontWeight: 900, textTransform: 'uppercase' }}>{lab.owner}</span>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          )}
+           {filtered.length === 0 && (
+              <div className="py-40 flex flex-col items-center justify-center text-center">
+                 <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-6">
+                    <Search size={24} className="text-white/20" />
+                 </div>
+                 <h3 className="text-xl font-bold text-white mb-2">No projects found</h3>
+                 <p className="text-white/40">Try adjusting your category or search filters.</p>
+              </div>
+           )}
         </div>
 
-        {/* ── STATS FOOTER ────────────────────────────────────────────────── */}
-        <div className="shrink-0 flex items-center gap-6 px-6 py-2 border-t border-white/5" style={{ background: '#08080c' }}>
-          <span style={{ fontSize: '7px', fontWeight: 900, color: 'rgba(52,211,153,0.7)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>● {active} Active</span>
-          <span style={{ fontSize: '7px', fontWeight: 900, color: 'rgba(245,158,11,0.7)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>● {preview} Preview</span>
-          <span style={{ fontSize: '7px', fontWeight: 900, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>● {concept} Concept</span>
-          <span style={{ fontSize: '7px', color: 'rgba(255,255,255,0.15)', textTransform: 'uppercase', letterSpacing: '0.15em', marginLeft: 'auto' }}>{LABS.length} total projects</span>
+        {/* Footer Summary */}
+        <div className="mt-8 pt-6 border-t border-white/5 flex flex-wrap gap-6 items-center">
+           <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+              <div className="w-2 h-2 rounded-full bg-emerald-400" /> {active} Active
+           </div>
+           <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
+              <div className="w-2 h-2 rounded-full bg-amber-400" /> {preview} Preview
+           </div>
+           <div className="flex items-center gap-2 text-white/30 text-xs font-bold uppercase tracking-wider">
+              <div className="w-2 h-2 rounded-full bg-white/20" /> {concept} Concept
+           </div>
+           <div className="ml-auto text-xs font-medium text-white/40">
+              Showing {filtered.length} of {LABS.length} projects
+           </div>
         </div>
 
       </div>
