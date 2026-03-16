@@ -81,7 +81,9 @@ export function Pipeline() {
 
     // Phase 6: Subscribing to Socket.IO events for live UI updates
     const LOCAL_BACKEND = (window as any).NEXUS_API_BASE || '';
-    const socket = io(LOCAL_BACKEND); // Connects dynamically (Tauri uses port 3001, normal web uses relative origin)
+    const socket = io(LOCAL_BACKEND, {
+      transports: ['websocket'], // Force websockets to prevent Cloud Run load balancer from breaking the polling handshake
+    }); // Connects dynamically (Tauri uses port 3001, normal web uses relative origin)
 
     socket.on('pipeline_update', () => {
       // When the backend or an autonomous agent updates a track, automatically refresh the list
