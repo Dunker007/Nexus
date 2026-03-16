@@ -573,7 +573,7 @@ export function Chat() {
             <div className="max-w-3xl mx-auto w-full pointer-events-auto">
                <div className="glass-card p-1.5 border-white/10 group focus-within:border-cyan-500/40 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] bg-[#0d0d14]/80 backdrop-blur-xl">
                   <div className="flex items-end gap-2 px-2">
-                    <textarea
+                      <textarea
                       ref={inputRef}
                       value={input}
                       onChange={e => setInput(e.target.value)}
@@ -581,13 +581,13 @@ export function Chat() {
                       placeholder={`TRANSMIT COMMAND TO ${viewMode === 'agents' ? activeAgent.name.toUpperCase() : 'ENGINE'}...`}
                       disabled={loading}
                       rows={1}
-                      className="flex-1 bg-transparent text-white placeholder-white/10 text-sm outline-none resize-none py-4 font-medium tracking-tight min-h-[56px] max-h-40 overflow-y-auto"
+                      className="flex-1 bg-transparent text-white placeholder-white/10 text-sm outline-none resize-none py-3 font-medium tracking-tight min-h-[44px] max-h-32 overflow-y-auto"
                       style={{ fieldSizing: 'content' } as any}
                     />
                     <button
                       onClick={sendMessage}
                       disabled={!input.trim() || loading}
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shrink-0 transition-all shadow-xl mb-1 ${viewMode === 'models' ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/20' : 'bg-cyan-600 hover:bg-cyan-500 shadow-cyan-500/20'} active:scale-95 disabled:opacity-20 disabled:grayscale`}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 transition-all shadow-xl mb-1 ${viewMode === 'models' ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/20' : 'bg-cyan-600 hover:bg-cyan-500 shadow-cyan-500/20'} active:scale-95 disabled:opacity-20 disabled:grayscale`}
                     >
                       <Send size={18} />
                     </button>
