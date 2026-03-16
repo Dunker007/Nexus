@@ -60,5 +60,3 @@ temp/
 *.tmp
 .vercel
 .env*.local
-.playwright-mcp/
-*.db.backup

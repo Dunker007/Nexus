@@ -1,0 +1,63 @@
+[   15925ms] [ERROR] Access to fetch at 'https://bridge.dlxstudios.online/settings' from origin 'https://www.dlxstudios.online' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.dlxstudios.online/:0
+[   15925ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://bridge.dlxstudios.online/settings:0
+[   15925ms] [ERROR] Access to fetch at 'https://bridge.dlxstudios.online/status' from origin 'https://www.dlxstudios.online' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.dlxstudios.online/:0
+[   15926ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://bridge.dlxstudios.online/status:0
+[   15929ms] [ERROR] Access to fetch at 'https://bridge.dlxstudios.online/llm/models' from origin 'https://www.dlxstudios.online' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.dlxstudios.online/:0
+[   15929ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://bridge.dlxstudios.online/llm/models:0
+[   15929ms] [ERROR] Failed to fetch models @ https://www.dlxstudios.online/_next/static/chunks/1517-66879fe5a8a1d2b4.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:0
+[   15930ms] [ERROR] WebSocket connection to 'wss://bridge.dlxstudios.online/stream' failed: Error during WebSocket handshake: Unexpected response code: 530 @ https://www.dlxstudios.online/_next/static/chunks/2891-d8b6e15bd4d8303a.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:0
+[   16120ms] [ERROR] WebSocket connection to 'wss://bridge.dlxstudios.online/stream?key=dlx_studio_2024_secure_key_a7f9c3e8b2d1f6a4e9c7b5d3a1f8e6c4' failed: Error during WebSocket handshake: Unexpected response code: 530 @ https://www.dlxstudios.online/_next/static/chunks/app/page-e519f614da8a1f11.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:0
+[   18644ms] [ERROR] Access to fetch at 'https://bridge.dlxstudios.online/news?' from origin 'https://www.dlxstudios.online' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.dlxstudios.online/news:0
+[   18644ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://bridge.dlxstudios.online/news?:0
+[   18644ms] [ERROR] News fetch error: TypeError: Failed to fetch
+    at i (https://www.dlxstudios.online/_next/static/chunks/914-f3ee715c30b80d20.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:21384)
+    at W (https://www.dlxstudios.online/_next/static/chunks/app/news/page-6f1822c1ca621c52.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:5565)
+    at https://www.dlxstudios.online/_next/static/chunks/app/news/page-6f1822c1ca621c52.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:5675
+    at oT (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:81814)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98201)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98188)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98446)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98446)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98188)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98446)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98188)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98188)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98188)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98188)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98446)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98188)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98188)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98446)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98188)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98446)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98446)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98188)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98446)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98188)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98446)
+    at e (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98188)
+    at o9 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98472)
+    at o5 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97390)
+    at o9 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98601)
+    at o5 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97390)
+    at o9 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97486)
+    at o5 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97390)
+    at o9 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98601)
+    at o5 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97390)
+    at o9 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97486)
+    at o5 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97390)
+    at o9 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98601)
+    at o5 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97390)
+    at o9 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97486)
+    at o5 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97390)
+    at o9 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97486)
+    at o5 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97390)
+    at o9 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98601)
+    at o5 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97390)
+    at o9 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97486)
+    at o5 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97390)
+    at o9 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98601)
+    at o5 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97390)
+    at o9 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:98601)
+    at o5 (https://www.dlxstudios.online/_next/static/chunks/4bd1b696-c8b67af90e705fb3.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:1:97390) @ https://www.dlxstudios.online/_next/static/chunks/1517-66879fe5a8a1d2b4.js?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo:0
+[   21809ms] [WARNING] The resource https://www.dlxstudios.online/_next/static/css/9f27f9f172b8ee6f.css?dpl=dpl_BP7s6UfW3zUXiGuJxm2DUPrcBeDo was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://www.dlxstudios.online/news:0
