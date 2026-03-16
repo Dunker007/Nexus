@@ -243,35 +243,22 @@ export function Chat() {
       const reqSystem = viewMode === 'agents' ? activeAgent.systemPrompt : customSystemPrompt;
 
       let res;
-      if (viewMode === 'agents') {
-        // Map messages history for Gemini debate API
-        const debateMessages = [...messages, userMsg]
-          .filter(m => m.role === 'user' || m.role === 'agent')
-          .map(m => ({
-            role: m.role === 'user' ? 'user' : 'assistant',
-            content: m.content
-          }));
-        
-        res = await fetch('/api/debate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            messages: debateMessages,
-            systemPrompt: reqSystem,
-            agentName: activeAgent?.name
-          }),
-        });
-      } else {
-        // Use local LLM for non-agent model engine
-        res = await fetch('/api/brain-link', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            prompt: userMsg.content,
-            systemPrompt: reqSystem
-          }),
-        });
-      }
+      // In cloud, always use Gemini for debate. So just use it for models too.
+      const debateMessages = [...messages, userMsg]
+        .filter(m => m.role === 'user' || m.role === 'agent')
+        .map(m => ({
+          role: m.role === 'user' ? 'user' : 'assistant',
+          content: m.content
+        }));
+      res = await fetch('/api/debate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          messages: debateMessages,
+          systemPrompt: reqSystem,
+          agentName: viewMode === 'agents' ? activeAgent?.name : selectedModel?.id
+        }),
+      });
 
       if (!res.ok) throw new Error('LLM request failed');
 
