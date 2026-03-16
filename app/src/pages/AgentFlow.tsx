@@ -152,9 +152,6 @@ export function AgentFlow() {
     return 'rgba(255,255,255,0.05)';
   }, []);
 
-  const nodeTypes = useMemo(() => ({}), []);
-  const edgeTypes = useMemo(() => ({}), []);
-
   const handleExecute = useCallback(async () => {
     setIsExecuting(true);
     toast.info('Initiating Neural Sequence…');
@@ -238,8 +235,6 @@ export function AgentFlow() {
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
-              nodeTypes={nodeTypes}
-              edgeTypes={edgeTypes}
               fitView
               className="bg-[var(--bg-void)]"
               defaultEdgeOptions={defaultEdgeOptions}

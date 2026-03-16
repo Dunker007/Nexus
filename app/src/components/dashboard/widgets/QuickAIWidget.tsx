@@ -106,7 +106,8 @@ You MUST "think out loud" before replying to prompts. Wrap your internal reasoni
 <think>
 Chris is asking for a summary of the tasks. I should check the tracker or outline the moves.
 </think>
-Here's what I'm thinking...`
+Here's what I'm thinking...`,
+                    agentName: 'Lux'
                 })
             });
 

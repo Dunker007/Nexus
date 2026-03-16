@@ -199,12 +199,13 @@ export function setupRoutes(app: Express) {
       return res.status(503).json({ error: 'No Gemini key found — set GEMINI_FREE_KEY in .env' });
     }
     try {
-      const { messages, systemPrompt } = z.object({
+      const { messages, systemPrompt, agentName } = z.object({
         messages: z.array(z.object({
           role: z.enum(['user', 'assistant']),
           content: z.string()
         })).min(1),
         systemPrompt: z.string().optional(),
+        agentName: z.string().optional()
       }).parse(req.body);
 
       const geminiContents: { role: string; parts: { text: string }[] }[] = [];
@@ -217,8 +218,7 @@ export function setupRoutes(app: Express) {
         }
       });
 
-      // Explicitly define the system instruction properly
-      const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\n`;
+      const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file. To save a note, include it in your response wrapped exactly like this:\n<save_note>Your specific finding or note here</save_note>\n\n`;
       const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
 
       const body = {
@@ -229,12 +229,27 @@ export function setupRoutes(app: Express) {
       };
 
       const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
         { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
       );
       const data: any = await r.json();
       if (!r.ok) throw new Error(data?.error?.message || 'Gemini API error');
       const text = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join('\n') || 'No response.';
+
+      // Extract and save notes
+      const noteMatch = text.match(/<save_note>([\s\S]*?)<\/save_note>/i);
+      if (noteMatch) {
+         const noteContent = noteMatch[1].trim();
+         
+         let fallbackAgentName = 'AI Agent';
+         if (systemPrompt?.includes('You are Lux')) fallbackAgentName = 'Lux';
+         else if (systemPrompt?.includes('You are Newsician')) fallbackAgentName = 'Newsician';
+         else if (systemPrompt?.includes('You are QPL')) fallbackAgentName = 'QPL';
+         
+         const finalAgentName = agentName || fallbackAgentName;
+         appendMasterNotes(finalAgentName, noteContent).catch(console.error);
+      }
+
       res.json({ text });
     } catch (e: any) {
       console.error('[debate] Error:', e.message);
@@ -346,6 +361,51 @@ export function setupRoutes(app: Express) {
       res.status(500).json({ error: error.message });
     }
   });
+
+  // ─── Master Notes ─────────────────────────────────────────────────────────
+
+  async function appendMasterNotes(agentName: string, noteContent: string) {
+    try {
+      const auth = getGoogleAuth(['https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/drive.readonly']);
+      const drive = google.drive({ version: 'v3', auth });
+      const folderId = resolveFolderId();
+      
+      const search = await drive.files.list({
+        q: `name = 'MASTER_NOTES.md' and '${folderId}' in parents and trashed = false`,
+        fields: 'files(id)', pageSize: 1,
+        supportsAllDrives: true, includeItemsFromAllDrives: true,
+      });
+      
+      let fileId = (search.data as any).files?.[0]?.id;
+      let currentContent = '';
+      
+      if (fileId) {
+        const exportRes = await drive.files.export({ fileId, mimeType: 'text/plain' }).catch(() => null);
+        if (exportRes) currentContent = exportRes.data as string;
+        else {
+          const response = await drive.files.get({ fileId, alt: 'media', supportsAllDrives: true }).catch(() => null);
+          if (response) currentContent = response.data as string;
+        }
+      }
+      
+      const timestamp = new Date().toLocaleString('en-US', { timeZoneName: 'short' });
+      const newEntry = `\n\n### [${timestamp}] Finding from ${agentName}\n${noteContent}\n`;
+      const updatedContent = (currentContent + newEntry).trim() + '\n';
+      
+      if (fileId) {
+        await drive.files.update({ fileId, supportsAllDrives: true, media: { mimeType: 'text/plain', body: updatedContent } });
+      } else {
+        await drive.files.create({
+          requestBody: { name: 'MASTER_NOTES.md', parents: [folderId] },
+          media: { mimeType: 'text/plain', body: `# NEXUS MASTER NOTES\n\nShared memory and findings from all DLX agents.${newEntry}` },
+          supportsAllDrives: true,
+        });
+      }
+      console.log(`[Master Notes] Appended note from ${agentName}`);
+    } catch (error: any) {
+      console.error(`[Master Notes] Failed to append note:`, error.message);
+    }
+  }
 
   // ─── Shared Memory (CURRENT_OPS.md) ───────────────────────────────────────
 

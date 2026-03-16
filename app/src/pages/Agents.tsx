@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Bot, Settings, Music, TrendingUp, BarChart2, Zap, MessageSquare, Search, Radio, Mic } from 'lucide-react';
-import PageLayout from '../components/PageLayout';
+import PageLayout, { PageHeader } from '../components/PageLayout';
 import { useNavigate } from 'react-router-dom';
 
 const ROSTER = [
@@ -130,22 +130,19 @@ export function Agents() {
   const navigate = useNavigate();
 
   return (
-    <PageLayout color="cyan" noPadding>
-      <div className="flex flex-col h-full overflow-y-auto custom-scrollbar">
+    <PageLayout color="cyan">
+      <div className="max-w-7xl mx-auto w-full">
         {/* Roster Header */}
-        <div className="px-10 py-12 shrink-0">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
-              <Bot size={24} />
-            </div>
-            <h1 className="text-3xl font-black text-white tracking-tighter">DLX <span className="text-cyan-400">Roster</span></h1>
-          </div>
-          <p className="text-sm font-medium text-gray-400">Meet your specialized AI agents and thinking partners.</p>
-        </div>
+        <PageHeader 
+          title="DLX" 
+          titleAccent="Roster" 
+          subtitle="Meet your specialized AI agents and thinking partners" 
+          icon={<Bot size={24} className="text-cyan-400" />} 
+          color="cyan" 
+        />
 
         {/* Dynamic Grid */}
-        <div className="px-10 pb-20">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full">
             {ROSTER.map((agent, i) => {
               const Icon = agent.icon;
               return (
@@ -219,7 +216,6 @@ export function Agents() {
               );
             })}
           </div>
-        </div>
       </div>
     </PageLayout>
   );

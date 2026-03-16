@@ -257,7 +257,8 @@ export function Chat() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             messages: debateMessages,
-            systemPrompt: reqSystem
+            systemPrompt: reqSystem,
+            agentName: activeAgent?.name
           }),
         });
       } else {
