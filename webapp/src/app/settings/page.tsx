@@ -520,6 +520,9 @@ export default function SettingsPage() {
                                         >
                                             Test Google Integration →
                                         </Link>
+                                        <div className="mt-4">
+                                            <button onClick={() => window.location.href="/api/auth/signin"} className="btn-primary inline-block bg-blue-600 hover:bg-blue-700">Sign in with Google (NextAuth)</button>
+                                        </div>
                                     </div>
                                 </div>
                             )}

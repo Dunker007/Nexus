@@ -42,7 +42,7 @@ export default function GoogleTestPage() {
         try {
             setLoading(true);
             const response = await fetch(`${LUXRIG_BRIDGE_URL}/auth/google/callback?code=${code}`);
-            const data = await response.json();
+            
 
             if (data.success && data.tokens.access_token) {
                 setAccessToken(data.tokens.access_token);
@@ -60,9 +60,10 @@ export default function GoogleTestPage() {
 
     async function startOAuth() {
         try {
-            const response = await fetch(`${LUXRIG_BRIDGE_URL}/auth/google`);
-            const data = await response.json();
-            window.location.href = data.authUrl;
+            // NextAuth handles redirects
+            window.location.href="/api/auth/signin";
+            
+            
         } catch (err: any) {
             setError(err.message);
         }
@@ -70,10 +71,10 @@ export default function GoogleTestPage() {
 
     async function fetchUserInfo() {
         try {
-            const response = await fetch(`${LUXRIG_BRIDGE_URL}/google/user`, {
+            const response = await fetch(`/api/google/user`, {
                 headers: { 'Authorization': `Bearer ${accessToken}` }
             });
-            const data = await response.json();
+            
             setUserInfo(data);
         } catch (err: any) {
             setError(err.message);
@@ -82,10 +83,10 @@ export default function GoogleTestPage() {
 
     async function fetchCalendarEvents() {
         try {
-            const response = await fetch(`${LUXRIG_BRIDGE_URL}/google/calendar/events?maxResults=10`, {
+            const response = await fetch(`/api/google/calendar/events?maxResults=10`, {
                 headers: { 'Authorization': `Bearer ${accessToken}` }
             });
-            const data = await response.json();
+            
             setCalendarEvents(data);
         } catch (err: any) {
             console.error('Calendar error:', err);
@@ -94,10 +95,10 @@ export default function GoogleTestPage() {
 
     async function fetchDriveFiles() {
         try {
-            const response = await fetch(`${LUXRIG_BRIDGE_URL}/google/drive/files?maxResults=10`, {
+            const response = await fetch(`/api/google/drive/files?maxResults=10`, {
                 headers: { 'Authorization': `Bearer ${accessToken}` }
             });
-            const data = await response.json();
+            
             setDriveFiles(data);
         } catch (err: any) {
             console.error('Drive error:', err);

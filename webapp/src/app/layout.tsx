@@ -19,6 +19,7 @@ import { SettingsProvider } from "@/components/SettingsContext";
 import { VibeProvider } from "@/components/VibeContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SafetyProvider } from "@/components/SafetyGuard";
+import NextAuthProvider from "@/components/providers/NextAuthProvider";
 
 export default function RootLayout({
   children,
@@ -28,7 +29,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-grid`}>
-        <ThemeProvider defaultTheme="dark" storageKey="dlx-theme">
+        <NextAuthProvider>
+          <ThemeProvider defaultTheme="dark" storageKey="dlx-theme">
           <SettingsProvider>
             <VibeProvider>
               <SafetyProvider>
@@ -43,6 +45,7 @@ export default function RootLayout({
             </VibeProvider>
           </SettingsProvider>
         </ThemeProvider>
+        </NextAuthProvider>
       </body>
     </html>
   );

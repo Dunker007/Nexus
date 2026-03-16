@@ -8,6 +8,7 @@ import { Command } from 'lucide-react';
 import { useVibe } from './VibeContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NavItem } from '@/components/NavItem';
+import { useSession, signOut } from "next-auth/react";
 
 import {
     LayoutDashboard, Palette, MessageSquare, Bot, Radio, Users,
@@ -34,6 +35,7 @@ export default function Navigation() {
     const searchParams = useSearchParams();
     const isPopup = searchParams.get('mode') === 'popup';
     const { themeId, setTheme, availableThemes, mode } = useVibe();
+    const { data: session } = useSession();
 
     // If in popup mode, don't render the navigation bar
     if (isPopup) return null;
@@ -109,7 +111,7 @@ export default function Navigation() {
                             <span>Cmd+K</span>
                         </button>
 
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 border border-white/20 shadow-lg shadow-cyan-500/20" />
+                        {session?.user?.image ? <img src={session.user.image} alt="User avatar" className="w-8 h-8 rounded-full border border-white/20 shadow-lg cursor-pointer hover:ring-2 hover:ring-cyan-500 transition-all" onClick={() => signOut()} title="Click to sign out" /> : <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 border border-white/20 shadow-lg shadow-cyan-500/20 cursor-pointer hover:ring-2 hover:ring-cyan-500 transition-all" onClick={() => window.location.href="/api/auth/signin"} title="Click to sign in" />}
                     </div>
 
                     {/* Mobile Menu Button */}
