@@ -22,7 +22,8 @@ export async function loadSecrets() {
       'GOOGLE_CLIENT_ID',
       'GOOGLE_CLIENT_SECRET',
       'GOOGLE_SERVICE_ACCOUNT_JSON',
-      'DATABASE_URL'
+      'DATABASE_URL',
+      'GEMINI_FREE_KEY'
     ];
 
     for (const secretName of secretsToLoad) {
