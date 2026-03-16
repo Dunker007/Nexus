@@ -464,7 +464,7 @@ export function Chat() {
           </AnimatePresence>
 
           {/* Buffer Message Field */}
-          <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8 custom-scrollbar pb-40">
+          <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8 custom-scrollbar relative">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center opacity-40 select-none">
                 <div className="text-[8px] font-black uppercase tracking-[0.4em] text-white/30 mb-2">NEURAL LINK READY</div>
@@ -492,7 +492,7 @@ export function Chat() {
                       <span>{isUser ? 'LOCAL_USER' : isSystem ? 'KERNEL' : agent.name}</span>
                       <span>{msg.timestamp?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
-                    <div className={`rounded-2xl p-4 text-sm leading-relaxed relative w-full border ${isUser ? 'bg-cyan-500/10 border-cyan-500/30 text-white' : 'bg-white/[0.03] border-white/5 text-white/80'}`}>
+                    <div className={`rounded-2xl p-4 text-sm leading-relaxed relative w-full border overflow-hidden ${isUser ? 'bg-cyan-500/10 border-cyan-500/30 text-white' : 'bg-white/[0.03] border-white/5 text-white/80'}`}>
                        {isUser || isSystem ? (
                          <p className="whitespace-pre-wrap">{msg.content}</p>
                        ) : (
@@ -531,6 +531,8 @@ export function Chat() {
                   </div>
                </div>
             )}
+            
+            <div className="h-32 w-full shrink-0" /> {/* Spacer to prevent UI overlap with absolute input box */}
             <div ref={messagesEndRef} />
           </div>
 
