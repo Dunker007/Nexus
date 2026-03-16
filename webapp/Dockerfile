@@ -1,12 +1,16 @@
 # Dockerfile for Next.js app
-# Version 2 - Force a clean build
+# Version 3 - Fix Prisma schema location
 
 # 1. Install dependencies
 FROM node:20-slim AS deps
 
 WORKDIR /app
 
+# Copy package files and prisma schema
 COPY package.json package-lock.json ./
+COPY prisma ./prisma
+
+# Install dependencies
 RUN npm install --legacy-peer-deps
 
 # 2. Build the app
