@@ -277,29 +277,37 @@ export default function DashboardPage() {
         if (!quickAiInput.trim()) return;
 
         setIsAiThinking(true);
-        setQuickAiResponse(''); // Clear previous response
+        setQuickAiResponse(''); 
 
         try {
-            const res = await bridgeFetch('/llm/chat', {
+            const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     messages: [{ role: 'user', content: quickAiInput }],
-                    provider: 'lmstudio' // Default to LM Studio as requested
+                    agentId: 'lux'
                 })
             });
 
-            if (res.ok) {
-                const data = await res.json();
-                // Assuming data structure matches OpenAI chat completion
-                setQuickAiResponse(data.choices?.[0]?.message?.content || data.content || 'No response text received.');
-            } else {
-                setQuickAiResponse('Error: Failed to get response from AI.');
+            if (!res.ok) throw new Error("Cloud brain unreachable");
+
+            const reader = res.body?.getReader();
+            if (!reader) throw new Error("No response stream");
+
+            let accumulated = '';
+            const decoder = new TextDecoder();
+            
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                accumulated += decoder.decode(value);
+                setQuickAiResponse(accumulated);
             }
-        } catch (error) {
-            setQuickAiResponse('Error: Could not connect to Bridge.');
+        } catch (error: any) {
+            setQuickAiResponse("Error: " + error.message);
         } finally {
             setIsAiThinking(false);
+            setQuickAiInput('');
         }
     }
 
