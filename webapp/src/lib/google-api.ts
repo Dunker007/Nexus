@@ -9,7 +9,7 @@ export class GoogleAPIClient {
   }
 
   static async createFromSession() {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as any;
     if (!session || !session.accessToken) {
       throw new Error("User is not authenticated with Google");
     }
