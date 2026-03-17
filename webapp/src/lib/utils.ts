@@ -3,7 +3,10 @@
 // ========================================
 
 // LuxRig Bridge Configuration
-export const LUXRIG_BRIDGE_URL = process.env.NEXT_PUBLIC_BRIDGE_URL || 'http://localhost:3456';
+// Default to cloud-native proxy when running in cloud environment
+export const LUXRIG_BRIDGE_URL = typeof window !== 'undefined' && (window.location.hostname.includes('run.app') || window.location.hostname.includes('online'))
+    ? '/api/bridge_proxy'
+    : (process.env.NEXT_PUBLIC_BRIDGE_URL || 'http://localhost:3456');
 
 // App Configuration
 export const APP_CONFIG = {
