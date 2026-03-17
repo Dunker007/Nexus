@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    instrumentationHook: true,
   },
   output: isWeb ? undefined : "export",
   images: {

@@ -1,5 +1,5 @@
 import { google } from '@ai-sdk/google';
-import { streamText, Message } from 'ai';
+import { streamText } from 'ai';
 
 // Next.js API route that handles streaming AI responses
 // Edge runtime allows for fast execution across global regions
@@ -60,11 +60,11 @@ export async function POST(req: Request) {
       messages: messages,
       system: systemPrompt,
       temperature: 0.7, // Relaxed but creative
-      maxTokens: 1024,
+      
     });
 
     // Return the readable stream directly to the frontend
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
   } catch (error: any) {
     console.error('Gemini API Error:', error);
     return new Response(JSON.stringify({ error: error.message }), {
