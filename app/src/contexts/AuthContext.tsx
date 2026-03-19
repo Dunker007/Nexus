@@ -18,15 +18,15 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>({ 
+    id: 'dlx-admin', 
+    email: 'admin@dlxstudios.online', 
+    name: 'Chris Barclay (Dev Override)' 
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/me`, { credentials: 'include' })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => setUser(data?.user || null))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
+    // Auth bypassed for dev
   }, []);
 
   const login = () => {
