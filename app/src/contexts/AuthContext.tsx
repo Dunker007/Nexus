@@ -22,7 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/auth/me', { credentials: 'include' })
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/me`, { credentials: 'include' })
       .then(r => r.ok ? r.json() : null)
       .then(data => setUser(data?.user || null))
       .catch(() => setUser(null))
@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = () => {
-    fetch('/api/auth/url', { credentials: 'include' })
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/url`, { credentials: 'include' })
       .then(r => {
         if (!r.ok) throw new Error(`auth/url returned ${r.status}`);
         const ct = r.headers.get('content-type') || '';
@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    await fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/logout`, { method: 'POST', credentials: 'include' });
     setUser(null);
   };
 

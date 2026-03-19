@@ -18,7 +18,7 @@ export function PortfolioSummaryWidget() {
 
   const fetchSummary = async () => {
     try {
-      const res = await fetch('/api/portfolio/summary');
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/portfolio/summary`);
       if (res.ok) {
         const data = await res.json();
         setSummary(data);

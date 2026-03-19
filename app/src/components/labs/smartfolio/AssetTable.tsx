@@ -11,7 +11,7 @@ import { PositionDetail } from './asset-table/PositionDetail';
 // ─── Main Component ───
 
 export default function AssetTable() {
-    const { assets, pendingOrders, fillOrder, killOrder, activeAccount, fearGreed } = usePortfolio();
+    const { assets, pendingOrders, fillOrder, killOrder, activeAccount, fearGreed, addOrder } = usePortfolio();
     const [expandedSymbol, setExpandedSymbol] = useState<string | null>(null);
     const [alerts, setAlerts] = useState<PriceAlert[]>([]);
     const refreshAlerts = useCallback(() => setAlerts(getAlerts()), []);
@@ -182,7 +182,7 @@ export default function AssetTable() {
                                                     orders={symbolOrders}
                                                     fillOrder={fillOrder}
                                                     killOrder={killOrder}
-                                                    addOrder={usePortfolio().addOrder}
+                                                    addOrder={addOrder}
                                                     currentCashPercent={(assets.find(a => a.symbol === 'USD')?.allocation || 0)}
                                                     activeAccount={activeAccount}
                                                     alerts={alerts.filter(a => a.symbol === asset.symbol)}

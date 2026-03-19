@@ -53,7 +53,7 @@ export function Pipeline() {
 
   const fetchTracks = async () => {
     try {
-      const res = await fetch('/api/pipeline');
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pipeline`);
       if (res.ok) {
         const contentType = res.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
@@ -107,7 +107,7 @@ export function Pipeline() {
         steps: editForm.steps || JSON.stringify(DEFAULT_STEPS),
         target_date: editForm.target_date || new Date().toISOString().split('T')[0]
       };
-      const res = await fetch('/api/pipeline', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pipeline`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newTrack),
@@ -124,7 +124,7 @@ export function Pipeline() {
       }
     } else if (selectedTrack) {
       const updatedTrack = { ...selectedTrack, ...editForm };
-      const res = await fetch(`/api/pipeline/${selectedTrack.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pipeline/${selectedTrack.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedTrack),
@@ -153,7 +153,7 @@ export function Pipeline() {
 
         const updatedTrack = { ...selectedTrack, steps: JSON.stringify(steps), progress };
         
-        const res = await fetch(`/api/pipeline/${selectedTrack.id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pipeline/${selectedTrack.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedTrack),
@@ -171,7 +171,7 @@ export function Pipeline() {
     setSyncing(true);
     toast.info('Syncing Pipeline…');
     try {
-      const res = await fetch('/api/pipeline/sync', { method: 'POST' });
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pipeline/sync`, { method: 'POST' });
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.tracks) {

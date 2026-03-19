@@ -12,6 +12,7 @@ import { songsRouter } from './api/songs.js';
 import { tasksRouter } from './api/tasks.js';
 import { portfolioRouter } from './api/portfolio.js';
 import { pipelineRouter } from './api/pipeline.js';
+import { videoRouter } from './api/video.js';
 import { authRouter } from './auth.js';
 // ─── Google Auth Helper ───────────────────────────────────────────────────────
 
@@ -491,6 +492,7 @@ export function setupRoutes(app: Express) {
   app.use('/api/portfolio', portfolioRouter);
   app.use('/api/smartfolio', portfolioRouter); // Alias for laboratory bridge
   app.use('/api/pipeline', pipelineRouter);
+  app.use('/api/video', videoRouter);
 
   // ─── Google Sheets (Pipeline Sync) ────────────────────────────────────────
 

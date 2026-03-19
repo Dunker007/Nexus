@@ -1,8 +1,0 @@
-src/pages/smartfolio/SmartFolioRisk.tsx(2,8): error TS6133: 'React' is declared but its value is never read.
-src/pages/smartfolio/SmartFolioRisk.tsx(83,11): error TS6133: 'cashAsset' is declared but its value is never read.
-src/pages/smartfolio/SmartFolioRisk.tsx(88,19): error TS6133: 'range' is declared but its value is never read.
-src/pages/smartfolio/SmartFolioRisk.tsx(244,39): error TS6133: 'colorClass' is declared but its value is never read.
-src/pages/smartfolio/SmartFolioSettings.tsx(2,8): error TS6133: 'React' is declared but its value is never read.
-src/pages/smartfolio/SmartFolioSettings.tsx(8,54): error TS6133: 'activeAccount' is declared but its value is never read.
-src/pages/smartfolio/SmartFolioSettings.tsx(11,12): error TS6133: 'keyStatus' is declared but its value is never read.
-src/pages/smartfolio/SmartFolioSettings.tsx(11,23): error TS6133: 'setKeyStatus' is declared but its value is never read.

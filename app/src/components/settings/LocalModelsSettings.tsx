@@ -8,7 +8,7 @@ export function LocalModelsSettings() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/llm/status')
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/llm/status`)
       .then(res => res.json())
       .then(data => {
         setStatus(data);
@@ -108,7 +108,7 @@ export function LocalModelsSettings() {
         <button
           onClick={() => {
              setLoading(true);
-             fetch('/api/llm/status')
+             fetch(`${import.meta.env.VITE_API_URL || ''}/api/llm/status`)
                 .then(res => res.json())
                 .then(data => {
                   setStatus(data);

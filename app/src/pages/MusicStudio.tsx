@@ -76,7 +76,7 @@ export function MusicStudio() {
     setDraft(null);
     setSaved(false);
     try {
-      const res = await fetch('/api/brain-link', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/brain-link`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -111,7 +111,7 @@ export function MusicStudio() {
     if (!draft) return;
     setSaving(true);
     try {
-      await fetch('/api/songs', {
+      await fetch(`${import.meta.env.VITE_API_URL || ''}/api/songs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -395,7 +395,7 @@ function SongLibrary() {
   const [selected, setSelected] = useState<any | null>(null);
 
   useEffect(() => {
-    fetch('/api/songs').then(r => r.json()).then(data => { setSongs(data); setLoading(false); }).catch(() => setLoading(false));
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/songs`).then(r => r.json()).then(data => { setSongs(data); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
   if (loading) return (
@@ -477,7 +477,7 @@ function ReleaseBoard() {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetch('/api/songs').then(r => r.json()).then(data => { setSongs(data); setLoading(false); }).catch(() => setLoading(false));
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/songs`).then(r => r.json()).then(data => { setSongs(data); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
   if (loading) return (
@@ -493,7 +493,7 @@ function ReleaseBoard() {
     try {
       const songToUpdate = songs.find(s => s.id === id);
       if (songToUpdate) {
-         await fetch('/api/songs', {
+         await fetch(`${import.meta.env.VITE_API_URL || ''}/api/songs`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ...songToUpdate, status: newStatus }),

@@ -60,28 +60,6 @@ export function FearGreedWidget() {
     return () => clearInterval(timer);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs text-white/40 font-mono">Loading index...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !data) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="flex flex-col items-center gap-2 text-red-400/60">
-          <AlertCircle size={24} />
-          <p className="text-xs font-mono">{error || 'No data'}</p>
-        </div>
-      </div>
-    );
-  }
-
   // Memoize color calculations to prevent recalculation on every render
   const colorClasses = useMemo(() => {
     if (!data) return { color: '', bgGradient: '', borderColor: '' };
@@ -113,6 +91,30 @@ export function FearGreedWidget() {
 
     return { color, bgGradient, borderColor };
   }, [data]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs text-white/40 font-mono">Loading index...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center gap-2 text-red-400/60">
+          <AlertCircle size={24} />
+          <p className="text-xs font-mono">{error || 'No data'}</p>
+        </div>
+      </div>
+    );
+  }
+
+
 
   const isExtreme = data ? (data.value <= 25 || data.value >= 75) : false;
 

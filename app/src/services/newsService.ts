@@ -97,7 +97,7 @@ export function countTrackerMatches(articles: NewsArticle[], trackers: SubjectTr
 
 export async function fetchAllNews(): Promise<NewsArticle[]> {
   try {
-      const response = await fetch('/api/news');
+      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/news`);
       if (!response.ok) throw new Error('Failed to fetch news');
       const articles = await response.json();
       return articles;

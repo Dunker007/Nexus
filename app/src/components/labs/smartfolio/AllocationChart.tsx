@@ -31,7 +31,15 @@ export default function AllocationChart() {
     const center = baseSize / 2;
     const radius = (baseSize - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
-    let currentOffset = 0;
+    
+    let accOffset = 0;
+    const sortedWithOffsets = sorted.map(asset => {
+        const pct = asset.allocation / 100;
+        const strokeLength = pct * circumference;
+        const offset = accOffset;
+        accOffset += strokeLength;
+        return { asset, pct, strokeLength, offset };
+    });
 
     // Smart center display
     const centerMain = activeAccount === 'sui'
@@ -62,11 +70,7 @@ export default function AllocationChart() {
                         className="w-full h-full transform -rotate-90 filter drop-shadow-[0_0_40px_rgba(59,130,246,0.1)]"
                     >
                         <circle cx={center} cy={center} r={radius} fill="transparent" stroke="currentColor" strokeWidth={strokeWidth} className="text-white/5" />
-                        {sorted.map((asset) => {
-                            const pct = asset.allocation / 100;
-                            const strokeLength = pct * circumference;
-                            const offset = currentOffset;
-                            currentOffset += strokeLength;
+                        {sortedWithOffsets.map(({ asset, strokeLength, offset }) => {
                             const colors = getColorFor(asset.symbol);
                             return (
                                 <circle

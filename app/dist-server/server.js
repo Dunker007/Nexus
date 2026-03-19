@@ -21,12 +21,15 @@ async function startServer() {
     // Phase 5: DB Cloud Migration
     await autoMigrateCloud();
     const app = express();
+    app.set('trust proxy', 1); // Phase 3: Allow Rate Limiter behind Cloud Run proxy
     const allowedOrigins = [
         'http://localhost:3001',
         'http://localhost:3000',
+        'http://localhost:3005',
         'https://nexus-cloud-50841896985.us-central1.run.app',
         'https://dlxstudios.ai',
         'https://www.dlxstudios.ai',
+        'https://luxweb.netlify.app',
         process.env.ALLOWED_ORIGIN,
     ].filter(Boolean);
     app.use(cors({
@@ -73,7 +76,7 @@ async function startServer() {
             next();
         });
     }
-    app.use(express.json({ limit: '10mb' }));
+    app.use(express.json({ limit: '50mb' }));
     app.use(cookieParser());
     // Request logger — always logs method + path + status + duration
     app.use((req, res, next) => {

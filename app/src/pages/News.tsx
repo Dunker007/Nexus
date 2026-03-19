@@ -32,7 +32,7 @@ function PovEngine({ article }: { article: NewsArticle | null }) {
     const setT = pundit === 'rex' ? setRexText  : setValText;
     setB(true); setT('');
     try {
-      const r = await fetch('/api/debate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, systemPrompt: system }) });
+      const r = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/debate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, systemPrompt: system }) });
       const d = await r.json();
       setT(r.ok ? (d.text || d.response || 'No response.') : 'API error.');
     } catch { setT('Could not reach AI.'); }
@@ -175,7 +175,7 @@ export function News() {
   const refreshNews = async () => {
     setIsLoading(true);
     try {
-      const data = await fetch('/api/news/refresh', { method: 'POST' });
+      const data = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/news/refresh`, { method: 'POST' });
       if (data.ok) {
         const liveNews = await fetchAllNews();
         setArticles(liveNews);
@@ -251,7 +251,7 @@ export function News() {
     setIsFactChecking(true);
     setFactCheckResult(null);
     try {
-      const res = await fetch('/api/brain-link', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/brain-link`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

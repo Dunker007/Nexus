@@ -1,0 +1,489 @@
+
+C:\Repos GIT\Nexus\app\dist-server\server.js
+  112:5  error  Definition for rule '@typescript-eslint/no-unused-vars' was not found  @typescript-eslint/no-unused-vars
+
+C:\Repos GIT\Nexus\app\server.ts
+  126:3  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-unused-vars')
+
+C:\Repos GIT\Nexus\app\src\components\CommandPalette.tsx
+  150:6  warning  React Hook useEffect has missing dependencies: 'handleAiQuery' and 'saveRecentCommand'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Repos GIT\Nexus\app\src\components\Layout.tsx
+  53:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\components\Layout.tsx:53:5
+  51 |   // Close mobile menu on route change
+  52 |   useEffect(() => {
+> 53 |     setMobileOpen(false);
+     |     ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  54 |   }, [location.pathname]);
+  55 |
+  56 |   return (  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\app\src\components\ThemeToggle.tsx
+  11:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\components\ThemeToggle.tsx:11:5
+   9 |
+  10 |   useEffect(() => {
+> 11 |     setMounted(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  12 |   }, []);
+  13 |
+  14 |   if (!mounted) {  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\CalendarWidget.tsx
+  13:9  error  Error: Cannot access variable before it is declared
+
+`fetchGoogleCalendar` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\CalendarWidget.tsx:13:9
+  11 |
+  12 |     useEffect(() => {
+> 13 |         fetchGoogleCalendar();
+     |         ^^^^^^^^^^^^^^^^^^^ `fetchGoogleCalendar` accessed before it is declared
+  14 |     }, []);
+  15 |
+  16 |     async function fetchGoogleCalendar() {
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\CalendarWidget.tsx:16:5
+  14 |     }, []);
+  15 |
+> 16 |     async function fetchGoogleCalendar() {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 17 |         try {
+     | ^^^^^^^^^^^^^
+> 18 |             const accessToken = localStorage.getItem('google_access_token');
+     ΓÇª
+     | ^^^^^^^^^^^^^
+> 37 |         } catch { }
+     | ^^^^^^^^^^^^^
+> 38 |     }
+     | ^^^^^^ `fetchGoogleCalendar` is declared here
+  39 |
+  40 |     return (
+  41 |         <div className="space-y-2">  react-hooks/immutability
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\FearGreedWidget.tsx
+  86:24  error  React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\NewsWidget.tsx
+  14:8  warning  React Hook useEffect has a missing dependency: 'fetchDashboardNews'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\QuickLinksWidget.tsx
+  10:19  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\QuickLinksWidget.tsx:10:19
+   8 |         const savedQuickLinks = localStorage.getItem('dashboard-quicklinks');
+   9 |         if (savedQuickLinks) {
+> 10 |             try { setQuickLinks(JSON.parse(savedQuickLinks)); } catch { }
+     |                   ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  11 |         }
+  12 |     }, []);
+  13 |  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\QuoteWidget.tsx
+  8:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\QuoteWidget.tsx:8:9
+   6 |
+   7 |     useEffect(() => {
+>  8 |         setQuote(DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)]);
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+   9 |     }, []);
+  10 |
+  11 |     return (  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\RecentWidget.tsx
+  10:19  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\RecentWidget.tsx:10:19
+   8 |         const savedRecent = localStorage.getItem('dashboard-recent');
+   9 |         if (savedRecent) {
+> 10 |             try { setRecentPages(JSON.parse(savedRecent)); } catch { }
+     |                   ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  11 |         }
+  12 |     }, []);
+  13 |  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\ScratchpadWidget.tsx
+  9:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\ScratchpadWidget.tsx:9:13
+   7 |         const savedScratchpad = localStorage.getItem('dashboard-scratchpad');
+   8 |         if (savedScratchpad) {
+>  9 |             setScratchpadText(savedScratchpad);
+     |             ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  10 |         }
+  11 |     }, []);
+  12 |  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\SystemStatsWidget.tsx
+  24:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\SystemStatsWidget.tsx:24:5
+  22 |
+  23 |   useEffect(() => {
+> 24 |     fetchStatus();
+     |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  25 |     const timer = setInterval(fetchStatus, 30_000);
+  26 |     return () => clearInterval(timer);
+  27 |   }, []);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-hooks/set-state-in-effect
+  54:10  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\SystemStatsWidget.tsx:54:10
+  52 |     <div className="flex flex-col gap-3 h-full">
+  53 |       <div className="grid grid-cols-2 gap-3">
+> 54 |         <ServiceRow label="LM Studio" online={status?.lmStudio ?? false} />
+     |          ^^^^^^^^^^ This component is created during render
+  55 |         <ServiceRow label="Ollama"    online={status?.ollama ?? false} />
+  56 |       </div>
+  57 |
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\SystemStatsWidget.tsx:31:22
+  29 |   const anyOnline = status ? (status.ollama || status.lmStudio) : false;
+  30 |
+> 31 |   const ServiceRow = ({ label, online }: { label: string; online: boolean }) => (
+     |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 32 |     <div className="p-3 rounded-xl bg-[#12121a] border border-white/5 flex flex-col justify-center gap-1">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 33 |       <div className="flex items-center gap-2">
+     ΓÇª
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 48 |     </div>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 49 |   );
+     | ^^^^ The component is created during render here
+  50 |
+  51 |   return (
+  52 |     <div className="flex flex-col gap-3 h-full">                                                                     react-hooks/static-components
+  55:10  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\SystemStatsWidget.tsx:55:10
+  53 |       <div className="grid grid-cols-2 gap-3">
+  54 |         <ServiceRow label="LM Studio" online={status?.lmStudio ?? false} />
+> 55 |         <ServiceRow label="Ollama"    online={status?.ollama ?? false} />
+     |          ^^^^^^^^^^ This component is created during render
+  56 |       </div>
+  57 |
+  58 |       <div className="p-3 rounded-xl bg-[#12121a] border border-white/5 flex-1 flex flex-col justify-center gap-2">
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\SystemStatsWidget.tsx:31:22
+  29 |   const anyOnline = status ? (status.ollama || status.lmStudio) : false;
+  30 |
+> 31 |   const ServiceRow = ({ label, online }: { label: string; online: boolean }) => (
+     |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 32 |     <div className="p-3 rounded-xl bg-[#12121a] border border-white/5 flex flex-col justify-center gap-1">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 33 |       <div className="flex items-center gap-2">
+     ΓÇª
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 48 |     </div>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 49 |   );
+     | ^^^^ The component is created during render here
+  50 |
+  51 |   return (
+  52 |     <div className="flex flex-col gap-3 h-full">  react-hooks/static-components
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\TasksWidget.tsx
+  16:19  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\TasksWidget.tsx:16:19
+  14 |         const savedTasks = localStorage.getItem('dashboard-tasks');
+  15 |         if (savedTasks) {
+> 16 |             try { setTasks(JSON.parse(savedTasks)); } catch { }
+     |                   ^^^^^^^^ Avoid calling setState() directly within an effect
+  17 |         }
+  18 |     }, []);
+  19 |  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\VoiceControlWidget.tsx
+  16:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\components\dashboard\widgets\VoiceControlWidget.tsx:16:7
+  14 |
+  15 |     if (SpeechRecognition) {
+> 16 |       setIsSupported(true);
+     |       ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  17 |       const recognition = new SpeechRecognition();
+  18 |       recognition.continuous = true;
+  19 |       recognition.interimResults = true;  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\app\src\components\labs\smartfolio\AllocationChart.tsx
+  69:29  error  Error: Cannot reassign variable after render completes
+
+Reassigning `currentOffset` after render has completed can cause inconsistent behavior on subsequent renders. Consider using state instead.
+
+C:\Repos GIT\Nexus\app\src\components\labs\smartfolio\AllocationChart.tsx:69:29
+  67 |                             const strokeLength = pct * circumference;
+  68 |                             const offset = currentOffset;
+> 69 |                             currentOffset += strokeLength;
+     |                             ^^^^^^^^^^^^^ Cannot reassign `currentOffset` after render completes
+  70 |                             const colors = getColorFor(asset.symbol);
+  71 |                             return (
+  72 |                                 <circle  react-hooks/immutability
+
+C:\Repos GIT\Nexus\app\src\components\labs\smartfolio\AssetTable.tsx
+  185:63  error  React Hook "usePortfolio" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+
+C:\Repos GIT\Nexus\app\src\components\labs\smartfolio\CoinResearch.tsx
+  135:8  warning  React Hook useEffect has a missing dependency: 'data'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Repos GIT\Nexus\app\src\contexts\AuthContext.tsx
+  56:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Repos GIT\Nexus\app\src\contexts\MemoryContext.tsx
+  41:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Repos GIT\Nexus\app\src\contexts\ThemeContext.tsx
+  84:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Repos GIT\Nexus\app\src\contexts\ToastContext.tsx
+  57:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Repos GIT\Nexus\app\src\contexts\VibeContext.tsx
+   25:14  warning  Fast refresh only works when a file only exports components. Move your React context(s) to a separate file                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react-refresh/only-export-components
+  133:52  error    Error: Cannot access variable before it is declared
+
+`connect` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Repos GIT\Nexus\app\src\contexts\VibeContext.tsx:133:52
+  131 |           const delay = Math.min(BASE_RETRY_DELAY * Math.pow(2, retryCountRef.current - 1), 60000);
+  132 |           if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
+> 133 |           reconnectTimeoutRef.current = setTimeout(connect, delay);
+      |                                                    ^^^^^^^ `connect` accessed before it is declared
+  134 |         }
+  135 |       };
+  136 |
+
+C:\Repos GIT\Nexus\app\src\contexts\VibeContext.tsx:68:3
+   66 |   };
+   67 |
+>  68 |   const connect = useCallback(() => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  69 |     if (!isMountedRef.current) return;
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  70 |
+      ΓÇª
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 147 |     }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 148 |   }, [manualOverride]);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^ `connect` is declared here
+  149 |
+  150 |   useEffect(() => {
+  151 |     isMountedRef.current = true;  react-hooks/immutability
+  198:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react-refresh/only-export-components
+
+C:\Repos GIT\Nexus\app\src\contexts\labs\smartfolio\PortfolioContext.tsx
+  111:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\contexts\labs\smartfolio\PortfolioContext.tsx:111:9
+  109 |
+  110 |         const savedAccount = loadFromStorage<AccountId>(`${STORAGE_PREFIX}activeAccount`, 'sui');
+> 111 |         setActiveAccount(savedAccount);
+      |         ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  112 |         const savedMarket = loadFromStorage<'accumulation' | 'bull' | 'bear' | 'distribution' | 'choppiness'>(`${STORAGE_PREFIX}marketCondition`, 'accumulation');
+  113 |         setMarketConditionRaw(savedMarket);
+  114 |  react-hooks/set-state-in-effect
+  488:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react-refresh/only-export-components
+
+C:\Repos GIT\Nexus\app\src\pages\Chat.tsx
+  181:6  warning  React Hook useEffect has a missing dependency: 'fetchAllModels'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
+  203:6  warning  React Hook useEffect has a missing dependency: 'messages.length'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Repos GIT\Nexus\app\src\pages\Dashboard.tsx
+  97:27  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\app\src\pages\Dashboard.tsx:97:27
+   95 |
+   96 |   function addWidget(type: WidgetType) {
+>  97 |     const id = `${type}-${Date.now()}`;
+      |                           ^^^^^^^^^^ Cannot call impure function
+   98 |     const config = WIDGET_CATALOG[type];
+   99 |     const newWidget: WidgetConfig = { i: id, type, title: config.title, icon: config.icon };
+  100 |     const newLayout = {  react-hooks/purity
+
+C:\Repos GIT\Nexus\app\src\pages\Drive.tsx
+  26:48  warning  React Hook useEffect has a missing dependency: 'currentFolder.id'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Repos GIT\Nexus\app\src\pages\Pipeline.tsx
+  96:6  warning  React Hook useEffect has a missing dependency: 'fetchTracks'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Repos GIT\Nexus\app\src\pages\smartfolio\SmartFolioAUM.tsx
+  133:9  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+C:\Repos GIT\Nexus\app\src\pages\smartfolio\SmartFolioMarket.tsx
+  29:9   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  87:33  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+C:\Repos GIT\Nexus\app\src\pages\smartfolio\SmartFolioReport.tsx
+  161:8  warning  React Hook useMemo has an unnecessary dependency: 'assets'. Either exclude it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/exhaustive-deps
+  218:9  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\pages\smartfolio\SmartFolioReport.tsx:218:9
+  216 |     useEffect(() => {
+  217 |         const geminiAvailable = hasGeminiKey();
+> 218 |         setIsGemini(geminiAvailable);
+      |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  219 |         if (geminiAvailable && mounted && mounted2) {
+  220 |             generateBrief();
+  221 |         }  react-hooks/set-state-in-effect
+  222:8  warning  React Hook useEffect has a missing dependency: 'generateBrief'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react-hooks/exhaustive-deps
+
+C:\Repos GIT\Nexus\app\src\pages\smartfolio\SmartFolioRisk.tsx
+   17:21  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\pages\smartfolio\SmartFolioRisk.tsx:17:21
+  15 |     const [mounted2, setMounted2] = useState(false);
+  16 |
+> 17 |     useEffect(() => setMounted2(true), []);
+     |                     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  18 |     // Reset simulation on account switch
+  19 |     useEffect(() => { setCustomPrices({}); setSimulateFills(false); }, [activeAccount]);
+  20 |                                     react-hooks/set-state-in-effect
+   19:23  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\pages\smartfolio\SmartFolioRisk.tsx:19:23
+  17 |     useEffect(() => setMounted2(true), []);
+  18 |     // Reset simulation on account switch
+> 19 |     useEffect(() => { setCustomPrices({}); setSimulateFills(false); }, [activeAccount]);
+     |                       ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  20 |
+  21 |     const copyToClipboard = (txt: string | number) => {
+  22 |         if (!txt) return;  react-hooks/set-state-in-effect
+   79:8   warning  React Hook useMemo has an unnecessary dependency: 'activeAccount'. Either exclude it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+  136:8   warning  React Hook useMemo has an unnecessary dependency: 'activeStrategy'. Either exclude it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/exhaustive-deps
+
+C:\Repos GIT\Nexus\app\src\pages\smartfolio\SmartFolioSettings.tsx
+  13:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Repos GIT\Nexus\app\src\pages\smartfolio\SmartFolioSettings.tsx:13:9
+  11 |
+  12 |     useEffect(() => {
+> 13 |         setMounted(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  14 |     }, []);
+  15 |
+  16 |     const handleExport = () => {  react-hooks/set-state-in-effect
+
+C:\Repos GIT\Nexus\app\src\pages\studios\VideoStudio.tsx
+  29:38  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\app\src\pages\studios\VideoStudio.tsx:29:38
+  27 |                     className="w-4 bg-orange-500 rounded-t-md opacity-80"
+  28 |                     animate={isPlaying ? {
+> 29 |                         height: [40, Math.random() * 120 + 20, 40],
+     |                                      ^^^^^^^^^^^^^ Cannot call impure function
+  30 |                     } : { height: 20 }}
+  31 |                     transition={{
+  32 |                         repeat: Infinity,  react-hooks/purity
+  33:41  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Repos GIT\Nexus\app\src\pages\studios\VideoStudio.tsx:33:41
+  31 |                     transition={{
+  32 |                         repeat: Infinity,
+> 33 |                         duration: 0.5 + Math.random() * 0.5,
+     |                                         ^^^^^^^^^^^^^ Cannot call impure function
+  34 |                         ease: "easeInOut"
+  35 |                     }}
+  36 |                 />                                                                               react-hooks/purity
+
+Γ£û 47 problems (25 errors, 22 warnings)
+  0 errors and 4 warnings potentially fixable with the `--fix` option.
+

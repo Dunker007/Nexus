@@ -3,15 +3,11 @@ import { Link } from 'react-router-dom';
 import type { CalendarEvent } from '../../../types/dashboard';
 import { STATIC_CALENDAR_EVENTS } from '../../../config/dashboardConfig';
 
-const LUXRIG_BRIDGE_URL = '/api';
+const LUXRIG_BRIDGE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
 
 export function CalendarWidget() {
     const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(STATIC_CALENDAR_EVENTS as CalendarEvent[]);
     const [googleConnected, setGoogleConnected] = useState(false);
-
-    useEffect(() => {
-        fetchGoogleCalendar();
-    }, []);
 
     async function fetchGoogleCalendar() {
         try {
@@ -36,6 +32,10 @@ export function CalendarWidget() {
             }
         } catch { }
     }
+
+    useEffect(() => {
+        fetchGoogleCalendar();
+    }, []);
 
     return (
         <div className="space-y-2">

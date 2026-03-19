@@ -36,7 +36,7 @@ export function DevStudio() {
         try {
             // In the new unified app, we hit our own /api/agents/github/repos or similar
             // For now, let's try to hit the backend /api/agents/github/repos if it exists
-            const res = await fetch('/api/agents/github/repos');
+            const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/agents/github/repos`);
 
             if (!res.ok) {
                 // If not found, use mock data so Chris can see the UI working
@@ -89,7 +89,7 @@ export function DevStudio() {
 
     const fetchSystemStatus = async () => {
         try {
-            const res = await fetch('/api/health'); // Use new health endpoint
+            const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/health`); // Use new health endpoint
             const data = await res.json();
             setStatus(data);
         } catch (err) {

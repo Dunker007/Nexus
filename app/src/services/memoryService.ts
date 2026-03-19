@@ -20,7 +20,7 @@ export const memoryService = {
   },
 
   async createFolder(name: string, parentId?: string): Promise<{ id: string; name: string }> {
-    const res = await fetch('/api/drive/folders', {
+    const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/drive/folders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, parentId }),
@@ -30,7 +30,7 @@ export const memoryService = {
   },
 
   async createFile(name: string, content: string, parentId?: string, mimeType?: string): Promise<DriveFile> {
-    const res = await fetch('/api/drive/files', {
+    const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/drive/files`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, content, parentId, mimeType }),

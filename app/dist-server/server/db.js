@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH = path.join(__dirname, '..', 'nexus.db');
+const DB_PATH = path.join(process.cwd(), 'nexus.db');
 export const db = new Database(DB_PATH);
 // Lazy Prisma init — DATABASE_URL may not be set until migrate-cloud.ts runs
 let _prisma = null;

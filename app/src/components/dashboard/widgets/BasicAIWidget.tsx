@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Send, Loader2, Eraser } from 'lucide-react';
 
-const LUXRIG_BRIDGE_URL = '/api';
+const LUXRIG_BRIDGE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
 const bridgeFetch = (path: string, options: any = {}) => fetch(`${LUXRIG_BRIDGE_URL}${path}`, options);
 
 interface ChatMessage {

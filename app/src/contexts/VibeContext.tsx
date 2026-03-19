@@ -65,6 +65,8 @@ export function VibeProvider({ children }: { children: ReactNode }) {
     saveTheme(id);
   };
 
+  const connectRef = useRef<(() => void) | null>(null);
+
   const connect = useCallback(() => {
     if (!isMountedRef.current) return;
 
@@ -130,7 +132,7 @@ export function VibeProvider({ children }: { children: ReactNode }) {
           retryCountRef.current += 1;
           const delay = Math.min(BASE_RETRY_DELAY * Math.pow(2, retryCountRef.current - 1), 60000);
           if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-          reconnectTimeoutRef.current = setTimeout(connect, delay);
+          reconnectTimeoutRef.current = setTimeout(() => { if (connectRef.current) connectRef.current(); }, delay);
         }
       };
 
@@ -142,10 +144,14 @@ export function VibeProvider({ children }: { children: ReactNode }) {
         retryCountRef.current += 1;
         const delay = Math.min(BASE_RETRY_DELAY * Math.pow(2, retryCountRef.current - 1), 60000);
         if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = setTimeout(connect, delay);
+        reconnectTimeoutRef.current = setTimeout(() => { if (connectRef.current) connectRef.current(); }, delay);
       }
     }
   }, [manualOverride]);
+
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   useEffect(() => {
     isMountedRef.current = true;

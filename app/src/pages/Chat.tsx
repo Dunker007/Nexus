@@ -146,7 +146,7 @@ export function Chat() {
   // --- Actions ---
   async function fetchAllModels() {
     try {
-      const res = await fetch(`/api/llm/status`, { cache: 'no-store' });
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/llm/status`, { cache: 'no-store' });
       if (!res.ok) return;
       const data = await res.json();
       
@@ -210,7 +210,7 @@ export function Chat() {
     if (!window.confirm('Clear all chat history? This cannot be undone.')) return;
     setMessages([]);
     localStorage.removeItem('nexus-chat-messages');
-    fetch('/api/chat', { method: 'DELETE' }).catch(console.error);
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/chat`, { method: 'DELETE' }).catch(console.error);
   };
 
   async function sendMessage() {
@@ -234,7 +234,7 @@ export function Chat() {
     setStreaming('');
 
     try {
-      await fetch('/api/chat', {
+      await fetch(`${import.meta.env.VITE_API_URL || ''}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: 'user', content: userMsg.content }),
@@ -250,7 +250,7 @@ export function Chat() {
           role: m.role === 'user' ? 'user' : 'assistant',
           content: m.content
         }));
-      res = await fetch('/api/debate', {
+      res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/debate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -282,7 +282,7 @@ export function Chat() {
 
       setMessages(prev => [...prev, assistantMsg]);
 
-      await fetch('/api/chat', {
+      await fetch(`${import.meta.env.VITE_API_URL || ''}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: 'assistant', content: reply }),

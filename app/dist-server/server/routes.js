@@ -10,6 +10,7 @@ import { songsRouter } from './api/songs.js';
 import { tasksRouter } from './api/tasks.js';
 import { portfolioRouter } from './api/portfolio.js';
 import { pipelineRouter } from './api/pipeline.js';
+import { videoRouter } from './api/video.js';
 import { authRouter } from './auth.js';
 // ─── Google Auth Helper ───────────────────────────────────────────────────────
 const getGoogleAuth = (scopes) => {
@@ -182,20 +183,51 @@ export function setupRoutes(app) {
             return res.status(503).json({ error: 'No Gemini key found — set GEMINI_FREE_KEY in .env' });
         }
         try {
-            const { prompt, systemPrompt } = z.object({
-                prompt: z.string().min(1),
+            const { messages, systemPrompt, agentName } = z.object({
+                messages: z.array(z.object({
+                    role: z.enum(['user', 'assistant']),
+                    content: z.string()
+                })).min(1),
                 systemPrompt: z.string().optional(),
+                agentName: z.string().optional()
             }).parse(req.body);
+            const geminiContents = [];
+            messages.forEach(msg => {
+                const role = msg.role === 'assistant' ? 'model' : 'user';
+                if (geminiContents.length > 0 && geminiContents[geminiContents.length - 1].role === role) {
+                    geminiContents[geminiContents.length - 1].parts[0].text += '\n\n' + msg.content;
+                }
+                else {
+                    geminiContents.push({ role, parts: [{ text: msg.content }] });
+                }
+            });
+            const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file. To save a note, include it in your response wrapped exactly like this:\n<save_note>Your specific finding or note here</save_note>\n\n`;
+            const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
             const body = {
-                system_instruction: systemPrompt ? { parts: [{ text: systemPrompt }] } : undefined,
-                contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.7, maxOutputTokens: 300 },
+                system_instruction: { parts: [{ text: finalSystemPrompt }] },
+                contents: geminiContents,
+                generationConfig: { temperature: 0.9, maxOutputTokens: 4000 },
+                tools: [{ googleSearch: {} }],
             };
-            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
             const data = await r.json();
             if (!r.ok)
                 throw new Error(data?.error?.message || 'Gemini API error');
-            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response.';
+            const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join('\n') || 'No response.';
+            // Extract and save notes
+            const noteMatch = text.match(/<save_note>([\s\S]*?)<\/save_note>/i);
+            if (noteMatch) {
+                const noteContent = noteMatch[1].trim();
+                let fallbackAgentName = 'AI Agent';
+                if (systemPrompt?.includes('You are Lux'))
+                    fallbackAgentName = 'Lux';
+                else if (systemPrompt?.includes('You are Newsician'))
+                    fallbackAgentName = 'Newsician';
+                else if (systemPrompt?.includes('You are QPL'))
+                    fallbackAgentName = 'QPL';
+                const finalAgentName = agentName || fallbackAgentName;
+                appendMasterNotes(finalAgentName, noteContent).catch(console.error);
+            }
             res.json({ text });
         }
         catch (e) {
@@ -315,6 +347,48 @@ export function setupRoutes(app) {
             res.status(500).json({ error: error.message });
         }
     });
+    // ─── Master Notes ─────────────────────────────────────────────────────────
+    async function appendMasterNotes(agentName, noteContent) {
+        try {
+            const auth = getGoogleAuth(['https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/drive.readonly']);
+            const drive = google.drive({ version: 'v3', auth });
+            const folderId = resolveFolderId();
+            const search = await drive.files.list({
+                q: `name = 'MASTER_NOTES.md' and '${folderId}' in parents and trashed = false`,
+                fields: 'files(id)', pageSize: 1,
+                supportsAllDrives: true, includeItemsFromAllDrives: true,
+            });
+            let fileId = search.data.files?.[0]?.id;
+            let currentContent = '';
+            if (fileId) {
+                const exportRes = await drive.files.export({ fileId, mimeType: 'text/plain' }).catch(() => null);
+                if (exportRes)
+                    currentContent = exportRes.data;
+                else {
+                    const response = await drive.files.get({ fileId, alt: 'media', supportsAllDrives: true }).catch(() => null);
+                    if (response)
+                        currentContent = response.data;
+                }
+            }
+            const timestamp = new Date().toLocaleString('en-US', { timeZoneName: 'short' });
+            const newEntry = `\n\n### [${timestamp}] Finding from ${agentName}\n${noteContent}\n`;
+            const updatedContent = (currentContent + newEntry).trim() + '\n';
+            if (fileId) {
+                await drive.files.update({ fileId, supportsAllDrives: true, media: { mimeType: 'text/plain', body: updatedContent } });
+            }
+            else {
+                await drive.files.create({
+                    requestBody: { name: 'MASTER_NOTES.md', parents: [folderId] },
+                    media: { mimeType: 'text/plain', body: `# NEXUS MASTER NOTES\n\nShared memory and findings from all DLX agents.${newEntry}` },
+                    supportsAllDrives: true,
+                });
+            }
+            console.log(`[Master Notes] Appended note from ${agentName}`);
+        }
+        catch (error) {
+            console.error(`[Master Notes] Failed to append note:`, error.message);
+        }
+    }
     // ─── Shared Memory (CURRENT_OPS.md) ───────────────────────────────────────
     app.get('/api/memory/ops', async (_req, res) => {
         let fileId = resolveOpsFileId();
@@ -401,6 +475,7 @@ export function setupRoutes(app) {
     app.use('/api/portfolio', portfolioRouter);
     app.use('/api/smartfolio', portfolioRouter); // Alias for laboratory bridge
     app.use('/api/pipeline', pipelineRouter);
+    app.use('/api/video', videoRouter);
     // ─── Google Sheets (Pipeline Sync) ────────────────────────────────────────
     app.get('/api/gsheets/:id', async (req, res) => {
         try {

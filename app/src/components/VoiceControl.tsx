@@ -80,7 +80,7 @@ export default function VoiceControl() {
 
             // 3. BRIDGE API FALLBACK
             // Attempt to hit the Nexus Bridge intent agent
-            const res = await fetch('/api/brain-link', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/brain-link`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
