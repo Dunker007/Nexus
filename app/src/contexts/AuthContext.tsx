@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     email: 'admin@dlxstudios.online', 
     name: 'Chris Barclay (Dev Override)' 
   });
-  const [loading, setLoading] = useState(false);
+  const loading = false; // Hardcode loading state to false
 
   useEffect(() => {
     // Auth bypassed for dev
