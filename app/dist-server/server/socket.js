@@ -1,9 +1,9 @@
 import { Server as SocketIOServer } from 'socket.io';
 let io;
-export function initSocket(server) {
+export function initSocket(server, allowedOrigins) {
     io = new SocketIOServer(server, {
         cors: {
-            origin: '*', // Allow all origins since it acts as a local rig
+            origin: allowedOrigins,
             methods: ['GET', 'POST']
         }
     });

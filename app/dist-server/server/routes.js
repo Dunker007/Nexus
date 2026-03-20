@@ -1,7 +1,9 @@
 import { z } from 'genkit';
 import { getPrisma } from './db.js';
 import { google } from 'googleapis';
+import { GoogleGenAI } from '@google/genai';
 import { driveConfig, ollamaConfig, lmStudioConfig } from './config.js';
+import { requireAuth } from './middleware/requireAuth.js';
 import { ai } from './genkit.js';
 import { agentsRouter } from './api/agents.js';
 import { chatRouter } from './api/chat.js';
@@ -158,7 +160,7 @@ export function setupRoutes(app) {
     });
     // ─── AI Inference ────────────────────────────────────────────────────────
     // LLM inference (Ollama / LM Studio — no Gemini)
-    app.post('/api/brain-link', async (req, res) => {
+    app.post('/api/brain-link', requireAuth, async (req, res) => {
         try {
             const schema = z.object({
                 prompt: z.string().min(1, 'Prompt is required'),
@@ -176,12 +178,8 @@ export function setupRoutes(app) {
             res.status(500).json({ error: error.message || 'LLM unavailable' });
         }
     });
-    // ─── Debate Pundits — Gemini Free Tier ───────────────────────────────────
-    app.post('/api/debate', async (req, res) => {
-        const apiKey = process.env.GEMINI_FREE_KEY || process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            return res.status(503).json({ error: 'No Gemini key found — set GEMINI_FREE_KEY in .env' });
-        }
+    // ─── Debate Pundits — LM Studio (Tailscale) with MCP ─────────────────────
+    app.post('/api/debate', requireAuth, async (req, res) => {
         try {
             const { messages, systemPrompt, agentName } = z.object({
                 messages: z.array(z.object({
@@ -191,42 +189,61 @@ export function setupRoutes(app) {
                 systemPrompt: z.string().optional(),
                 agentName: z.string().optional()
             }).parse(req.body);
-            const geminiContents = [];
+            let conversation = '';
+            let lastUserMsg = '';
             messages.forEach(msg => {
-                const role = msg.role === 'assistant' ? 'model' : 'user';
-                if (geminiContents.length > 0 && geminiContents[geminiContents.length - 1].role === role) {
-                    geminiContents[geminiContents.length - 1].parts[0].text += '\n\n' + msg.content;
-                }
-                else {
-                    geminiContents.push({ role, parts: [{ text: msg.content }] });
+                if (msg.role === 'user')
+                    lastUserMsg = msg.content;
+                conversation += `${msg.role === 'assistant' ? 'Assistant' : 'User'}: ${msg.content}\n\n`;
+            });
+            let searchContext = '';
+            const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file by wrapping it in <save_note>...</save_note>.\n\nCRITICAL INSTRUCTION 2: If the user asks you to write a lyric, a song, a document, or generate a final markdown asset, you MUST wrap the ENTIRE document content inside a <save_file name="Filename.md">...</save_file> tag. Choose an appropriate filename (like N_SongName_v1.md). This will automatically deploy the file to the artist's Google Drive pipeline!\n\nCRITICAL INSTRUCTION 3: If you use <think> tags to reason, you MUST immediately output your actual response directly below the closing </think> tag! Do NOT stop generating after your thoughts.\n\n`;
+            const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
+            // Map to Gemini's format
+            const geminiMessages = messages.map(m => ({
+                role: m.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: m.content }]
+            }));
+            // Call Gemini 2.5 Flash with native Google Search
+            const apiKey = process.env.GEMINI_FREE_KEY || process.env.GEMINI_API_KEY;
+            if (!apiKey)
+                throw new Error("GEMINI_FREE_KEY is missing from environment");
+            const ai = new GoogleGenAI({ apiKey });
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: geminiMessages,
+                config: {
+                    systemInstruction: finalSystemPrompt,
+                    tools: [{ googleSearch: {} }]
                 }
             });
-            const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file. To save a note, include it in your response wrapped exactly like this:\n<save_note>Your specific finding or note here</save_note>\n\n`;
-            const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
-            const body = {
-                system_instruction: { parts: [{ text: finalSystemPrompt }] },
-                contents: geminiContents,
-                generationConfig: { temperature: 0.9, maxOutputTokens: 4000 },
-                tools: [{ googleSearch: {} }],
-            };
-            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-            const data = await r.json();
-            if (!r.ok)
-                throw new Error(data?.error?.message || 'Gemini API error');
-            const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join('\n') || 'No response.';
-            // Extract and save notes
+            const text = response.text || 'No response.';
+            // Extract and save notes completely invisibly in background
             const noteMatch = text.match(/<save_note>([\s\S]*?)<\/save_note>/i);
             if (noteMatch) {
                 const noteContent = noteMatch[1].trim();
-                let fallbackAgentName = 'AI Agent';
-                if (systemPrompt?.includes('You are Lux'))
-                    fallbackAgentName = 'Lux';
-                else if (systemPrompt?.includes('You are Newsician'))
-                    fallbackAgentName = 'Newsician';
-                else if (systemPrompt?.includes('You are QPL'))
-                    fallbackAgentName = 'QPL';
-                const finalAgentName = agentName || fallbackAgentName;
-                appendMasterNotes(finalAgentName, noteContent).catch(console.error);
+                const fallbackAgentName = systemPrompt?.includes('You are Newsician') ? 'Newsician' : systemPrompt?.includes('You are QPL') ? 'QPL' : 'Lux';
+                appendMasterNotes(agentName || fallbackAgentName, noteContent).catch(console.error);
+            }
+            // Check for document saves to Drive
+            const fileMatch = text.match(/<save_file name="([^"]+)">([\s\S]*?)<\/save_file>/i);
+            if (fileMatch) {
+                const filename = fileMatch[1].trim();
+                const fileContent = fileMatch[2].trim();
+                try {
+                    const auth = getGoogleAuth(['https://www.googleapis.com/auth/drive.file']);
+                    const drive = google.drive({ version: 'v3', auth });
+                    const parentId = resolveFolderId();
+                    await drive.files.create({
+                        requestBody: { name: filename, parents: [parentId], mimeType: 'text/markdown' },
+                        media: { mimeType: 'text/markdown', body: fileContent },
+                        supportsAllDrives: true
+                    });
+                    console.log(`[Drive] Saved generative file to Drive: ${filename}`);
+                }
+                catch (err) {
+                    console.error('[Drive] Failed to save generative file:', err.message);
+                }
             }
             res.json({ text });
         }
@@ -258,7 +275,7 @@ export function setupRoutes(app) {
         res.json(status);
     });
     // ─── Drive Anchor ──────────────────────────────────────────────────────────
-    app.get('/api/drive-anchor', async (_req, res) => {
+    app.get('/api/drive-anchor', requireAuth, async (_req, res) => {
         try {
             const auth = getGoogleAuth(driveConfig.scopes);
             const drive = google.drive({ version: 'v3', auth });
@@ -282,7 +299,7 @@ export function setupRoutes(app) {
         }
     });
     // ─── Drive Files ──────────────────────────────────────────────────────────
-    app.get('/api/drive/files', async (req, res) => {
+    app.get('/api/drive/files', requireAuth, async (req, res) => {
         try {
             const folderId = resolveFolderId(req.query.folderId);
             const auth = getGoogleAuth(driveConfig.scopes);
@@ -300,7 +317,7 @@ export function setupRoutes(app) {
             res.status(500).json({ error: error.message });
         }
     });
-    app.post('/api/drive/folders', async (req, res) => {
+    app.post('/api/drive/folders', requireAuth, async (req, res) => {
         try {
             const schema = z.object({
                 name: z.string().min(1, 'Name is required'),
@@ -324,7 +341,7 @@ export function setupRoutes(app) {
             res.status(500).json({ error: error.message });
         }
     });
-    app.post('/api/drive/files', async (req, res) => {
+    app.post('/api/drive/files', requireAuth, async (req, res) => {
         try {
             const schema = z.object({
                 name: z.string().min(1, 'Name is required'),
@@ -390,7 +407,7 @@ export function setupRoutes(app) {
         }
     }
     // ─── Shared Memory (CURRENT_OPS.md) ───────────────────────────────────────
-    app.get('/api/memory/ops', async (_req, res) => {
+    app.get('/api/memory/ops', requireAuth, async (_req, res) => {
         let fileId = resolveOpsFileId();
         let mimeType = '';
         try {
@@ -429,7 +446,7 @@ export function setupRoutes(app) {
             res.status(500).json({ error: error.message });
         }
     });
-    app.post('/api/memory/ops', async (req, res) => {
+    app.post('/api/memory/ops', requireAuth, async (req, res) => {
         try {
             const schema = z.object({
                 content: z.string()
@@ -477,27 +494,17 @@ export function setupRoutes(app) {
     app.use('/api/pipeline', pipelineRouter);
     app.use('/api/video', videoRouter);
     // ─── Google Sheets (Pipeline Sync) ────────────────────────────────────────
-    app.get('/api/gsheets/:id', async (req, res) => {
+    app.get('/api/gsheets/:id', requireAuth, async (req, res) => {
         try {
             const spreadsheetId = req.params.id;
             const range = req.query.range || 'A:Z';
             const auth = getGoogleAuth(['https://www.googleapis.com/auth/spreadsheets.readonly']);
             const sheets = google.sheets({ version: 'v4', auth });
-            const response = await sheets.spreadsheets.values.get({ spreadsheetId, range });
+            const response = await sheets.spreadsheets.values.get({ spreadsheetId: spreadsheetId, range: range });
             res.json(response.data.values || []);
         }
         catch (e) {
             res.status(500).json({ error: e.message });
         }
-    });
-    // Env info (for debugging Drive setup)
-    app.get('/api/env', (_req, res) => {
-        res.json({
-            folderId: process.env.GDRIVE_FOLDER_ID ? '✅ Set' : '❌ Missing',
-            serviceAccount: process.env.GOOGLE_SERVICE_ACCOUNT_JSON ? '✅ Set' : '❌ Missing',
-            oauth: process.env.GOOGLE_CLIENT_ID ? '✅ Set' : '❌ Missing',
-            ollama: ollamaConfig.baseUrl,
-            lmStudio: lmStudioConfig.baseUrl,
-        });
     });
 }

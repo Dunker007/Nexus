@@ -42,7 +42,7 @@ tasksRouter.put('/:id', requireAuth, async (req, res) => {
     if (category !== undefined) updateData.category = category;
     
     const task = await getPrisma().tasks.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: updateData
     });
     res.json(task);
@@ -51,7 +51,7 @@ tasksRouter.put('/:id', requireAuth, async (req, res) => {
 
 tasksRouter.delete('/:id', requireAuth, async (req, res) => {
   try {
-    await getPrisma().tasks.delete({ where: { id: req.params.id } });
+    await getPrisma().tasks.delete({ where: { id: req.params.id as string } });
     res.json({ success: true });
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });

@@ -4,7 +4,15 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(process.cwd(), 'nexus.db');
-export const db = new Database(DB_PATH);
+// On Cloud Run (K_SERVICE is set), the filesystem is ephemeral — SQLite writes
+// are lost on restart. All production paths use getPrisma() (PostgreSQL) instead.
+const IS_CLOUD_RUN = !!process.env.K_SERVICE;
+if (IS_CLOUD_RUN) {
+    console.warn('[DB] Cloud Run detected — SQLite is ephemeral and will not be used. All data operations must go through getPrisma().');
+}
+export const db = IS_CLOUD_RUN
+    ? { exec: () => { }, pragma: () => { }, prepare: () => ({ run: () => { }, all: () => [], get: () => undefined }) }
+    : new Database(DB_PATH);
 // Lazy Prisma init — DATABASE_URL may not be set until migrate-cloud.ts runs
 let _prisma = null;
 export const getPrisma = () => {
@@ -16,9 +24,11 @@ export const getPrisma = () => {
 export const prisma = new Proxy({}, {
     get: (_t, prop) => getPrisma()[prop],
 });
-// Enable WAL mode for better concurrent performance
-db.pragma('journal_mode = WAL');
-db.exec(`
+// Enable WAL mode for better concurrent performance (local SQLite only)
+if (!IS_CLOUD_RUN)
+    db.pragma('journal_mode = WAL');
+if (!IS_CLOUD_RUN)
+    db.exec(`
   CREATE TABLE IF NOT EXISTS agents (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -132,9 +142,9 @@ const safeIndex = (sql) => { try {
 catch { /* already exists */ } };
 safeIndex(`CREATE INDEX IF NOT EXISTS idx_news_items_created_at    ON news_items(created_at DESC)`);
 safeIndex(`CREATE INDEX IF NOT EXISTS idx_chat_history_timestamp   ON chat_history(timestamp ASC)`);
-safeIndex(`CREATE INDEX IF NOT EXISTS idx_portfolio_sync_account   ON portfolio_sync(account_id)`);
 // ─── Portfolio sync table (persists bridge state across restarts) ─────────────
-db.exec(`
+if (!IS_CLOUD_RUN)
+    db.exec(`
   CREATE TABLE IF NOT EXISTS portfolio_sync (
     account_id TEXT PRIMARY KEY,
     positions  TEXT NOT NULL DEFAULT '[]',
@@ -144,9 +154,11 @@ db.exec(`
 `);
 // Add user_id for per-user portfolio scoping (defaults to 'default' for existing rows)
 safeAlter(`ALTER TABLE portfolio_sync ADD COLUMN user_id TEXT NOT NULL DEFAULT 'default'`);
+safeIndex(`CREATE INDEX IF NOT EXISTS idx_portfolio_sync_account   ON portfolio_sync(account_id)`);
 safeIndex(`CREATE INDEX IF NOT EXISTS idx_portfolio_sync_user ON portfolio_sync(user_id, account_id)`);
 // ─── Users table (Google OAuth) ───────────────────────────────────────────────
-db.exec(`
+if (!IS_CLOUD_RUN)
+    db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id         TEXT PRIMARY KEY,
     email      TEXT UNIQUE NOT NULL,
@@ -156,4 +168,5 @@ db.exec(`
     last_seen  DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 `);
-console.log(`[DB] SQLite connected: ${DB_PATH}`);
+if (!IS_CLOUD_RUN)
+    console.log(`[DB] SQLite connected: ${DB_PATH}`);

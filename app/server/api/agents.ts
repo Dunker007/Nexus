@@ -25,7 +25,7 @@ agentsRouter.put('/:id', requireAuth, async (req, res) => {
   try {
     const { name, role, description, status, system_prompt } = req.body;
     const result = await getPrisma().agents.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: { name, role, description, status, system_prompt }
     });
     res.json(result);
@@ -34,7 +34,7 @@ agentsRouter.put('/:id', requireAuth, async (req, res) => {
 
 agentsRouter.delete('/:id', requireAuth, async (req, res) => {
   try {
-    await getPrisma().agents.delete({ where: { id: req.params.id } });
+    await getPrisma().agents.delete({ where: { id: req.params.id as string } });
     res.json({ success: true });
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });

@@ -20,7 +20,8 @@ export async function loadSecrets() {
             'GOOGLE_CLIENT_SECRET',
             'GOOGLE_SERVICE_ACCOUNT_JSON',
             'DATABASE_URL',
-            'GEMINI_FREE_KEY'
+            'GEMINI_FREE_KEY',
+            'JWT_SECRET'
         ];
         for (const secretName of secretsToLoad) {
             if (!process.env[secretName]) { // Only fetch if not already in env

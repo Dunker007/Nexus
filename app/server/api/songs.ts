@@ -27,7 +27,7 @@ songsRouter.put('/:id', requireAuth, async (req, res) => {
   try {
     const { title, artist, genre, mood, lyrics, suno_prompt, status } = req.body;
     const song = await getPrisma().songs.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: { title, artist, genre, mood, lyrics, suno_prompt, status, updated_at: new Date() }
     });
     res.json(song);
@@ -36,7 +36,7 @@ songsRouter.put('/:id', requireAuth, async (req, res) => {
 
 songsRouter.delete('/:id', requireAuth, async (req, res) => {
   try {
-    await getPrisma().songs.delete({ where: { id: req.params.id } });
+    await getPrisma().songs.delete({ where: { id: req.params.id as string } });
     res.json({ success: true });
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });

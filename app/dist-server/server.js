@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import './server/config.js'; // validates required env vars at startup
 import express from 'express';
 import { createServer } from 'http';
 import helmet from 'helmet';
@@ -45,10 +46,10 @@ async function startServer() {
     }));
     const httpServer = createServer(app);
     // Phase 6: Initialize WebSockets
-    initSocket(httpServer);
+    initSocket(httpServer, allowedOrigins);
     // Phase 3: Security & Hardening
     app.use(helmet({
-        contentSecurityPolicy: false // Disable CSP locally so Vite HMR + Inline styles don't break
+        contentSecurityPolicy: isDev ? false : undefined // Disable CSP in dev (Vite HMR + inline styles); enabled in production
     }));
     const apiLimiter = rateLimit({
         windowMs: 1 * 60 * 1000,

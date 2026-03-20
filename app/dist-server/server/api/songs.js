@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getPrisma } from '../db.js';
 import { required } from '../middleware/validate.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 export const songsRouter = Router();
 songsRouter.get('/', async (_req, res) => {
     try {
@@ -10,7 +11,7 @@ songsRouter.get('/', async (_req, res) => {
         res.status(500).json({ error: e.message });
     }
 });
-songsRouter.post('/', required(['title', 'artist']), async (req, res) => {
+songsRouter.post('/', requireAuth, required(['title', 'artist']), async (req, res) => {
     try {
         const { id, title, artist, genre, mood, lyrics, suno_prompt, status } = req.body;
         const song = await getPrisma().songs.create({
@@ -25,7 +26,7 @@ songsRouter.post('/', required(['title', 'artist']), async (req, res) => {
         res.status(500).json({ error: e.message });
     }
 });
-songsRouter.put('/:id', async (req, res) => {
+songsRouter.put('/:id', requireAuth, async (req, res) => {
     try {
         const { title, artist, genre, mood, lyrics, suno_prompt, status } = req.body;
         const song = await getPrisma().songs.update({
@@ -38,7 +39,7 @@ songsRouter.put('/:id', async (req, res) => {
         res.status(500).json({ error: e.message });
     }
 });
-songsRouter.delete('/:id', async (req, res) => {
+songsRouter.delete('/:id', requireAuth, async (req, res) => {
     try {
         await getPrisma().songs.delete({ where: { id: req.params.id } });
         res.json({ success: true });

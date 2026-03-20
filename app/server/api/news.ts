@@ -167,7 +167,7 @@ newsRouter.post('/refresh', requireAuth, async (req, res) => {
 
 newsRouter.delete('/:id', requireAuth, async (req, res) => {
   try {
-    await getPrisma().news_items.delete({ where: { id: req.params.id } });
+    await getPrisma().news_items.delete({ where: { id: req.params.id as string } });
     res.json({ success: true });
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });

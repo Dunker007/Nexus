@@ -521,7 +521,7 @@ export function setupRoutes(app: Express) {
       const range = (req.query.range as string) || 'A:Z';
       const auth = getGoogleAuth(['https://www.googleapis.com/auth/spreadsheets.readonly']);
       const sheets = google.sheets({ version: 'v4', auth });
-      const response = await sheets.spreadsheets.values.get({ spreadsheetId, range });
+      const response = await sheets.spreadsheets.values.get({ spreadsheetId: spreadsheetId as string, range: range as string }) as any;
       res.json(response.data.values || []);
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });

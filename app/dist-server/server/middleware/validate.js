@@ -1,4 +1,13 @@
 /**
+ * Standardized API error response. Use instead of inline res.status(N).json({ error: msg })
+ * to avoid leaking internal error details to clients.
+ *
+ * Usage: return apiError(res, 400, 'Invalid agent_id');
+ */
+export function apiError(res, status, message) {
+    return res.status(status).json({ error: message, status });
+}
+/**
  * Returns Express middleware that validates required fields in req.body.
  * Responds with 400 and a clear error message if any field is missing or empty.
  *

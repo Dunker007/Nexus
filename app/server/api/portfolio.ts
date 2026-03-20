@@ -78,7 +78,7 @@ portfolioRouter.get('/accounts', requireAuth, async (_req, res) => {
 portfolioRouter.get('/:accountId', requireAuth, async (req, res) => {
   const { accountId } = req.params;
   const userId = (req as any).user.id;
-  const data = await getSyncRow(userId, accountId.toLowerCase());
+  const data = await getSyncRow(userId, (accountId as string).toLowerCase());
   res.json(data || { positions: [], journal: [], pendingOrders: [] });
 });
 
@@ -87,11 +87,11 @@ portfolioRouter.post('/:accountId/sync', requireAuth, async (req, res) => {
   const { accountId } = req.params;
   const { assets, journal } = req.body;
   const userId = (req as any).user.id;
-  const accountIdNorm = accountId.toLowerCase();
+  const accountIdNorm = (accountId as string).toLowerCase();
 
   try {
     await getPrisma().portfolio_sync.upsert({
-      where: { user_id_account_id: { user_id: userId, account_id: accountIdNorm } },
+      where: { user_id_account_id: { user_id: userId, account_id: accountIdNorm } } as any,
       update: {
         positions: JSON.stringify(assets || []),
         journal: JSON.stringify(journal || []),

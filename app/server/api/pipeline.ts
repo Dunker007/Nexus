@@ -21,7 +21,7 @@ router.get('/', async (_req, res) => {
 // Get single track
 router.get('/:id', async (req, res) => {
   try {
-    const track = await getPrisma().pipeline_tracks.findUnique({ where: { id: req.params.id } });
+    const track = await getPrisma().pipeline_tracks.findUnique({ where: { id: req.params.id as string } });
     if (!track) {
       return res.status(404).json({ error: 'Track not found' });
     }
@@ -58,7 +58,7 @@ router.put('/:id', requireAuth, async (req, res) => {
     const { title, artist, genre, bpm, key, status, progress, notes } = req.body;
 
     const track = await getPrisma().pipeline_tracks.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: {
         title, artist, genre, bpm: bpm != null ? Number(bpm) : null, key, status, progress: progress != null ? Number(progress) : 0, notes
       }
@@ -76,7 +76,7 @@ router.put('/:id', requireAuth, async (req, res) => {
 // Delete track
 router.delete('/:id', requireAuth, async (req, res) => {
   try {
-    await getPrisma().pipeline_tracks.delete({ where: { id: req.params.id } });
+    await getPrisma().pipeline_tracks.delete({ where: { id: req.params.id as string } });
     
     try { getIO().emit('pipeline_update', { type: 'delete', id: req.params.id }); } catch(e) {}
 
