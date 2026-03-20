@@ -1,29 +1,14 @@
 import { Router } from 'express';
 import { getPrisma } from '../db.js';
-import { verifyToken } from '../auth.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 
 export const portfolioRouter = Router();
 
-// ─── Resolve user from cookie (optional — falls back to 'default') ────────────
-const getUserId = (req: any): string => {
-  const token = req.cookies?.nexus_token;
-  if (!token) return 'default';
-  const user = verifyToken(token);
-  return user?.id || 'default';
-};
-
 // ─── DB helpers ───────────────────────────────────────────────────────────────
 const getSyncRow = async (userId: string, accountId: string) => {
-  let row = await getPrisma().portfolio_sync.findFirst({
+  const row = await getPrisma().portfolio_sync.findFirst({
     where: { user_id: userId, account_id: accountId }
   });
-  
-  if (!row && userId !== 'default') {
-    row = await getPrisma().portfolio_sync.findFirst({
-      where: { user_id: 'default', account_id: accountId }
-    });
-  }
-
   if (!row) return null;
   return {
     positions: JSON.parse(row.positions),
@@ -34,13 +19,12 @@ const getSyncRow = async (userId: string, accountId: string) => {
 };
 
 // Portfolio summary for dashboard widget
-portfolioRouter.get('/summary', async (req, res) => {
+portfolioRouter.get('/summary', requireAuth, async (req, res) => {
   try {
-    const userId = getUserId(req);
+    const userId = (req as any).user.id;
     const suiData = await getSyncRow(userId, 'sui');
     const altsData = await getSyncRow(userId, 'alts');
 
-    // Calculate totals from both accounts
     const calculateTotal = (data: any) => {
       if (!data || !data.positions) return 0;
       return data.positions.reduce((sum: number, p: any) => {
@@ -58,19 +42,12 @@ portfolioRouter.get('/summary', async (req, res) => {
     const suiTotal = calculateTotal(suiData);
     const altsTotal = calculateTotal(altsData);
     const totalValue = suiTotal + altsTotal;
-
-    const suiCash = calculateCash(suiData);
-    const altsCash = calculateCash(altsData);
-    const cashBalance = suiCash + altsCash;
-
+    const cashBalance = calculateCash(suiData) + calculateCash(altsData);
     const safetyNetPercent = totalValue > 0 ? (cashBalance / totalValue) * 100 : 0;
 
-    // Get active account from latest sync
     const lastSuiSync = suiData?.lastSync ? new Date(suiData.lastSync).getTime() : 0;
     const lastAltsSync = altsData?.lastSync ? new Date(altsData.lastSync).getTime() : 0;
     const activeAccount = lastSuiSync > lastAltsSync ? 'sui' : 'alts';
-
-    const lastSync = suiData?.lastSync || altsData?.lastSync || null;
 
     res.json({
       totalValue,
@@ -78,8 +55,8 @@ portfolioRouter.get('/summary', async (req, res) => {
       safetyNetPercent,
       isSafetyNetCritical: safetyNetPercent < 5,
       activeAccount,
-      lastSync,
-      isLive: false // Will be true when live price updates are enabled
+      lastSync: suiData?.lastSync || altsData?.lastSync || null,
+      isLive: false,
     });
   } catch (e: any) {
     res.status(500).json({ error: e.message });
@@ -87,7 +64,7 @@ portfolioRouter.get('/summary', async (req, res) => {
 });
 
 // Account details
-portfolioRouter.get('/accounts', async (_req, res) => {
+portfolioRouter.get('/accounts', requireAuth, async (_req, res) => {
   try {
     const accounts = await getPrisma().portfolio_accounts.findMany();
     const allPositions = await getPrisma().portfolio_positions.findMany();
@@ -98,34 +75,34 @@ portfolioRouter.get('/accounts', async (_req, res) => {
 });
 
 // Retrieve specific account data (Bridge)
-portfolioRouter.get('/:accountId', async (req, res) => {
+portfolioRouter.get('/:accountId', requireAuth, async (req, res) => {
   const { accountId } = req.params;
-  const userId = getUserId(req);
+  const userId = (req as any).user.id;
   const data = await getSyncRow(userId, accountId.toLowerCase());
   res.json(data || { positions: [], journal: [], pendingOrders: [] });
 });
 
 // Sync account data from local agent (Bridge)
-portfolioRouter.post('/:accountId/sync', async (req, res) => {
+portfolioRouter.post('/:accountId/sync', requireAuth, async (req, res) => {
   const { accountId } = req.params;
   const { assets, journal } = req.body;
-  const userId = getUserId(req);
+  const userId = (req as any).user.id;
+  const accountIdNorm = accountId.toLowerCase();
 
   try {
     await getPrisma().portfolio_sync.upsert({
-      where: { account_id: accountId.toLowerCase() },
+      where: { user_id_account_id: { user_id: userId, account_id: accountIdNorm } },
       update: {
-        user_id: userId,
         positions: JSON.stringify(assets || []),
         journal: JSON.stringify(journal || []),
-        last_sync: new Date()
+        last_sync: new Date(),
       },
       create: {
-        account_id: accountId.toLowerCase(),
+        account_id: accountIdNorm,
         user_id: userId,
         positions: JSON.stringify(assets || []),
         journal: JSON.stringify(journal || []),
-        last_sync: new Date()
+        last_sync: new Date(),
       }
     });
     res.json({ success: true });
