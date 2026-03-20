@@ -52,11 +52,11 @@ async function startServer() {
   const httpServer = createServer(app);
   
   // Phase 6: Initialize WebSockets
-  initSocket(httpServer);
+  initSocket(httpServer, allowedOrigins);
   
   // Phase 3: Security & Hardening
   app.use(helmet({
-    contentSecurityPolicy: false // Disable CSP locally so Vite HMR + Inline styles don't break
+    contentSecurityPolicy: isDev ? false : undefined // Disable CSP in dev (Vite HMR + inline styles); enabled in production
   }));
 
   const apiLimiter = rateLimit({
