@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MemoryProvider } from './contexts/MemoryContext';
 import { ToastProvider } from './contexts/ToastContext';
@@ -6,32 +7,33 @@ import { PortfolioProvider } from './contexts/labs/smartfolio/PortfolioContext';
 import { ToastStack } from './components/ToastStack';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
-import { Login } from './pages/Login';
-import { Dashboard } from './pages/Dashboard';
-import { Chat } from './pages/Chat';
-import { Agents } from './pages/Agents';
-import { Drive } from './pages/Drive';
-import { Pipeline } from './pages/Pipeline';
-import { MusicStudio } from './pages/MusicStudio';
-import { News } from './pages/News';
-import { Studios } from './pages/Studios';
-import { Labs } from './pages/Labs';
-import { Meeting } from './pages/Meeting';
-import { Settings } from './pages/Settings';
-import { SmartFolioLayout } from './pages/smartfolio/SmartFolioLayout';
-import { SmartFolioHub } from './pages/smartfolio/SmartFolioHub';
-import { SmartFolioReport } from './pages/smartfolio/SmartFolioReport';
-import { SmartFolioMarket } from './pages/smartfolio/SmartFolioMarket';
-import { SmartFolioOrders } from './pages/smartfolio/SmartFolioOrders';
-import { SmartFolioRisk } from './pages/smartfolio/SmartFolioRisk';
-import { SmartFolioSettings } from './pages/smartfolio/SmartFolioSettings';
-import { SmartFolioAUM } from './pages/smartfolio/SmartFolioAUM';
-import { AgentFlow } from './pages/AgentFlow';
-import { DevStudio } from './pages/studios/DevStudio';
-import { VideoStudio } from './pages/studios/VideoStudio';
-import { ArtStudio } from './pages/studios/ArtStudio';
-import { BlogStudio } from './pages/studios/BlogStudio';
-import { LabStub } from './pages/labs/LabStub';
+
+const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })));
+const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
+const Chat = lazy(() => import('./pages/Chat').then(m => ({ default: m.Chat })));
+const Agents = lazy(() => import('./pages/Agents').then(m => ({ default: m.Agents })));
+const Drive = lazy(() => import('./pages/Drive').then(m => ({ default: m.Drive })));
+const Pipeline = lazy(() => import('./pages/Pipeline').then(m => ({ default: m.Pipeline })));
+const MusicStudio = lazy(() => import('./pages/MusicStudio').then(m => ({ default: m.MusicStudio })));
+const News = lazy(() => import('./pages/News').then(m => ({ default: m.News })));
+const Studios = lazy(() => import('./pages/Studios').then(m => ({ default: m.Studios })));
+const Labs = lazy(() => import('./pages/Labs').then(m => ({ default: m.Labs })));
+const Meeting = lazy(() => import('./pages/Meeting').then(m => ({ default: m.Meeting })));
+const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
+const SmartFolioLayout = lazy(() => import('./pages/smartfolio/SmartFolioLayout').then(m => ({ default: m.SmartFolioLayout })));
+const SmartFolioHub = lazy(() => import('./pages/smartfolio/SmartFolioHub').then(m => ({ default: m.SmartFolioHub })));
+const SmartFolioReport = lazy(() => import('./pages/smartfolio/SmartFolioReport').then(m => ({ default: m.SmartFolioReport })));
+const SmartFolioMarket = lazy(() => import('./pages/smartfolio/SmartFolioMarket').then(m => ({ default: m.SmartFolioMarket })));
+const SmartFolioOrders = lazy(() => import('./pages/smartfolio/SmartFolioOrders').then(m => ({ default: m.SmartFolioOrders })));
+const SmartFolioRisk = lazy(() => import('./pages/smartfolio/SmartFolioRisk').then(m => ({ default: m.SmartFolioRisk })));
+const SmartFolioSettings = lazy(() => import('./pages/smartfolio/SmartFolioSettings').then(m => ({ default: m.SmartFolioSettings })));
+const SmartFolioAUM = lazy(() => import('./pages/smartfolio/SmartFolioAUM').then(m => ({ default: m.SmartFolioAUM })));
+const AgentFlow = lazy(() => import('./pages/AgentFlow').then(m => ({ default: m.AgentFlow })));
+const DevStudio = lazy(() => import('./pages/studios/DevStudio').then(m => ({ default: m.DevStudio })));
+const VideoStudio = lazy(() => import('./pages/studios/VideoStudio').then(m => ({ default: m.VideoStudio })));
+const ArtStudio = lazy(() => import('./pages/studios/ArtStudio').then(m => ({ default: m.ArtStudio })));
+const BlogStudio = lazy(() => import('./pages/studios/BlogStudio').then(m => ({ default: m.BlogStudio })));
+const LabStub = lazy(() => import('./pages/labs/LabStub').then(m => ({ default: m.LabStub })));
 
 import { ThemeProvider } from './contexts/ThemeContext';
 export default function App() {
@@ -42,10 +44,11 @@ export default function App() {
             <MemoryProvider>
               <PortfolioProvider>
                 <BrowserRouter>
-                  <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-                      <Route index element={<Navigate to="/dashboard" replace />} />
+                  <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[#0a0a0a]"><div className="w-8 h-8 border-2 border-white/10 border-t-white/80 rounded-full animate-spin flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.2)]"></div></div>}>
+                    <Routes>
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                        <Route index element={<Navigate to="/dashboard" replace />} />
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="studios" element={<Studios />} />
                     <Route path="studios/dev" element={<DevStudio />} />
@@ -86,6 +89,7 @@ export default function App() {
                     <Route path="settings" element={<Settings />} />
                     </Route>
                   </Routes>
+                  </Suspense>
                   <ToastStack />
                 </BrowserRouter>
               </PortfolioProvider>
