@@ -1,7 +1,10 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 
 export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
-  const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://dlxai.netlify.app';
+  const origin = event.headers.origin || '';
+  const allowedOrigins = ['https://dlxai.netlify.app', 'https://dlxstudios.ai', 'https://www.dlxstudios.ai'];
+  const allowedOrigin = allowedOrigins.includes(origin) ? origin : (process.env.ALLOWED_ORIGIN || 'https://dlxai.netlify.app');
+
   const headers = {
     'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Headers': 'Content-Type',
