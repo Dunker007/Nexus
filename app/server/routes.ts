@@ -224,8 +224,8 @@ export function setupRoutes(app: Express) {
       }));
 
       // Call Gemini 2.5 Flash with native Google Search
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) throw new Error("GEMINI_API_KEY is missing from environment");
+      const apiKey = process.env.GEMINI_FREE_KEY || process.env.GEMINI_API_KEY;
+      if (!apiKey) throw new Error("GEMINI_FREE_KEY is missing from environment");
 
       const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
