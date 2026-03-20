@@ -231,7 +231,7 @@ export function setupRoutes(app: Express) {
       const data: any = await r.json();
       if (!r.ok) throw new Error(data?.error?.message || 'LM Studio API error');
       
-      const text = data?.output?.content || data?.text || data?.response || data?.choices?.[0]?.message?.content || data?.content || 'No response.';
+      const text = data?.output?.[0]?.content || data?.text || data?.response || data?.choices?.[0]?.message?.content || data?.content || 'No response.';
 
       // Extract and save notes
       const noteMatch = text.match(/<save_note>([\s\S]*?)<\/save_note>/i);
