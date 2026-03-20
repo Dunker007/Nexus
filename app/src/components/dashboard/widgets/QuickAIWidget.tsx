@@ -12,14 +12,14 @@ interface ChatMessage {
 
 const renderMessageContent = (content: string) => {
     // Extract any content between various thinking/thought tags (both <think></think> and <pause></pause>)
-    const tagMatch = content.match(/<(think|pause)>([\s\S]*?)<\/\1>/i);
+    const tagMatch = content.match(/<(think|pause)>([\s\S]*?)(?:<\/\1>|$)/i);
     if (tagMatch) {
         const thinkContent = tagMatch[2].trim();
-        const restContent = content.replace(/<(think|pause)>[\s\S]*?<\/\1>/gi, '').trim();
+        const restContent = content.replace(/<(think|pause)>[\s\S]*?(?:<\/\1>|$)/gi, '').trim();
         return (
             <div className="flex flex-col gap-2">
                 <div className="text-[11px] text-cyan-500/60 font-mono border-l-2 border-cyan-500/20 pl-3 py-1.5 whitespace-pre-wrap bg-cyan-500/5 rounded-r">
-                    {thinkContent}
+                    {thinkContent || 'Thinking...'}
                 </div>
                 {restContent && <div className="whitespace-pre-wrap text-gray-200">{restContent}</div>}
             </div>
