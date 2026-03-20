@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getPrisma } from '../db.js';
 import { required } from '../middleware/validate.js';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 export const chatRouter = Router();
 chatRouter.get('/', requireAuth, async (req, res) => {
     try {

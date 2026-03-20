@@ -1,11 +1,6 @@
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { Storage } from '@google-cloud/storage';
 const isCloudRun = !!process.env.K_SERVICE;
-// ─── IAP Verification ────────────────────────────────────────────────────────
-export const requireIAP = (req, res, next) => {
-    // Temporarily bypass IAP since we are running Cloud Run as --allow-unauthenticated
-    return next();
-};
 // ─── Secret Manager ──────────────────────────────────────────────────────────
 export async function loadSecrets() {
     if (!isCloudRun)

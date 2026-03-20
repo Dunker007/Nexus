@@ -4,7 +4,7 @@ import { getIO } from '../socket.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 const router = Router();
 // Get all pipeline tracks
-router.get('/', async (_req, res) => {
+router.get('/', requireAuth, async (_req, res) => {
     try {
         const tracks = await getPrisma().pipeline_tracks.findMany({
             orderBy: { created_at: 'desc' }
@@ -17,7 +17,7 @@ router.get('/', async (_req, res) => {
     }
 });
 // Get single track
-router.get('/:id', async (req, res) => {
+router.get('/:id', requireAuth, async (req, res) => {
     try {
         const track = await getPrisma().pipeline_tracks.findUnique({ where: { id: req.params.id } });
         if (!track) {

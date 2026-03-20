@@ -1,4 +1,8 @@
-import { db, prisma } from './db.js';
+import Database from 'better-sqlite3';
+import { prisma } from './db.js';
+import path from 'path';
+// Standalone sync script — creates its own SQLite connection
+const db = new Database(path.join(process.cwd(), 'nexus.db'));
 // Convert SQLite date strings into actual Date objects for Prisma
 const dateFields = ['created_at', 'updated_at', 'timestamp'];
 async function syncTable(tableName, prismaModel) {

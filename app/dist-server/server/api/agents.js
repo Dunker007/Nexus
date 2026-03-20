@@ -3,7 +3,7 @@ import { getPrisma } from '../db.js';
 import { required } from '../middleware/validate.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 export const agentsRouter = Router();
-agentsRouter.get('/', async (_req, res) => {
+agentsRouter.get('/', requireAuth, async (_req, res) => {
     try {
         res.json(await getPrisma().agents.findMany());
     }

@@ -101,7 +101,7 @@ function extractImage(item) {
         return match[1];
     return null;
 }
-newsRouter.get('/', async (req, res) => {
+newsRouter.get('/', requireAuth, async (req, res) => {
     try {
         const rows = await getPrisma().news_items.findMany({
             orderBy: { created_at: 'desc' },

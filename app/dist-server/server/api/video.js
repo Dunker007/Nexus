@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { required } from '../middleware/validate.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { assembleMusicVideo } from '../ffmpegService.js';
+import { callLocalLLM } from '../llm.js';
 import fs from 'fs/promises';
 import path from 'path';
 export const videoRouter = Router();
@@ -42,18 +43,8 @@ Example format:
   }
 ]`;
         const prompt = `Here are the lyrics to build the hybrid image/video storyboard for:\n\n${contextStr}\n${lyrics}`;
-        // Use the existing local LLM endpoint to avoid circular dependencies
-        const port = process.env.PORT || '3000';
-        const llmRes = await fetch(`http://127.0.0.1:${port}/api/brain-link`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt, systemPrompt })
-        });
-        if (!llmRes.ok) {
-            throw new Error(`LLM Engine unreachable: ${llmRes.statusText}`);
-        }
-        const llmData = (await llmRes.json());
-        const textResponse = llmData.text || '';
+        // Call LLM directly instead of self-referential HTTP call
+        const textResponse = await callLocalLLM(prompt, systemPrompt);
         // Attempt to parse JSON
         let storyboard = [];
         try {
