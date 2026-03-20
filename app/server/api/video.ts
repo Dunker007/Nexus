@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { required } from '../middleware/validate.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 import { assembleMusicVideo, StoryboardItem } from '../ffmpegService.js';
 import fs from 'fs/promises';
 import path from 'path';
@@ -82,17 +83,18 @@ Example format:
 });
 
 // Render the final music video from the assembled timeline
-videoRouter.post('/render', required(['timeline', 'audioPath']), async (req, res) => {
+videoRouter.post('/render', requireAuth, required(['timeline', 'audioPath']), async (req, res) => {
   try {
     const { timeline, audioPath, outputName } = req.body;
-    
+
     // Create a strict temp directory for this render job
     const tempDir = path.join(process.cwd(), '.temp_render', Date.now().toString());
     await fs.mkdir(tempDir, { recursive: true });
-    
-    // Output path goes to the _Dropbox or a specified folder in the project
-    const finalName = outputName || `MusicVideo_${Date.now()}.mp4`;
-    const outputPath = path.join(process.cwd(), '..', '_Dropbox', finalName); // Assuming _Dropbox is sibling of Nexus
+
+    // Sanitize outputName — basename only, no path traversal
+    const safeName = path.basename(outputName || `MusicVideo_${Date.now()}.mp4`).replace(/[^a-zA-Z0-9._-]/g, '_');
+    const dropboxDir = path.resolve(process.cwd(), '..', '_Dropbox');
+    const outputPath = path.join(dropboxDir, safeName);
     
     // Kick off async render (maybe don't await if we want to return immediately, but here we await for simplicity)
     const resultPath = await assembleMusicVideo(timeline, audioPath, outputPath, tempDir);

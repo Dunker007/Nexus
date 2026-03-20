@@ -1,17 +1,19 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 
 export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
-
+  const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://luxhub.netlify.app';
   const headers = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
   };
 
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, headers, body: 'Method Not Allowed' };
   }
 
   // Use the Netlify Environment Variable for the Gemini API
@@ -46,7 +48,7 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
       }
     });
 
-    const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file. To save a note, include it in your response wrapped exactly like this:\n<save_note>Your specific finding or note here</save_note>\n\n`;
+    const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\n`;
     const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
 
     const body = {
