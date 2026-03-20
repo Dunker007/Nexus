@@ -59,6 +59,7 @@ app.use(cors({
         // Match dlxstudios.online, www.dlxstudios.online, and vercel previews
         const isAllowed = origin.includes('dlxstudios.online') ||
             origin.includes('vercel.app') ||
+            origin.includes('netlify.app') ||
             origin.includes('localhost');
 
         if (isAllowed) {
