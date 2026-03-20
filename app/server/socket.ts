@@ -3,10 +3,10 @@ import type { Server as HttpServer } from 'http';
 
 let io: SocketIOServer;
 
-export function initSocket(server: HttpServer) {
+export function initSocket(server: HttpServer, allowedOrigins: string[]) {
   io = new SocketIOServer(server, {
     cors: {
-      origin: '*', // Allow all origins since it acts as a local rig
+      origin: allowedOrigins,
       methods: ['GET', 'POST']
     }
   });

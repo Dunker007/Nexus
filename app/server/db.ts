@@ -145,7 +145,6 @@ safeAlter(`ALTER TABLE pipeline_tracks ADD COLUMN notes TEXT DEFAULT NULL`);
 const safeIndex = (sql: string) => { try { db.exec(sql); } catch { /* already exists */ } };
 safeIndex(`CREATE INDEX IF NOT EXISTS idx_news_items_created_at    ON news_items(created_at DESC)`);
 safeIndex(`CREATE INDEX IF NOT EXISTS idx_chat_history_timestamp   ON chat_history(timestamp ASC)`);
-safeIndex(`CREATE INDEX IF NOT EXISTS idx_portfolio_sync_account   ON portfolio_sync(account_id)`);
 
 // ─── Portfolio sync table (persists bridge state across restarts) ─────────────
 if (!IS_CLOUD_RUN) db.exec(`
@@ -158,6 +157,7 @@ if (!IS_CLOUD_RUN) db.exec(`
 `);
 // Add user_id for per-user portfolio scoping (defaults to 'default' for existing rows)
 safeAlter(`ALTER TABLE portfolio_sync ADD COLUMN user_id TEXT NOT NULL DEFAULT 'default'`);
+safeIndex(`CREATE INDEX IF NOT EXISTS idx_portfolio_sync_account   ON portfolio_sync(account_id)`);
 safeIndex(`CREATE INDEX IF NOT EXISTS idx_portfolio_sync_user ON portfolio_sync(user_id, account_id)`);
 
 // ─── Users table (Google OAuth) ───────────────────────────────────────────────
