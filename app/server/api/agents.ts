@@ -5,7 +5,7 @@ import { requireAuth } from '../middleware/requireAuth.js';
 
 export const agentsRouter = Router();
 
-agentsRouter.get('/', async (_req, res) => {
+agentsRouter.get('/', requireAuth, async (_req, res) => {
   try { res.json(await getPrisma().agents.findMany()); }
   catch (e: any) { res.status(500).json({ error: e.message }); }
 });

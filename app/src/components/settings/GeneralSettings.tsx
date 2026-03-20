@@ -11,7 +11,7 @@ export function GeneralSettings() {
   });
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL || ''}/api/drive-anchor`)
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/drive/anchor`)
       .then(res => {
          if (!res.ok) throw new Error('Auth failed');
          return res.json();
@@ -102,7 +102,7 @@ export function GeneralSettings() {
               <button 
                 onClick={() => {
                    setDriveStatus({ synced: false, checking: true });
-                   fetch(`${import.meta.env.VITE_API_URL || ''}/api/drive-anchor`)
+                   fetch(`${import.meta.env.VITE_API_URL || ''}/api/drive/anchor`)
                       .then(res => { if (!res.ok) throw new Error(); return res.json(); })
                       .then(data => {
                          if (Array.isArray(data) && data.length > 0) {

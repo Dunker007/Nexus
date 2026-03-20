@@ -24,3 +24,21 @@ dist-ssr
 *.sw?
 
 /src/generated/prisma
+
+# Build & debug artifacts
+*.log
+cloudlogs*.json
+eslint_errors*.txt
+eslint_final_check.txt
+tsc_errors.*
+*_build.log
+build_log.txt
+dev_output.log
+vite_build.log
+tauri_build.log
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+prisma/dev.db

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import type { AuthRequest } from '../types.js';
 import { getPrisma } from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 
@@ -21,7 +22,7 @@ const getSyncRow = async (userId: string, accountId: string) => {
 // Portfolio summary for dashboard widget
 portfolioRouter.get('/summary', requireAuth, async (req, res) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as AuthRequest).user!.id;
     const suiData = await getSyncRow(userId, 'sui');
     const altsData = await getSyncRow(userId, 'alts');
 

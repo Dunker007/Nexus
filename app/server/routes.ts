@@ -1,13 +1,16 @@
 import { Express } from 'express';
 import { z } from 'genkit';
-import { search, SafeSearchType } from 'duck-duck-scrape';
-import { getPrisma } from './db.js';
-import { google } from 'googleapis';
 import { GoogleGenAI } from '@google/genai';
-import { driveConfig, ollamaConfig, lmStudioConfig } from './config.js';
-import { required } from './middleware/validate.js';
+import { ollamaConfig, lmStudioConfig } from './config.js';
+import { getPrisma } from './db.js';
 import { requireAuth } from './middleware/requireAuth.js';
 import { ai } from './genkit.js';
+import { callLocalLLM, fetchWithTimeout } from './llm.js';
+import { getGoogleAuth, resolveFolderId } from './google.js';
+import { appendMasterNotes } from './api/drive.js';
+import { google } from 'googleapis';
+
+// Sub-routers
 import { agentsRouter } from './api/agents.js';
 import { chatRouter } from './api/chat.js';
 import { newsRouter } from './api/news.js';
@@ -16,113 +19,9 @@ import { tasksRouter } from './api/tasks.js';
 import { portfolioRouter } from './api/portfolio.js';
 import { pipelineRouter } from './api/pipeline.js';
 import { videoRouter } from './api/video.js';
+import { driveRouter } from './api/drive.js';
+import { memoryRouter } from './api/memory.js';
 import { authRouter } from './auth.js';
-// ─── Google Auth Helper ───────────────────────────────────────────────────────
-
-const getGoogleAuth = (scopes: string[]) => {
-  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_REFRESH_TOKEN) {
-    const auth = new google.auth.OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI
-    );
-    auth.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
-    return auth;
-  }
-
-  const credentialsJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-  if (!credentialsJson) throw new Error('Missing Google Auth Credentials');
-  try {
-    const credentials = JSON.parse(credentialsJson);
-    return new google.auth.GoogleAuth({ credentials, scopes });
-  } catch {
-    throw new Error('Invalid GOOGLE_SERVICE_ACCOUNT_JSON format');
-  }
-};
-
-const DRIVE_ID_RE = /^[a-zA-Z0-9_\-]{10,}$/;
-const resolveFolderId = (id?: string) => {
-  let folderId = id || process.env.GDRIVE_FOLDER_ID || 'root';
-  if (folderId) folderId = folderId.replace(/['"]/g, '').trim().split('?')[0];
-  if (!folderId || folderId === '.') return 'root';
-  if (folderId !== 'root' && !DRIVE_ID_RE.test(folderId)) return 'root';
-  return folderId;
-};
-
-const resolveOpsFileId = () => {
-  let fileId = process.env.GDRIVE_OPS_FILE_ID;
-  if (!fileId) return undefined;
-  fileId = fileId.trim();
-  if (['auto', 'none', 'null', 'false', 'create', ''].includes(fileId.toLowerCase())) return undefined;
-  if (fileId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) return undefined;
-  return fileId;
-};
-
-// ─── Utility ──────────────────────────────────────────────────────────────────
-
-async function fetchWithTimeout(url: string, options: RequestInit, timeout = 15000) {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-  try {
-    const response = await fetch(url, { ...options, signal: controller.signal });
-    clearTimeout(id);
-    return response;
-  } catch (error: any) {
-    clearTimeout(id);
-    if (error.name === 'AbortError') throw new Error(`Request timed out after ${timeout}ms`);
-    throw error;
-  }
-}
-
-// ─── Local LLM Helper (Ollama → LM Studio fallback) ──────────────────────────
-
-async function callLocalLLM(prompt: string, systemPrompt?: string): Promise<string> {
-  // Try Ollama first
-  try {
-    const res = await fetchWithTimeout(`${ollamaConfig.baseUrl}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: ollamaConfig.defaultModel,
-        prompt: systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt,
-        stream: false,
-      }),
-    }, 30000); // 30s for actual generation
-
-    if (res.ok) {
-      const data = await res.json() as any;
-      if (data.response) return data.response;
-    }
-  } catch (err: any) {
-    console.log(`[LLM] Ollama preferred route failed: ${err.message}. Trying LM Studio...`);
-  }
-
-  // Fallback to LM Studio (OpenAI-compatible)
-  try {
-    const res = await fetchWithTimeout(`${lmStudioConfig.baseUrl}/v1/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: lmStudioConfig.defaultModel,
-        messages: [
-          ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
-          { role: 'user', content: prompt },
-        ],
-        stream: false,
-      }),
-    }, 30000);
-
-    if (!res.ok) throw new Error(`LM Studio error: ${res.status}`);
-    const data = await res.json() as any;
-    if (data.choices?.[0]?.message?.content) {
-      return data.choices[0].message.content;
-    }
-    throw new Error('Invalid response format from LM Studio');
-  } catch (err: any) {
-    console.error(`[LLM] Fallback failed: ${err.message}`);
-    throw new Error('AI Inference Engine unreachable. Ensure Ollama or LM Studio is running.');
-  }
-}
 
 // ─── Genkit Flows (Phase 7: Tracing) ─────────────────────────────────────────
 
@@ -172,10 +71,8 @@ export function setupRoutes(app: Express) {
     });
   });
 
-  // ─── AI Inference ────────────────────────────────────────────────────────
+  // ─── AI Inference (Local LLM via Genkit) ──────────────────────────────────
 
-
-  // LLM inference (Ollama / LM Studio — no Gemini)
   app.post('/api/brain-link', requireAuth, async (req, res) => {
     try {
       const schema = z.object({
@@ -186,7 +83,7 @@ export function setupRoutes(app: Express) {
       const { prompt, context, systemPrompt } = schema.parse(req.body);
       const fullPrompt = context ? `${prompt}\n\nContext: ${context}` : prompt;
 
-      // Execute through Genkit flow instead of raw function to generate tracing data
+      // Execute through Genkit flow for tracing
       const text = await llmInferenceFlow({ prompt: fullPrompt, systemPrompt });
 
       res.json({ text });
@@ -196,7 +93,8 @@ export function setupRoutes(app: Express) {
     }
   });
 
-  // ─── Debate Pundits — LM Studio (Tailscale) with MCP ─────────────────────
+  // ─── Debate (Gemini 2.5 Flash + Google Search) ────────────────────────────
+
   app.post('/api/debate', requireAuth, async (req, res) => {
     try {
       const { messages, systemPrompt, agentName } = z.object({
@@ -208,14 +106,6 @@ export function setupRoutes(app: Express) {
         agentName: z.string().optional()
       }).parse(req.body);
 
-      let conversation = '';
-      let lastUserMsg = '';
-      messages.forEach(msg => {
-        if (msg.role === 'user') lastUserMsg = msg.content;
-        conversation += `${msg.role === 'assistant' ? 'Assistant' : 'User'}: ${msg.content}\n\n`;
-      });
-
-      let searchContext = '';
       const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file by wrapping it in <save_note>...</save_note>.\n\nCRITICAL INSTRUCTION 2: If the user asks you to write a lyric, a song, a document, or generate a final markdown asset, you MUST wrap the ENTIRE document content inside a <save_file name="Filename.md">...</save_file> tag. Choose an appropriate filename (like N_SongName_v1.md). This will automatically deploy the file to the artist's Google Drive pipeline!\n\nCRITICAL INSTRUCTION 3: If you use <think> tags to reason, you MUST immediately output your actual response directly below the closing </think> tag! Do NOT stop generating after your thoughts.\n\n`;
       const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
 
@@ -229,9 +119,9 @@ export function setupRoutes(app: Express) {
       const apiKey = process.env.GEMINI_FREE_KEY || process.env.GEMINI_API_KEY;
       if (!apiKey) throw new Error("GEMINI_FREE_KEY is missing from environment");
 
-      const ai = new GoogleGenAI({ apiKey });
+      const genAI = new GoogleGenAI({ apiKey });
       
-      const response = await ai.models.generateContent({
+      const response = await genAI.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: geminiMessages,
         config: {
@@ -242,7 +132,7 @@ export function setupRoutes(app: Express) {
 
       const text = response.text || 'No response.';
 
-      // Extract and save notes completely invisibly in background
+      // Extract and save notes invisibly in background
       const noteMatch = text.match(/<save_note>([\s\S]*?)<\/save_note>/i);
       if (noteMatch) {
          const noteContent = noteMatch[1].trim();
@@ -277,7 +167,8 @@ export function setupRoutes(app: Express) {
     }
   });
 
-  // LLM status check
+  // ─── LLM Status ──────────────────────────────────────────────────────────
+
   app.get('/api/llm/status', async (_req, res) => {
     const status = { ollama: false, lmStudio: false, activeModel: null as string | null };
     try {
@@ -291,216 +182,7 @@ export function setupRoutes(app: Express) {
     res.json(status);
   });
 
-  // ─── Drive Anchor ──────────────────────────────────────────────────────────
-
-  app.get('/api/drive-anchor', requireAuth, async (_req, res) => {
-    try {
-      const auth = getGoogleAuth(driveConfig.scopes);
-      const drive = google.drive({ version: 'v3', auth });
-      const response = await drive.files.list({
-        q: `name = '${driveConfig.brainFolderName}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
-        fields: 'files(id, name)',
-      });
-      let files = response.data.files || [];
-      if (files.length === 0) {
-        const folder = await drive.files.create({
-          requestBody: { name: driveConfig.brainFolderName, mimeType: 'application/vnd.google-apps.folder' },
-          fields: 'id, name',
-        });
-        if (folder.data) files = [folder.data];
-      }
-      res.json(files);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  // ─── Drive Files ──────────────────────────────────────────────────────────
-
-  app.get('/api/drive/files', requireAuth, async (req, res) => {
-    try {
-      const folderId = resolveFolderId(req.query.folderId as string);
-      const auth = getGoogleAuth(driveConfig.scopes);
-      const drive = google.drive({ version: 'v3', auth });
-      const response = await drive.files.list({
-        q: `'${folderId}' in parents and trashed = false`,
-        fields: 'files(id, name, mimeType, webViewLink, iconLink, modifiedTime)',
-        orderBy: 'folder,name',
-        supportsAllDrives: true,
-        includeItemsFromAllDrives: true,
-      });
-      res.json({ files: response.data.files || [] });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post('/api/drive/folders', requireAuth, async (req, res) => {
-    try {
-      const schema = z.object({
-        name: z.string().min(1, 'Name is required'),
-        parentId: z.string().optional()
-      });
-      const { name, parentId } = schema.parse(req.body);
-      const auth = getGoogleAuth(driveConfig.scopes);
-      const drive = google.drive({ version: 'v3', auth });
-      const folder = await drive.files.create({
-        requestBody: {
-          name,
-          mimeType: 'application/vnd.google-apps.folder',
-          parents: [resolveFolderId(parentId)],
-        },
-        fields: 'id, name',
-        supportsAllDrives: true,
-      });
-      res.json(folder.data);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post('/api/drive/files', requireAuth, async (req, res) => {
-    try {
-      const schema = z.object({
-        name: z.string().min(1, 'Name is required'),
-        content: z.string().optional(),
-        mimeType: z.string().optional(),
-        parentId: z.string().optional()
-      });
-      const { name, content, mimeType, parentId } = schema.parse(req.body);
-      const auth = getGoogleAuth(driveConfig.scopes);
-      const drive = google.drive({ version: 'v3', auth });
-      const file = await drive.files.create({
-        requestBody: { name, parents: [resolveFolderId(parentId)] },
-        media: { mimeType: mimeType || 'text/plain', body: content },
-        fields: 'id, name, webViewLink',
-        supportsAllDrives: true,
-      });
-      res.json(file.data);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  // ─── Master Notes ─────────────────────────────────────────────────────────
-
-  async function appendMasterNotes(agentName: string, noteContent: string) {
-    try {
-      const auth = getGoogleAuth(['https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/drive.readonly']);
-      const drive = google.drive({ version: 'v3', auth });
-      const folderId = resolveFolderId();
-      
-      const search = await drive.files.list({
-        q: `name = 'MASTER_NOTES.md' and '${folderId}' in parents and trashed = false`,
-        fields: 'files(id)', pageSize: 1,
-        supportsAllDrives: true, includeItemsFromAllDrives: true,
-      });
-      
-      let fileId = (search.data as any).files?.[0]?.id;
-      let currentContent = '';
-      
-      if (fileId) {
-        const exportRes = await drive.files.export({ fileId, mimeType: 'text/plain' }).catch(() => null);
-        if (exportRes) currentContent = exportRes.data as string;
-        else {
-          const response = await drive.files.get({ fileId, alt: 'media', supportsAllDrives: true }).catch(() => null);
-          if (response) currentContent = response.data as string;
-        }
-      }
-      
-      const timestamp = new Date().toLocaleString('en-US', { timeZoneName: 'short' });
-      const newEntry = `\n\n### [${timestamp}] Finding from ${agentName}\n${noteContent}\n`;
-      const updatedContent = (currentContent + newEntry).trim() + '\n';
-      
-      if (fileId) {
-        await drive.files.update({ fileId, supportsAllDrives: true, media: { mimeType: 'text/plain', body: updatedContent } });
-      } else {
-        await drive.files.create({
-          requestBody: { name: 'MASTER_NOTES.md', parents: [folderId] },
-          media: { mimeType: 'text/plain', body: `# NEXUS MASTER NOTES\n\nShared memory and findings from all DLX agents.${newEntry}` },
-          supportsAllDrives: true,
-        });
-      }
-      console.log(`[Master Notes] Appended note from ${agentName}`);
-    } catch (error: any) {
-      console.error(`[Master Notes] Failed to append note:`, error.message);
-    }
-  }
-
-  // ─── Shared Memory (CURRENT_OPS.md) ───────────────────────────────────────
-
-  app.get('/api/memory/ops', requireAuth, async (_req, res) => {
-    let fileId = resolveOpsFileId();
-    let mimeType = '';
-    try {
-      const auth = getGoogleAuth(['https://www.googleapis.com/auth/drive.readonly']);
-      const drive = google.drive({ version: 'v3', auth });
-      if (!fileId) {
-        const folderId = resolveFolderId();
-        const search = await drive.files.list({
-          q: `name = 'CURRENT_OPS.md' and '${folderId}' in parents and trashed = false`,
-          fields: 'files(id, mimeType)', pageSize: 1,
-          supportsAllDrives: true, includeItemsFromAllDrives: true,
-        });
-        const file = (search.data as any).files?.[0];
-        fileId = file?.id; mimeType = file?.mimeType;
-      } else {
-        const file = await drive.files.get({ fileId, fields: 'mimeType', supportsAllDrives: true });
-        mimeType = file.data.mimeType || '';
-      }
-      if (!fileId) {
-        return res.json({ content: '# NEXUS DAILY OPS\n\nSTATUS: Offline\nMEMORY: Local Only\n\n(Create CURRENT_OPS.md in LuxRig_Brain to enable shared memory)' });
-      }
-      let content = '';
-      if (mimeType?.startsWith('application/vnd.google-apps.')) {
-        const exportRes = await drive.files.export({ fileId, mimeType: 'text/plain' });
-        content = exportRes.data as string;
-      } else {
-        const response = await drive.files.get({ fileId, alt: 'media', supportsAllDrives: true });
-        content = response.data as string;
-      }
-      res.json({ content });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post('/api/memory/ops', requireAuth, async (req, res) => {
-    try {
-      const schema = z.object({
-        content: z.string()
-      });
-      const { content } = schema.parse(req.body);
-      let fileId = resolveOpsFileId();
-      const auth = getGoogleAuth(['https://www.googleapis.com/auth/drive.file']);
-      const drive = google.drive({ version: 'v3', auth });
-      if (!fileId) {
-        const folderId = resolveFolderId();
-        const search = await drive.files.list({
-          q: `name = 'CURRENT_OPS.md' and '${folderId}' in parents and trashed = false`,
-          fields: 'files(id)', pageSize: 1,
-          supportsAllDrives: true, includeItemsFromAllDrives: true,
-        });
-        fileId = (search.data as any).files?.[0]?.id;
-      }
-      if (fileId) {
-        await drive.files.update({ fileId, supportsAllDrives: true, media: { mimeType: 'text/plain', body: content } });
-      } else {
-        const folderId = resolveFolderId();
-        const response = await drive.files.create({
-          requestBody: { name: 'CURRENT_OPS.md', parents: [folderId] },
-          media: { mimeType: 'text/plain', body: content },
-          supportsAllDrives: true,
-        });
-        fileId = response.data.id!;
-      }
-      res.json({ success: true, id: fileId });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  // ─── Agents ───────────────────────────────────────────────────────────────
+  // ─── Mount Sub-Routers ──────────────────────────────────────────────────
 
   app.use('/api/auth', authRouter);
   app.use('/api/agents', agentsRouter);
@@ -512,18 +194,10 @@ export function setupRoutes(app: Express) {
   app.use('/api/smartfolio', portfolioRouter); // Alias for laboratory bridge
   app.use('/api/pipeline', pipelineRouter);
   app.use('/api/video', videoRouter);
+  app.use('/api/drive', driveRouter);
+  app.use('/api/memory', memoryRouter);
 
-  // ─── Google Sheets (Pipeline Sync) ────────────────────────────────────────
-
-  app.get('/api/gsheets/:id', requireAuth, async (req, res) => {
-    try {
-      const spreadsheetId = req.params.id;
-      const range = (req.query.range as string) || 'A:Z';
-      const auth = getGoogleAuth(['https://www.googleapis.com/auth/spreadsheets.readonly']);
-      const sheets = google.sheets({ version: 'v4', auth });
-      const response = await sheets.spreadsheets.values.get({ spreadsheetId: spreadsheetId as string, range: range as string }) as any;
-      res.json(response.data.values || []);
-    } catch (e: any) { res.status(500).json({ error: e.message }); }
-  });
-
+  // Backwards-compatible aliases for moved endpoints
+  app.get('/api/drive-anchor', (req, res) => res.redirect(307, '/api/drive/anchor'));
+  app.get('/api/gsheets/:id', (req, res) => res.redirect(307, `/api/drive/gsheets/${req.params.id}?${new URLSearchParams(req.query as any)}`));
 }

@@ -97,9 +97,11 @@ authRouter.get('/callback', async (req, res) => {
   }
 });
 
+import type { AuthRequest } from './types.js';
+
 // ─── GET /api/auth/me — returns current user from cookie ─────────────────────
 authRouter.get('/me', (req, res) => {
-  const token = (req as any).cookies?.nexus_token;
+  const token = (req as AuthRequest).cookies?.nexus_token;
   if (!token) return res.status(401).json({ user: null });
 
   const user = verifyToken(token);

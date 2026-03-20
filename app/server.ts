@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { setupRoutes } from './server/routes.js';
-import { loadSecrets, requireIAP } from './server/gcp.js';
+import { loadSecrets } from './server/gcp.js';
 import { autoMigrateCloud } from './server/migrate-cloud.js';
 import { initSocket } from './server/socket.js';
 import { logger } from './server/logger.js';
@@ -69,8 +69,7 @@ async function startServer() {
   });
   app.use('/api/', apiLimiter);
 
-  // Phase 4: Google Identity-Aware Proxy Validation
-  app.use('/api/', requireIAP);
+
 
   // Filter non-authorized traffic on local/Tailscale network bindings.
   // On Cloud Run, all traffic arrives via Google's proxy so socket IP is internal — skip filter there.

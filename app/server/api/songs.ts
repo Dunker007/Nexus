@@ -5,7 +5,7 @@ import { requireAuth } from '../middleware/requireAuth.js';
 
 export const songsRouter = Router();
 
-songsRouter.get('/', async (_req, res) => {
+songsRouter.get('/', requireAuth, async (_req, res) => {
   try { res.json(await getPrisma().songs.findMany({ orderBy: { created_at: 'desc' } })); }
   catch (e: any) { res.status(500).json({ error: e.message }); }
 });

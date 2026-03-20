@@ -1,14 +1,15 @@
 import { Router } from 'express';
+import type { AuthRequest } from '../types.js';
 import { getPrisma } from '../db.js';
 import { required } from '../middleware/validate.js';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 
 export const chatRouter = Router();
 
 chatRouter.get('/', requireAuth, async (req, res) => {
   try {
     const { agentId, limit = '200', offset = '0' } = req.query as Record<string, string>;
-    const userId = (req as any).user.id;
+    const userId = (req as AuthRequest).user!.id;
     const take = Math.min(parseInt(limit) || 200, 500);
     const skip = parseInt(offset) || 0;
 
@@ -26,7 +27,7 @@ chatRouter.get('/', requireAuth, async (req, res) => {
 chatRouter.post('/', requireAuth, required(['role', 'content']), async (req, res) => {
   try {
     const { role, content, agent_id } = req.body;
-    const userId = (req as any).user.id;
+    const userId = (req as AuthRequest).user!.id;
     const result = await getPrisma().chat_history.create({
       data: { role, content, agent_id: agent_id ?? null, user_id: userId }
     });
@@ -37,7 +38,7 @@ chatRouter.post('/', requireAuth, required(['role', 'content']), async (req, res
 chatRouter.delete('/', requireAuth, async (req, res) => {
   try {
     const { agentId } = req.query as Record<string, string>;
-    const userId = (req as any).user.id;
+    const userId = (req as AuthRequest).user!.id;
     await getPrisma().chat_history.deleteMany({
       where: { user_id: userId, ...(agentId ? { agent_id: agentId } : {}) }
     });
