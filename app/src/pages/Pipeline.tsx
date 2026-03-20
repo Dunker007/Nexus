@@ -53,7 +53,7 @@ export function Pipeline() {
 
   const fetchTracks = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pipeline`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pipeline`, { credentials: 'include' });
       if (res.ok) {
         const contentType = res.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
@@ -109,6 +109,7 @@ export function Pipeline() {
       };
       const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pipeline`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newTrack),
       });
@@ -126,6 +127,7 @@ export function Pipeline() {
       const updatedTrack = { ...selectedTrack, ...editForm };
       const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pipeline/${selectedTrack.id}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedTrack),
       });
@@ -155,6 +157,7 @@ export function Pipeline() {
         
         const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pipeline/${selectedTrack.id}`, {
           method: 'PUT',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedTrack),
         });
@@ -171,7 +174,7 @@ export function Pipeline() {
     setSyncing(true);
     toast.info('Syncing Pipeline…');
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pipeline/sync`, { method: 'POST' });
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pipeline/sync`, { method: 'POST', credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.tracks) {

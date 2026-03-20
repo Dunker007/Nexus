@@ -11,6 +11,7 @@ export async function bridgeFetch(path: string, options: RequestInit = {}) {
   const url = path.startsWith('http') ? path : `${BRIDGE_URL}${path}`;
   
   const response = await fetch(url, {
+    credentials: 'include',
     ...options,
     headers: {
       'Content-Type': 'application/json',

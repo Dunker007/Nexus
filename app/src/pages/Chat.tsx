@@ -146,7 +146,7 @@ export function Chat() {
   // --- Actions ---
   async function fetchAllModels() {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/llm/status`, { cache: 'no-store' });
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/llm/status`, { cache: 'no-store', credentials: 'include' });
       if (!res.ok) return;
       const data = await res.json();
       
@@ -210,7 +210,7 @@ export function Chat() {
     if (!window.confirm('Clear all chat history? This cannot be undone.')) return;
     setMessages([]);
     localStorage.removeItem('nexus-chat-messages');
-    fetch(`${import.meta.env.VITE_API_URL || ''}/api/chat`, { method: 'DELETE' }).catch(console.error);
+    fetch(`${import.meta.env.VITE_API_URL || ''}/api/chat`, { method: 'DELETE', credentials: 'include' }).catch(console.error);
   };
 
   async function sendMessage() {
@@ -236,6 +236,7 @@ export function Chat() {
     try {
       await fetch(`${import.meta.env.VITE_API_URL || ''}/api/chat`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: 'user', content: userMsg.content }),
       }).catch(console.error);
@@ -252,6 +253,7 @@ export function Chat() {
         }));
       res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/debate`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           messages: debateMessages,
@@ -284,6 +286,7 @@ export function Chat() {
 
       await fetch(`${import.meta.env.VITE_API_URL || ''}/api/chat`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: 'assistant', content: reply }),
       }).catch(console.error);

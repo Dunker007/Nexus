@@ -78,11 +78,10 @@ authRouter.get('/callback', async (req, res) => {
 
     const token = signToken({ id: userId, email, name });
 
-    // Set HTTP-only cookie
     res.cookie('nexus_token', token, {
       httpOnly: true,
-      secure: IS_PROD,
-      sameSite: IS_PROD ? 'none' : 'lax',
+      secure: true, // Required for cross-site cookies
+      sameSite: 'none', // Required to allow Netlify to reach the local bridge API
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: '/',
     });

@@ -16,7 +16,8 @@ export function Drive() {
     setLoading(true); setError(null);
     try {
       const url = folderId ? `/api/drive/files?folderId=${folderId}` : '/api/drive/files';
-      const res = await fetch(url);
+      const baseUrl = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${baseUrl}${url}`, { credentials: 'include' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setFiles(data.files);
