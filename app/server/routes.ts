@@ -214,59 +214,60 @@ export function setupRoutes(app: Express) {
       });
 
       let searchContext = '';
-      // Aggressive keyword matching for dynamic searches
-      const isSearchLikely = /weather|forecast|news|who is|what is|when did|what's the|price|stock|current|today|latest|score|update/i.test(lastUserMsg);
-      if (isSearchLikely || lastUserMsg.length > 40) {
-        try {
-            console.log(`[Search] Intercepted likely search query, fetching live DuckDuckGo data for: "${lastUserMsg.substring(0, 30)}..."`);
-            const ddg = await search(lastUserMsg, { safeSearch: SafeSearchType.MODERATE });
-            if (ddg && ddg.results && ddg.results.length > 0) {
-                searchContext = "\n\n[LIVE SEARCH CONTEXT PULLED FROM THE INTERNET JUST SECONDS AGO]:\n";
-                ddg.results.slice(0, 4).forEach((r: any) => {
-                    searchContext += `--- Result ---\nTitle: ${r.title}\nSnippet: ${r.description}\nSource: ${r.url}\n\n`;
-                });
-                searchContext += "You MUST weave these exact real-time results into your answer. Do not hallucinate data that contradicts these results.\n";
-            }
-        } catch (e: any) {
-            console.error('[Search] DuckDuckGo native search failed', e.message);
-        }
-      }
+      const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file by wrapping it in <save_note>...</save_note>. \n\nCRITICAL INSTRUCTION 2: If the user asks you to write a lyric, a song, a document, or generate a final markdown asset, you MUST wrap the ENTIRE document content inside a <save_file name="Filename.md">...</save_file> tag. Choose an appropriate filename (like N_SongName_v1.md). This will automatically deploy the file to the artist's Google Drive pipeline!\n\n`;
+      const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
 
-      const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file. To save a note, include it in your response wrapped exactly like this:\n<save_note>Your specific finding or note here</save_note>\n\n`;
-      const finalSystemPrompt = systemPrompt ? timeContext + searchContext + systemPrompt : timeContext + searchContext;
+      // Map to Gemini's format
+      const geminiMessages = messages.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+      }));
 
-      const inputStr = conversation.trim() + '\n\nAssistant:';
-      const lmStudioUrl = 'http://100.74.130.117:1234/api/v1/chat';
-      
-      const body = {
-        model: "qwen3-4b-claude-sonnet-4-reasoning-distill-safetensor",
-        system_prompt: finalSystemPrompt,
-        input: inputStr
-      };
+      // Call Gemini 2.5 Flash with native Google Search
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) throw new Error("GEMINI_API_KEY is missing from environment");
 
-      const r = await fetch(lmStudioUrl, { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(body) 
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: finalSystemPrompt }] },
+          contents: geminiMessages,
+          tools: [{ googleSearch: {} }] // Enable native Google Grounding!
+        })
       });
 
       const data: any = await r.json();
-      if (!r.ok) throw new Error(data?.error?.message || 'LM Studio API error');
+      if (!r.ok) throw new Error(data?.error?.message || 'Gemini API error');
       
-      const text = data?.output?.[0]?.content || data?.text || data?.response || data?.choices?.[0]?.message?.content || data?.content || 'No response.';
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response.';
 
-      // Extract and save notes
+      // Extract and save notes completely invisibly in background
       const noteMatch = text.match(/<save_note>([\s\S]*?)<\/save_note>/i);
       if (noteMatch) {
          const noteContent = noteMatch[1].trim();
-         
-         let fallbackAgentName = 'AI Agent';
-         if (systemPrompt?.includes('You are Lux')) fallbackAgentName = 'Lux';
-         else if (systemPrompt?.includes('You are Newsician')) fallbackAgentName = 'Newsician';
-         else if (systemPrompt?.includes('You are QPL')) fallbackAgentName = 'QPL';
-         
-         const finalAgentName = agentName || fallbackAgentName;
-         appendMasterNotes(finalAgentName, noteContent).catch(console.error);
+         const fallbackAgentName = systemPrompt?.includes('You are Newsician') ? 'Newsician' : systemPrompt?.includes('You are QPL') ? 'QPL' : 'Lux';
+         appendMasterNotes(agentName || fallbackAgentName, noteContent).catch(console.error);
+      }
+
+      // Check for document saves to Drive
+      const fileMatch = text.match(/<save_file name="([^"]+)">([\s\S]*?)<\/save_file>/i);
+      if (fileMatch) {
+         const filename = fileMatch[1].trim();
+         const fileContent = fileMatch[2].trim();
+         try {
+             const auth = getGoogleAuth(['https://www.googleapis.com/auth/drive.file']);
+             const drive = google.drive({ version: 'v3', auth });
+             const parentId = resolveFolderId();
+             await drive.files.create({
+                 requestBody: { name: filename, parents: [parentId], mimeType: 'text/markdown' },
+                 media: { mimeType: 'text/markdown', body: fileContent },
+                 supportsAllDrives: true
+             });
+             console.log(`[Drive] Saved generative file to Drive: ${filename}`);
+         } catch (err: any) {
+             console.error('[Drive] Failed to save generative file:', err.message);
+         }
       }
 
       res.json({ text });

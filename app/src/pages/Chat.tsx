@@ -500,7 +500,7 @@ export function Chat() {
                          <p className="whitespace-pre-wrap">{msg.content}</p>
                        ) : (
                          <div className="flex flex-col gap-2">
-                           {msg.content.split(/(<think>[\s\S]*?(?:<\/think>|$)|<save_note>[\s\S]*?(?:<\/save_note>|$))/gi).map((token, i) => {
+                           {msg.content.split(/(<think>[\s\S]*?(?:<\/think>|$)|<save_note>[\s\S]*?(?:<\/save_note>|$)|<save_file name="[^"]+">[\s\S]*?(?:<\/save_file>|$))/gi).map((token, i) => {
                               if (/^<think>([\s\S]*?)(?:<\/think>|$)/i.test(token)) {
                                 const inner = token.replace(/^<think>/i, '').replace(/<\/think>$/i, '').trim();
                                 return (
@@ -524,6 +524,21 @@ export function Chat() {
                                        <div className="text-[9px] font-black uppercase tracking-widest mb-1 opacity-60">Auto-Synced to Master Notes</div>
                                        <div className="text-sm italic">{inner || '...'}</div>
                                      </div>
+                                  </div>
+                                );
+                              }
+                              if (/^<save_file name="([^"]+)">([\s\S]*?)(?:<\/save_file>|$)/i.test(token)) {
+                                const match = token.match(/^<save_file name="([^"]+)">([\s\S]*?)(?:<\/save_file>|$)/i);
+                                const filename = match?.[1] || 'Unknown.md';
+                                const content = match?.[2] || '';
+                                return (
+                                  <div key={i} className="my-3 p-4 rounded-xl border border-cyan-500/30 bg-cyan-900/10 flex flex-col gap-3 shadow-[0_0_15px_rgba(6,182,212,0.1)]">
+                                     <div className="flex items-center gap-2 text-cyan-400">
+                                        <Database size={16} />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Saved to Google Drive</span>
+                                     </div>
+                                     <div className="text-white font-bold text-sm tracking-tight">{filename}</div>
+                                     <div className="text-sm text-white/60 line-clamp-3 italic opacity-80 pl-2 border-l-2 border-cyan-500/30">{content.trim()}</div>
                                   </div>
                                 );
                               }
