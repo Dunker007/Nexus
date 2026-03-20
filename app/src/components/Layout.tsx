@@ -58,8 +58,11 @@ export function Layout() {
       <KeyboardShortcuts />
       <CommandPalette />
 
+      {/* Skip to main content link */}
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+
       {/* Top Navigation Bar */}
-      <nav className="flex-none h-16 border-b border-white/5 bg-[var(--glass-bg)] backdrop-blur-2xl relative z-50 px-4 md:px-6">
+      <nav aria-label="Main navigation" className="flex-none h-16 border-b border-white/5 bg-[var(--glass-bg)] backdrop-blur-2xl relative z-50 px-4 md:px-6">
         <div className="h-full max-w-[1600px] mx-auto flex items-center justify-between">
           
           {/* Logo Section */}
@@ -112,11 +115,12 @@ export function Layout() {
                 <ThemeToggle />
             </div>
             
-            <button 
+            <button
                 onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
                 className="hidden xl:flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 transition-all text-[10px] font-black uppercase tracking-widest"
+                aria-label="Open command palette (Ctrl+K)"
             >
-                <CommandIcon className="w-3.5 h-3.5" />
+                <CommandIcon className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>Ctrl+K</span>
             </button>
 
@@ -124,6 +128,9 @@ export function Layout() {
               <button
                 onClick={() => setShowProfileMenu(v => !v)}
                 className="relative p-0.5 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-white/10 hover:border-cyan-500/40 transition-all"
+                aria-label="User profile menu"
+                aria-expanded={showProfileMenu}
+                aria-haspopup="true"
               >
                 <div className="w-9 h-9 rounded-[14px] bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center font-black text-black overflow-hidden">
                   {user?.picture
@@ -141,6 +148,8 @@ export function Layout() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -8 }}
                     className="absolute right-0 top-12 w-52 bg-[var(--bg-deep)]/95 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-50"
+                    role="menu"
+                    aria-label="User menu"
                   >
                     <div className="px-4 py-3 border-b border-white/5">
                       <div className="text-[9px] font-black text-white/60 uppercase tracking-widest truncate">{user?.name}</div>
@@ -149,8 +158,9 @@ export function Layout() {
                     <button
                       onClick={() => { setShowProfileMenu(false); logout(); }}
                       className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                      role="menuitem"
                     >
-                      <LogOut size={13} />
+                      <LogOut size={13} aria-hidden="true" />
                       Sign out
                     </button>
                   </motion.div>
@@ -159,11 +169,14 @@ export function Layout() {
             </div>
 
             {/* Mobile Menu Toggle */}
-            <button 
+            <button
                 className="lg:hidden w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-all border border-white/5"
                 onClick={() => setMobileOpen(!mobileOpen)}
+                aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-expanded={mobileOpen}
+                aria-controls="mobile-menu"
             >
-                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {mobileOpen ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
             </button>
           </div>
         </div>
@@ -173,10 +186,13 @@ export function Layout() {
       <AnimatePresence>
         {mobileOpen && (
             <motion.div
+                id="mobile-menu"
                 initial={{ opacity: 0, scale: 0.95, y: -20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -20 }}
                 className="lg:hidden absolute top-20 left-4 right-4 bg-[var(--bg-deep)]/95 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden z-[60] shadow-2xl p-4"
+                role="navigation"
+                aria-label="Mobile navigation"
             >
                 <div className="grid grid-cols-2 gap-3">
                     {navItems.map((item) => {
@@ -204,7 +220,7 @@ export function Layout() {
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full overflow-x-hidden overflow-y-auto relative z-10 custom-scrollbar">
+      <main id="main-content" className="flex-1 w-full overflow-x-hidden overflow-y-auto relative z-10 custom-scrollbar">
         <PageTransition>
           <Outlet />
         </PageTransition>

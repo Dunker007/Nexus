@@ -24,7 +24,7 @@ export function NavigationItem({ to, icon: Icon, label, shortcut, isHovered }: N
     >
       {({ isActive }) => (
         <>
-          <Icon className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-cyan-400' : ''}`} />
+          <Icon className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-cyan-400' : ''}`} aria-hidden="true" />
           <span>{label}</span>
           
           {/* Active Indicator Underline */}
@@ -48,6 +48,7 @@ export function NavigationItem({ to, icon: Icon, label, shortcut, isHovered }: N
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
+                role="tooltip"
               >
                 {shortcut}
               </motion.div>

@@ -21,6 +21,9 @@ export function ShortcutModal({ onClose, groupedShortcuts }: ShortcutModalProps)
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: -20 }}
       transition={{ duration: 0.2 }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Keyboard shortcuts"
     >
       <FocusTrap onEscape={onClose}>
         <div className="bg-[#0a0a0f]/95 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden glass-panel">
@@ -38,8 +41,9 @@ export function ShortcutModal({ onClose, groupedShortcuts }: ShortcutModalProps)
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              aria-label="Close keyboard shortcuts"
             >
-              <X size={20} className="text-gray-400" />
+              <X size={20} className="text-gray-400" aria-hidden="true" />
             </button>
           </div>
 

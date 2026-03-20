@@ -209,7 +209,7 @@ export default function PageLayout({
 
       {/* Decorative floating orbs */}
       {showDecorations && (
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
           <div className={`absolute top-1/4 right-1/4 w-80 h-80 ${orbs[0]} rounded-full blur-3xl animate-pulse`} />
           <div className={`absolute bottom-1/3 left-1/4 w-64 h-64 ${orbs[1]} rounded-full blur-3xl`} style={{ animationDelay: '1s' }} />
           <div className={`absolute top-1/2 right-1/3 w-48 h-48 ${orbs[2]} rounded-full blur-2xl animate-pulse`} style={{ animationDelay: '2s' }} />

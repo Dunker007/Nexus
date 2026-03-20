@@ -33,7 +33,7 @@ export function GeneralSettings() {
     <div className="glass-card border-white/5 bg-white/[0.01] overflow-hidden min-h-[600px] flex flex-col">
       <div className="p-10 flex-1">
         <div className="flex items-center gap-4 mb-12 pb-6 border-b border-white/5">
-           <div className="w-1.5 h-6 bg-purple-500 rounded-full" />
+           <div className="w-1.5 h-6 bg-purple-500 rounded-full" aria-hidden="true" />
            <h2 className="text-xl font-bold text-white tracking-wide">General Settings</h2>
         </div>
         
@@ -58,8 +58,12 @@ export function GeneralSettings() {
                  <div className="text-sm font-bold text-white tracking-wide">Remote Access (Tailscale)</div>
                  <p className="text-xs text-white/40">Manage your secure remote connection to the local server.</p>
                </div>
-               <motion.div 
+               <motion.div
                   whileHover={{ scale: 1.05 }}
+                  role="switch"
+                  aria-checked="true"
+                  aria-label="Toggle remote access"
+                  tabIndex={0}
                   className="w-14 h-7 bg-purple-500/20 border border-purple-500/40 rounded-full relative cursor-pointer"
                >
                   <div className="absolute right-1 top-1 w-5 h-5 bg-purple-400 rounded-full shadow-[0_0_15px_rgba(168,85,247,0.6)]" />
@@ -118,7 +122,7 @@ export function GeneralSettings() {
             <div className="relative group overflow-hidden bg-[#0d0d14] rounded-2xl border border-white/5">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500/[0.03] to-cyan-500/[0.03] opacity-0 group-hover:opacity-100 transition-all duration-700" />
                 <div className="p-8 relative z-10">
-                  <div className="flex items-center gap-4 mb-4">
+                  <div role="status" aria-label="Drive connection status" className="flex items-center gap-4 mb-4">
                     {driveStatus.checking ? (
                        <>
                          <div className="w-2.5 h-2.5 rounded-full bg-white/20 animate-pulse" />
@@ -149,7 +153,7 @@ export function GeneralSettings() {
 
       <div className="p-8 border-t border-white/5 bg-white/[0.01] flex justify-between items-center mt-auto">
         <div className="flex items-center gap-2 text-xs font-medium text-white/30">
-          <Clock size={14} /> Last saved: {new Date().toLocaleTimeString()}
+          <Clock size={14} aria-hidden="true" /> Last saved: {new Date().toLocaleTimeString()}
         </div>
         <button
           onClick={() => toast.success('Settings saved successfully')}

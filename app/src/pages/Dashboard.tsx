@@ -165,7 +165,7 @@ export function Dashboard() {
     return (
       <ErrorBoundary>
         <Suspense fallback={
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center h-full" role="status" aria-label="Loading widget">
             <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin shadow-[0_0_10px_rgba(6,182,212,0.4)]" />
           </div>
         }>
@@ -271,8 +271,8 @@ export function Dashboard() {
                       <span className="text-sm scale-110 grayscale group-hover:grayscale-0 transition-all filter drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]">{widget.icon}</span> {widget.title}
                     </h3>
                     {editMode && (
-                      <button onClick={() => removeWidget(widget.i)} className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all hover:scale-110">
-                        <X size={14} />
+                      <button onClick={() => removeWidget(widget.i)} className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all hover:scale-110" aria-label={`Remove ${widget.title} widget`}>
+                        <X size={14} aria-hidden="true" />
                       </button>
                     )}
                   </div>
@@ -296,13 +296,14 @@ export function Dashboard() {
       {/* Widget Picker Modal */}
       <AnimatePresence>
         {showWidgetPicker && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Add widget">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/80 backdrop-blur-md"
               onClick={() => setShowWidgetPicker(false)}
+              aria-hidden="true"
             />
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 30 }}
@@ -316,13 +317,13 @@ export function Dashboard() {
               <div className="flex items-center justify-between mb-10 relative z-10">
                 <div>
                   <h2 className="text-2xl font-black flex items-center gap-3 tracking-tighter text-white">
-                    <Plus className="text-cyan-400 w-6 h-6" />
+                    <Plus className="text-cyan-400 w-6 h-6" aria-hidden="true" />
                     INTERFACE <span className="text-cyan-400">MODULES</span>
                   </h2>
                   <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.2em] mt-1">Select capability to hot-swap into local OS</p>
                 </div>
-                <button onClick={() => setShowWidgetPicker(false)} className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/30 hover:text-white transition-all transform hover:rotate-90">
-                  <X size={20} />
+                <button onClick={() => setShowWidgetPicker(false)} className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/30 hover:text-white transition-all transform hover:rotate-90" aria-label="Close widget picker">
+                  <X size={20} aria-hidden="true" />
                 </button>
               </div>
 
@@ -334,6 +335,7 @@ export function Dashboard() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.03 }}
                     onClick={() => addWidget(type as WidgetType)}
+                    aria-label={`Add ${config.title} widget`}
                     className="p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-cyan-500/10 hover:border-cyan-500/40 text-left transition-all group flex flex-col items-center justify-center text-center gap-4 relative overflow-hidden"
                   >
                     <div className="text-4xl bg-black/40 p-4 rounded-2xl group-hover:scale-110 group-hover:bg-cyan-500/20 transition-all duration-300 shadow-xl group-hover:shadow-cyan-500/10">

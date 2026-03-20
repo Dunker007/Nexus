@@ -13,6 +13,7 @@ export function Backdrop({ onClick, className = '' }: BackdropProps) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClick}
+      aria-hidden="true"
     />
   );
 }

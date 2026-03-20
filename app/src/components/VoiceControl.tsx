@@ -127,7 +127,7 @@ export default function VoiceControl() {
     if (!hasSupport) return null;
 
     return (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 pointer-events-none">
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 pointer-events-none" role="region" aria-label="Voice control">
             <AnimatePresence>
                 {(transcript || response || processing) && (
                     <motion.div
@@ -160,20 +160,22 @@ export default function VoiceControl() {
                 onClick={toggleListening}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                aria-label={isListening ? 'Stop listening' : 'Start voice command'}
+                aria-pressed={isListening}
                 className={`pointer-events-auto w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-xl group ${
-                    isListening 
-                    ? 'bg-rose-500 text-white shadow-rose-500/20' 
+                    isListening
+                    ? 'bg-rose-500 text-white shadow-rose-500/20'
                     : 'bg-[#1a1a24] text-white/60 hover:text-white border border-white/5 hover:border-cyan-500/50 shadow-black'
                 }`}
             >
                 {isListening ? (
                     <div className="relative">
-                        <MicOff className="w-5 h-5" />
-                        <span className="absolute -inset-4 bg-rose-500/20 rounded-full animate-ping"></span>
+                        <MicOff className="w-5 h-5" aria-hidden="true" />
+                        <span className="absolute -inset-4 bg-rose-500/20 rounded-full animate-ping" aria-hidden="true"></span>
                     </div>
                 ) : (
                     <div className="flex flex-col items-center">
-                        <Mic className="w-5 h-5 group-hover:text-cyan-400 transition-colors" />
+                        <Mic className="w-5 h-5 group-hover:text-cyan-400 transition-colors" aria-hidden="true" />
                     </div>
                 )}
             </motion.button>

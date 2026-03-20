@@ -163,6 +163,11 @@
   transform: translateY(-1px) scale(0.98);
 }
 
+.btn-premium:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
 /* Ghost button variant */
 .btn-ghost {
   background: transparent;
@@ -200,6 +205,11 @@
   color: #030305;
   border-color: #00f5d4;
   box-shadow: 0 0 30px rgba(0, 245, 212, 0.5);
+}
+
+.btn-ghost:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
 }
 
 /* ========================================

@@ -40,30 +40,33 @@ export function Settings() {
           {/* Sidebar Navigation */}
           <div className="lg:col-span-3 space-y-6">
             <div className="glass-card p-4 border-white/5 bg-white/[0.01]">
-              <h3 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-6 ml-4">Preferences</h3>
-              <div className="space-y-1">
+              <h2 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-6 ml-4">Preferences</h2>
+              <div className="space-y-1" role="tablist" aria-label="Settings sections">
                 {TABS.map((tab) => (
                   <button
                     key={tab.id}
+                    role="tab"
+                    aria-selected={activeTab === tab.id}
+                    aria-controls={`settings-panel-${tab.id}`}
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full flex items-center justify-between px-5 py-4 rounded-xl transition-all border ${
-                      activeTab === tab.id 
-                        ? 'bg-purple-500/10 border-purple-500/30 text-white shadow-xl shadow-purple-950/20' 
+                      activeTab === tab.id
+                        ? 'bg-purple-500/10 border-purple-500/30 text-white shadow-xl shadow-purple-950/20'
                         : 'text-white/40 border-transparent hover:bg-white/[0.02] hover:text-white/70'
                     }`}
                   >
                     <div className="flex items-center gap-4">
-                      <tab.icon size={18} className={activeTab === tab.id ? 'text-purple-400' : 'text-white/20'} />
+                      <tab.icon size={18} className={activeTab === tab.id ? 'text-purple-400' : 'text-white/20'} aria-hidden="true" />
                       <span className="text-xs font-bold tracking-wide">{tab.label}</span>
                     </div>
-                    {activeTab === tab.id && <div className="w-1.5 h-4 bg-purple-500 rounded-full" />}
+                    {activeTab === tab.id && <div className="w-1.5 h-4 bg-purple-500 rounded-full" aria-hidden="true" />}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="glass-card p-6 border-white/5 bg-gradient-to-br from-purple-500/[0.02] to-transparent">
-               <h4 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-4">System Status</h4>
+               <h2 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-4">System Status</h2>
                <div className="space-y-4">
                   <div className="flex items-center justify-between">
                      <div className="flex items-center gap-3 text-white/50">
@@ -84,7 +87,7 @@ export function Settings() {
           </div>
 
           {/* Main Configuration Workspace */}
-          <div className="lg:col-span-9">
+          <div className="lg:col-span-9" role="tabpanel" id={`settings-panel-${activeTab}`} aria-label={`${TABS.find(t => t.id === activeTab)?.label} settings`}>
              {activeTab === 'general' && <GeneralSettings />}
              {activeTab === 'ai' && <LocalModelsSettings />}
              {activeTab === 'privacy' && <PrivacySettings />}

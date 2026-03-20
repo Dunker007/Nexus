@@ -120,24 +120,30 @@ export function Studios() {
           icon={<Sparkles size={24} className="text-cyan-400" />}
           actions={
             <div className="flex items-center gap-4">
-               <div className="flex bg-white/5 border border-white/5 p-1 rounded-xl backdrop-blur-md">
-                <button 
+               <div className="flex bg-white/5 border border-white/5 p-1 rounded-xl backdrop-blur-md" role="group" aria-label="View mode">
+                <button
                   onClick={() => setViewMode('grid')}
+                  aria-label="Grid view"
+                  aria-pressed={viewMode === 'grid'}
                   className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white/10 text-white' : 'text-white/20 hover:text-white/40'}`}
                 >
-                  <LayoutGrid size={16} />
+                  <LayoutGrid size={16} aria-hidden="true" />
                 </button>
-                <button 
+                <button
                   onClick={() => setViewMode('compact')}
+                  aria-label="Compact view"
+                  aria-pressed={viewMode === 'compact'}
                   className={`p-2 rounded-lg transition-all ${viewMode === 'compact' ? 'bg-white/10 text-white' : 'text-white/20 hover:text-white/40'}`}
                 >
-                  <Grid3X3 size={16} />
+                  <Grid3X3 size={16} aria-hidden="true" />
                 </button>
-                <button 
+                <button
                   onClick={() => setViewMode('list')}
+                  aria-label="List view"
+                  aria-pressed={viewMode === 'list'}
                   className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white/10 text-white' : 'text-white/20 hover:text-white/40'}`}
                 >
-                  <List size={16} />
+                  <List size={16} aria-hidden="true" />
                 </button>
               </div>
               <StatPill label={`${studios.length} Nodes`} color="cyan" />
@@ -187,10 +193,13 @@ export function Studios() {
                     <Link
                       to={isLocked ? '#' : studio.href}
                       className={`block group h-full relative ${isLocked ? 'cursor-not-allowed opacity-40' : ''}`}
+                      aria-disabled={isLocked}
+                      tabIndex={isLocked ? -1 : undefined}
+                      onClick={isLocked ? (e: React.MouseEvent) => e.preventDefault() : undefined}
                     >
                       <div className="h-full glass-card border-white/5 bg-black/40 p-6 flex flex-col group-hover:border-cyan-500/40 transition-all group-hover:bg-cyan-500/[0.02] shadow-xl group-hover:shadow-cyan-900/10">
                         <div className="flex items-start justify-between mb-6">
-                           <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                           <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform" aria-hidden="true">
                              {studio.icon}
                            </div>
                            <StatPill 
@@ -198,7 +207,7 @@ export function Studios() {
                              color={studio.status === 'live' ? 'green' : studio.status === 'beta' ? 'cyan' : 'purple'} 
                            />
                         </div>
-                        <h3 className="text-sm font-black text-white uppercase tracking-tight mb-2 group-hover:text-cyan-400 transition-colors">{studio.name}</h3>
+                        <h2 className="text-sm font-black text-white uppercase tracking-tight mb-2 group-hover:text-cyan-400 transition-colors">{studio.name}</h2>
                         <p className="text-[10px] text-white/20 font-black leading-relaxed uppercase tracking-widest mb-6 flex-1">{studio.description}</p>
                         <div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
                            {studio.features.slice(0, 2).map(f => (
@@ -228,10 +237,13 @@ export function Studios() {
                 <Link
                   key={studio.id}
                   to={studio.status === 'coming-soon' ? '#' : studio.href}
+                  aria-disabled={studio.status === 'coming-soon'}
+                  tabIndex={studio.status === 'coming-soon' ? -1 : undefined}
+                  onClick={studio.status === 'coming-soon' ? (e: React.MouseEvent) => e.preventDefault() : undefined}
                   className={`group relative ${studio.status === 'coming-soon' ? 'cursor-not-allowed opacity-30 shadow-none' : ''}`}
                 >
                   <div className="glass-card p-4 border-white/5 bg-black/40 text-center flex flex-col items-center gap-3 hover:border-cyan-500/30 transition-all hover:bg-cyan-500/[0.05] hover:scale-105">
-                     <span className="text-3xl filter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{studio.icon}</span>
+                     <span className="text-3xl filter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]" aria-hidden="true">{studio.icon}</span>
                      <div className="min-w-0 w-full">
                         <div className="text-[9px] font-black text-white uppercase tracking-tighter truncate">{studio.name.replace('DLX ', '')}</div>
                         <div className={`text-[7px] font-black uppercase tracking-widest mt-1 ${studio.status === 'live' ? 'text-green-500' : studio.status === 'beta' ? 'text-cyan-500' : 'text-purple-500'}`}>
@@ -256,12 +268,15 @@ export function Studios() {
                 <Link
                   key={studio.id}
                   to={studio.status === 'coming-soon' ? '#' : studio.href}
+                  aria-disabled={studio.status === 'coming-soon'}
+                  tabIndex={studio.status === 'coming-soon' ? -1 : undefined}
+                  onClick={studio.status === 'coming-soon' ? (e: React.MouseEvent) => e.preventDefault() : undefined}
                   className={`group block ${studio.status === 'coming-soon' ? 'cursor-not-allowed opacity-30' : ''}`}
                 >
                   <div className="glass-card px-8 py-5 border-white/5 bg-black/40 hover:border-cyan-500/30 transition-all hover:bg-cyan-500/[0.02] flex items-center gap-8">
                      <span className="text-2xl w-10 flex-shrink-0 group-hover:scale-110 transition-transform">{studio.icon}</span>
                      <div className="w-48 flex-shrink-0">
-                        <h3 className="text-sm font-black text-white uppercase tracking-tight group-hover:text-cyan-400 transition-colors uppercase">{studio.name}</h3>
+                        <h2 className="text-sm font-black text-white uppercase tracking-tight group-hover:text-cyan-400 transition-colors uppercase">{studio.name}</h2>
                      </div>
                      <p className="flex-1 text-[10px] text-white/20 font-black uppercase tracking-widest truncate">{studio.description}</p>
                      <div className="hidden lg:flex items-center gap-3">

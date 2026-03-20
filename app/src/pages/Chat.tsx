@@ -312,6 +312,7 @@ export function Chat() {
         <motion.aside
           animate={{ width: sidebarOpen ? 300 : 80 }}
           className="border-r border-white/5 bg-black/40 backdrop-blur-xl flex flex-col shrink-0 relative z-20 shadow-2xl transition-all"
+          aria-label="Chat workspace"
         >
           <div className="p-8 border-b border-white/5 flex items-center justify-between">
             {sidebarOpen && (
@@ -323,8 +324,10 @@ export function Chat() {
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className={`w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/30 hover:text-white transition-all ${!sidebarOpen && 'mx-auto'}`}
+              aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+              aria-expanded={sidebarOpen}
             >
-              <ChevronRight size={16} className={`transition-transform ${sidebarOpen ? 'rotate-180' : ''}`} />
+              <ChevronRight size={16} className={`transition-transform ${sidebarOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
             </button>
           </div>
 
@@ -430,12 +433,12 @@ export function Chat() {
 
              <div className="flex items-center gap-2">
                 {viewMode === 'models' && (
-                   <button onClick={() => setShowPromptEditor(!showPromptEditor)} className={`p-2 rounded-lg border transition-all ${showPromptEditor ? 'bg-purple-500/20 border-purple-500/40 text-purple-400' : 'bg-white/5 border-white/5 text-white/30 hover:text-white'}`}>
-                      <Settings size={14} />
+                   <button onClick={() => setShowPromptEditor(!showPromptEditor)} aria-label="Toggle system prompt editor" aria-expanded={showPromptEditor} className={`p-2 rounded-lg border transition-all ${showPromptEditor ? 'bg-purple-500/20 border-purple-500/40 text-purple-400' : 'bg-white/5 border-white/5 text-white/30 hover:text-white'}`}>
+                      <Settings size={14} aria-hidden="true" />
                    </button>
                 )}
-                <button onClick={clearChat} className="p-2 rounded-lg bg-white/5 border border-white/5 text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-all">
-                  <Trash2 size={14} />
+                <button onClick={clearChat} className="p-2 rounded-lg bg-white/5 border border-white/5 text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-all" aria-label="Clear chat history">
+                  <Trash2 size={14} aria-hidden="true" />
                 </button>
              </div>
           </div>
@@ -464,7 +467,7 @@ export function Chat() {
           </AnimatePresence>
 
           {/* Buffer Message Field */}
-          <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8 custom-scrollbar relative">
+          <div role="log" aria-label="Chat messages" aria-live="polite" className="flex-1 overflow-y-auto px-6 py-8 space-y-8 custom-scrollbar relative">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center opacity-40 select-none">
                 <div className="text-[8px] font-black uppercase tracking-[0.4em] text-white/30 mb-2">NEURAL LINK READY</div>
@@ -556,9 +559,9 @@ export function Chat() {
             )}
 
             {loading && !streaming && (
-               <div className="flex justify-center py-4">
+               <div className="flex justify-center py-4" role="status" aria-label="Loading response">
                   <div className="flex items-center gap-4 px-5 py-2 rounded-full bg-white/5 border border-white/5 shadow-2xl">
-                     <Loader2 size={14} className="animate-spin text-cyan-400" />
+                     <Loader2 size={14} className="animate-spin text-cyan-400" aria-hidden="true" />
                      <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">Calibrating Neural Weights...</span>
                   </div>
                </div>
@@ -581,15 +584,17 @@ export function Chat() {
                       placeholder={`TRANSMIT COMMAND TO ${viewMode === 'agents' ? activeAgent.name.toUpperCase() : 'ENGINE'}...`}
                       disabled={loading}
                       rows={1}
+                      aria-label="Chat message input"
                       className="flex-1 bg-transparent text-white placeholder-white/10 text-sm outline-none resize-none py-3 font-medium tracking-tight min-h-[44px] max-h-32 overflow-y-auto"
                       style={{ fieldSizing: 'content' } as any}
                     />
                     <button
                       onClick={sendMessage}
                       disabled={!input.trim() || loading}
+                      aria-label="Send message"
                       className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 transition-all shadow-xl mb-1 ${viewMode === 'models' ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/20' : 'bg-cyan-600 hover:bg-cyan-500 shadow-cyan-500/20'} active:scale-95 disabled:opacity-20 disabled:grayscale`}
                     >
-                      <Send size={18} />
+                      <Send size={18} aria-hidden="true" />
                     </button>
                   </div>
                </div>

@@ -69,6 +69,8 @@ export default function VibeController() {
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.18 }}
                         className="mb-3 glass-card border-white/10 backdrop-blur-2xl shadow-2xl w-[220px] overflow-hidden"
+                        role="menu"
+                        aria-label="Vibe mode selector"
                     >
                         {/* Header */}
                         <div className="px-4 py-3 border-b border-white/5">
@@ -92,13 +94,15 @@ export default function VibeController() {
                                     <button
                                         key={v.id}
                                         onClick={() => { setMode(v.id); setExpanded(false); }}
+                                        role="menuitemradio"
+                                        aria-checked={isActive}
                                         className={`w-full px-3 py-2.5 rounded-xl flex items-center gap-3 text-left transition-all ${
                                             isActive
                                                 ? `${v.bg} border ${v.border} ${v.color}`
                                                 : 'bg-white/[0.02] border border-transparent text-white/30 hover:bg-white/5 hover:text-white/60'
                                         }`}
                                     >
-                                        <VIcon size={13} />
+                                        <VIcon size={13} aria-hidden="true" />
                                         <div>
                                             <div className="text-[9px] font-black uppercase tracking-widest">{v.label}</div>
                                             <div className="text-[8px] opacity-50 normal-case tracking-normal font-normal">{v.desc}</div>
@@ -117,12 +121,15 @@ export default function VibeController() {
             {/* Trigger Pill */}
             <button
                 onClick={() => setExpanded(prev => !prev)}
+                aria-label={`Vibe mode: ${current.label}. Click to ${expanded ? 'close' : 'open'} selector`}
+                aria-expanded={expanded}
+                aria-haspopup="true"
                 className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl glass-card border backdrop-blur-2xl shadow-2xl transition-all ${current.border} hover:scale-[1.03] active:scale-[0.98]`}
             >
-                <div className={`w-2 h-2 rounded-full ${current.dot} ${mode !== 'focus' ? 'animate-pulse' : ''}`} />
-                <Icon size={13} className={current.color} />
+                <div className={`w-2 h-2 rounded-full ${current.dot} ${mode !== 'focus' ? 'animate-pulse' : ''}`} aria-hidden="true" />
+                <Icon size={13} className={current.color} aria-hidden="true" />
                 <span className={`text-[9px] font-black uppercase tracking-widest ${current.color}`}>{current.label}</span>
-                <Zap size={10} className="text-white/20" />
+                <Zap size={10} className="text-white/20" aria-hidden="true" />
                 <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
                     <ChevronDown size={12} className="text-white/30" />
                 </motion.div>
