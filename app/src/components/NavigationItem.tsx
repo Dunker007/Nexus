@@ -1,5 +1,4 @@
 import { NavLink } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
 import { type LucideIcon } from 'lucide-react';
 
 interface NavItemProps {
@@ -26,34 +25,21 @@ export function NavigationItem({ to, icon: Icon, label, shortcut, isHovered }: N
         <>
           <Icon className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-cyan-400' : ''}`} aria-hidden="true" />
           <span>{label}</span>
-          
+
           {/* Active Indicator Underline */}
-          <AnimatePresence>
-            {isActive && (
-              <motion.div 
-                layoutId="nav-active-pill"
-                className="absolute -bottom-[21px] left-1/2 -translate-x-1/2 w-12 h-1 bg-cyan-500 rounded-full shadow-[0_0_12px_rgba(6,182,212,0.8)]" 
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.5 }}
-              />
-            )}
-          </AnimatePresence>
+          {isActive && (
+            <div className="absolute -bottom-[21px] left-1/2 -translate-x-1/2 w-12 h-1 bg-cyan-500 rounded-full shadow-[0_0_12px_rgba(6,182,212,0.8)]" />
+          )}
 
           {/* Hover Tooltip (Shortcut) */}
-          <AnimatePresence>
-            {isHovered && shortcut && (
-              <motion.div
-                className="absolute -bottom-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/80 rounded text-[9px] text-cyan-400 border border-cyan-500/30 whitespace-nowrap z-[100] font-mono tracking-tighter"
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                role="tooltip"
-              >
-                {shortcut}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {isHovered && shortcut && (
+            <div
+              className="absolute -bottom-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/80 rounded text-[9px] text-cyan-400 border border-cyan-500/30 whitespace-nowrap z-[100] font-mono tracking-tighter animate-in fade-in slide-in-from-top-1 duration-100"
+              role="tooltip"
+            >
+              {shortcut}
+            </div>
+          )}
         </>
       )}
     </NavLink>

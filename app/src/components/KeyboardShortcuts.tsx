@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { Backdrop } from './Backdrop';
 import { ShortcutModal } from './ShortcutModal';
@@ -106,7 +105,7 @@ export default function KeyboardShortcuts() {
   }, {} as Record<string, Shortcut[]>);
 
   return (
-    <AnimatePresence>
+    <>
       {open && (
         <>
           <Backdrop onClick={() => setOpen(false)} />
@@ -116,12 +115,7 @@ export default function KeyboardShortcuts() {
 
       {/* G key hint */}
       {showGHint && (
-        <motion.div
-          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[90]"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-        >
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[90] animate-in fade-in slide-in-from-bottom-4 duration-150">
           <div className="bg-[#0a0a0f]/95 backdrop-blur-xl rounded-xl border border-cyan-500/30 shadow-lg shadow-cyan-500/10 px-4 py-3">
             <div className="flex items-center gap-3 text-sm">
               <kbd className="px-2 py-1 bg-cyan-500/20 border border-cyan-500/30 rounded text-cyan-400 font-mono">G</kbd>
@@ -135,8 +129,8 @@ export default function KeyboardShortcuts() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }

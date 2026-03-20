@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import { X, Command } from 'lucide-react';
 import FocusTrap from './FocusTrap';
 
@@ -15,12 +14,8 @@ interface ShortcutModalProps {
 
 export function ShortcutModal({ onClose, groupedShortcuts }: ShortcutModalProps) {
   return (
-    <motion.div
-      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-full max-w-2xl px-4"
-      initial={{ opacity: 0, scale: 0.95, y: -20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95, y: -20 }}
-      transition={{ duration: 0.2 }}
+    <div
+      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-full max-w-2xl px-4 animate-in fade-in zoom-in-95 duration-200"
       role="dialog"
       aria-modal="true"
       aria-label="Keyboard shortcuts"
@@ -88,6 +83,6 @@ export function ShortcutModal({ onClose, groupedShortcuts }: ShortcutModalProps)
           </div>
         </div>
       </FocusTrap>
-    </motion.div>
+    </div>
   );
 }

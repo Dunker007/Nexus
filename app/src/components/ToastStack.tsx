@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { useToast, type Toast } from '../contexts/ToastContext';
 
 const ICONS: Record<Toast['type'], string> = {
@@ -31,14 +30,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
   }, [toast.duration]);
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, x: 80, scale: 0.9 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className={`relative flex items-start gap-3 w-80 bg-[#0d0d14]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl ${glow} overflow-hidden`}
-    >
+    <div className={`relative flex items-start gap-3 w-80 bg-[#0d0d14]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl ${glow} overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200`}>
       {/* Accent bar left */}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${bar} rounded-l-2xl`} />
 
@@ -62,7 +54,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
           style={{ width: '100%' }}
         />
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -75,13 +67,11 @@ export function ToastStack() {
       aria-live="polite"
       aria-label="Notifications"
     >
-      <AnimatePresence mode="popLayout">
-        {toasts.map(t => (
-          <div key={t.id} className="pointer-events-auto">
-            <ToastItem toast={t} onDismiss={dismiss} />
-          </div>
-        ))}
-      </AnimatePresence>
+      {toasts.map(t => (
+        <div key={t.id} className="pointer-events-auto">
+          <ToastItem toast={t} onDismiss={dismiss} />
+        </div>
+      ))}
     </div>
   );
 }

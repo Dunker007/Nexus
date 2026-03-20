@@ -6,7 +6,6 @@ import {
   UsersRound, Command as CommandIcon, Menu, X, Workflow, LogOut
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { motion, AnimatePresence } from 'motion/react';
 import { useMemory } from '../contexts/MemoryContext';
 import KeyboardShortcuts from './KeyboardShortcuts';
 import CommandPalette from './CommandPalette';
@@ -67,13 +66,9 @@ export function Layout() {
           
           {/* Logo Section */}
           <div className="flex items-center gap-4 shrink-0 group">
-            <motion.div 
-                whileHover={{ scale: 1.05, rotate: [0, -5, 5, 0] }}
-                whileTap={{ scale: 0.95 }}
-                className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center font-black text-black shadow-xl shadow-cyan-500/20 cursor-pointer"
-            >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center font-black text-black shadow-xl shadow-cyan-500/20 cursor-pointer transition-transform duration-150 hover:scale-105 active:scale-95">
               N
-            </motion.div>
+            </div>
             <div className="flex flex-col">
                 <span className="font-black tracking-[0.2em] text-white text-sm leading-none uppercase">NEXUS</span>
                 <span className="text-[10px] text-white/30 font-black tracking-widest uppercase mt-1">Local Interface</span>
@@ -141,13 +136,9 @@ export function Layout() {
                 <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0a0a0f] shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
               </button>
 
-              <AnimatePresence>
-                {showProfileMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -8 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -8 }}
-                    className="absolute right-0 top-12 w-52 bg-[var(--bg-deep)]/95 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-50"
+              {showProfileMenu && (
+                  <div
+                    className="absolute right-0 top-12 w-52 bg-[var(--bg-deep)]/95 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-50 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-150"
                     role="menu"
                     aria-label="User menu"
                   >
@@ -163,9 +154,8 @@ export function Layout() {
                       <LogOut size={13} aria-hidden="true" />
                       Sign out
                     </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                  </div>
+              )}
             </div>
 
             {/* Mobile Menu Toggle */}
@@ -183,14 +173,10 @@ export function Layout() {
       </nav>
 
       {/* Mobile Menu Dropdown */}
-      <AnimatePresence>
         {mobileOpen && (
-            <motion.div
+            <div
                 id="mobile-menu"
-                initial={{ opacity: 0, scale: 0.95, y: -20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                className="lg:hidden absolute top-20 left-4 right-4 bg-[var(--bg-deep)]/95 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden z-[60] shadow-2xl p-4"
+                className="lg:hidden absolute top-20 left-4 right-4 bg-[var(--bg-deep)]/95 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden z-[60] shadow-2xl p-4 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-150"
                 role="navigation"
                 aria-label="Mobile navigation"
             >
@@ -215,9 +201,8 @@ export function Layout() {
                         );
                     })}
                 </div>
-            </motion.div>
+            </div>
         )}
-      </AnimatePresence>
 
       {/* Main Content Area */}
       <main id="main-content" className="flex-1 w-full overflow-x-hidden overflow-y-auto relative z-10 custom-scrollbar">

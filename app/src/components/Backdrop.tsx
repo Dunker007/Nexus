@@ -1,5 +1,3 @@
-import { motion } from 'motion/react';
-
 interface BackdropProps {
   onClick: () => void;
   className?: string;
@@ -7,11 +5,8 @@ interface BackdropProps {
 
 export function Backdrop({ onClick, className = '' }: BackdropProps) {
   return (
-    <motion.div
-      className={`fixed inset-0 z-50 bg-black/70 backdrop-blur-md ${className}`}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+    <div
+      className={`fixed inset-0 z-50 bg-black/70 backdrop-blur-md animate-in fade-in duration-150 ${className}`}
       onClick={onClick}
       aria-hidden="true"
     />
