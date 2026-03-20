@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 
 function Install-Cloudflared {
     if (-not (Test-Path "cloudflared.exe")) {
@@ -51,7 +51,7 @@ credentials-file: $env:USERPROFILE\.cloudflared\$UUID.json
 
 ingress:
   - hostname: bridge.dlxstudios.online
-    service: http://localhost:3456
+    service: http://localhost:3001
   - service: http_status:404
 "@
         Set-Content "config.yml" $Config
@@ -61,7 +61,7 @@ ingress:
         ./cloudflared.exe tunnel route dns $TunnelName bridge.dlxstudios.online 2>&1 | Out-Null
         
         Write-Host "4. Starting Tunnel..." -ForegroundColor Green
-        ./cloudflared.exe tunnel run $TunnelName
+        ./cloudflared.exe tunnel --config config.yml run $TunnelName
     }
     else {
         Write-Error "Could not find tunnel '$TunnelName'. Please run: ./cloudflared.exe tunnel list"
