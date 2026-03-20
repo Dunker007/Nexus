@@ -6,7 +6,16 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(process.cwd(), 'nexus.db');
 
-export const db = new Database(DB_PATH);
+// On Cloud Run (K_SERVICE is set), the filesystem is ephemeral — SQLite writes
+// are lost on restart. All production paths use getPrisma() (PostgreSQL) instead.
+const IS_CLOUD_RUN = !!process.env.K_SERVICE;
+if (IS_CLOUD_RUN) {
+  console.warn('[DB] Cloud Run detected — SQLite is ephemeral and will not be used. All data operations must go through getPrisma().');
+}
+
+export const db = IS_CLOUD_RUN
+  ? ({ exec: () => {}, pragma: () => {}, prepare: () => ({ run: () => {}, all: () => [], get: () => undefined }) } as unknown as Database.Database)
+  : new Database(DB_PATH);
 
 // Lazy Prisma init — DATABASE_URL may not be set until migrate-cloud.ts runs
 let _prisma: PrismaClient | null = null;
@@ -19,10 +28,10 @@ export const prisma = new Proxy({} as PrismaClient, {
   get: (_t, prop) => (getPrisma() as any)[prop],
 });
 
-// Enable WAL mode for better concurrent performance
-db.pragma('journal_mode = WAL');
+// Enable WAL mode for better concurrent performance (local SQLite only)
+if (!IS_CLOUD_RUN) db.pragma('journal_mode = WAL');
 
-db.exec(`
+if (!IS_CLOUD_RUN) db.exec(`
   CREATE TABLE IF NOT EXISTS agents (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -139,7 +148,7 @@ safeIndex(`CREATE INDEX IF NOT EXISTS idx_chat_history_timestamp   ON chat_histo
 safeIndex(`CREATE INDEX IF NOT EXISTS idx_portfolio_sync_account   ON portfolio_sync(account_id)`);
 
 // ─── Portfolio sync table (persists bridge state across restarts) ─────────────
-db.exec(`
+if (!IS_CLOUD_RUN) db.exec(`
   CREATE TABLE IF NOT EXISTS portfolio_sync (
     account_id TEXT PRIMARY KEY,
     positions  TEXT NOT NULL DEFAULT '[]',
@@ -152,7 +161,7 @@ safeAlter(`ALTER TABLE portfolio_sync ADD COLUMN user_id TEXT NOT NULL DEFAULT '
 safeIndex(`CREATE INDEX IF NOT EXISTS idx_portfolio_sync_user ON portfolio_sync(user_id, account_id)`);
 
 // ─── Users table (Google OAuth) ───────────────────────────────────────────────
-db.exec(`
+if (!IS_CLOUD_RUN) db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id         TEXT PRIMARY KEY,
     email      TEXT UNIQUE NOT NULL,
@@ -163,5 +172,5 @@ db.exec(`
   );
 `);
 
-console.log(`[DB] SQLite connected: ${DB_PATH}`);
+if (!IS_CLOUD_RUN) console.log(`[DB] SQLite connected: ${DB_PATH}`);
 

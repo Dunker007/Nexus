@@ -6,7 +6,11 @@ import { logger } from './logger.js';
 
 export const authRouter = Router();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'nexus-dev-secret-change-in-prod';
+if (!process.env.JWT_SECRET) {
+  console.error('[auth] FATAL: JWT_SECRET environment variable is not set. Refusing to start.');
+  process.exit(1);
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRY = '7d';
 const IS_PROD = process.env.NODE_ENV === 'production';
 

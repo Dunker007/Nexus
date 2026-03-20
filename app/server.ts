@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import './server/config.js'; // validates required env vars at startup
 import express from 'express';
 import { createServer } from 'http';
 import helmet from 'helmet';
