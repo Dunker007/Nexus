@@ -218,9 +218,11 @@ export default function PageLayout({
 
       {/* Main content — full width, centered */}
       <div
-         className={`relative z-10 w-full max-w-[1600px] mx-auto ${noPadding ? 'h-full overflow-hidden' : 'py-8 px-6'} ${containerClass}`}
+         className={`relative z-10 w-full max-w-[2000px] mx-auto flex flex-col items-center ${noPadding ? 'h-full overflow-hidden' : 'py-8 px-6'} ${containerClass}`}
       >
-        {children}
+        <div className="w-full h-full flex flex-col justify-start">
+            {children}
+        </div>
       </div>
     </div>
   );

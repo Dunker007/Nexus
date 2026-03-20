@@ -1,7 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 
 export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
-  const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://luxhub.netlify.app';
+  const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://dlxai.netlify.app';
   const headers = {
     'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Headers': 'Content-Type',

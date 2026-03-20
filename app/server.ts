@@ -35,14 +35,14 @@ async function startServer() {
     'https://nexus-cloud-50841896985.us-central1.run.app',
     'https://dlxstudios.ai',
     'https://www.dlxstudios.ai',
-    'https://luxweb.netlify.app',
+    'https://dlxai.netlify.app',
     process.env.ALLOWED_ORIGIN,
   ].filter(Boolean) as string[];
 
   app.use(cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, curl, same-origin)
-      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('luxhub.netlify.app')) return callback(null, true);
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('dlxai.netlify.app')) return callback(null, true);
       callback(new Error(`CORS: origin ${origin} not allowed`));
     },
     credentials: true,

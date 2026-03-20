@@ -62,7 +62,7 @@ export function Layout() {
 
       {/* Top Navigation Bar */}
       <nav aria-label="Main navigation" className="flex-none h-16 border-b border-white/5 bg-[var(--glass-bg)] backdrop-blur-2xl relative z-50 px-4 md:px-6">
-        <div className="h-full max-w-[1600px] mx-auto flex items-center justify-between">
+        <div className="h-full max-w-[2000px] mx-auto flex items-center justify-between">
           
           {/* Logo Section */}
           <div className="flex items-center gap-4 shrink-0 group">
