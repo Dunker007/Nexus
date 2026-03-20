@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getPrisma } from '../db.js';
 import { required } from '../middleware/validate.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 
 export const tasksRouter = Router();
 
@@ -16,7 +17,7 @@ tasksRouter.get('/', async (_req, res) => {
   catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-tasksRouter.post('/', required(['id', 'title']), async (req, res) => {
+tasksRouter.post('/', requireAuth, required(['id', 'title']), async (req, res) => {
   try {
     const { id, title, completed, category } = req.body;
     const task = await getPrisma().tasks.create({
@@ -31,7 +32,7 @@ tasksRouter.post('/', required(['id', 'title']), async (req, res) => {
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-tasksRouter.put('/:id', async (req, res) => {
+tasksRouter.put('/:id', requireAuth, async (req, res) => {
   try {
     const { title, completed, category } = req.body;
     
@@ -48,7 +49,7 @@ tasksRouter.put('/:id', async (req, res) => {
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-tasksRouter.delete('/:id', async (req, res) => {
+tasksRouter.delete('/:id', requireAuth, async (req, res) => {
   try {
     await getPrisma().tasks.delete({ where: { id: req.params.id } });
     res.json({ success: true });

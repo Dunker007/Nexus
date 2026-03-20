@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getPrisma } from '../db.js';
 import { getIO } from '../socket.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 
 const router = Router();
 
@@ -32,7 +33,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create track
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   try {
     const { id, title, artist, genre, bpm, key, status, progress, notes } = req.body;
 
@@ -52,7 +53,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update track
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth, async (req, res) => {
   try {
     const { title, artist, genre, bpm, key, status, progress, notes } = req.body;
 
@@ -73,7 +74,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete track
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     await getPrisma().pipeline_tracks.delete({ where: { id: req.params.id } });
     
@@ -87,7 +88,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Sync from Google Drive
-router.post('/sync', async (req, res) => {
+router.post('/sync', requireAuth, async (req, res) => {
   try {
     // TODO: Implement Google Drive sync
     res.json({ success: true, message: 'Sync not yet implemented' });

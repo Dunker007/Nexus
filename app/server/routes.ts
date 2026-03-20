@@ -6,6 +6,7 @@ import { google } from 'googleapis';
 import { GoogleGenAI } from '@google/genai';
 import { driveConfig, ollamaConfig, lmStudioConfig } from './config.js';
 import { required } from './middleware/validate.js';
+import { requireAuth } from './middleware/requireAuth.js';
 import { ai } from './genkit.js';
 import { agentsRouter } from './api/agents.js';
 import { chatRouter } from './api/chat.js';
@@ -175,7 +176,7 @@ export function setupRoutes(app: Express) {
 
 
   // LLM inference (Ollama / LM Studio — no Gemini)
-  app.post('/api/brain-link', async (req, res) => {
+  app.post('/api/brain-link', requireAuth, async (req, res) => {
     try {
       const schema = z.object({
         prompt: z.string().min(1, 'Prompt is required'),
@@ -196,7 +197,7 @@ export function setupRoutes(app: Express) {
   });
 
   // ─── Debate Pundits — LM Studio (Tailscale) with MCP ─────────────────────
-  app.post('/api/debate', async (req, res) => {
+  app.post('/api/debate', requireAuth, async (req, res) => {
     try {
       const { messages, systemPrompt, agentName } = z.object({
         messages: z.array(z.object({
@@ -292,7 +293,7 @@ export function setupRoutes(app: Express) {
 
   // ─── Drive Anchor ──────────────────────────────────────────────────────────
 
-  app.get('/api/drive-anchor', async (_req, res) => {
+  app.get('/api/drive-anchor', requireAuth, async (_req, res) => {
     try {
       const auth = getGoogleAuth(driveConfig.scopes);
       const drive = google.drive({ version: 'v3', auth });
@@ -316,7 +317,7 @@ export function setupRoutes(app: Express) {
 
   // ─── Drive Files ──────────────────────────────────────────────────────────
 
-  app.get('/api/drive/files', async (req, res) => {
+  app.get('/api/drive/files', requireAuth, async (req, res) => {
     try {
       const folderId = resolveFolderId(req.query.folderId as string);
       const auth = getGoogleAuth(driveConfig.scopes);
@@ -334,7 +335,7 @@ export function setupRoutes(app: Express) {
     }
   });
 
-  app.post('/api/drive/folders', async (req, res) => {
+  app.post('/api/drive/folders', requireAuth, async (req, res) => {
     try {
       const schema = z.object({
         name: z.string().min(1, 'Name is required'),
@@ -358,7 +359,7 @@ export function setupRoutes(app: Express) {
     }
   });
 
-  app.post('/api/drive/files', async (req, res) => {
+  app.post('/api/drive/files', requireAuth, async (req, res) => {
     try {
       const schema = z.object({
         name: z.string().min(1, 'Name is required'),
@@ -428,7 +429,7 @@ export function setupRoutes(app: Express) {
 
   // ─── Shared Memory (CURRENT_OPS.md) ───────────────────────────────────────
 
-  app.get('/api/memory/ops', async (_req, res) => {
+  app.get('/api/memory/ops', requireAuth, async (_req, res) => {
     let fileId = resolveOpsFileId();
     let mimeType = '';
     try {
@@ -464,7 +465,7 @@ export function setupRoutes(app: Express) {
     }
   });
 
-  app.post('/api/memory/ops', async (req, res) => {
+  app.post('/api/memory/ops', requireAuth, async (req, res) => {
     try {
       const schema = z.object({
         content: z.string()
@@ -514,7 +515,7 @@ export function setupRoutes(app: Express) {
 
   // ─── Google Sheets (Pipeline Sync) ────────────────────────────────────────
 
-  app.get('/api/gsheets/:id', async (req, res) => {
+  app.get('/api/gsheets/:id', requireAuth, async (req, res) => {
     try {
       const spreadsheetId = req.params.id;
       const range = (req.query.range as string) || 'A:Z';
@@ -525,14 +526,4 @@ export function setupRoutes(app: Express) {
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
-  // Env info (for debugging Drive setup)
-  app.get('/api/env', (_req, res) => {
-    res.json({
-      folderId: process.env.GDRIVE_FOLDER_ID ? '✅ Set' : '❌ Missing',
-      serviceAccount: process.env.GOOGLE_SERVICE_ACCOUNT_JSON ? '✅ Set' : '❌ Missing',
-      oauth: process.env.GOOGLE_CLIENT_ID ? '✅ Set' : '❌ Missing',
-      ollama: ollamaConfig.baseUrl,
-      lmStudio: lmStudioConfig.baseUrl,
-    });
-  });
 }

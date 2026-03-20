@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getPrisma } from '../db.js';
 import { required } from '../middleware/validate.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 
 export const agentsRouter = Router();
 
@@ -9,7 +10,7 @@ agentsRouter.get('/', async (_req, res) => {
   catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-agentsRouter.post('/', required(['name', 'role']), async (req, res) => {
+agentsRouter.post('/', requireAuth, required(['name', 'role']), async (req, res) => {
   try {
     const { name, role, description, status, system_prompt } = req.body;
     const id = crypto.randomUUID();
@@ -20,7 +21,7 @@ agentsRouter.post('/', required(['name', 'role']), async (req, res) => {
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-agentsRouter.put('/:id', async (req, res) => {
+agentsRouter.put('/:id', requireAuth, async (req, res) => {
   try {
     const { name, role, description, status, system_prompt } = req.body;
     const result = await getPrisma().agents.update({
@@ -31,7 +32,7 @@ agentsRouter.put('/:id', async (req, res) => {
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-agentsRouter.delete('/:id', async (req, res) => {
+agentsRouter.delete('/:id', requireAuth, async (req, res) => {
   try {
     await getPrisma().agents.delete({ where: { id: req.params.id } });
     res.json({ success: true });

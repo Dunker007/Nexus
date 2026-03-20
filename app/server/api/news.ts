@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getPrisma } from '../db.js';
 import Parser from 'rss-parser';
+import { requireAuth } from '../middleware/requireAuth.js';
 
 export const newsRouter = Router();
 const parser = new Parser({
@@ -110,7 +111,7 @@ newsRouter.get('/', async (req, res) => {
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-newsRouter.post('/refresh', async (req, res) => {
+newsRouter.post('/refresh', requireAuth, async (req, res) => {
     const allFeeds = Object.values(NEWS_SOURCES).flat();
 
     // Respond immediately — run fetches in background
@@ -164,7 +165,7 @@ newsRouter.post('/refresh', async (req, res) => {
     console.log(`[News] Refresh complete — ${addedCount} items added from ${allFeeds.length} feeds`);
 });
 
-newsRouter.delete('/:id', async (req, res) => {
+newsRouter.delete('/:id', requireAuth, async (req, res) => {
   try {
     await getPrisma().news_items.delete({ where: { id: req.params.id } });
     res.json({ success: true });
