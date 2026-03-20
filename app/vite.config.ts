@@ -18,9 +18,23 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules/recharts')) return 'charts';
-          if (id.includes('node_modules/reactflow') || id.includes('node_modules/@reactflow')) return 'flow';
-          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) return 'vendor';
+          if (!id.includes('node_modules')) return;
+
+          // Core React — small, cached aggressively
+          if (id.includes('react-dom')) return 'react-dom';
+          if (id.includes('react-router')) return 'react-router';
+          if (id.includes('/react/')) return 'react-core';
+
+          // Heavy visualization libs — split so they parse in parallel
+          if (id.includes('recharts') || id.includes('d3-') || id.includes('victory')) return 'charts';
+          if (id.includes('reactflow') || id.includes('@reactflow')) return 'flow';
+          if (id.includes('framer-motion')) return 'framer';
+
+          // Icon library (lots of tree-shaken SVGs)
+          if (id.includes('lucide')) return 'icons';
+
+          // Everything else from node_modules
+          return 'vendor';
         }
       }
     }
