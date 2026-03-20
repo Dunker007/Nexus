@@ -3,6 +3,7 @@ import { z } from 'genkit';
 import { search, SafeSearchType } from 'duck-duck-scrape';
 import { getPrisma } from './db.js';
 import { google } from 'googleapis';
+import { GoogleGenAI } from '@google/genai';
 import { driveConfig, ollamaConfig, lmStudioConfig } from './config.js';
 import { required } from './middleware/validate.js';
 import { ai } from './genkit.js';
@@ -227,20 +228,18 @@ export function setupRoutes(app: Express) {
       const apiKey = process.env.GEMINI_FREE_KEY || process.env.GEMINI_API_KEY;
       if (!apiKey) throw new Error("GEMINI_FREE_KEY is missing from environment");
 
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: finalSystemPrompt }] },
-          contents: geminiMessages,
-          tools: [{ googleSearchRetrieval: { dynamicRetrievalConfig: { mode: "MODE_DYNAMIC", dynamicThreshold: 0.3 } } }] // Native Grounding Configuration
-        })
+      const ai = new GoogleGenAI({ apiKey });
+      
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: geminiMessages,
+        config: {
+          systemInstruction: finalSystemPrompt,
+          tools: [{ googleSearch: {} }]
+        }
       });
 
-      const data: any = await r.json();
-      if (!r.ok) throw new Error(data?.error?.message || 'Gemini API error');
-      
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response.';
+      const text = response.text || 'No response.';
 
       // Extract and save notes completely invisibly in background
       const noteMatch = text.match(/<save_note>([\s\S]*?)<\/save_note>/i);
