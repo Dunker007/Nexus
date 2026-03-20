@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MemoryProvider } from './contexts/MemoryContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { AuthProvider } from './contexts/AuthContext';
-import { PortfolioProvider } from './contexts/labs/smartfolio/PortfolioContext';
 import { ToastStack } from './components/ToastStack';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
@@ -42,7 +41,6 @@ export default function App() {
         <ToastProvider>
           <AuthProvider>
             <MemoryProvider>
-              <PortfolioProvider>
                 <BrowserRouter>
                   <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[#0a0a0a]"><div className="w-8 h-8 border-2 border-white/10 border-t-white/80 rounded-full animate-spin flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.2)]"></div></div>}>
                     <Routes>
@@ -92,7 +90,6 @@ export default function App() {
                   </Suspense>
                   <ToastStack />
                 </BrowserRouter>
-              </PortfolioProvider>
             </MemoryProvider>
           </AuthProvider>
         </ToastProvider>
