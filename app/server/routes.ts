@@ -1,5 +1,6 @@
 import { Express } from 'express';
 import { z } from 'genkit';
+import { search, SafeSearchType } from 'duck-duck-scrape';
 import { getPrisma } from './db.js';
 import { google } from 'googleapis';
 import { driveConfig, ollamaConfig, lmStudioConfig } from './config.js';
@@ -206,12 +207,33 @@ export function setupRoutes(app: Express) {
       }).parse(req.body);
 
       let conversation = '';
+      let lastUserMsg = '';
       messages.forEach(msg => {
+        if (msg.role === 'user') lastUserMsg = msg.content;
         conversation += `${msg.role === 'assistant' ? 'Assistant' : 'User'}: ${msg.content}\n\n`;
       });
 
+      let searchContext = '';
+      // Aggressive keyword matching for dynamic searches
+      const isSearchLikely = /weather|forecast|news|who is|what is|when did|what's the|price|stock|current|today|latest|score|update/i.test(lastUserMsg);
+      if (isSearchLikely || lastUserMsg.length > 40) {
+        try {
+            console.log(`[Search] Intercepted likely search query, fetching live DuckDuckGo data for: "${lastUserMsg.substring(0, 30)}..."`);
+            const ddg = await search(lastUserMsg, { safeSearch: SafeSearchType.MODERATE });
+            if (ddg && ddg.results && ddg.results.length > 0) {
+                searchContext = "\n\n[LIVE SEARCH CONTEXT PULLED FROM THE INTERNET JUST SECONDS AGO]:\n";
+                ddg.results.slice(0, 4).forEach((r: any) => {
+                    searchContext += `--- Result ---\nTitle: ${r.title}\nSnippet: ${r.description}\nSource: ${r.url}\n\n`;
+                });
+                searchContext += "You MUST weave these exact real-time results into your answer. Do not hallucinate data that contradicts these results.\n";
+            }
+        } catch (e: any) {
+            console.error('[Search] DuckDuckGo native search failed', e.message);
+        }
+      }
+
       const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file. To save a note, include it in your response wrapped exactly like this:\n<save_note>Your specific finding or note here</save_note>\n\n`;
-      const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
+      const finalSystemPrompt = systemPrompt ? timeContext + searchContext + systemPrompt : timeContext + searchContext;
 
       const inputStr = conversation.trim() + '\n\nAssistant:';
       const lmStudioUrl = 'http://100.74.130.117:1234/api/v1/chat';
