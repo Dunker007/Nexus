@@ -214,7 +214,7 @@ export function setupRoutes(app: Express) {
       });
 
       let searchContext = '';
-      const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file by wrapping it in <save_note>...</save_note>. \n\nCRITICAL INSTRUCTION 2: If the user asks you to write a lyric, a song, a document, or generate a final markdown asset, you MUST wrap the ENTIRE document content inside a <save_file name="Filename.md">...</save_file> tag. Choose an appropriate filename (like N_SongName_v1.md). This will automatically deploy the file to the artist's Google Drive pipeline!\n\n`;
+      const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file by wrapping it in <save_note>...</save_note>.\n\nCRITICAL INSTRUCTION 2: If the user asks you to write a lyric, a song, a document, or generate a final markdown asset, you MUST wrap the ENTIRE document content inside a <save_file name="Filename.md">...</save_file> tag. Choose an appropriate filename (like N_SongName_v1.md). This will automatically deploy the file to the artist's Google Drive pipeline!\n\nCRITICAL INSTRUCTION 3: If you use <think> tags to reason, you MUST immediately output your actual response directly below the closing </think> tag! Do NOT stop generating after your thoughts.\n\n`;
       const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
 
       // Map to Gemini's format
@@ -233,7 +233,7 @@ export function setupRoutes(app: Express) {
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: finalSystemPrompt }] },
           contents: geminiMessages,
-          tools: [{ googleSearch: {} }] // Enable native Google Grounding!
+          tools: [{ googleSearchRetrieval: { dynamicRetrievalConfig: { mode: "MODE_DYNAMIC", dynamicThreshold: 0.3 } } }] // Native Grounding Configuration
         })
       });
 
