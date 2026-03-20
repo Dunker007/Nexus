@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import { usePortfolio } from '@/contexts/labs/smartfolio/PortfolioContext';
 import AssetTable from '@/components/labs/smartfolio/AssetTable';
 import AllocationChart from '@/components/labs/smartfolio/AllocationChart';
@@ -37,7 +37,7 @@ export function SmartFolioHub() {
             <div className="max-w-[2000px] mx-auto px-6 py-8 space-y-8 text-gray-200 font-sans relative z-10 pb-16">
 
                 {/* ─── 1. Enhanced Header & Controls ─── */}
-                <motion.div
+                <m.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="flex flex-col md:flex-row items-center justify-between gap-6 p-1"
@@ -86,12 +86,12 @@ export function SmartFolioHub() {
                             <span className={`text-lg leading-none ${isRefreshing ? 'animate-spin' : ''}`}>↻</span>
                         </button>
                     </div>
-                </motion.div>
+                </m.div>
 
                 <PriceTicker />
 
                 {/* ─── 2. Main Content Grid ─── */}
-                <motion.div
+                <m.div
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
@@ -101,29 +101,29 @@ export function SmartFolioHub() {
                     {/* Top: Visualization (Allocation & Curve) */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[400px]">
                         {/* Allocation */}
-                        <motion.div variants={itemVariants} className="glass-card bg-[var(--bg-void)]/40 p-6 hover:border-blue-500/20">
+                        <m.div variants={itemVariants} className="glass-card bg-[var(--bg-void)]/40 p-6 hover:border-blue-500/20">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-blue-500/10 transition-all duration-1000"></div>
                             <AllocationChart />
-                        </motion.div>
+                        </m.div>
 
                         {/* Equity Curve */}
-                        <motion.div variants={itemVariants} className="glass-card bg-[var(--bg-void)]/40 p-1 hover:border-emerald-500/20 flex flex-col">
+                        <m.div variants={itemVariants} className="glass-card bg-[var(--bg-void)]/40 p-1 hover:border-emerald-500/20 flex flex-col">
                             <div className="absolute bottom-0 left-0 w-full h-32 bg-emerald-500/5 blur-[80px] pointer-events-none group-hover:bg-emerald-500/10 transition-all duration-1000"></div>
                             <EquityCurve accountId={activeAccount} currentValue={totalValue} />
-                        </motion.div>
+                        </m.div>
                     </div>
 
                     {/* Middle: Main Asset Table (Showcase Module) */}
-                    <motion.div variants={itemVariants} className="relative min-h-[600px]">
+                    <m.div variants={itemVariants} className="relative min-h-[600px]">
                         <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-emerald-500/20 rounded-[2rem] blur-xl opacity-20 pointer-events-none"></div>
                         <AssetTable />
-                    </motion.div>
+                    </m.div>
 
                     {/* Bottom: Trade Journal */}
-                    <motion.div variants={itemVariants}>
+                    <m.div variants={itemVariants}>
                         <TradeJournal />
-                    </motion.div>
-                </motion.div>
+                    </m.div>
+                </m.div>
             </div>
         </div>
     );

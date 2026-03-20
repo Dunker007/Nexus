@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import { Plus, Target, RefreshCw, ShieldAlert, Cpu, X, Send } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
 import {
@@ -60,7 +60,7 @@ function PovEngine({ article }: { article: NewsArticle | null }) {
   const Dots = ({ color }: { color: string }) => (
     <div className="flex gap-1 items-center py-1">
       {[0,1,2].map(i => (
-        <motion.div key={i} className={`w-1 h-1 rounded-full ${color}`}
+        <m.div key={i} className={`w-1 h-1 rounded-full ${color}`}
           animate={{ opacity: [0.2,1,0.2] }} transition={{ duration: 0.9, repeat: Infinity, delay: i*0.2 }} />
       ))}
     </div>
@@ -547,7 +547,7 @@ export function News() {
           </div>
           <AnimatePresence>
             {showFactChecker && (
-              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+              <m.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
                 style={{ flexShrink: 0, borderBottom: '1px solid rgba(168,85,247,0.2)', background: 'rgba(168,85,247,0.04)', overflow: 'hidden' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px' }}>
                   <span style={{ fontSize: '6px', fontWeight: 900, color: 'rgba(168,85,247,0.6)', textTransform: 'uppercase', letterSpacing: '0.25em', whiteSpace: 'nowrap' }}>FACT CHECK</span>
@@ -559,7 +559,7 @@ export function News() {
                   </button>
                 </div>
                 {factCheckResult && <div style={{ padding: '0 12px 8px' }}><p style={{ fontSize: '9px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.5, margin: 0 }}>{factCheckResult.aiAnalysis}</p></div>}
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
           <div className="flex-1 overflow-y-auto custom-scrollbar">
@@ -624,10 +624,10 @@ export function News() {
       <AnimatePresence>
         {showSourceManager && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(8px)' }}
               onClick={() => setShowSourceManager(false)} />
-            <motion.div initial={{ scale: 0.97, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.97, opacity: 0 }}
+            <m.div initial={{ scale: 0.97, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.97, opacity: 0 }}
               className="relative z-10 flex flex-col"
               style={{ maxWidth: '900px', width: '100%', maxHeight: '80vh', background: '#0c0c12', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden' }}
               onClick={e => e.stopPropagation()}>
@@ -660,7 +660,7 @@ export function News() {
                   );
                 })}
               </div>
-            </motion.div>
+            </m.div>
           </div>
         )}
       </AnimatePresence>

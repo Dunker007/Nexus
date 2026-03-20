@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 
 interface SkeletonProps {
   className?: string;
@@ -120,7 +120,7 @@ export function LoadingSpinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
   };
 
   return (
-    <motion.div
+    <m.div
       className={`${sizeMap[size]} border-2 border-cyan-500/30 border-t-cyan-500 rounded-full`}
       animate={{ rotate: 360 }}
       transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}

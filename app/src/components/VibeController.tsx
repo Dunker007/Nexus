@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import { Activity, Cpu, Zap, AlertTriangle, Focus, ChevronDown } from 'lucide-react';
 import { useVibe } from '../contexts/VibeContext';
 
@@ -54,7 +54,7 @@ export default function VibeController() {
     const Icon = current.icon;
 
     return (
-        <motion.div
+        <m.div
             className="fixed bottom-6 right-6 z-50 select-none"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -62,7 +62,7 @@ export default function VibeController() {
         >
             <AnimatePresence>
                 {expanded && (
-                    <motion.div
+                    <m.div
                         key="panel"
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -114,7 +114,7 @@ export default function VibeController() {
                                 );
                             })}
                         </div>
-                    </motion.div>
+                    </m.div>
                 )}
             </AnimatePresence>
 
@@ -130,10 +130,10 @@ export default function VibeController() {
                 <Icon size={13} className={current.color} aria-hidden="true" />
                 <span className={`text-[9px] font-black uppercase tracking-widest ${current.color}`}>{current.label}</span>
                 <Zap size={10} className="text-white/20" aria-hidden="true" />
-                <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                <m.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
                     <ChevronDown size={12} className="text-white/30" />
-                </motion.div>
+                </m.div>
             </button>
-        </motion.div>
+        </m.div>
     );
 }

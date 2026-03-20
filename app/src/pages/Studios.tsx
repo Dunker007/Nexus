@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import { useState } from 'react';
 import { LayoutGrid, Grid3X3, List, Sparkles } from 'lucide-react';
 import PageLayout, { PageHeader, StatPill } from '../components/PageLayout';
@@ -159,7 +159,7 @@ export function Studios() {
              { label: 'Researching', val: studios.filter(s => s.status === 'coming-soon').length, color: 'text-purple-400', bg: 'bg-purple-500/5' },
              { label: 'Uplink', val: 'ACTIVE', color: 'text-white/40', bg: 'bg-white/5' },
            ].map((stat, i) => (
-             <motion.div 
+             <m.div 
                 key={i}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -168,13 +168,13 @@ export function Studios() {
              >
                 <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/10 mb-1">{stat.label}</span>
                 <span className={`text-xl font-black ${stat.color} tracking-tighter`}>{stat.val}</span>
-             </motion.div>
+             </m.div>
            ))}
         </div>
 
         <AnimatePresence mode="wait">
           {viewMode === 'grid' && (
-            <motion.div
+            <m.div
               key="grid"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -184,7 +184,7 @@ export function Studios() {
               {studios.map((studio, idx) => {
                 const isLocked = studio.status === 'coming-soon';
                 return (
-                  <motion.div
+                  <m.div
                     key={studio.id}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -219,14 +219,14 @@ export function Studios() {
                         </div>
                       </div>
                     </Link>
-                  </motion.div>
+                  </m.div>
                 );
               })}
-            </motion.div>
+            </m.div>
           )}
 
           {viewMode === 'compact' && (
-            <motion.div
+            <m.div
               key="compact"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -253,11 +253,11 @@ export function Studios() {
                   </div>
                 </Link>
               ))}
-            </motion.div>
+            </m.div>
           )}
 
           {viewMode === 'list' && (
-            <motion.div
+            <m.div
               key="list"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -293,13 +293,13 @@ export function Studios() {
                   </div>
                 </Link>
               ))}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
 
         {/* Global Capability Matrix Footer */}
         <section className="mt-20">
-           <motion.div 
+           <m.div 
              initial={{ opacity: 0, y: 20 }}
              animate={{ opacity: 1, y: 0 }}
              transition={{ delay: 0.5 }}
@@ -324,7 +324,7 @@ export function Studios() {
                     <div className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em]">Synthetic Nodes</div>
                  </div>
               </div>
-           </motion.div>
+           </m.div>
         </section>
       </div>
     </PageLayout>

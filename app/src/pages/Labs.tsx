@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import { Plus, Search, LayoutList, LayoutGrid, ExternalLink, Beaker } from 'lucide-react';
 import PageLayout, { PageHeader, StatPill } from '../components/PageLayout';
 
@@ -133,7 +133,7 @@ export function Labs() {
                  {filtered.map((lab, idx) => {
                     const sc = STATUS_COLORS[lab.status];
                     return (
-                       <motion.div 
+                       <m.div 
                           key={lab.id}
                           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}
                           onClick={() => navigate(lab.route)}
@@ -159,7 +159,7 @@ export function Labs() {
                                 <span className={lab.progress === 100 ? 'text-emerald-400' : ''}>{lab.progress}%</span>
                              </div>
                              <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden border border-white/5">
-                                <motion.div 
+                                <m.div 
                                    initial={{ width: 0 }} animate={{ width: `${lab.progress}%` }} transition={{ duration: 1 }}
                                    className={`h-full rounded-full ${sc.bar}`}
                                 />
@@ -169,7 +169,7 @@ export function Labs() {
                           <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all text-white/20 hover:text-cyan-400">
                              <ExternalLink size={16} />
                           </div>
-                       </motion.div>
+                       </m.div>
                     );
                  })}
               </div>

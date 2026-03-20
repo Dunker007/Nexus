@@ -1,6 +1,6 @@
 import { Users, Play } from 'lucide-react';
 import { useState } from 'react';
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import PageLayout, { PageHeader, StatPill } from '../components/PageLayout';
 
 const AGENTS = [
@@ -44,7 +44,7 @@ export function Meeting() {
               {AGENTS.map((agent) => {
                 const isSelected = selected.includes(agent.id);
                 return (
-                  <motion.button
+                  <m.button
                     key={agent.id}
                     whileHover={{ scale: agent.active ? 1.03 : 1 }}
                     whileTap={{ scale: agent.active ? 0.97 : 1 }}
@@ -59,20 +59,20 @@ export function Meeting() {
                     }`}
                   >
                     {isSelected && (
-                      <motion.div 
+                      <m.div 
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         className="absolute top-3 right-3 w-5 h-5 rounded-full bg-purple-500 flex items-center justify-center shadow-[0_0_10px_rgba(168,85,247,0.5)]"
                       >
                         <div className="w-2 h-2 rounded-full bg-white" />
-                      </motion.div>
+                      </m.div>
                     )}
                     <span className="text-3xl filter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{agent.emoji}</span>
                     <div className="text-center">
                       <div className={`text-[10px] font-black uppercase tracking-widest ${isSelected ? 'text-white' : 'text-white/40'}`}>{agent.name}</div>
                       <div className="text-[8px] font-black uppercase tracking-widest text-white/10 mt-1">{agent.role}</div>
                     </div>
-                  </motion.button>
+                  </m.button>
                 );
               })}
             </div>

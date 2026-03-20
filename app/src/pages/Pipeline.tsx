@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Save, Clock, RefreshCw, Music, Edit3 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import { useToast } from '../contexts/ToastContext';
 import PageLayout, { StatPill } from '../components/PageLayout';
 import { io } from 'socket.io-client';
@@ -232,7 +232,7 @@ export function Pipeline() {
             {tracks.map((track, idx) => {
               const statusInfo = STATUS_CONFIG[track.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.planning;
               return (
-                <motion.div
+                <m.div
                   key={track.id}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -243,7 +243,7 @@ export function Pipeline() {
                     : 'text-white/40 border-transparent hover:bg-white/[0.03] hover:text-white'}`}
                 >
                   {selectedTrack?.id === track.id && !isCreating && (
-                    <motion.div layoutId="pipeline-active-marker" className="absolute left-1.5 top-4 bottom-4 w-0.5 bg-purple-500 rounded-full" />
+                    <m.div layoutId="pipeline-active-marker" className="absolute left-1.5 top-4 bottom-4 w-0.5 bg-purple-500 rounded-full" />
                   )}
                   <div className="flex justify-between items-start mb-3">
                     <div className="min-w-0 flex-1">
@@ -254,11 +254,11 @@ export function Pipeline() {
                   </div>
                   <div className="flex items-center gap-3 mt-4">
                     <div className="flex-1 h-0.5 bg-white/5 rounded-full overflow-hidden">
-                       <motion.div initial={{ width: 0 }} animate={{ width: `${track.progress}%` }} className="h-full bg-purple-500" />
+                       <m.div initial={{ width: 0 }} animate={{ width: `${track.progress}%` }} className="h-full bg-purple-500" />
                     </div>
                     <span className="text-[8px] font-black text-white/20 font-mono tracking-tighter">{track.progress}%</span>
                   </div>
-                </motion.div>
+                </m.div>
               );
             })}
             
@@ -277,7 +277,7 @@ export function Pipeline() {
           <div className="max-w-4xl mx-auto px-8 py-10 pb-40">
             <AnimatePresence mode="wait">
               {(selectedTrack || isCreating) ? (
-                <motion.div key={isCreating ? 'create' : selectedTrack?.id} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} className="space-y-10">
+                <m.div key={isCreating ? 'create' : selectedTrack?.id} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} className="space-y-10">
                   
                   {/* Status Header Panel */}
                   <div className="glass-card border-white/5 bg-white/[0.01] p-8 relative overflow-hidden group">
@@ -361,7 +361,7 @@ export function Pipeline() {
                              <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Progress</span>
                              <div className="flex items-center gap-3">
                                 <div className="w-40 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                   <motion.div initial={{ width: 0 }} animate={{ width: `${selectedTrack?.progress}%` }} className="h-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.3)]" />
+                                   <m.div initial={{ width: 0 }} animate={{ width: `${selectedTrack?.progress}%` }} className="h-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.3)]" />
                                 </div>
                                 <span className="text-[11px] font-black text-purple-400 font-mono">{selectedTrack?.progress}%</span>
                              </div>
@@ -377,7 +377,7 @@ export function Pipeline() {
                     </div>
                   )}
 
-                </motion.div>
+                </m.div>
               ) : (
                 <div className="h-[60vh] flex flex-col items-center justify-center text-center p-12">
                    <div className="w-16 h-16 rounded-3xl bg-white/5 border border-white/5 flex items-center justify-center mb-6 shadow-2xl relative group cursor-pointer" 

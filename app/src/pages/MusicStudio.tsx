@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Music, Sparkles, FileText, RefreshCw, Copy, Check, Video, Activity, Mic, Radio, UserCog, Library, Rocket } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import { useToast } from '../contexts/ToastContext';
 import PageLayout, { PageHeader, StatPill } from '../components/PageLayout';
 
@@ -166,7 +166,7 @@ export function MusicStudio() {
 
         <AnimatePresence mode="wait">
           {tab === 'songwriter' && (
-            <motion.div
+            <m.div
               key="songwriter"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -193,7 +193,7 @@ export function MusicStudio() {
                           <div className={`text-xs font-black uppercase tracking-tight ${mode === m.id ? 'text-white' : 'text-white/40'}`}>{m.name}</div>
                           <div className="text-[9px] font-black uppercase tracking-widest opacity-30 truncate mt-0.5">{m.desc}</div>
                         </div>
-                        {mode === m.id && <motion.div layoutId="mode-marker" className="absolute left-0 top-4 bottom-4 w-0.5 bg-purple-500 rounded-full" />}
+                        {mode === m.id && <m.div layoutId="mode-marker" className="absolute left-0 top-4 bottom-4 w-0.5 bg-purple-500 rounded-full" />}
                       </button>
                     ))}
                   </div>
@@ -310,7 +310,7 @@ export function MusicStudio() {
                   )}
 
                   {draft && !generating && (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, scale: 0.98 }}
                       animate={{ opacity: 1, scale: 1 }}
                       className="flex-1 glass-card border-purple-500/30 flex flex-col bg-[#0d0d14]/60 overflow-hidden shadow-2xl shadow-purple-950/20"
@@ -366,22 +366,22 @@ export function MusicStudio() {
                             <RefreshCw size={12} /> Clear Draft
                          </button>
                       </div>
-                    </motion.div>
+                    </m.div>
                   )}
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           )}
 
           {tab === 'library' && (
-            <motion.div key="library" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <m.div key="library" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <SongLibrary />
-            </motion.div>
+            </m.div>
           )}
           {tab === 'releases' && (
-            <motion.div key="releases" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <m.div key="releases" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <ReleaseBoard />
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

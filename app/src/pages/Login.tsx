@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
 
 export function Login() {
@@ -29,7 +29,7 @@ export function Login() {
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 via-black to-purple-950/20" />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl" />
 
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -78,7 +78,7 @@ export function Login() {
             Access restricted to authorized accounts
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

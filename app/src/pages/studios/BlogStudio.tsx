@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import { BookOpen, PenTool, Search, Send, FileText, Check, RefreshCw, Globe, ArrowRight, Save } from 'lucide-react';
 import PageLayout, { PageHeader, StatPill } from '../../components/PageLayout';
 
@@ -59,7 +59,7 @@ export function BlogStudio() {
 
                 {mode === 'dashboard' && (
                     <div className="space-y-8">
-                        <motion.div
+                        <m.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             className="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border border-emerald-500/20 rounded-3xl p-8 shadow-2xl relative overflow-hidden"
@@ -86,7 +86,7 @@ export function BlogStudio() {
                                     <span className="uppercase tracking-widest text-xs">View Site</span>
                                 </button>
                             </div>
-                        </motion.div>
+                        </m.div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             <div className="glass-card border-white/5 space-y-6">
@@ -127,7 +127,7 @@ export function BlogStudio() {
                 )}
 
                 {(mode === 'create' || mode === 'write') && (
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, scale: 0.98 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="grid grid-cols-1 lg:grid-cols-12 gap-8"
@@ -183,7 +183,7 @@ export function BlogStudio() {
                         <div className="lg:col-span-9">
                             <AnimatePresence mode="wait">
                                 {mode === 'create' ? (
-                                    <motion.div
+                                    <m.div
                                         key="create"
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
@@ -227,9 +227,9 @@ export function BlogStudio() {
                                                 </button>
                                             ))}
                                         </div>
-                                    </motion.div>
+                                    </m.div>
                                 ) : (
-                                    <motion.div
+                                    <m.div
                                         key="write"
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
@@ -270,11 +270,11 @@ export function BlogStudio() {
                                             <button className="text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 bg-white/5 rounded-full hover:bg-white/10 shrink-0 transition-colors">Fix Dialect</button>
                                             <button className="text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 bg-white/5 rounded-full hover:bg-white/10 shrink-0 transition-colors">Add Punch</button>
                                         </div>
-                                    </motion.div>
+                                    </m.div>
                                 )}
                             </AnimatePresence>
                         </div>
-                    </motion.div>
+                    </m.div>
                 )}
             </div>
         </PageLayout>

@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { Terminal, Cpu, GitBranch, Github, ExternalLink, RefreshCw, Folder } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -152,7 +152,7 @@ export function DevStudio() {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {repos.map((repo, i) => (
-                                    <motion.a
+                                    <m.a
                                         key={repo.id}
                                         href={repo.html_url}
                                         target="_blank"
@@ -193,7 +193,7 @@ export function DevStudio() {
                                             </div>
                                             <span>{new Date(repo.updated_at).toLocaleDateString()}</span>
                                         </div>
-                                    </motion.a>
+                                    </m.a>
                                 ))}
 
                                 {repos.length === 0 && !error && (
@@ -207,7 +207,7 @@ export function DevStudio() {
 
                     {/* System Status & Tools */}
                     <aside className="lg:col-span-4 space-y-6">
-                        <motion.div
+                        <m.div
                             className="glass-card border-white/5 relative overflow-hidden"
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -226,7 +226,7 @@ export function DevStudio() {
                                         <span className="text-cyan-400">{status?.memory?.used || 742} MB</span>
                                     </div>
                                     <div className="progress-bar">
-                                        <motion.div
+                                        <m.div
                                             className="progress-fill"
                                             initial={{ width: 0 }}
                                             animate={{ width: `${Math.min(((status?.memory?.used || 742) / 8192) * 100, 100)}%` }}
@@ -240,7 +240,7 @@ export function DevStudio() {
                                         <span className="text-purple-400">{status?.services?.system === 'up' ? '12%' : 'Offline'}</span>
                                     </div>
                                     <div className="progress-bar">
-                                        <motion.div
+                                        <m.div
                                             className="progress-fill"
                                             style={{ background: 'linear-gradient(90deg, #a855f7, #ec4899)' }}
                                             initial={{ width: 0 }}
@@ -260,9 +260,9 @@ export function DevStudio() {
                                     <div className="font-mono text-xs text-purple-400">x64</div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </m.div>
 
-                        <motion.div
+                        <m.div
                             className="glass-card border-white/5 relative overflow-hidden"
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -296,7 +296,7 @@ export function DevStudio() {
                                     </div>
                                 </button>
                             </div>
-                        </motion.div>
+                        </m.div>
                     </aside>
                 </div>
             </div>

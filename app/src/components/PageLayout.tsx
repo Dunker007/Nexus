@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import PageBackground from './PageBackground';
 
 // ============================================
@@ -137,7 +137,7 @@ export function PageHeader({ title, titleAccent, subtitle, icon, color = 'cyan',
   const colors = headerColorMap[color];
 
   return (
-    <motion.header
+    <m.header
       className={`flex flex-wrap items-center justify-between gap-4 mb-8 ${className}`}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -168,7 +168,7 @@ export function PageHeader({ title, titleAccent, subtitle, icon, color = 'cyan',
         {stats}
         {actions}
       </div>
-    </motion.header>
+    </m.header>
   );
 }
 

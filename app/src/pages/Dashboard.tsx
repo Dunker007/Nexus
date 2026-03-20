@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
+import type { ReactNode } from 'react';
 import { Responsive } from 'react-grid-layout';
 const ResponsiveGridLayout = Responsive as any;
 
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import { X, Plus, Settings, Move, LayoutDashboard, Clock, Calendar } from 'lucide-react';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import PageLayout, { PageHeader, StatPill } from '../components/PageLayout';
@@ -34,6 +35,38 @@ import {
   DEFAULT_LAYOUT,
   DEFAULT_WIDGETS
 } from '../config/dashboardConfig';
+
+function DeferredRender({ children }: { children: ReactNode }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="h-full w-full">
+      {isVisible ? children : (
+        <div className="flex items-center justify-center h-full" role="status" aria-label="Loading widget">
+          <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin shadow-[0_0_10px_rgba(6,182,212,0.4)]" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 export function Dashboard() {
   const [time, setTime] = useState(new Date());
@@ -164,13 +197,15 @@ export function Dashboard() {
 
     return (
       <ErrorBoundary>
-        <Suspense fallback={
-          <div className="flex items-center justify-center h-full" role="status" aria-label="Loading widget">
-            <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin shadow-[0_0_10px_rgba(6,182,212,0.4)]" />
-          </div>
-        }>
-          {widgetComponent}
-        </Suspense>
+        <DeferredRender>
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-full" role="status" aria-label="Loading widget">
+              <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin shadow-[0_0_10px_rgba(6,182,212,0.4)]" />
+            </div>
+          }>
+            {widgetComponent}
+          </Suspense>
+        </DeferredRender>
       </ErrorBoundary>
     );
   }
@@ -210,7 +245,7 @@ export function Dashboard() {
 
                 <AnimatePresence>
                   {editMode && (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 20 }}
@@ -228,7 +263,7 @@ export function Dashboard() {
                       >
                         Reset
                       </button>
-                    </motion.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
               </div>
@@ -297,7 +332,7 @@ export function Dashboard() {
       <AnimatePresence>
         {showWidgetPicker && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Add widget">
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -305,7 +340,7 @@ export function Dashboard() {
               onClick={() => setShowWidgetPicker(false)}
               aria-hidden="true"
             />
-            <motion.div
+            <m.div
               initial={{ scale: 0.9, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 30 }}
@@ -329,7 +364,7 @@ export function Dashboard() {
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 relative z-10 max-h-[60vh] overflow-y-auto custom-scrollbar pr-4">
                 {Object.entries(WIDGET_CATALOG).map(([type, config], idx) => (
-                  <motion.button
+                  <m.button
                     key={type}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -345,10 +380,10 @@ export function Dashboard() {
                       {config.title.split(' ').pop()}
                     </div>
                     <div className="absolute inset-x-0 bottom-0 h-1 bg-cyan-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                  </motion.button>
+                  </m.button>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           </div>
         )}
       </AnimatePresence>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import { Mic, MicOff, Loader2, Sparkles } from 'lucide-react';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useNavigate } from 'react-router-dom';
@@ -130,7 +130,7 @@ export default function VoiceControl() {
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 pointer-events-none" role="region" aria-label="Voice control">
             <AnimatePresence>
                 {(transcript || response || processing) && (
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, scale: 0.9, x: 20 }}
                         animate={{ opacity: 1, scale: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.9, x: 10 }}
@@ -152,11 +152,11 @@ export default function VoiceControl() {
                                 {response || transcript || 'Speak a command...'}
                             </span>
                         </div>
-                    </motion.div>
+                    </m.div>
                 )}
             </AnimatePresence>
 
-            <motion.button
+            <m.button
                 onClick={toggleListening}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -178,7 +178,7 @@ export default function VoiceControl() {
                         <Mic className="w-5 h-5 group-hover:text-cyan-400 transition-colors" aria-hidden="true" />
                     </div>
                 )}
-            </motion.button>
+            </m.button>
         </div>
     );
 }

@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import { LazyMotion, domAnimation } from 'motion/react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MemoryProvider } from './contexts/MemoryContext';
 import { ToastProvider } from './contexts/ToastContext';
@@ -37,7 +38,8 @@ const LabStub = lazy(() => import('./pages/labs/LabStub').then(m => ({ default: 
 import { ThemeProvider } from './contexts/ThemeContext';
 export default function App() {
   return (
-    <ThemeProvider>
+    <LazyMotion features={domAnimation}>
+      <ThemeProvider>
         <ToastProvider>
           <AuthProvider>
             <MemoryProvider>
@@ -93,7 +95,8 @@ export default function App() {
             </MemoryProvider>
           </AuthProvider>
         </ToastProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </LazyMotion>
   );
 }
 

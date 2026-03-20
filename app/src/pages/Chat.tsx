@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import {
   Shield, Terminal, Layout,
   Activity, Zap, MessageSquare,
@@ -309,7 +309,7 @@ export function Chat() {
       <div className="flex h-[calc(100vh-64px)] relative overflow-hidden">
         
         {/* Workspace Sidebar */}
-        <motion.aside
+        <m.aside
           animate={{ width: sidebarOpen ? 300 : 80 }}
           className="border-r border-white/5 bg-black/40 backdrop-blur-xl flex flex-col shrink-0 relative z-20 shadow-2xl transition-all"
           aria-label="Chat workspace"
@@ -361,7 +361,7 @@ export function Chat() {
                     onClick={() => setActiveAgentId(agent.id)}
                     className={`group w-full flex items-center gap-4 p-3 rounded-xl transition-all border relative ${isActive ? 'bg-cyan-500/10 border-cyan-500/30 text-white' : 'hover:bg-white/[0.03] border-transparent text-white/30 hover:text-white'}`}
                   >
-                    {isActive && sidebarOpen && <motion.div layoutId="active-chat-marker" className="absolute left-1.5 top-3 bottom-3 w-0.5 bg-cyan-500 rounded-full" />}
+                    {isActive && sidebarOpen && <m.div layoutId="active-chat-marker" className="absolute left-1.5 top-3 bottom-3 w-0.5 bg-cyan-500 rounded-full" />}
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-black/40 border transition-all ${isActive ? 'border-cyan-500/30 text-cyan-400' : 'border-white/5'}`}>
                       <Icon size={18} />
                     </div>
@@ -397,7 +397,7 @@ export function Chat() {
               </div>
             )}
           </div>
-        </motion.aside>
+        </m.aside>
 
         {/* Primary Interaction Field */}
         <main className="flex-1 flex flex-col relative z-10">
@@ -446,7 +446,7 @@ export function Chat() {
           {/* System Prompt Editor */}
           <AnimatePresence>
             {showPromptEditor && viewMode === 'models' && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
@@ -462,7 +462,7 @@ export function Chat() {
                     placeholder="You are a helpful AI assistant..."
                   />
                 </div>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
 
@@ -481,7 +481,7 @@ export function Chat() {
               const Icon = isUser ? User : isSystem ? Shield : agent.icon;
 
               return (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   key={msg.id}
@@ -552,7 +552,7 @@ export function Chat() {
                        )}
                     </div>
                   </div>
-                </motion.div>
+                </m.div>
               );
             })}
             
@@ -567,7 +567,7 @@ export function Chat() {
                    </div>
                    <div className="glass-card p-4 text-sm text-white/80 border-cyan-500/20 ring-1 ring-cyan-500/10">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>{streaming}</ReactMarkdown>
-                      <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.6, repeat: Infinity }} className="inline-block w-1.5 h-4 bg-cyan-400 ml-1 translate-y-0.5" />
+                      <m.span animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.6, repeat: Infinity }} className="inline-block w-1.5 h-4 bg-cyan-400 ml-1 translate-y-0.5" />
                    </div>
                 </div>
               </div>

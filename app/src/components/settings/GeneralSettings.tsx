@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import { Clock } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 import { useState, useEffect } from 'react';
@@ -58,7 +58,7 @@ export function GeneralSettings() {
                  <div className="text-sm font-bold text-white tracking-wide">Remote Access (Tailscale)</div>
                  <p className="text-xs text-white/40">Manage your secure remote connection to the local server.</p>
                </div>
-               <motion.div
+               <m.div
                   whileHover={{ scale: 1.05 }}
                   role="switch"
                   aria-checked="true"
@@ -67,7 +67,7 @@ export function GeneralSettings() {
                   className="w-14 h-7 bg-purple-500/20 border border-purple-500/40 rounded-full relative cursor-pointer"
                >
                   <div className="absolute right-1 top-1 w-5 h-5 bg-purple-400 rounded-full shadow-[0_0_15px_rgba(168,85,247,0.6)]" />
-               </motion.div>
+               </m.div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

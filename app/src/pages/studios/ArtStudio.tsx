@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import { Image as ImageIcon, Download, Wand2, Settings, Layers, Maximize } from 'lucide-react';
 import PageLayout, { PageHeader, StatPill } from '../../components/PageLayout';
 
@@ -62,7 +62,7 @@ export function ArtStudio() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* Controls Sidebar */}
                     <div className="lg:col-span-4 space-y-6">
-                        <motion.div
+                        <m.div
                             className="glass-card border-white/5 relative overflow-hidden"
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -156,13 +156,13 @@ export function ArtStudio() {
                                     )}
                                 </button>
                             </div>
-                        </motion.div>
+                        </m.div>
                     </div>
 
                     {/* Canvas / Gallery */}
                     <div className="lg:col-span-8">
                         {generatedImages.length === 0 && !isGenerating ? (
-                            <motion.div
+                            <m.div
                                 className="h-full min-h-[600px] glass-card border-white/5 flex flex-col items-center justify-center text-white/20"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
@@ -174,7 +174,7 @@ export function ArtStudio() {
                                 <p className="text-xs max-w-xs text-center leading-relaxed">
                                     Select a project, enter a prompt, and choose a style to begin creating.
                                 </p>
-                            </motion.div>
+                            </m.div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {isGenerating && (
@@ -184,7 +184,7 @@ export function ArtStudio() {
                                     </div>
                                 )}
                                 {generatedImages.map((img) => (
-                                    <motion.div
+                                    <m.div
                                         key={img.id}
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
@@ -219,7 +219,7 @@ export function ArtStudio() {
                                                 </button>
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </m.div>
                                 ))}
                             </div>
                         )}
@@ -230,7 +230,7 @@ export function ArtStudio() {
             {/* Refine Modal Overlay */}
             {refineImage && (
                 <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         className="glass-card border-white/10 max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-2"
@@ -271,7 +271,7 @@ export function ArtStudio() {
                                 </button>
                             </div>
                         </div>
-                    </motion.div>
+                    </m.div>
                 </div>
             )}
         </PageLayout>

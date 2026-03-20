@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 
 // Fixed particle positions to avoid hydration mismatch
 const particles = [
@@ -17,7 +17,7 @@ export default function HeroBackground() {
       <div className="absolute top-0 right-0 w-1/3 h-64 bg-gradient-to-bl from-black via-black/60 to-transparent rounded-bl-[100%] opacity-40" />
       
       {/* Stage spotlights - slow panning */}
-      <motion.div
+      <m.div
         className="absolute top-0 left-1/4 w-[600px] h-[800px] opacity-40"
         style={{
           background: 'conic-gradient(from 180deg at 50% 0%, transparent 30%, rgba(6, 182, 212, 0.6) 50%, transparent 70%)',
@@ -28,7 +28,7 @@ export default function HeroBackground() {
         }}
         transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div
+      <m.div
         className="absolute top-0 right-1/4 w-[600px] h-[800px] opacity-40"
         style={{
           background: 'conic-gradient(from 180deg at 50% 0%, transparent 30%, rgba(168, 85, 247, 0.6) 50%, transparent 70%)',
@@ -39,7 +39,7 @@ export default function HeroBackground() {
         }}
         transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div
+      <m.div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[700px] opacity-35"
         style={{
           background: 'conic-gradient(from 180deg at 50% 0%, transparent 30%, rgba(236, 72, 153, 0.5) 50%, transparent 70%)',
@@ -51,7 +51,7 @@ export default function HeroBackground() {
       />
 
       {/* Ambient glow orbs */}
-      <motion.div
+      <m.div
         className="absolute top-1/3 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl"
         animate={{
           x: [0, 30, 0],
@@ -60,7 +60,7 @@ export default function HeroBackground() {
         }}
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div
+      <m.div
         className="absolute top-1/2 right-1/4 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl"
         animate={{
           x: [0, -20, 0],
@@ -84,7 +84,7 @@ export default function HeroBackground() {
 
       {/* Floating particles - fixed positions */}
       {particles.map((p, i) => (
-        <motion.div
+        <m.div
           key={i}
           className="absolute w-1 h-1 bg-cyan-400 rounded-full"
           style={{ left: `${p.left}%`, top: `${p.top}%` }}

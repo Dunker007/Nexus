@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import { Bot, Settings, Music, TrendingUp, BarChart2, Zap, MessageSquare, Search, Radio, Mic } from 'lucide-react';
 import PageLayout, { PageHeader } from '../components/PageLayout';
 import { useNavigate } from 'react-router-dom';
@@ -146,7 +146,7 @@ export function Agents() {
             {ROSTER.map((agent, i) => {
               const Icon = agent.icon;
               return (
-                <motion.div 
+                <m.div 
                   key={agent.id}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -212,7 +212,7 @@ export function Agents() {
                       </button>
                     </div>
                   </div>
-                </motion.div>
+                </m.div>
               );
             })}
           </div>

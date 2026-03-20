@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import { Film, Music, Upload, Play, Pause, Settings, Share2, Monitor, ExternalLink, Video, Clock, CheckCircle, RefreshCw, Wand2 } from 'lucide-react';
 import PageLayout, { PageHeader, StatPill } from '../../components/PageLayout';
 
@@ -22,7 +22,7 @@ const AudioVisualizer = ({ isPlaying }: { isPlaying: boolean }) => {
     return (
         <div className="flex items-end justify-center gap-1 h-32 w-full px-12">
             {[...Array(20)].map((_, i) => (
-                <motion.div
+                <m.div
                     key={i}
                     className="w-4 bg-orange-500 rounded-t-md opacity-80"
                     animate={isPlaying ? {
@@ -90,7 +90,7 @@ export function VideoStudio() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     <div className="lg:col-span-3 space-y-6">
-                        <motion.div
+                        <m.div
                             className="glass-card border-white/5 space-y-4"
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -124,7 +124,7 @@ export function VideoStudio() {
 
                             <AnimatePresence>
                                 {selectedAudio === 'suno' && (
-                                    <motion.div
+                                    <m.div
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: 'auto', opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
@@ -140,12 +140,12 @@ export function VideoStudio() {
                                                 <CheckCircle size={14} className="text-green-500 shrink-0" />
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </m.div>
                                 )}
                             </AnimatePresence>
-                        </motion.div>
+                        </m.div>
 
-                        <motion.div
+                        <m.div
                             className="glass-card border-white/5 space-y-4"
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -179,7 +179,7 @@ export function VideoStudio() {
                                     className="w-full accent-orange-500 h-1.5 bg-black/40 rounded-full appearance-none cursor-pointer"
                                 />
                             </div>
-                        </motion.div>
+                        </m.div>
 
                         <button
                             onClick={handleRender}
@@ -207,14 +207,14 @@ export function VideoStudio() {
                     </div>
 
                     <div className="lg:col-span-6 flex flex-col gap-6">
-                        <motion.div
+                        <m.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             className="bg-black border border-white/10 rounded-3xl aspect-video overflow-hidden relative group shadow-2xl"
                         >
                             <AnimatePresence>
                                 {isRendering && (
-                                    <motion.div
+                                    <m.div
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
@@ -231,7 +231,7 @@ export function VideoStudio() {
                                         <p className="text-white/40 text-xs max-w-sm leading-relaxed">
                                             Neural Frames is generating latent noise patterns based on your audio spectrum analysis.
                                         </p>
-                                    </motion.div>
+                                    </m.div>
                                 )}
                             </AnimatePresence>
 
@@ -259,7 +259,7 @@ export function VideoStudio() {
                                                 {isPlaying ? <Pause size={20} /> : <Play size={20} />}
                                             </button>
                                             <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
-                                                <motion.div
+                                                <m.div
                                                     className="h-full bg-gradient-to-r from-orange-500 to-red-500"
                                                     animate={{ width: isPlaying ? '100%' : '0%' }}
                                                     transition={{ duration: 10, ease: "linear" }}
@@ -277,7 +277,7 @@ export function VideoStudio() {
                                     <p className="text-[10px] font-bold uppercase tracking-widest text-white/20">Studio Preview Area</p>
                                 </div>
                             )}
-                        </motion.div>
+                        </m.div>
 
                         <div className="glass-card border-white/5 relative overflow-hidden">
                              <div className="flex justify-between items-center mb-6">
@@ -318,7 +318,7 @@ export function VideoStudio() {
                     </div>
 
                     <div className="lg:col-span-3 space-y-6">
-                        <motion.div
+                        <m.div
                             className="bg-linear-to-br from-emerald-950/20 to-transparent border border-emerald-500/20 p-6 rounded-3xl"
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -332,9 +332,9 @@ export function VideoStudio() {
                             <button className="w-full py-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-500/20 transition-all">
                                 Launch Dashboard
                             </button>
-                        </motion.div>
+                        </m.div>
 
-                        <motion.div
+                        <m.div
                             className="glass-card border-white/5"
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -361,7 +361,7 @@ export function VideoStudio() {
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </m.div>
 
                         <div className="p-6 rounded-3xl bg-linear-to-br from-indigo-950/40 to-black/40 border border-indigo-500/20 shadow-2xl">
                             <h3 className="font-bold text-[10px] uppercase tracking-widest mb-3 text-indigo-300">Pro Tip</h3>

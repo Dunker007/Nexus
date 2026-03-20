@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { HardDrive, Folder, FileText, ExternalLink, RefreshCw, ChevronRight, Home, Grid, List as ListIcon, Clock, ShieldAlert } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import type { DriveFile } from '../services/memoryService';
 import PageLayout, { PageHeader, StatPill } from '../components/PageLayout';
 
@@ -97,23 +97,23 @@ export function Drive() {
         </div>
 
         {error && (
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="mb-8 p-5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-200 text-sm font-medium flex items-center gap-4">
+            <m.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="mb-8 p-5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-200 text-sm font-medium flex items-center gap-4">
                 <ShieldAlert size={18} className="text-red-500" /> {error}
-            </motion.div>
+            </m.div>
         )}
 
         <AnimatePresence mode="wait">
           {loading ? (
-            <motion.div 
+            <m.div 
                key="loading"
                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                className="flex flex-col items-center justify-center py-40 gap-6 glass-card border flex-1"
             >
                 <RefreshCw size={32} className="text-cyan-500 animate-spin opacity-50" />
                 <span className="text-sm font-bold text-white/40 tracking-wider">Loading files...</span>
-            </motion.div>
+            </m.div>
           ) : files.length === 0 ? (
-            <motion.div 
+            <m.div 
                 key="empty"
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                 className="glass-card border-dashed border-white/10 py-40 flex flex-col items-center justify-center text-center bg-white/[0.01]"
@@ -123,15 +123,15 @@ export function Drive() {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Folder is Empty</h3>
                 <p className="text-sm text-white/40">Drop files here or check back later.</p>
-            </motion.div>
+            </m.div>
           ) : viewMode === 'grid' ? (
-            <motion.div 
+            <m.div 
                 key="grid"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6"
             >
                 {[...files].sort((a, b) => (isFolder(b) ? 1 : 0) - (isFolder(a) ? 1 : 0)).map((file, idx) => (
-                    <motion.div
+                    <m.div
                         key={file.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -162,11 +162,11 @@ export function Drive() {
                                 </a>
                             )}
                         </div>
-                    </motion.div>
+                    </m.div>
                 ))}
-            </motion.div>
+            </m.div>
           ) : (
-            <motion.div 
+            <m.div 
                 key="list"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                 className="glass-card border-white/5 overflow-hidden bg-black/40"
@@ -219,7 +219,7 @@ export function Drive() {
                         </tbody>
                     </table>
                 </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>
