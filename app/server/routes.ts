@@ -193,12 +193,8 @@ export function setupRoutes(app: Express) {
     }
   });
 
-  // ─── Debate Pundits — Gemini Free Tier ───────────────────────────────────
+  // ─── Debate Pundits — LM Studio (Tailscale) with MCP ─────────────────────
   app.post('/api/debate', async (req, res) => {
-    const apiKey = process.env.GEMINI_FREE_KEY || process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.status(503).json({ error: 'No Gemini key found — set GEMINI_FREE_KEY in .env' });
-    }
     try {
       const { messages, systemPrompt, agentName } = z.object({
         messages: z.array(z.object({
@@ -209,33 +205,33 @@ export function setupRoutes(app: Express) {
         agentName: z.string().optional()
       }).parse(req.body);
 
-      const geminiContents: { role: string; parts: { text: string }[] }[] = [];
+      let conversation = '';
       messages.forEach(msg => {
-        const role = msg.role === 'assistant' ? 'model' : 'user';
-        if (geminiContents.length > 0 && geminiContents[geminiContents.length - 1].role === role) {
-          geminiContents[geminiContents.length - 1].parts[0].text += '\n\n' + msg.content;
-        } else {
-          geminiContents.push({ role, parts: [{ text: msg.content }] });
-        }
+        conversation += `${msg.role === 'assistant' ? 'Assistant' : 'User'}: ${msg.content}\n\n`;
       });
 
       const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file. To save a note, include it in your response wrapped exactly like this:\n<save_note>Your specific finding or note here</save_note>\n\n`;
       const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
 
+      const inputStr = conversation.trim() + '\n\nAssistant:';
+      const lmStudioUrl = 'http://100.74.130.117:1234/api/v1/chat';
+      
       const body = {
-        system_instruction: { parts: [{ text: finalSystemPrompt }] },
-        contents: geminiContents,
-        generationConfig: { temperature: 0.9, maxOutputTokens: 4000 },
-        tools: [{ googleSearch: {} }],
+        model: "qwen3-4b-claude-sonnet-4-reasoning-distill-safetensor",
+        system_prompt: finalSystemPrompt,
+        input: inputStr
       };
 
-      const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
-      );
+      const r = await fetch(lmStudioUrl, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(body) 
+      });
+
       const data: any = await r.json();
-      if (!r.ok) throw new Error(data?.error?.message || 'Gemini API error');
-      const text = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join('\n') || 'No response.';
+      if (!r.ok) throw new Error(data?.error?.message || 'LM Studio API error');
+      
+      const text = data?.output?.content || data?.text || data?.response || data?.choices?.[0]?.message?.content || data?.content || 'No response.';
 
       // Extract and save notes
       const noteMatch = text.match(/<save_note>([\s\S]*?)<\/save_note>/i);
