@@ -53,7 +53,7 @@ export function Layout() {
   }, [location.pathname]);
 
   return (
-    <div className="flex flex-col h-screen bg-[var(--bg-void)] text-white overflow-hidden font-sans selection:bg-cyan-500/30">
+    <div className="w-full flex flex-col h-screen bg-[var(--bg-void)] text-white overflow-hidden font-sans selection:bg-cyan-500/30">
       <KeyboardShortcuts />
       <CommandPalette />
 
@@ -61,8 +61,8 @@ export function Layout() {
       <a href="#main-content" className="skip-link">Skip to main content</a>
 
       {/* Top Navigation Bar */}
-      <nav aria-label="Main navigation" className="flex-none h-16 border-b border-white/5 bg-[var(--glass-bg)] backdrop-blur-2xl relative z-50 px-4 md:px-6">
-        <div className="h-full max-w-[2000px] mx-auto flex items-center justify-between">
+      <nav aria-label="Main navigation" className="w-full flex-none h-16 border-b border-white/5 bg-[var(--glass-bg)] backdrop-blur-2xl relative z-50 flex justify-center">
+        <div className="h-full w-full max-w-[2000px] px-4 md:px-8 flex items-center justify-between relative">
           
           {/* Logo Section */}
           <div className="flex items-center gap-4 shrink-0 group">

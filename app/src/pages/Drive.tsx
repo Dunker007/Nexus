@@ -42,7 +42,7 @@ export function Drive() {
 
   return (
     <PageLayout color="cyan" noPadding>
-      <div className="max-w-[1600px] mx-auto px-6 py-10 pb-32">
+      <div className="max-w-[2000px] mx-auto px-6 py-10 pb-32">
         <PageHeader
           title="Drive Explorer"
           subtitle="Manage your local and cloud-synced files."

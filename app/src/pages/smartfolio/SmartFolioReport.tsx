@@ -238,7 +238,7 @@ export function SmartFolioReport() {
             </header>
 
             <div className="flex-1 overflow-y-auto p-6 pb-20 custom-scrollbar relative z-10">
-              <div className="max-w-[1600px] mx-auto space-y-6">
+              <div className="max-w-[2000px] mx-auto space-y-6">
                 {/* ═══ STRATEGY SCORECARD ═══ */}
                 <div className="glass-card p-6 space-y-5">
                     <div className="flex items-center justify-between">

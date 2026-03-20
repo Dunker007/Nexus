@@ -169,7 +169,7 @@ export function SmartFolioOrders() {
             </header>
 
             <div className="flex-1 overflow-y-auto p-6 pb-20 custom-scrollbar">
-              <div className="max-w-[1600px] mx-auto space-y-6">
+              <div className="max-w-[2000px] mx-auto space-y-6">
                 {/* Mode toggle */}
                 <div className="flex items-center gap-3">
                     <button

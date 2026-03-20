@@ -99,7 +99,7 @@ export function DevStudio() {
 
     return (
         <PageLayout color="cyan">
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-8">
+            <div className="max-w-[2000px] mx-auto px-4 sm:px-6 py-8">
                 <PageHeader
                     title="Dev Studio"
                     subtitle="CODE REPOSITORIES • SYSTEM PERFORMANCE • DEPLOYMENTS"

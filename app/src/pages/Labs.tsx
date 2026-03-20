@@ -68,7 +68,7 @@ export function Labs() {
 
   return (
     <PageLayout color="cyan" noPadding>
-      <div className="max-w-[1600px] mx-auto px-6 py-10 pb-32 flex flex-col min-h-screen">
+      <div className="w-full max-w-[2000px] mx-auto px-6 md:px-10 py-10 pb-32 flex flex-col min-h-screen">
         
         <PageHeader
           title="Labs Hub"

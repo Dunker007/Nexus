@@ -48,7 +48,7 @@ export function ArtStudio() {
 
     return (
         <PageLayout color="purple">
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-8">
+            <div className="max-w-[2000px] mx-auto px-4 sm:px-6 py-8">
                 <PageHeader
                     title="Art Studio"
                     subtitle="AI IMAGE GENERATION • STYLES • PROJECT LIBRARY"

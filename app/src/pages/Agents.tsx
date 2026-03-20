@@ -131,7 +131,7 @@ export function Agents() {
 
   return (
     <PageLayout color="cyan">
-      <div className="max-w-7xl mx-auto w-full">
+      <div className="w-full">
         {/* Roster Header */}
         <PageHeader 
           title="DLX" 

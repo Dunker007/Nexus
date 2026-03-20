@@ -48,7 +48,7 @@ export function SmartFolioSettings() {
             </header>
 
             <div className="flex-1 overflow-y-auto p-6 pb-20 relative z-10 custom-scrollbar">
-              <div className="max-w-[1600px] mx-auto space-y-6">
+              <div className="max-w-[2000px] mx-auto space-y-6">
                 {/* ═══ GEMINI API KEY ═══ */}
                 <section className="glass-card p-6 space-y-4 animate-fade-in-up border-l-4 border-l-blue-500/50">
                     <div className="flex items-center justify-between">
