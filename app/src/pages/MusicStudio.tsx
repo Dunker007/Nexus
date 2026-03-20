@@ -178,22 +178,22 @@ export function MusicStudio() {
                 <div className="glass-card p-6 border-white/5">
                   <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-6">Persona Mode</h3>
                   <div className="space-y-2">
-                    {MODES.map(m => (
+                    {MODES.map(modeData => (
                       <button
-                        key={m.id}
-                        onClick={() => setMode(m.id)}
-                        className={`w-full px-4 py-4 rounded-xl text-left transition-all flex items-center gap-4 relative overflow-hidden group border ${mode === m.id
+                        key={modeData.id}
+                        onClick={() => setMode(modeData.id)}
+                        className={`w-full px-4 py-4 rounded-xl text-left transition-all flex items-center gap-4 relative overflow-hidden group border ${mode === modeData.id
                           ? 'bg-purple-500/10 border-purple-500/30 text-white shadow-xl shadow-purple-900/10'
                           : 'bg-white/[0.02] border-transparent text-white/30 hover:text-white/60'}`}
                       >
-                        <div className={`p-2.5 rounded-lg transition-colors ${mode === m.id ? 'bg-purple-500/20 text-purple-400' : 'bg-black/40 text-white/10 group-hover:text-white/20'}`}>
-                          <m.icon size={18} />
+                        <div className={`p-2.5 rounded-lg transition-colors ${mode === modeData.id ? 'bg-purple-500/20 text-purple-400' : 'bg-black/40 text-white/10 group-hover:text-white/20'}`}>
+                          <modeData.icon size={18} />
                         </div>
                         <div className="min-w-0">
-                          <div className={`text-xs font-black uppercase tracking-tight ${mode === m.id ? 'text-white' : 'text-white/40'}`}>{m.name}</div>
-                          <div className="text-[9px] font-black uppercase tracking-widest opacity-30 truncate mt-0.5">{m.desc}</div>
+                          <div className={`text-xs font-black uppercase tracking-tight ${mode === modeData.id ? 'text-white' : 'text-white/40'}`}>{modeData.name}</div>
+                          <div className="text-[9px] font-black uppercase tracking-widest opacity-30 truncate mt-0.5">{modeData.desc}</div>
                         </div>
-                        {mode === m.id && <m.div layoutId="mode-marker" className="absolute left-0 top-4 bottom-4 w-0.5 bg-purple-500 rounded-full" />}
+                        {mode === modeData.id && <m.div layoutId="mode-marker" className="absolute left-0 top-4 bottom-4 w-0.5 bg-purple-500 rounded-full" />}
                       </button>
                     ))}
                   </div>
