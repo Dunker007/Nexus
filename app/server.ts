@@ -41,9 +41,10 @@ async function startServer() {
   app.use(cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, curl, same-origin)
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('luxhub.netlify.app')) return callback(null, true);
       callback(new Error(`CORS: origin ${origin} not allowed`));
     },
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
   }));

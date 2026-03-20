@@ -209,7 +209,7 @@ export function setupRoutes(app) {
                 generationConfig: { temperature: 0.9, maxOutputTokens: 4000 },
                 tools: [{ googleSearch: {} }],
             };
-            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
             const data = await r.json();
             if (!r.ok)
                 throw new Error(data?.error?.message || 'Gemini API error');
