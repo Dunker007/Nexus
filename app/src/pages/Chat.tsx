@@ -138,6 +138,7 @@ export function Chat() {
   const [selectedModel, setSelectedModel] = useState<{ provider: 'lmstudio' | 'ollama', id: string } | null>(null);
   const [customSystemPrompt, setCustomSystemPrompt] = useState('You are a helpful AI assistant connected to the Nexus Neural Hub.');
   const [showPromptEditor, setShowPromptEditor] = useState(false);
+  const [usePiecesContext, setUsePiecesContext] = useState(location.state?.usePiecesContext || false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -192,15 +193,63 @@ export function Chat() {
 
   useEffect(() => {
     if (messages.length === 0 && viewMode === 'agents') {
-      setMessages([{
-        id: '0',
-        role: 'assistant',
-        content: `**Neural Hub Online.**\n\nI am Lux, your primary interface. Select an agent to collaborate, or switch to "Models" tab to inspect and drive local LLMs directly.`,
-        timestamp: new Date(),
-        agentId: 'lux'
-      }]);
+      if (location.state?.initialMessage) {
+         // Auto-fire is handled in the second useEffect.
+         // Actually, let's just use effect for the auto send. 
+      } else {
+         setMessages([{
+           id: '0',
+           role: 'assistant',
+           content: `**Neural Hub Online.**\n\nI am Lux, your primary interface. Select an agent to collaborate, or switch to "Models" tab to inspect and drive local LLMs directly.`,
+           timestamp: new Date(),
+           agentId: 'lux'
+         }]);
+      }
     }
   }, [viewMode]);
+
+  // Handle auto-send for initialMessage
+  useEffect(() => {
+    if (location.state?.initialMessage && messages.length === 0 && viewMode === 'agents') {
+      const msg = location.state.initialMessage;
+      // wipe it from history so we don't double fire
+      window.history.replaceState({}, '');
+      
+      const userMsg: Message = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: msg,
+        timestamp: new Date()
+      };
+      setMessages([userMsg]);
+      
+      setLoading(true);
+      fetch(`${import.meta.env.VITE_API_URL || ''}/api/debate`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          messages: [{ role: 'user', content: msg }],
+          systemPrompt: activeAgent.systemPrompt,
+          agentName: activeAgent?.name,
+          usePiecesContext: location.state?.usePiecesContext || false
+        }),
+      }).then(res => res.json()).then(data => {
+         const reply = data.text || "No response";
+         setMessages(prev => [...prev, {
+            id: (Date.now() + 1).toString(),
+            role: 'agent',
+            content: reply,
+            timestamp: new Date(),
+            agentId: activeAgentId
+         }]);
+      }).catch(e => {
+         console.error(e);
+      }).finally(() => {
+         setLoading(false);
+      });
+    }
+  }, [location.state?.initialMessage, messages.length, viewMode, activeAgent, activeAgentId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -258,7 +307,8 @@ export function Chat() {
         body: JSON.stringify({ 
           messages: debateMessages,
           systemPrompt: reqSystem,
-          agentName: viewMode === 'agents' ? activeAgent?.name : selectedModel?.id
+          agentName: viewMode === 'agents' ? activeAgent?.name : selectedModel?.id,
+          usePiecesContext
         }),
       });
 
@@ -435,6 +485,15 @@ export function Chat() {
              </div>
 
              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setUsePiecesContext(!usePiecesContext)} 
+                  className={`p-2 rounded-lg border transition-all flex items-center gap-2 ${usePiecesContext ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400' : 'bg-white/5 border-white/5 text-white/30 hover:text-white'}`}
+                  aria-label="Toggle Pieces LTM Context"
+                  title="Enable Pieces LTM Context"
+                >
+                  <Database size={14} aria-hidden="true" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest hidden md:inline">Pieces</span>
+                </button>
                 {viewMode === 'models' && (
                    <button onClick={() => setShowPromptEditor(!showPromptEditor)} aria-label="Toggle system prompt editor" aria-expanded={showPromptEditor} className={`p-2 rounded-lg border transition-all ${showPromptEditor ? 'bg-purple-500/20 border-purple-500/40 text-purple-400' : 'bg-white/5 border-white/5 text-white/30 hover:text-white'}`}>
                       <Settings size={14} aria-hidden="true" />

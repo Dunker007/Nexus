@@ -9,6 +9,7 @@ import { callLocalLLM, fetchWithTimeout } from './llm.js';
 import { getGoogleAuth, resolveFolderId } from './google.js';
 import { appendMasterNotes } from './api/drive.js';
 import { google } from 'googleapis';
+import { getPiecesContext } from './pieces.js';
 
 // Sub-routers
 import { agentsRouter } from './api/agents.js';
@@ -78,10 +79,18 @@ export function setupRoutes(app: Express) {
       const schema = z.object({
         prompt: z.string().min(1, 'Prompt is required'),
         context: z.string().optional(),
-        systemPrompt: z.string().optional()
+        systemPrompt: z.string().optional(),
+        usePiecesContext: z.boolean().optional()
       });
-      const { prompt, context, systemPrompt } = schema.parse(req.body);
-      const fullPrompt = context ? `${prompt}\n\nContext: ${context}` : prompt;
+      const { prompt, context, systemPrompt, usePiecesContext } = schema.parse(req.body);
+      
+      let injectedPieces = '';
+      if (usePiecesContext !== false) { // Default to true if undefined, or you can make it explicit
+          const piecesContext = await getPiecesContext(prompt);
+          injectedPieces = piecesContext && !piecesContext.includes('Unavailable') ? `\n\n[Pieces OS Internal Context]\n${piecesContext}\n[/Pieces]` : '';
+      }
+      
+      const fullPrompt = context ? `${prompt}\n\nContext: ${context}${injectedPieces}` : `${prompt}${injectedPieces}`;
 
       // Execute through Genkit flow for tracing
       const text = await llmInferenceFlow({ prompt: fullPrompt, systemPrompt });
@@ -97,17 +106,26 @@ export function setupRoutes(app: Express) {
 
   app.post('/api/debate', requireAuth, async (req, res) => {
     try {
-      const { messages, systemPrompt, agentName } = z.object({
+      const { messages, systemPrompt, agentName, usePiecesContext } = z.object({
         messages: z.array(z.object({
           role: z.enum(['user', 'assistant']),
           content: z.string()
         })).min(1),
         systemPrompt: z.string().optional(),
-        agentName: z.string().optional()
+        agentName: z.string().optional(),
+        usePiecesContext: z.boolean().optional()
       }).parse(req.body);
 
       const timeContext = `SYSTEM TIME OVERRIDE: The exact current date and time is ${new Date().toLocaleString('en-US', { timeZoneName: 'short' })}. You must use THIS date for all current events, forecasting, and references, NEVER a default cached date.\n\nCRITICAL INSTRUCTION: If you discover an important finding, idea, or decision that should be remembered, you MUST save it to the master notes file by wrapping it in <save_note>...</save_note>.\n\nCRITICAL INSTRUCTION 2: If the user asks you to write a lyric, a song, a document, or generate a final markdown asset, you MUST wrap the ENTIRE document content inside a <save_file name="Filename.md">...</save_file> tag. Choose an appropriate filename (like N_SongName_v1.md). This will automatically deploy the file to the artist's Google Drive pipeline!\n\nCRITICAL INSTRUCTION 3: If you use <think> tags to reason, you MUST immediately output your actual response directly below the closing </think> tag! Do NOT stop generating after your thoughts.\n\n`;
-      const finalSystemPrompt = systemPrompt ? timeContext + systemPrompt : timeContext;
+      
+      let injectedPieces = '';
+      if (usePiecesContext !== false) {
+          const latestMessage = messages[messages.length - 1].content;
+          const piecesContext = await getPiecesContext(latestMessage);
+          injectedPieces = piecesContext && !piecesContext.includes('Unavailable') ? `\n\n[Pieces OS Internal Context for the current topic]\n${piecesContext}\n[/Pieces]\n\n` : '';
+      }
+      
+      const finalSystemPrompt = systemPrompt ? timeContext + injectedPieces + systemPrompt : timeContext + injectedPieces;
 
       // Map to Gemini's format
       const geminiMessages = messages.map(m => ({

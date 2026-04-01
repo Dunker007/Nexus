@@ -16,8 +16,8 @@ Rewrite or augment existing Nexus components to rely on the Pieces Long-Term Mem
 ## 🌊 PHASE 1: Wiring & Verification (Current)
 - [x] Connect Lux (Antigravity IDE) directly to Pieces OS via MCP over SSE.
 - [x] Verify LTM capabilities (Vision, Audio, Workstream logging) are properly connected and querying correctly.
-- [ ] Audit existing Nexus backend services (`localhost:3001` bridge) to map where Pieces can replace legacy local SQLite or JSON storage.
-- [ ] Establish standard tag schema for DLX assets (e.g., `#Newsician`, `#QPL`, `#Labs`).
+- [x] Audit existing Nexus backend services (`localhost:3001` bridge) to map where Pieces can replace legacy local SQLite or JSON storage.
+- [x] Establish standard tag schema for DLX assets (e.g., `#Newsician`, `#QPL`, `#Labs`).
 
 ## 🌊 PHASE 2: Nexus Architecture Rewrite
 - [ ] **Contextual Agent Memory:** Update the AI Staff Meeting and Agent Hub modules to inject Pieces LTM directly into contextual prompts.

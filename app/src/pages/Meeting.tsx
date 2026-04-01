@@ -1,6 +1,7 @@
-import { Users, Play } from 'lucide-react';
+import { Users, Play, Database } from 'lucide-react';
 import { useState } from 'react';
 import { m } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import PageLayout, { PageHeader, StatPill } from '../components/PageLayout';
 
 const AGENTS = [
@@ -11,9 +12,11 @@ const AGENTS = [
 ];
 
 export function Meeting() {
+  const navigate = useNavigate();
   const [topic, setTopic] = useState('');
   const [rounds, setRounds] = useState(2);
   const [selected, setSelected] = useState<string[]>(['architect', 'security', 'qa']);
+  const [usePiecesContext, setUsePiecesContext] = useState(false);
 
   const toggleAgent = (id: string) => {
     setSelected(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]);
@@ -127,12 +130,30 @@ export function Meeting() {
                   <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
                   Nexus AI Council Ready
                 </div>
-                <button 
-                  disabled={!topic.trim() || selected.length === 0}
-                  className="px-10 py-4 bg-gradient-to-r from-indigo-600 to-purple-700 hover:brightness-110 active:scale-95 text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl transition-all shadow-2xl shadow-purple-950/40 disabled:opacity-20 disabled:grayscale flex items-center gap-3"
-                >
-                  <Play size={14} /> Initiate Session
-                </button>
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => setUsePiecesContext(!usePiecesContext)} 
+                    className={`p-3 rounded-xl border transition-all flex items-center gap-2 ${usePiecesContext ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400' : 'bg-white/5 border-white/5 text-white/30 hover:text-white'}`}
+                    aria-label="Toggle Pieces LTM Context"
+                    title="Enable Pieces LTM Context"
+                  >
+                    <Database size={16} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest hidden md:inline">Pieces Knowledge</span>
+                  </button>
+                  <button 
+                    disabled={!topic.trim() || selected.length === 0}
+                    onClick={() => navigate('/chat', { 
+                      state: { 
+                        agentId: selected[0], // Primary agent
+                        usePiecesContext,
+                        initialMessage: `AI Council Session: ${topic}\nParticipating Agents: ${selected.join(', ')}\nRounds: ${rounds}`
+                      } 
+                    })}
+                    className="px-10 py-4 bg-gradient-to-r from-indigo-600 to-purple-700 hover:brightness-110 active:scale-95 text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl transition-all shadow-2xl shadow-purple-950/40 disabled:opacity-20 disabled:grayscale flex items-center gap-3"
+                  >
+                    <Play size={14} /> Initiate Session
+                  </button>
+                </div>
               </div>
             </div>
           </div>

@@ -199,7 +199,10 @@ export function Agents() {
                       >
                         <MessageSquare size={16} /> Chat
                       </button>
-                      <button className="flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl font-bold text-xs shadow-inner transition-colors">
+                      <button 
+                        onClick={() => navigate('/chat', { state: { agentId: agent.id, usePiecesContext: true } })}
+                        className="flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl font-bold text-xs shadow-inner transition-colors"
+                      >
                         <Search size={16} /> Grounded
                       </button>
                     </div>
