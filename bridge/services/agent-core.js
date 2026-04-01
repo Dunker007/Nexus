@@ -38,10 +38,26 @@ export class Agent {
 
         try {
             const memories = await this.db.getAgentMemories(this.id);
-            // In a deeper integration, we would parse back `memories` into `this.memory`.
-            // Currently, pieces generates distinct assets, so extending the array from assets requires metadata parsing.
             if (memories && memories.length > 0) {
-                 console.log(`[${this.name}] Discovered ${memories.length} memory pieces in OS.`);
+                // Hydrate in-memory cache from Pieces OS assets
+                for (const asset of memories) {
+                    try {
+                        const entry = {
+                            source: 'pieces-os',
+                            assetId: asset.id,
+                            name: asset.name || 'Unknown',
+                            timestamp: asset.created?.value || new Date(),
+                        };
+                        this.memory.push(entry);
+                    } catch (parseErr) {
+                        // Skip unparseable entries
+                    }
+                }
+                // Cap at 100 entries
+                if (this.memory.length > 100) {
+                    this.memory = this.memory.slice(-100);
+                }
+                console.log(`[${this.name}] Hydrated ${this.memory.length} memory entries from Pieces OS.`);
             }
         } catch (error) {
             console.warn(`[${this.name}] Failed to load memory from Pieces OS:`, error.message);

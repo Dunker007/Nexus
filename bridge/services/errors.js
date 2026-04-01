@@ -340,9 +340,27 @@ export class RateLimiter {
     clear() {
         this.requests.clear();
     }
+
+    /**
+     * Purge expired entries from all tracked IPs
+     */
+    cleanup() {
+        const now = Date.now();
+        for (const [id, timestamps] of this.requests) {
+            const valid = timestamps.filter(time => now - time < this.windowMs);
+            if (valid.length === 0) {
+                this.requests.delete(id);
+            } else {
+                this.requests.set(id, valid);
+            }
+        }
+    }
 }
 
 const limiterInstance = new RateLimiter();
+
+// Periodic cleanup of stale rate-limit entries (every 5 minutes)
+setInterval(() => limiterInstance.cleanup(), 300000);
 
 /**
  * Rate Limiter Middleware

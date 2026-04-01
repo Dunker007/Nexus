@@ -4,6 +4,13 @@
  */
 
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const GENERATED_SECRETS_PATH = path.join(__dirname, '..', '.generated-secrets.json');
 
 // ============ PKCE (Proof Key for Code Exchange) ============
 
@@ -108,9 +115,10 @@ function getEncryptionKey() {
     if (keyString) {
         return crypto.scryptSync(keyString, 'salt', 32);
     }
-    // Fallback to a derived key (not recommended for production)
-    console.warn('[Security] TOKEN_ENCRYPTION_KEY not set, using derived key');
-    return crypto.scryptSync('default-key-change-in-production', 'salt', 32);
+    // Auto-generate and persist a secure key on first boot
+    console.warn('[Security] TOKEN_ENCRYPTION_KEY not set — using auto-generated key (set env var for production)');
+    const generated = getOrCreateGeneratedSecret('encryptionKey');
+    return crypto.scryptSync(generated, 'salt', 32);
 }
 
 /**
@@ -300,8 +308,36 @@ function base64URLEncode(buffer) {
  * Sign a payload using HMAC-SHA256
  */
 function sign(payload) {
-    const secret = process.env.SESSION_SECRET || 'change-this-in-production';
+    let secret = process.env.SESSION_SECRET;
+    if (!secret) {
+        console.warn('[Security] SESSION_SECRET not set — using auto-generated secret (set env var for production)');
+        secret = getOrCreateGeneratedSecret('sessionSecret');
+    }
     return crypto.createHmac('sha256', secret).update(payload).digest('hex');
+}
+
+/**
+ * Get or create a persistent auto-generated secret.
+ * Stores in a local JSON file so keys survive restarts but aren't hardcoded.
+ */
+function getOrCreateGeneratedSecret(key) {
+    let secrets = {};
+    try {
+        if (fs.existsSync(GENERATED_SECRETS_PATH)) {
+            secrets = JSON.parse(fs.readFileSync(GENERATED_SECRETS_PATH, 'utf-8'));
+        }
+    } catch { /* first run */ }
+
+    if (!secrets[key]) {
+        secrets[key] = crypto.randomBytes(48).toString('hex');
+        try {
+            fs.writeFileSync(GENERATED_SECRETS_PATH, JSON.stringify(secrets, null, 2), 'utf-8');
+            console.log(`[Security] Auto-generated secret '${key}' persisted to .generated-secrets.json`);
+        } catch (err) {
+            console.warn(`[Security] Could not persist generated secret:`, err.message);
+        }
+    }
+    return secrets[key];
 }
 
 /**

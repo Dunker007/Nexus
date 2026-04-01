@@ -14,8 +14,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const dbPath = path.join(__dirname, '..', 'prisma', 'dev.db');
 
-console.log('DEBUG: __dirname:', __dirname);
-console.log('DEBUG: dbPath calculated:', dbPath);
 
 // Set DATABASE_URL if not already set, for Prisma to pick it up if needed
 if (!process.env.DATABASE_URL) {

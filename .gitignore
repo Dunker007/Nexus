@@ -26,8 +26,12 @@ webapp/src-tauri/gen/
 .env
 .env.local
 .env.*.local
+.generated-secrets.json
 
 # Logs
+deploy_log.txt
+webapp_log.txt
+
 # Cloudflared
 cloudflared.exe
 config.yml
