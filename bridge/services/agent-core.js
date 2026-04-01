@@ -15,20 +15,20 @@ export class Agent {
         this.useDatabase = true;
         this.dbReady = false;
 
-        // Initialize database connection
+        // Initialize Pieces OS connection
         this.initDatabase();
     }
 
     async initDatabase() {
         try {
-            const { agentMemory } = await import('./database.js');
-            this.db = agentMemory;
-            this.dbReady = true;
+            const { piecesService } = await import('./pieces.js');
+            this.db = piecesService;
+            this.dbReady = await this.db.ping();
 
-            // Load existing memory from database
+            // Load existing memory from database (if available)
             await this.loadMemory();
         } catch (error) {
-            console.warn(`[${this.name}] Database not available, using in-memory only:`, error.message);
+            console.warn(`[${this.name}] Pieces OS not available, using in-memory only:`, error.message);
             this.useDatabase = false;
         }
     }
@@ -37,12 +37,14 @@ export class Agent {
         if (!this.useDatabase || !this.dbReady) return;
 
         try {
-            const memoryData = await this.db.getAll(this.id);
-            if (memoryData && memoryData.entries) {
-                this.memory = memoryData.entries;
+            const memories = await this.db.getAgentMemories(this.id);
+            // In a deeper integration, we would parse back `memories` into `this.memory`.
+            // Currently, pieces generates distinct assets, so extending the array from assets requires metadata parsing.
+            if (memories && memories.length > 0) {
+                 console.log(`[${this.name}] Discovered ${memories.length} memory pieces in OS.`);
             }
         } catch (error) {
-            console.warn(`[${this.name}] Failed to load memory from database:`, error.message);
+            console.warn(`[${this.name}] Failed to load memory from Pieces OS:`, error.message);
         }
     }
 
@@ -50,14 +52,32 @@ export class Agent {
         this.status = 'running';
         this.currentTask = task;
 
+        // Log Workstream Summary - Start
+        let summaryId = null;
+        if (this.useDatabase && this.dbReady) {
+            summaryId = await this.db.logTaskSummary(this.id, task, 'running', context);
+        }
+
         try {
             const result = await this.processTask(task, context);
             await this.addToMemory({ task, result, timestamp: new Date() });
             this.status = 'completed';
+
+            // Log Workstream Summary - Complete
+            if (this.useDatabase && this.dbReady) {
+                await this.db.logTaskSummary(this.id, task, 'completed', { result, previousSummaryId: summaryId });
+            }
+
             return result;
         } catch (error) {
             this.status = 'failed';
             await this.addToMemory({ task, error: error.message, timestamp: new Date() });
+
+            // Log Workstream Summary - Failed
+            if (this.useDatabase && this.dbReady) {
+                await this.db.logTaskSummary(this.id, task, 'failed', { error: error.message, previousSummaryId: summaryId });
+            }
+
             throw error;
         }
     }
@@ -76,30 +96,19 @@ export class Agent {
             this.memory = this.memory.slice(-100);
         }
 
-        // Persist to database (async, non-blocking)
+        // Persist to Pieces OS Context (async, non-blocking)
         if (this.useDatabase && this.dbReady) {
             try {
-                await this.db.set(this.id, 'entries', this.memory);
+                // Store each memory entry as a distinct Annotation/Asset in Pieces OS
+                await this.db.storeAgentMemory(this.id, `entry-${Date.now()}`, entry);
             } catch (error) {
-                console.warn(`[${this.name}] Failed to persist memory to database:`, error.message);
+                console.warn(`[${this.name}] Failed to persist memory to Pieces OS:`, error.message);
             }
         }
     }
 
     async getMemory(limit = 10) {
-        // Try to get from database first for most recent data
-        if (this.useDatabase && this.dbReady) {
-            try {
-                const memoryData = await this.db.getAll(this.id);
-                if (memoryData && memoryData.entries) {
-                    return memoryData.entries.slice(-limit);
-                }
-            } catch (error) {
-                console.warn(`[${this.name}] Failed to get memory from database:`, error.message);
-            }
-        }
-
-        // Fallback to in-memory
+        // Fallback to in-memory since fetching live array requires complex Pieces OS asset parsing in MVP
         return this.memory.slice(-limit);
     }
 
@@ -116,13 +125,7 @@ export class Agent {
         this.currentTask = null;
         this.memory = [];
 
-        // Clear database too
-        if (this.useDatabase && this.dbReady) {
-            try {
-                await this.db.clear(this.id);
-            } catch (error) {
-                console.warn(`[${this.name}] Failed to clear database:`, error.message);
-            }
-        }
+        // Note: For Pieces OS, deciding not to clear all external assets to preserve history mapping.
+        console.log(`[${this.name}] reset complete. Preserved Pieces OS memories.`);
     }
 }

@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+
+<!-- Perplexity Computer Attribution — SEO Meta Tags -->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DLX Portfolio Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg-base: #0a0b0f;
+    --bg-surface: #111318;
+    --bg-card: #161921;
+    --bg-elevated: #1e2128;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.12);
+    --text-primary: #f0f2f5;
+    --text-secondary: #8b919e;
+    --text-muted: #555c6a;
+    --accent-teal: #00d4aa;
+    --accent-teal-dim: rgba(0,212,170,0.12);
+    --accent-blue: #3b82f6;
+    --accent-blue-dim: rgba(59,130,246,0.12);
+    --accent-purple: #8b5cf6;
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.12);
+    --red: #ef4444;
+    --red-dim: rgba(239,68,68,0.12);
+    --yellow: #eab308;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo svg { width: 32px; height: 32px; }
+
+  .logo-text {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text-primary);
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent-teal);
+    background: var(--accent-teal-dim);
+    border: 1px solid rgba(0,212,170,0.2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+
+  .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-teal);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .timestamp {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  /* ── Layout ── */
+  .main { padding: 24px 28px; max-width: 1400px; margin: 0 auto; }
+
+  /* ── KPI Row ── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .kpi-card:hover { border-color: var(--border-bright); }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .kpi-card.teal::before { background: linear-gradient(90deg, var(--accent-teal), transparent); }
+  .kpi-card.blue::before { background: linear-gradient(90deg, var(--accent-blue), transparent); }
+  .kpi-card.green::before { background: linear-gradient(90deg, var(--green), transparent); }
+  .kpi-card.red::before { background: linear-gradient(90deg, var(--red), transparent); }
+  .kpi-card.yellow::before { background: linear-gradient(90deg, var(--yellow), transparent); }
+
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 10px;
+  }
+
+  .kpi-value {
+    font-size: 26px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums lining-nums;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+
+  .kpi-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    margin-top: 8px;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  .kpi-delta.up { color: var(--green); background: var(--green-dim); }
+  .kpi-delta.down { color: var(--red); background: var(--red-dim); }
+  .kpi-delta.flat { color: var(--text-secondary); background: rgba(255,255,255,0.05); }
+
+  /* ── Grid Layout ── */
+  .grid-2col { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+  .grid-equal { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  /* ── Card ── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.1px;
+  }
+
+  .card-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .card-badge.teal { color: var(--accent-teal); background: var(--accent-teal-dim); }
+  .card-badge.blue { color: var(--accent-blue); background: var(--accent-blue-dim); }
+
+  .card-body { padding: 20px; }
+
+  /* ── Chart Containers ── */
+  .chart-wrap { position: relative; }
+  .chart-wrap canvas { display: block; }
+
+  /* ── Holdings Table ── */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead th {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 10px 14px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  thead th:first-child { text-align: left; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+    cursor: default;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg-elevated); }
+
+  tbody td {
+    padding: 12px 14px;
+    text-align: right;
+    font-variant-numeric: tabular-nums lining-nums;
+    vertical-align: middle;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  tbody td:first-child { text-align: left; }
+
+  .ticker-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ticker-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .ticker-info .ticker-sym {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+
+  .ticker-info .ticker-name {
+    font-size: 11px;
+    color: var(--text-muted);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .change-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .change-pill.up { color: var(--green); background: var(--green-dim); }
+  .change-pill.down { color: var(--red); background: var(--red-dim); }
+  .change-pill.flat { color: var(--text-secondary); background: rgba(255,255,255,0.05); }
+
+  /* ── Open Orders ── */
+  .order-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+
+  .order-row:last-child { border-bottom: none; }
+
+  .order-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .order-type {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+  }
+
+  .order-type.buy { color: var(--green); background: var(--green-dim); }
+  .order-type.sell { color: var(--red); background: var(--red-dim); }
+
+  .order-sym {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 40px;
+  }
+
+  .order-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .order-right {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .order-price {
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+  }
+
+  .order-qty {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  /* ── Allocation Bar ── */
+  .alloc-bar-wrap {
+    display: flex;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    gap: 2px;
+  }
+
+  .alloc-segment {
+    height: 100%;
+    border-radius: 2px;
+    transition: flex 0.5s ease;
+  }
+
+  .alloc-legend {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .alloc-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .alloc-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .alloc-pct {
+    margin-left: auto;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+    font-size: 12px;
+  }
+
+  /* ── Performance Bar ── */
+  .perf-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .perf-row:last-child { border-bottom: none; }
+
+  .perf-sym {
+    font-size: 12px;
+    font-weight: 600;
+    width: 40px;
+    flex-shrink: 0;
+  }
+
+  .perf-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-elevated);
+    border-radius: 3px;
+    overflow: visible;
+    position: relative;
+  }
+
+  .perf-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+    position: absolute;
+    top: 0;
+  }
+
+  .perf-pct {
+    font-size: 11px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    width: 54px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── Sparklines in table ── */
+  .sparkline-cell { width: 80px; }
+  .sparkline-cell canvas { display: block; }
+
+  /* ── Range indicator ── */
+  .range-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .range-track {
+    flex: 1;
+    height: 4px;
+    background: var(--bg-elevated);
+    border-radius: 2px;
+    position: relative;
+  }
+
+  .range-dot {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-card);
+  }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  footer a { color: var(--accent-teal); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ── Responsive ── */
+  @media (max-width: 1024px) {
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .grid-2col { grid-template-columns: 1fr; }
+    .grid-3col { grid-template-columns: repeat(2, 1fr); }
+    .grid-equal { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 640px) {
+    .main { padding: 16px; }
+    .header { padding: 14px 16px; }
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+    .grid-3col { grid-template-columns: 1fr; }
+    .kpi-value { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="logo">
+    <svg viewBox="0 0 32 32" fill="none" aria-label="DLX Studios">
+      <rect width="32" height="32" rx="8" fill="#00d4aa" fill-opacity="0.15"/>
+      <path d="M8 8h5c5 0 8 3.5 8 8s-3 8-8 8H8V8z" fill="none" stroke="#00d4aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M20 12l4 4-4 4" stroke="#00d4aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+    </svg>
+    <div>
+      <div class="logo-text">DLX Portfolio</div>
+      <div class="logo-sub">Schwab · Charles Schwab</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      Live Data
+    </div>
+    <div class="timestamp" id="ts">Mar 22, 2026 · 07:28 CT</div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="main">
+
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi-card teal">
+      <div class="kpi-label">Total Portfolio</div>
+      <div class="kpi-value">$75,412</div>
+      <div class="kpi-delta flat">2 accounts</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Day Change</div>
+      <div class="kpi-value" style="color: var(--red)">-$195.50</div>
+      <div class="kpi-delta down">▼ -0.26%</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Total Gain / Loss</div>
+      <div class="kpi-value" style="color: var(--green)">+$572</div>
+      <div class="kpi-delta up">▲ +1.07%</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-label">Open Orders</div>
+      <div class="kpi-value">19</div>
+      <div class="kpi-delta flat">GTC-ext · unfilled</div>
+    </div>
+  </div>
+
+  <!-- Row: Price Chart + Allocation -->
+  <div class="grid-2col">
+    <!-- 90-Day Price History -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">90-Day Price History</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div id="chart-legend" style="display:flex;gap:12px;flex-wrap:wrap"></div>
+          <span class="card-badge teal">Dec 22 – Mar 22</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap" style="height:280px">
+          <canvas id="priceChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Allocation -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Portfolio Allocation</div>
+        <span class="card-badge teal">8 Positions</span>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap" style="height:200px; margin-bottom: 16px;">
+          <canvas id="allocChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Holdings Table -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header">
+      <div class="card-title">Holdings</div>
+      <span class="card-badge blue">Charles Schwab</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Market Value</th>
+            <th>Cost Basis</th>
+            <th>Gain / Loss</th>
+            <th>Day Chg</th>
+            <th>Trend (90d)</th>
+            <th>52W Range</th>
+          </tr>
+        </thead>
+        <tbody id="holdingsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Row: Performance + Open Orders -->
+  <div class="grid-equal">
+
+    <!-- Performance Bars -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">P&amp;L Performance</div>
+        <span class="card-badge teal">Gain / Loss %</span>
+      </div>
+      <div class="card-body">
+        <div id="perfBars"></div>
+      </div>
+    </div>
+
+    <!-- Open Orders -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Open Limit Orders</div>
+        <span class="card-badge blue">19 GTC-ext</span>
+      </div>
+      <div id="ordersBody"></div>
+    </div>
+
+  </div>
+
+  <!-- Row: Trad vs Roth + Market Sentiment -->
+  <div class="grid-3col">
+
+    <!-- Trad Account -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Trad Account (BTC/ETH)</div>
+        <span class="card-badge teal">Schwab</span>
+      </div>
+      <div class="card-body">
+        <div id="tradPie" style="height:180px">
+          <canvas id="tradChart"></canvas>
+        </div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px" id="tradLegend"></div>
+      </div>
+    </div>
+
+    <!-- Roth Account -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Roth Account (Alts)</div>
+        <span class="card-badge blue">Schwab</span>
+      </div>
+      <div class="card-body">
+        <div id="rothPie" style="height:180px">
+          <canvas id="rothChart"></canvas>
+        </div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px" id="rothLegend"></div>
+      </div>
+    </div>
+
+    <!-- Target Orders Summary -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Target Price Levels</div>
+        <span class="card-badge teal">Buy / Sell Targets</span>
+      </div>
+      <div class="card-body" style="padding:0">
+        <div id="targetsBody"></div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  Data as of March 22, 2026 · All values in USD ·
+  <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+  · Sources: <a href="https://www.perplexity.ai/finance/ETH" target="_blank">ETH</a> ·
+  <a href="https://www.perplexity.ai/finance/IBIT" target="_blank">IBIT</a> ·
+  <a href="https://www.perplexity.ai/finance/BSOL" target="_blank">BSOL</a> ·
+  <a href="https://www.perplexity.ai/finance/BITQ" target="_blank">BITQ</a>
+</footer>
+
+<script>
+// ══════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════
+
+const HOLDINGS = [
+  { sym: 'ETH',  name: 'Grayscale Ethereum Mini Trust',   qty: 743,  price: 20.20, cost: 14058.24, value: 15008.60, gl: 950.36,  glPct: 6.76,  dayChg: -0.39, year52Low: 13.69, year52High: 45.78, color: '#627EEA', acct: 'trad' },
+  { sym: 'IBIT', name: 'iShares Bitcoin Trust ETF',        qty: 362,  price: 39.77, cost: 14052.96, value: 14396.74, gl: 343.78,  glPct: 2.45,  dayChg: -0.13, year52Low: 35.30, year52High: 71.82, color: '#F7931A', acct: 'trad' },
+  { sym: 'BITQ', name: 'Bitwise Crypto Innovators ETF',    qty: 300,  price: 20.38, cost: 5917.22,  value: 6114.00,  gl: 196.78,  glPct: 3.33,  dayChg: -2.35, year52Low: 10.50, year52High: 31.45, color: '#FF6B35', acct: 'roth' },
+  { sym: 'BSOL', name: 'Bitwise Solana Staking ETF',       qty: 501,  price: 11.91, cost: 6681.03,  value: 5966.91,  gl: -714.12, glPct: -10.69,dayChg:  0.34, year52Low: 10.10, year52High: 26.60, color: '#9945FF', acct: 'roth' },
+  { sym: 'EZPZ', name: 'Franklin Crypto Index ETF',        qty: 289,  price: 17.88, cost: 4995.93,  value: 5167.32,  gl: 171.39,  glPct: 3.43,  dayChg:  0.17, year52Low: 15.92, year52High: 33.77, color: '#00B4D8', acct: 'roth' },
+  { sym: 'CRPT', name: 'SkyBridge Crypto Industry ETF',    qty: 238,  price: 12.84, cost: 2954.15,  value: 3055.92,  gl: 101.77,  glPct: 3.44,  dayChg:  0.01, year52Low: 10.51, year52High: 25.90, color: '#06D6A0', acct: 'roth' },
+  { sym: 'XRPZ', name: 'Franklin XRP Trust',               qty: 301,  price: 15.58, cost: 5167.92,  value: 4689.58,  gl: -478.34, glPct: -9.26, dayChg:  null, year52Low: null,  year52High: null,  color: '#00AAE4', acct: 'roth' },
+  { sym: 'GSUI', name: 'Grayscale Sui Staking ETF',         qty: 1,    price: 13.85, cost: 13.20,   value: 13.85,    gl: 0.65,    glPct: 4.92,  dayChg:  null, year52Low: null,  year52High: null,  color: '#4FD1C5', acct: 'roth' },
+];
+
+const OPEN_ORDERS = [
+  // Trad
+  { sym: 'ETH',  type: 'buy', price: 15.80, qty: 87,  acct: 'Trad' },
+  { sym: 'ETH',  type: 'buy', price: 13.50, qty: 153, acct: 'Trad' },
+  { sym: 'ETH',  type: 'buy', price: 11.15, qty: 309, acct: 'Trad' },
+  { sym: 'IBIT', type: 'buy', price: 32.75, qty: 42,  acct: 'Trad' },
+  { sym: 'IBIT', type: 'buy', price: 28.50, qty: 72,  acct: 'Trad' },
+  { sym: 'IBIT', type: 'buy', price: 23.10, qty: 149, acct: 'Trad' },
+  // Roth
+  { sym: 'GSUI', type: 'buy', price: 12.75, qty: 20,  acct: 'Roth' },
+  { sym: 'GSUI', type: 'buy', price: 12.26, qty: 20,  acct: 'Roth' },
+  { sym: 'BSOL', type: 'buy', price: 9.67,  qty: 20,  acct: 'Roth' },
+  { sym: 'BSOL', type: 'buy', price: 8.54,  qty: 34,  acct: 'Roth' },
+  { sym: 'BSOL', type: 'buy', price: 6.83,  qty: 71,  acct: 'Roth' },
+  { sym: 'EZPZ', type: 'buy', price: 14.76, qty: 13,  acct: 'Roth' },
+  { sym: 'EZPZ', type: 'buy', price: 13.02, qty: 22,  acct: 'Roth' },
+  { sym: 'EZPZ', type: 'buy', price: 10.42, qty: 46,  acct: 'Roth' },
+  { sym: 'CRPT', type: 'buy', price: 9.50,  qty: 41,  acct: 'Roth' },
+  { sym: 'CRPT', type: 'buy', price: 7.60,  qty: 77,  acct: 'Roth' },
+  { sym: 'XRPZ', type: 'buy', price: 12.60, qty: 15,  acct: 'Roth' },
+  { sym: 'XRPZ', type: 'buy', price: 11.12, qty: 26,  acct: 'Roth' },
+  { sym: 'XRPZ', type: 'buy', price: 8.89,  qty: 54,  acct: 'Roth' },
+];
+
+const TARGET_LEVELS = [
+  { sym: 'ETH',  current: 20.20, buyTarget: '$19.00',  sellTarget: '$25.00 (30% trim)' },
+  { sym: 'IBIT', current: 39.77, buyTarget: '$37.00',  sellTarget: '$50.00 (25% trim)' },
+  { sym: 'BITQ', current: 20.38, buyTarget: '$18.00',  sellTarget: '$25.00 (20% trim)' },
+  { sym: 'BSOL', current: 11.91, buyTarget: '$7–10 ladder', sellTarget: '$13.00 avg up' },
+  { sym: 'EZPZ', current: 17.88, buyTarget: '$10–15 ladder', sellTarget: '$22.00 (20% trim)' },
+  { sym: 'XRPZ', current: 15.58, buyTarget: '$9–13 ladder', sellTarget: '$17.17 breakeven' },
+];
+
+// 90-Day historical close prices (sampled key dates)
+const PRICE_HISTORY = {
+  dates: ['Dec 22','Dec 29','Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 22'],
+  ETH:   [28.08, 27.50, 34.20, 36.50, 41.80, 45.78, 22.10, 21.30, 22.80, 21.00, 20.90, 19.50, 20.71, 20.20],
+  IBIT:  [50.09, 49.00, 55.20, 60.10, 65.40, 71.82, 43.50, 41.00, 44.20, 42.00, 41.20, 39.50, 40.26, 39.77],
+  BSOL:  [16.40, 16.00, 19.50, 21.80, 24.20, 26.60, 12.50, 11.20, 12.80, 12.00, 12.20, 11.40, 12.01, 11.91],
+  BITQ:  [21.77, 21.00, 24.80, 27.50, 29.00, 31.45, 18.00, 17.20, 19.50, 18.80, 20.10, 19.80, 20.95, 20.38],
+  EZPZ:  [22.98, 22.50, 27.80, 30.50, 32.00, 33.77, 17.80, 16.50, 18.50, 17.50, 18.00, 17.20, 18.11, 17.88],
+  CRPT:  [16.35, 15.80, 19.50, 21.50, 23.00, 25.90, 12.30, 11.50, 13.20, 12.50, 13.00, 12.40, 13.20, 12.84],
+};
+
+// ══════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════
+
+// [...] Rest of JS logic
+function updateTimestamp() {
+  const el = document.getElementById('ts');
+  const now = new Date();
+  const opts = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' };
+  el.textContent = now.toLocaleDateString('en-US', opts).replace(', 2026', ', 2026 ·');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // logic...
+});
+</script>
+</body>
+</html>
