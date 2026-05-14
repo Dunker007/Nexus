@@ -31,11 +31,11 @@ This protocol standardizes handoffs between AI agents working on Nexus. All agen
 
 ### Key Paths
 ```
-C:\Repos GIT\Nexus\              # Main repo
-C:\Repos GIT\Nexus\webapp\       # Next.js frontend
-C:\Repos GIT\Nexus\bridge\       # Express backend (port 3456)
-C:\Repos GIT\Nexus\src-tauri\    # Tauri Rust backend
-C:\Repos GIT\Nexus\pipeline\     # PowerShell automation (frozen)
+C:\Github Repos\Nexus\              # Main repo
+C:\Github Repos\Nexus\webapp\       # Next.js frontend
+C:\Github Repos\Nexus\bridge\       # Express backend (port 3456)
+C:\Github Repos\Nexus\src-tauri\    # Tauri Rust backend
+C:\Github Repos\Nexus\pipeline\     # PowerShell automation (frozen)
 ```
 
 ### Local Services
@@ -171,7 +171,7 @@ If the work involves:
 ### PowerShell (LuxRig)
 ```powershell
 # Navigate
-cd "C:\Repos GIT\Nexus"
+cd "C:\Github Repos\Nexus"
 
 # Webapp
 cd webapp; npm run dev

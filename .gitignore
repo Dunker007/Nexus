@@ -58,6 +58,20 @@ Thumbs.db
 # Testing
 coverage/
 
+# Build artifacts
+app/dist-server/
+app/eslint-output.json
+
+# Playwright MCP logs
+.playwright-mcp/
+
+# Deploy/build logs (webapp)
+webapp/build-log*.txt
+webapp/deploy_log.txt
+webapp/deploy_final_log.txt
+webapp/deploy_webapp_log.txt
+webapp/local_build_log.txt
+
 # Temp
 tmp/
 temp/
