@@ -27,7 +27,13 @@ function loadFromStorage<T>(key: string, fallback: T): T {
 function saveToStorage(key: string, value: unknown) {
     if (typeof window === 'undefined') return;
     try {
-        localStorage.setItem(key, JSON.stringify(value));
+        const serialized = JSON.stringify(value);
+        // Chrome per-item quota is ~5-10MB. Reject anything over 4MB to stay safe.
+        if (serialized.length > 4 * 1024 * 1024) {
+            console.warn(`[SmartFolio] Skipping localStorage save for "${key}" — ${(serialized.length / 1024 / 1024).toFixed(1)}MB exceeds per-item limit`);
+            return;
+        }
+        localStorage.setItem(key, serialized);
     } catch { /* quota exceeded */ }
 }
 
