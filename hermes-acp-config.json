@@ -1,0 +1,15 @@
+{
+  "agent_servers": {
+    "hermes-lux": {
+      "type": "custom",
+      "command": "hermes",
+      "args": [
+        "acp",
+        "--accept-hooks"
+      ],
+      "options": {
+        "cwd": "/mnt/c/Github Repos/Nexus"
+      }
+    }
+  }
+}
