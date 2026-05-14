@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Send, Bot, Shield, Zap, Brain, Sparkles, AlertTriangle, Check, X, ChevronRight, ChevronLeft } from 'lucide-react';
+import { MessageSquare, Send, Bot, Shield, Zap, Brain, Sparkles, AlertTriangle, Check, X, ChevronRight, ChevronLeft, Download } from 'lucide-react';
 
 // Agent Definitions
 const AGENTS = [
@@ -138,6 +138,26 @@ export default function StaffMeetingPanel({ labsData, onUpdateLab, selectedLabId
         addMessage('architect', `Changes applied to roadmap.`);
     };
 
+    const exportTranscript = () => {
+        if (messages.length === 0) return;
+
+        const transcript = messages.map(msg => {
+            const agentName = msg.agentId === 'user' ? 'User' : (AGENTS.find(a => a.id === msg.agentId)?.name || 'System');
+            const date = new Date(msg.timestamp).toLocaleTimeString();
+            return `[${date}] ${agentName}: ${msg.text}`;
+        }).join('\n');
+
+        const blob = new Blob([transcript], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `staff-meeting-transcript-${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     if (!isOpen) {
         return (
             <button
@@ -169,7 +189,12 @@ export default function StaffMeetingPanel({ labsData, onUpdateLab, selectedLabId
                         </div>
                     </div>
                 </div>
-                <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-white"><ChevronRight /></button>
+                <div className="flex items-center gap-3">
+                    <button onClick={exportTranscript} className="text-gray-400 hover:text-white transition-colors" title="Export Transcript">
+                        <Download size={18} />
+                    </button>
+                    <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-white"><ChevronRight /></button>
+                </div>
             </div>
 
             {/* Chat Area */}
