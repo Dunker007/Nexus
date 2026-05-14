@@ -340,18 +340,68 @@ Production-ready means:
 - ✅ Labs Hub with project management
 - ✅ v1.0.0 released
 
-### Growth Phase (Current — Active)
-**Focus:**
-- Content Pipeline activation
-- Revenue stream development
-- Distribution tracking (Music → Spotify/YouTube)
-- Art Studio for Etsy/POD
-- Unified Income Dashboard
+### Lux Orchestrator Phase (Current — Active)
 
-**Active Streams:**
-- Blog/AdSense (pipeline ready)
-- Music/Streaming (tracking building)
-- Art/Etsy (planned)
+**Goal:** Build the agent orchestration brain. Lux (Gemma 4 via LM Studio local) receives compound queries, delegates sub-tasks to specialized agents or tools, and consolidates a single output. Tiered model routing: local first → free/cheap tokens → costly LLMs only when required. Direct-use agents (Newsician, etc.) get memory and direct endpoints — not everything goes through Lux.
+
+**Architecture:**
+```
+User Query
+    ↓
+Lux (Gemma 4 @ LM Studio) ← Tool Registry
+    ↓
+    ├── Local tools (weather, time, system)
+    ├── delegate_to_agent → Newsician, CodeAgent, etc.
+    ├── query_memory → Pieces OS LTM
+    └── upgrade_model → OpenRouter (free/cheap → costly)
+    ↓
+Consolidated Output
+```
+
+| Phase | Name | Goal | Key Deliverable | Status |
+|-------|------|------|-----------------|--------|
+| O-1 | Orchestrator Core | Lux uses shared tool registry with live data | "what time + weather in Chicago?" | ✅ |
+| O-2 | Agent Delegation | Lux delegates to other agents as tools | `delegate_to_agent` tool wired | ⬜ |
+| O-3 | Memory Layer | Agents have Pieces OS LTM access | "catch me up on Nexus" via LTM | ⬜ |
+| O-4 | Model Tiering | Local → free → costly routing | Simple=local, complex=cloud | ⬜ |
+| O-5 | Direct Agent Access | User-facing agents get direct endpoints | Chat with Newsician directly | ⬜ |
+| O-6 | Integration | Compound queries, consolidated output | "catch me up + weather" in one call | ⬜ |
+
+**Phase O-1: Orchestrator Core**
+- Wire shared tool-registry into agents-lux.js (merge duplicate tool definitions)
+- Add real `get_weather` tool (Open-Meteo free API, no key required)
+- Add `get_system_time` tool from shared registry
+- Test: Gemma 4 returns time AND weather in one consolidated response
+
+**Phase O-2: Agent Delegation**
+- Add `delegate_to_agent` tool to shared tool registry
+- Agent registry exposes list of callable agents + their capabilities
+- Lux tool-calling loop handles delegation: call agent → receive result → synthesize
+- Test: Lux farms a sub-task to another agent, incorporates result
+
+**Phase O-3: Memory Layer**
+- Bridge agents get Pieces OS LTM query capability
+- Each agent maintains conversation history persistence
+- Lux can query session context for "catch up" queries
+- Test: "what were we working on last session?" returns real context
+
+**Phase O-4: Model Tiering**
+- OpenRouter provider added to bridge services
+- Cost-tier router: complexity assessment → model selection
+- Lux upgrades model via `upgrade_model` tool when task requires it
+- Test: Simple query hits Gemma 4 local; complex reasoning bumps to cloud
+
+**Phase O-5: Direct Agent Access**
+- Agent registry marks access pattern (direct vs internal-only)
+- Direct REST endpoints for user-facing agents
+- Newsician gets dedicated chat endpoint with memory
+- Test: Chat directly with Newsician, bypassing Lux
+
+**Phase O-6: Integration & Polish**
+- Lux queries Pieces OS for session context
+- Weather + project context in single consolidated output
+- Anti-loop safeguards across all tool calls
+- Full demo: "catch me up on Nexus project, also what's the weather today?"
 
 ---
 

@@ -1,8 +1,8 @@
 # Next Session Context
 
 **Last Updated:** May 14, 2026  
-**Last Agent:** Antigravity  
-**Session:** Post-reinstall hardening
+**Last Agent:** Hermes CLI (Lux)  
+**Session:** Lux Orchestrator Phase O-1 — Core
 
 ---
 
@@ -10,7 +10,7 @@
 
 - **OS:** Windows 11 Pro (LuxRig) — fresh tech stack reinstall completed
 - **Node:** v24.15.0
-- **Git:** Clean, all changes on `main`
+- **Git:** Phase O-1 changes uncommitted — see "Changes to Commit" below
 
 ### What Works
 - `app/` (Hermes Workspace) — boots on `npm run dev` → localhost:3000
@@ -24,25 +24,40 @@
 
 ---
 
-## Completed This Session
+## Completed This Session (Phase O-1: Orchestrator Core)
 
-1. ✅ Full repo health audit
-2. ✅ Purged 49 tracked build artifacts (3,083 lines of noise)
-3. ✅ Updated `.gitignore` to prevent future artifact commits
-4. ✅ Fixed stale repo paths in `AI_PROTOCOL.md`
-5. ✅ Created dev `.env` for Hermes Workspace
-6. ✅ Identified `app/` as Hermes Workspace (resolved "dual frontend" confusion)
-7. ✅ Updated all governance docs (SCOPE, AI_PROTOCOL, MASTER_PLAN, README, NEXT_SESSION)
+1. ✅ Added Lux Orchestrator phases (O-1 through O-6) to NEXUS_MASTER_PLAN.md
+2. ✅ `bridge/services/tool-registry.js` — Real `get_weather` tool (Open-Meteo free API, no key), `get_system_time` tool, extensible registry
+3. ✅ `bridge/services/agents-lux.js` — Refactored to use shared toolRegistry. Dynamic system prompt from registered tools. Multi-tool parsing + synthesis loop (up to 5 iterations)
+4. ✅ `bridge/test-lux.js` — Test harness for direct tool calls + LM Studio compound query
+5. ✅ Both tools verified: time (ISO + local) and weather (geocoding + Open-Meteo current + daily forecast)
 
 ---
 
-## Next Steps
+## Next Steps (Phase O-2: Agent Delegation)
 
-1. **Modularize `bridge/server.js`** — 1,065-line monolith → extract route groups
-2. **Audit `webapp/` routes** — 60 dirs, only 7 documented as working
-3. **Standardize Prisma** — webapp (7.1) vs bridge (check version)
-4. **Install webapp + bridge deps** — `npm install` in both after reinstall
-5. **Pieces OS integration audit** — verify LTM hooks in `app/`
+1. Add `delegate_to_agent` tool to shared tool-registry
+2. Agent registry must expose list of callable agents + capabilities
+3. Lux tool-calling loop handles delegation: call agent → receive result → synthesize
+4. Test: Lux farms a sub-task to another agent, incorporates result
+
+### Architecture Note
+Some agents (Newsician, etc.) will be user-facing and chat directly — not everything goes through Lux. The agent registry needs to distinguish:
+- **Internal agents** — only callable via Lux delegation
+- **Direct agents** — user-facing, chat directly, have their own endpoints
+
+This distinction doesn't need to block Phase O-2, but should be noted in the implementation.
+
+---
+
+## Changes to Commit
+
+```
+bridge/services/tool-registry.js  — Real weather + time tools
+bridge/services/agents-lux.js     — Refactored to use shared registry
+bridge/test-lux.js                — Updated test harness
+NEXUS_MASTER_PLAN.md              — Added Lux Orchestrator phases (O-1 ✅)
+```
 
 ---
 

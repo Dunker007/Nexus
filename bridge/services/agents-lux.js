@@ -1,124 +1,155 @@
 import { Agent } from './agent-core.js';
 import { lmstudioService } from './lmstudio.js';
-
-// Dumb / stateless tools that Lux can call
-const tools = {
-    get_weather: ({ location }) => {
-        // In the future, this will hit a real API like OpenWeatherMap
-        console.log(`[Tool Executed] Fetching weather for ${location}...`);
-        return `The current weather in ${location || 'your location'} is 68°F and sunny.`;
-    },
-    get_time: () => {
-        console.log(`[Tool Executed] Fetching current time...`);
-        return `The current time is ${new Date().toLocaleTimeString()}.`;
-    },
-    get_hockey_score: ({ team }) => {
-        // In the future, this will hit an ESPN or NHL API
-        console.log(`[Tool Executed] Fetching hockey score for ${team}...`);
-        return `The ${team || 'Blackhawks'} won 4-2 last night!`;
-    }
-};
+import { toolRegistry } from './tool-registry.js';
 
 export class LuxAgent extends Agent {
     constructor() {
         super({
             id: 'lux-orchestrator',
             name: 'Lux',
-            description: 'The Executive Orchestrator. Evaluates user intent and delegates to dumb tools or memory agents.',
-            capabilities: ['orchestration', 'tool-calling', 'synthesis']
+            description: 'The Executive Orchestrator. Evaluates user intent, delegates to tools/agents, and synthesizes a single consolidated response.',
+            capabilities: ['orchestration', 'tool-calling', 'delegation', 'synthesis']
         });
+    }
+
+    // Build Lux's system prompt dynamically from the shared tool registry
+    buildSystemPrompt() {
+        const toolList = toolRegistry.getTools()
+            .map(t => {
+                const params = t.parameters?.properties 
+                    ? Object.entries(t.parameters.properties)
+                        .map(([k, v]) => `${k}: ${v.description || v.type}`)
+                        .join(', ')
+                    : 'none';
+                const required = t.parameters?.required?.length 
+                    ? ` (required: ${t.parameters.required.join(', ')})` 
+                    : '';
+                return `- ${t.name}(${params})${required}: ${t.description}`;
+            })
+            .join('\n');
+
+        return `You are Lux, the executive orchestrator of the Nexus system.
+You have access to the following tools:
+
+${toolList}
+
+When you need to use a tool, reply with a JSON block in this EXACT format:
+\`\`\`json
+{
+  "tool": "tool_name",
+  "args": {
+    "param1": "value1"
+  }
+}
+\`\`\`
+
+RULES:
+- Use tools whenever you need REAL data (time, weather, system info, etc.). Do NOT guess or make up data that a tool can provide.
+- You can call MULTIPLE tools in one response by listing multiple JSON blocks.
+- After receiving tool results, SYNTHESIZE them into one natural, conversational response. Do NOT just dump raw JSON.
+- If you don't need a tool, answer the user directly.
+- Be concise but complete. Prioritize accuracy over speed.`;
+    }
+
+    // Format a tool result into something Gemma can read
+    formatToolResult(result) {
+        if (typeof result === 'string') return result;
+        if (result && typeof result === 'object') {
+            // Flatten nested objects into readable lines
+            return JSON.stringify(result, null, 0)
+                .replace(/[{}"]/g, '')
+                .replace(/,/g, ', ');
+        }
+        return String(result);
     }
 
     async processTask(task, context) {
         const { message, history = [] } = task;
 
-        // The Orchestrator's System Prompt
-        const systemPrompt = `You are Lux, the executive orchestrator of the Nexus system.
-You have access to the following tools:
-1. get_weather(location): Fetch the current weather.
-2. get_time(): Fetch the current local time.
-3. get_hockey_score(team): Fetch last night's hockey score.
-
-If you need to use a tool, you MUST reply with a JSON block in this exact format:
-\`\`\`json
-{
-  "tool": "tool_name",
-  "args": {
-    "location": "Chicago"
-  }
-}
-\`\`\`
-If you do not need a tool, just answer the user normally. Synthesize all tool responses into natural conversation.`;
-
+        const systemPrompt = this.buildSystemPrompt();
         const messages = [
             { role: 'system', content: systemPrompt },
             ...history,
             { role: 'user', content: message }
         ];
 
-        console.log(`[Lux] Analyzing user request: "${message}"`);
+        console.log(`[Lux] Processing: "${message}"`);
+        console.log(`[Lux] Available tools: ${toolRegistry.getToolNames().join(', ')}`);
 
-        // Loop up to 5 times to resolve multi-tool requests
+        // Loop up to 5 iterations for multi-tool resolution
         let iterations = 0;
         let response = await lmstudioService.chat(messages, 'default');
-        
+
         while (iterations < 5) {
-            let toolCallMatch = response.content.match(/```json\n([\s\S]*?)\n```/);
-            let gemmaMatch = response.content.match(/<\|tool_call>call:([a-zA-Z_]+)\{(.*?)\}<tool_call\|>/);
-            
-            let parsedTool = null;
-            
+            // Parse tool calls from Gemma's response
+            // Supports: ```json {...} ``` blocks, and Gemma native <|tool_call|> format
+            const toolCallMatch = response.content.match(/```json\n([\s\S]*?)\n```/g);
+            const gemmaMatch = response.content.match(/<\|tool_call\|>call:([a-zA-Z_]+)\{(.*?)\}<tool_call\|>/);
+
+            let parsedTools = [];
+
             if (toolCallMatch) {
-                try {
-                    parsedTool = JSON.parse(toolCallMatch[1]);
-                } catch(e) { }
+                for (const block of toolCallMatch) {
+                    try {
+                        const json = block.replace(/```json\n/, '').replace(/\n```/, '');
+                        parsedTools.push(JSON.parse(json));
+                    } catch (e) {
+                        console.warn(`[Lux] Failed to parse tool block: ${block.substring(0, 80)}...`);
+                    }
+                }
             } else if (gemmaMatch) {
                 let args = {};
                 try {
                     if (gemmaMatch[2]) {
                         args = JSON.parse(`{${gemmaMatch[2]}}`);
                     }
-                } catch(e) {}
-                parsedTool = { tool: gemmaMatch[1], args };
+                } catch (e) {}
+                parsedTools.push({ tool: gemmaMatch[1], args });
             }
-            
-            if (parsedTool) {
-                try {
-                    console.log(`[Lux] Decided to call tool: ${parsedTool.tool}`);
-                    
-                    if (tools[parsedTool.tool]) {
-                        // Execute the tool
-                        const toolResult = tools[parsedTool.tool](parsedTool.args || {});
-                        console.log(`[Lux] Tool returned: ${toolResult}`);
-                        
-                        // Feed the raw data back to Lux for synthesis/further tool calls
-                        messages.push({ role: 'assistant', content: response.content });
-                        messages.push({ role: 'user', content: `[SYSTEM: Tool Result] -> ${toolResult}` });
-                        
-                        // Call LM Studio again
-                        console.log(`[Lux] Synthesizing or checking for next tool...`);
-                        response = await lmstudioService.chat(messages, 'default');
-                    } else {
-                        console.log(`[Lux] Attempted to call unknown tool: ${parsedTool.tool}`);
-                        messages.push({ role: 'assistant', content: response.content });
-                        messages.push({ role: 'user', content: `[SYSTEM: Tool Result] -> Error: Unknown tool ${parsedTool.tool}` });
-                        response = await lmstudioService.chat(messages, 'default');
+
+            if (parsedTools.length > 0) {
+                console.log(`[Lux] Tool calls detected: ${parsedTools.map(t => t.tool).join(', ')}`);
+                const toolResults = [];
+
+                for (const parsed of parsedTools) {
+                    try {
+                        const result = await toolRegistry.executeTool(parsed.tool, parsed.args || {});
+                        const formatted = this.formatToolResult(result);
+                        toolResults.push({ tool: parsed.tool, success: true, result: formatted });
+                        console.log(`[Lux] ✓ ${parsed.tool} returned ${formatted.length} chars`);
+                    } catch (err) {
+                        toolResults.push({ tool: parsed.tool, success: false, result: `Error: ${err.message}` });
+                        console.error(`[Lux] ✗ ${parsed.tool} failed: ${err.message}`);
                     }
-                } catch (e) {
-                    console.error("[Lux] Error executing tool:", e);
-                    break;
                 }
+
+                // Feed results back to Lux for synthesis or next round
+                messages.push({ role: 'assistant', content: response.content });
+                messages.push({
+                    role: 'user',
+                    content: `[SYSTEM: Tool Results]\n${toolResults.map(tr =>
+                        `${tr.tool}: ${tr.success ? 'SUCCESS' : 'FAILED'} → ${tr.result}`
+                    ).join('\n')}`
+                });
+
+                console.log(`[Lux] Feeding ${toolResults.length} tool result(s) back for synthesis...`);
+                response = await lmstudioService.chat(messages, 'default');
             } else {
-                console.log(`[Lux] No tool needed, or finished resolving. Responding directly.`);
+                console.log(`[Lux] No tool calls detected. Responding directly.`);
                 break;
             }
             iterations++;
+        }
+
+        if (iterations >= 5) {
+            console.warn(`[Lux] Max iterations (5) reached. Returning last response.`);
         }
 
         return {
             content: response.content,
             provider: response.provider,
             model: response.model,
+            iterations,
             timestamp: new Date()
         };
     }
