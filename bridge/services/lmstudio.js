@@ -3,7 +3,7 @@
  * Connects to LM Studio's OpenAI-compatible API
  */
 
-const LMSTUDIO_URL = process.env.LMSTUDIO_URL || 'http://127.0.0.1:1234';
+const LMSTUDIO_URL = process.env.LMSTUDIO_URL || 'http://100.97.174.81:1234';
 import { settingsService } from './settings.js';
 
 function getUrl() {
@@ -162,7 +162,7 @@ export const lmstudioService = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: model || 'gemma-3n-e4b-it', // Fallback to user's preferred model
+                model: model === 'default' ? 'google/gemma-4-e4b' : (model || 'google/gemma-4-e4b'),
                 messages: sanitizedMessages,
                 temperature: 0.7,
                 max_tokens: -1, // Use -1 for infinite/context-limit

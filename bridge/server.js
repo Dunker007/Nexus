@@ -35,6 +35,7 @@ import distributionRoutes from './routes/distribution.js';
 import artProductsRoutes from './routes/art-products.js';
 import incomeRoutes from './routes/income.js';
 import smartfolioRoutes from './routes/smartfolio.js';
+import toolRoutes from './routes/tools.js';
 const app = express();
 const PORT = process.env.PORT || 3456;
 
@@ -86,6 +87,9 @@ app.use('/distribution', security.authenticateApiKey(), distributionRoutes);
 app.use('/art', security.authenticateApiKey(), artProductsRoutes);
 app.use('/income', security.authenticateApiKey(), incomeRoutes);
 app.use('/smartfolio', security.authenticateApiKey(), smartfolioRoutes);
+
+// Nexus Tool Server Routes
+app.use('/tools', security.authenticateApiKey(), toolRoutes);
 
 // Create HTTP server for both Express and WebSocket
 const server = createServer(app);
@@ -425,7 +429,7 @@ app.get('/github/repos', async (req, res) => {
 
 // Staff Meeting Routes (must be before parameterized routes)
 // Start a meeting
-app.post('/agents/meeting/start', async (req, res) => {
+app.post('/agents/meeting/start', security.authenticateApiKey(), async (req, res) => {
     try {
         const { topic } = req.body;
 
@@ -442,7 +446,7 @@ app.post('/agents/meeting/start', async (req, res) => {
 });
 
 // Get meeting status
-app.get('/agents/meeting/status', async (req, res) => {
+app.get('/agents/meeting/status', security.authenticateApiKey(), async (req, res) => {
     try {
         const status = staffMeetingAgent.getMeetingStatus();
         res.json(status);
@@ -452,7 +456,7 @@ app.get('/agents/meeting/status', async (req, res) => {
 });
 
 // Stop meeting
-app.post('/agents/meeting/stop', async (req, res) => {
+app.post('/agents/meeting/stop', security.authenticateApiKey(), async (req, res) => {
     try {
         const result = staffMeetingAgent.stopMeeting();
         res.json(result);
@@ -465,7 +469,7 @@ app.post('/agents/meeting/stop', async (req, res) => {
 const staffMeetingAgent = new StaffMeetingAgent();
 
 // Create and execute agent task
-app.post('/agents/execute', async (req, res) => {
+app.post('/agents/execute', security.authenticateApiKey(), async (req, res) => {
     try {
         const { agentType, task, context = {} } = req.body;
 
@@ -494,7 +498,7 @@ app.post('/agents/execute', async (req, res) => {
 });
 
 // Get agent status
-app.get('/agents/:type/status', (req, res) => {
+app.get('/agents/:type/status', security.authenticateApiKey(), (req, res) => {
     try {
         const agent = activeAgents.get(req.params.type);
         if (!agent) {
@@ -514,7 +518,7 @@ app.get('/agents/:type/status', (req, res) => {
 });
 
 // Get agent memory
-app.get('/agents/:type/memory', async (req, res) => {
+app.get('/agents/:type/memory', security.authenticateApiKey(), async (req, res) => {
     try {
         const agent = activeAgents.get(req.params.type);
         if (!agent) {
@@ -533,7 +537,7 @@ app.get('/agents/:type/memory', async (req, res) => {
 });
 
 // List all active and available agents
-app.get('/agents', (req, res) => {
+app.get('/agents', security.authenticateApiKey(), (req, res) => {
     try {
         const active = Array.from(activeAgents.values()).map(agent => ({
             id: agent.id,
@@ -562,7 +566,7 @@ app.get('/agents', (req, res) => {
 });
 
 // Reset agent
-app.post('/agents/:type/reset', async (req, res) => {
+app.post('/agents/:type/reset', security.authenticateApiKey(), async (req, res) => {
     try {
         const agent = activeAgents.get(req.params.type);
         if (!agent) {
@@ -579,7 +583,7 @@ app.post('/agents/:type/reset', async (req, res) => {
 // ============ Staff Meeting Routes ============
 
 // Start AI Staff Meeting
-app.post('/agents/meeting', async (req, res) => {
+app.post('/agents/meeting', security.authenticateApiKey(), async (req, res) => {
     try {
         const { topic, participants = ['architect', 'security', 'qa'], rounds = 2 } = req.body;
 
@@ -659,7 +663,7 @@ function generateAgentMessage(agent, topic, round) {
 }
 
 // Get meeting status
-app.get('/agents/meeting/:meetingId', (req, res) => {
+app.get('/agents/meeting/:meetingId', security.authenticateApiKey(), (req, res) => {
     try {
         // const status = staffMeetingAgent.getMeetingStatus();
         res.status(501).json({ error: 'Not implemented' });

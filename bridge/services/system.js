@@ -123,6 +123,11 @@ export const systemService = {
      */
     async getDisk(drive = 'C:') {
         try {
+            // Validate drive to prevent command injection
+            if (!/^[a-zA-Z]:$/.test(drive)) {
+                return { error: 'Invalid drive letter format. Expected format like "C:"' };
+            }
+
             const { stdout } = await execAsync(
                 `powershell -Command "Get-WmiObject Win32_LogicalDisk -Filter \\"DeviceID='${drive}'\\" | Select-Object Size,FreeSpace | ConvertTo-Json"`
             );

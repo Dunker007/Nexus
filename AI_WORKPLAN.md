@@ -188,11 +188,19 @@ This workplan guides AI agents through Nexus development. Tasks are organized in
 ### From Labs Hub:
 | Project | Current Progress | Action |
 |---------|------------------|--------|
-| Voice Command | 90% | ⬜ Complete remaining 10% |
+| Voice Command | 90% | ⏸️ Deferred (Awaiting hardware) |
 | Automation Lab | 60% | ⬜ Polish workflow builder |
 | Smart Home Control | 45% | ⬜ Design Home Assistant integration |
 | AI Staff Meeting | 80% | ⬜ Add transcript export |
 | Nexus Implementation Plan | 60% | ⬜ Continue roadmap execution |
+
+### Nexus Tool Server API (Immediate Focus)
+| Task | Priority | Status |
+|------|----------|--------|
+| Scaffold `tool-registry.js` to manage agent tools | High | ⬜ Pending |
+| Build `tools.js` API route for LM Studio payloads | High | ⬜ Pending |
+| Implement first test tool (e.g., `get_system_time`) | Medium | ⬜ Pending |
+| Integrate with LM Studio (test end-to-end) | High | ⬜ Pending |
 
 ---
 

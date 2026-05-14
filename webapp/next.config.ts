@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 // Robust check for web environments (Cloud Run, Vercel, or Production builds)
-const isWeb = !!(
+const isDev = process.env.NODE_ENV === 'development';
+const isWeb = isDev || !!(
   process.env.NEXT_PUBLIC_IS_WEB === 'true' || 
   process.env.VERCEL || 
   process.env.K_SERVICE || // Google Cloud Run environment variable

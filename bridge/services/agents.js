@@ -8,6 +8,7 @@ import { RevenueAgent } from './agents-revenue.js';
 import { IntentAgent } from './agents-intent.js';
 import { StaffMeetingAgent } from './agents-staff-meeting.js';
 import { LyricistAgent, ComposerAgent, CriticAgent, ProducerAgent, SongwriterRoom, NewsicianAgent, MidwestSentinelAgent, MicAgent } from './agents-songwriter.js';
+import { LuxAgent } from './agents-lux.js';
 
 export { Agent };
 
@@ -701,6 +702,7 @@ export const agentRegistry = {
     research: ResearchAgent,
     code: CodeAgent,
     workflow: WorkflowAgent,
+    lux: LuxAgent,
     // Advanced agents (2026 Vision)
     architect: ArchitectAgent,
     qa: QAAgent,
