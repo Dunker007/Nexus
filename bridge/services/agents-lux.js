@@ -43,7 +43,8 @@ When you need to use a tool, reply with a JSON block in this EXACT format:
 }
 \`\`\`
 
-RULES:
+CRITICAL INSTRUCTIONS FOR TOOLS:
+- DO NOT use "<|tool_call>call: tool_name(...)" syntax. You MUST use the JSON format above.
 - Use tools whenever you need REAL data (time, weather, system info, etc.). Do NOT guess or make up data that a tool can provide.
 - You can call MULTIPLE tools in one response by listing multiple JSON blocks.
 - After receiving tool results, SYNTHESIZE them into one natural, conversational response. Do NOT just dump raw JSON.
@@ -81,10 +82,12 @@ RULES:
         let response = await lmstudioService.chat(messages, 'default');
 
         while (iterations < 5) {
+            console.log(`\n[Lux DEBUG] Raw response content:\n${response.content}\n`);
             // Parse tool calls from Gemma's response
-            // Supports: ```json {...} ``` blocks, and Gemma native <|tool_call|> format
+            // Supports: ```json {...} ``` blocks, and Gemma native tool formats
             const toolCallMatch = response.content.match(/```json\n([\s\S]*?)\n```/g);
-            const gemmaMatch = response.content.match(/<\|tool_call\|>call:([a-zA-Z_]+)\{(.*?)\}<tool_call\|>/);
+            const gemmaJsonMatch = response.content.match(/(?:<\|tool_call\|>|<\|tool_call>)?call:\s*([a-zA-Z_]+)(?:\(\))?\s*\{([\s\S]*?)\}(?:<tool_call\|>)?/);
+            const gemmaFuncMatch = response.content.match(/(?:<\|tool_call\|>|<\|tool_call>)?call:\s*([a-zA-Z_]+)\(([\s\S]*?)\)(?:<tool_call\|>)?/);
 
             let parsedTools = [];
 
@@ -94,17 +97,35 @@ RULES:
                         const json = block.replace(/```json\n/, '').replace(/\n```/, '');
                         parsedTools.push(JSON.parse(json));
                     } catch (e) {
-                        console.warn(`[Lux] Failed to parse tool block: ${block.substring(0, 80)}...`);
+                        console.warn(`[Lux DEBUG] Failed to parse tool block: ${block.substring(0, 80)}... Error: ${e.message}`);
                     }
                 }
-            } else if (gemmaMatch) {
+            } else if (gemmaJsonMatch) {
                 let args = {};
                 try {
-                    if (gemmaMatch[2]) {
-                        args = JSON.parse(`{${gemmaMatch[2]}}`);
+                    if (gemmaJsonMatch[2].trim()) {
+                        args = JSON.parse(`{${gemmaJsonMatch[2]}}`);
                     }
-                } catch (e) {}
-                parsedTools.push({ tool: gemmaMatch[1], args });
+                } catch (e) {
+                    console.warn(`[Lux DEBUG] Failed to parse Gemma JSON args: {${gemmaJsonMatch[2]}}. Error: ${e.message}`);
+                }
+                parsedTools.push({ tool: gemmaJsonMatch[1], args });
+            } else if (gemmaFuncMatch) {
+                let args = {};
+                try {
+                    // Extremely naive parsing for param="value" or param={"key":"value"}
+                    // If this fails, we just rely on the strict JSON instruction above.
+                    const paramStr = gemmaFuncMatch[2].trim();
+                    if (paramStr) {
+                        // Just try wrapping the whole thing in {} if it's already comma separated key=value pairs, 
+                        // but converting key=value to "key": value is hard. Let's just fallback or do a simple replace.
+                        const jsonStr = paramStr.replace(/([a-zA-Z_]+)=/g, '"$1":');
+                        args = JSON.parse(`{${jsonStr}}`);
+                    }
+                } catch (e) {
+                    console.warn(`[Lux DEBUG] Failed to parse Gemma Func args: ${gemmaFuncMatch[2]}. Error: ${e.message}`);
+                }
+                parsedTools.push({ tool: gemmaFuncMatch[1], args });
             }
 
             if (parsedTools.length > 0) {

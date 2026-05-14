@@ -130,3 +130,76 @@ toolRegistry.registerTool({
         }
     };
 });
+
+// ─── TOOL: delegate_to_agent ───
+toolRegistry.registerTool({
+    name: 'delegate_to_agent',
+    description: 'Delegate a specialized sub-task to another AI agent.',
+    parameters: {
+        type: 'object',
+        properties: {
+            agent_type: {
+                type: 'string',
+                description: 'The ID of the agent to call (e.g. "research", "code", "newsician"). Call get_callable_agents if unsure.'
+            },
+            task: {
+                type: 'object',
+                description: 'The task payload for the agent (usually includes an "action" and other params, or "message", or "query").'
+            }
+        },
+        required: ['agent_type', 'task']
+    }
+}, async (args) => {
+    const { agent_type, task } = args;
+    if (!agent_type) throw new Error('Missing required parameter: agent_type');
+    if (!task) throw new Error('Missing required parameter: task');
+
+    // Dynamic import to avoid circular dependency
+    const { createAgent } = await import('./agents.js');
+    
+    try {
+        const agent = createAgent(agent_type);
+        const result = await agent.processTask(task, {});
+        return {
+            success: true,
+            agent: agent.name,
+            result
+        };
+    } catch (err) {
+        return {
+            success: false,
+            error: err.message
+        };
+    }
+});
+
+// ─── TOOL: get_callable_agents ───
+toolRegistry.registerTool({
+    name: 'get_callable_agents',
+    description: 'List all specialized AI agents available for delegation, including their IDs and capabilities.',
+    parameters: {
+        type: 'object',
+        properties: {}
+    }
+}, async () => {
+    const { agentRegistry } = await import('./agents.js');
+    const available = [];
+    for (const [key, AgentClass] of Object.entries(agentRegistry)) {
+        if (key === 'lux') continue; // Skip self
+        try {
+            const temp = new AgentClass();
+            available.push({
+                id: key,
+                name: temp.name,
+                description: temp.description,
+                capabilities: temp.capabilities || []
+            });
+        } catch (e) {
+            // Ignore errors for uninstantiable agents
+        }
+    }
+    return {
+        success: true,
+        agents: available
+    };
+});
