@@ -2,9 +2,9 @@
 
 **Version:** 1.1.0  
 **Created:** December 7, 2025  
-**Updated:** December 8, 2025  
-**Maintainer:** Claude (Overseer) + Human (Executive)  
-**Status:** Growth Phase (Active)
+**Updated:** May 14, 2026  
+**Maintainer:** Human (Executive) + AI Agents  
+**Status:** Hardening Phase (Active)
 
 ---
 
@@ -74,15 +74,18 @@ Track friction here. Fix later, don't slow down now.
 | Layer | Choice | Status |
 |-------|--------|--------|
 | Desktop Shell | Tauri 2.x | ✅ CLI installed |
-| Frontend | Next.js + React + TypeScript | ✅ From Fresh-Start |
-| Backend | Express (Bridge) on port 3456 | ✅ From Fresh-Start |
+| Frontend | Next.js 15 + React 19 + TypeScript | ✅ webapp/ |
+| Backend | Express (Bridge) on port 3456 | ✅ bridge/ |
 | Database | SQLite via Prisma | ✅ Working |
-| Local AI | LM Studio @ localhost:1234 | ✅ Running qwen2.5-vl-7b |
+| Local AI | LM Studio @ localhost:1234 | ✅ Running |
+| Agent Platform | Hermes Agent (hermes-workspace) | ✅ app/ (3rd-party dashboard) |
+| Long-Term Memory | Pieces OS (LTM Engine) | ✅ Integrated |
 | Automation | PowerShell (Content Pipeline) | ✅ Frozen but complete |
 | Version Control | Git (source of truth) | ✅ Active |
 | Remote Access | Tailscale | ✅ Configured |
-| Primary Builder | Antigravity + Gemini 3 Pro | ✅ Active |
-| Overseer | Claude | ✅ That's me |
+| Node.js | v24.15.0 | ✅ Post-reinstall |
+| Primary Builder | Antigravity (IDE Agent) | ✅ Active |
+| Overseer | Claude | ✅ Advisory |
 
 **Do not suggest alternatives to locked items.**
 
@@ -192,9 +195,11 @@ Everything here stays frozen or text-only until priority shifts back:
 
 | Agent | Role | Serves | Power Level |
 |-------|------|--------|-------------|
-| **You** | Executive decision maker | Everything | GO/NO-GO authority |
-| **Claude** | Overseer, planner, Git keeper | Strategic | Advisory + Documentation |
-| **Gemini 3 Pro** | Primary builder | Code production | Executes approved work |
+| **You (Chris)** | Executive decision maker | Everything | GO/NO-GO authority |
+| **Antigravity** | Primary IDE agent, full file system access | Code production | Executes approved work |
+| **Hermes Agent** | Autonomous task execution, MCP tools | Agent orchestration | Executes via hermes-workspace |
+| **Claude** | Overseer, planner, documentation | Strategic | Advisory + Documentation |
+| **Gemini 3 Pro** | Multi-file builds, architecture | Code production | Executes approved work |
 | **Copilot** | Inline assist, quick fixes | Dev support | Tactical |
 | **Income Seeker** | Opportunity research | Revenue planning | Advisory — seeds backlog |
 | **Legal Advisor** | Risk assessment | All projects | Advisory — no veto |
@@ -354,18 +359,21 @@ Production-ready means:
 
 ```
 Nexus/
-├── src-tauri/              # Tauri Rust backend (NEW)
-│   └── src/main.rs
+├── app/                    # Hermes Workspace (3rd-party agent dashboard)
+│   ├── src/               # React + Vite frontend
+│   ├── server.ts          # Express entry point
+│   └── src-tauri/         # Tauri shell (Hermes)
 │
-├── webapp/                 # Next.js frontend
+├── webapp/                 # Nexus frontend (canonical)
 │   ├── src/app/           # Page routes (front doors)
 │   ├── src/components/    # React components
-│   └── src/lib/           # Utilities
+│   ├── src/lib/           # Utilities
+│   └── src-tauri/         # Tauri shell (Nexus)
 │
-├── bridge/                 # Express backend
+├── bridge/                 # Express backend (port 3456)
 │   ├── services/          # All agents live here
 │   ├── prisma/            # Database
-│   └── server.js          # Main server
+│   └── server.js          # Main server (needs modularization)
 │
 ├── pipeline/               # Content Pipeline (frozen)
 │   ├── core/              # PowerShell modules

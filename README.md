@@ -25,10 +25,11 @@ npm run tauri dev
 
 ```
 Nexus/
-├── webapp/           # Next.js 16 + Tauri 2.0 application
+├── webapp/           # Next.js 15 + Tauri 2.0 application (Nexus UI)
 │   ├── src-tauri/    # Rust backend for Desktop App
 │   ├── src/app/      # App routes and pages
 │   └── src/components/ # Reusable components
+├── app/              # Hermes Workspace (3rd-party agent dashboard)
 ├── bridge/           # Express.js API backend (bundled with app)
 │   ├── routes/       # API endpoints
 │   └── services/     # Business logic
@@ -48,9 +49,11 @@ Nexus/
 ## 🛠️ Tech Stack
 
 - **Desktop**: Tauri 2.0 (Rust)
-- **Frontend**: Next.js 16, React 19, Tailwind CSS 4, Framer Motion
+- **Frontend**: Next.js 15, React 19, Tailwind CSS 4, Framer Motion
 - **Backend**: Express.js, Prisma, SQLite (Bridge)
 - **AI**: LM Studio, Ollama, Google AI Studio
+- **Agent Platform**: Hermes Agent (hermes-workspace)
+- **Long-Term Memory**: Pieces OS (LTM Engine)
 
 ## 📱 Remote Access
 

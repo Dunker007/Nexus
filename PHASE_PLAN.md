@@ -1,8 +1,8 @@
 # NEXUS PHASE PLAN
 
-**Version:** 1.2.0  
+**Version:** 1.3.0  
 **Created:** December 8, 2025  
-**Updated:** December 16, 2025  
+**Updated:** May 14, 2026  
 **Status:** Hardening Phase
 
 ---
@@ -305,6 +305,17 @@ These will be revisited when desktop tools are fully polished.
 | All desktop pages load | No 500 errors |
 | Chat works | LM Studio responds |
 | Settings persist | Across restarts |
+
+---
+
+## Post-Reinstall Notes (May 2026)
+
+- Full Windows + tech stack reinstall completed
+- Node.js updated to v24.15.0
+- `app/` directory identified as [hermes-workspace](https://github.com/outsourc-e/hermes-workspace) (3rd-party, not Nexus)
+- Pieces OS LTM Engine integrated
+- Hermes Agent operational via hermes-workspace dashboard
+- All governance docs updated to reflect current state
 
 ---
 

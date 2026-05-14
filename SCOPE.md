@@ -1,7 +1,7 @@
 # PROJECT SCOPE
 
-**Version:** 1.2.0  
-**Last Updated:** December 16, 2025  
+**Version:** 1.3.0  
+**Last Updated:** May 14, 2026  
 **Status:** Hardening Phase
 
 ---
@@ -34,6 +34,15 @@ This file is the quick reference. The Master Plan has full context.
 | **Income Dashboard** | webapp/src/app/income | ⏸️ Deferred |
 | **Distribution** | bridge/routes/distribution.js | ⏸️ Deferred |
 | **Art Studio** | webapp/src/app/studios/art | ⏸️ Deferred |
+
+### New Integrations (Active)
+
+| Integration | Location | Status |
+|-------------|----------|--------|
+| **Pieces OS** | app/ (LTM client) | 🟢 Integrated |
+| **Hermes Agent** | app/ (hermes-workspace) | 🟢 Running |
+
+> **Note:** `app/` is a fork of [hermes-workspace](https://github.com/outsourc-e/hermes-workspace) — a 3rd-party Hermes Agent dashboard. It is **not** the Nexus frontend. The Nexus frontend is `webapp/`.
 
 ### Backend
 

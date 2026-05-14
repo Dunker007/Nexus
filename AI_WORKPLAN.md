@@ -1,11 +1,11 @@
 # AI WORKPLAN - NEXUS DEVELOPMENT
 
-**Version:** 2.0.0  
+**Version:** 2.1.0  
 **Created:** January 11, 2026  
-**Updated:** February 14, 2026  
-**Primary Builder:** Gemini 3 Pro (Antigravity IDE)  
+**Updated:** May 14, 2026  
+**Primary Builder:** Antigravity (IDE Agent)  
 **Overseer:** Claude  
-**Status:** Hardening Phase + Web Deployment Complete
+**Status:** Hardening Phase + Post-Reinstall Stabilization
 
 ---
 
@@ -337,6 +337,7 @@ When switching between AI agents:
 |------|---------|---------|
 | 2026-01-11 | 1.0.0 | Initial workplan created from project review |
 | 2026-02-14 | 2.0.0 | Updated for reality: Wave 1-4 complete, deployment live, Smartfolio added |
+| 2026-05-14 | 2.1.0 | Post-reinstall: Pieces OS + Hermes Agent integrated, app/ identified as hermes-workspace, all docs updated |
 
 ---
 

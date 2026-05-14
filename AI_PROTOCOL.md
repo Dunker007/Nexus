@@ -1,8 +1,8 @@
 # AI Agent Protocol
 
-**Version:** 2.0.0  
-**Last Updated:** December 7, 2025  
-**Maintainer:** Claude (Overseer)
+**Version:** 2.1.0  
+**Last Updated:** May 14, 2026  
+**Maintainer:** Human (Executive) + AI Agents
 
 ---
 
@@ -25,15 +25,16 @@ This protocol standardizes handoffs between AI agents working on Nexus. All agen
 ### Target Platform
 - **Primary OS:** Windows 11 Pro (LuxRig)
 - **Desktop Framework:** Tauri 2.x
-- **Node Version:** v24.x
-- **Rust Version:** 1.91.x
+- **Node Version:** v24.15.0
+- **Rust Version:** 1.91.x (verify after reinstall)
 - **Package Manager:** npm
 
 ### Key Paths
 ```
 C:\Github Repos\Nexus\              # Main repo
-C:\Github Repos\Nexus\webapp\       # Next.js frontend
+C:\Github Repos\Nexus\webapp\       # Next.js frontend (canonical Nexus UI)
 C:\Github Repos\Nexus\bridge\       # Express backend (port 3456)
+C:\Github Repos\Nexus\app\          # Hermes Workspace (3rd-party agent dashboard, NOT Nexus)
 C:\Github Repos\Nexus\src-tauri\    # Tauri Rust backend
 C:\Github Repos\Nexus\pipeline\     # PowerShell automation (frozen)
 ```
@@ -161,6 +162,8 @@ If the work involves:
 | Agent | Strengths | Limitations |
 |-------|-----------|-------------|
 | Claude | Planning, oversight, documentation, Git | No direct file system (uses tools) |
+| Antigravity | Full IDE agent, file system, browser, terminal, persistent memory | Session timeouts, needs checklist for continuity |
+| Hermes Agent | Autonomous task execution, MCP tools, long-term memory (Pieces OS) | 3rd-party dashboard (hermes-workspace) |
 | Gemini 3 Pro | Multi-file builds, architecture | May not have full Git context |
 | Copilot | Inline completions, quick fixes | Limited context window |
 
