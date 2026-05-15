@@ -3,6 +3,9 @@
  * Verifies that the 5 new LTM tools are registered and callable
  */
 
+import os from 'os';
+import fs from 'fs';
+import { execSync } from 'child_process';
 import { toolRegistry } from './services/tool-registry.js';
 import { piecesService } from './services/pieces.js';
 import './services/pieces-mcp-adapter.js'; // Load the adapter to register tools
@@ -22,14 +25,30 @@ for (const tool of expectedTools) {
 
 // 2. Test Pieces OS connectivity
 console.log('\n=== Pieces OS Connectivity ===');
-console.log(`Pieces URL: ${piecesService.basePath}`);
+
+// Detect WSL and show expected gateway IP
+const isWsl = os.platform() === 'linux' && fs.existsSync('/mnt/c');
+if (isWsl) {
+    const gateway = execSync("ip route | grep default | awk '{print $3}'").toString().trim();
+    console.log(`WSL detected: true`);
+    console.log(`Gateway IP: ${gateway}`);
+    console.log(`Expected Pieces URL: http://${gateway}:39300`);
+} else {
+    console.log(`WSL detected: false`);
+    console.log(`Expected Pieces URL: http://localhost:39300 (Linux) or http://localhost:1000 (Windows/Mac)`);
+}
+console.log(`Actual Pieces URL: ${piecesService.basePath}`);
 const pingResult = await piecesService.ping();
 console.log(`Ping: ${pingResult ? '✅ Pieces OS is reachable' : '❌ Pieces OS not reachable'}`);
 
 if (!pingResult) {
     console.log('\n⚠️  Pieces OS is not running or not accessible at the configured port.');
     console.log('The adapter will gracefully degrade - tools will return error messages when called.');
-    console.log('\nTo fix: Ensure Pieces OS is running on Windows host.');
+    if (isWsl) {
+        console.log('\nTo fix: Ensure Pieces OS is running on Windows host and firewall allows port 39300.');
+    } else {
+        console.log('\nTo fix: Ensure Pieces OS is running on localhost.');
+    }
 }
 
 // 3. Try a simple query (if Pieces is up)

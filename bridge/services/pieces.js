@@ -28,7 +28,7 @@ const determinePort = () => {
 const getWslGateway = () => {
     try {
         const { execSync } = require('child_process');
-        const gateway = execSync('ip route | grep default | awk \'{print $3}\'').toString().trim();
+        const gateway = execSync('ip route | grep default').toString().trim().split(/\s+/)[2];
         return gateway || 'localhost';
     } catch {
         return 'localhost';
