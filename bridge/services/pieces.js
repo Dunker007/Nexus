@@ -1,5 +1,6 @@
 import * as Pieces from '@pieces.app/pieces-os-client';
 import os from 'os';
+import fs from 'fs';
 
 /**
  * Pieces OS Integration Service
@@ -7,13 +8,35 @@ import os from 'os';
  */
 
 // Discover correct port depending on OS (Windows/Mac uses 1000, Linux uses 39300)
+// When running in WSL connecting to Windows host, use port 39300 via gateway IP
 const determinePort = () => {
     const platform = os.platform();
-    if (platform === 'linux') return 39300;
+    // WSL2 connects to Windows host via gateway IP:39300
+    // Native Windows/Mac use 1000 on localhost
+    if (platform === 'linux') {
+        // Check if we're in WSL by looking for Windows mount points
+        if (fs.existsSync('/mnt/c')) {
+            // We're in WSL - Pieces OS on Windows host is accessible via gateway IP:39300
+            return 39300;
+        }
+        return 39300;
+    }
     return 1000;
 };
 
-const PIECES_URL = `http://localhost:${determinePort()}`;
+// Get WSL gateway IP (Windows host) for Pieces OS connectivity
+const getWslGateway = () => {
+    try {
+        const { execSync } = require('child_process');
+        const gateway = execSync('ip route | grep default | awk \'{print $3}\'').toString().trim();
+        return gateway || 'localhost';
+    } catch {
+        return 'localhost';
+    }
+};
+
+const PIECES_HOST = os.platform() === 'linux' && fs.existsSync('/mnt/c') ? getWslGateway() : 'localhost';
+const PIECES_URL = `http://${PIECES_HOST}:${determinePort()}`;
 
 // Setup configuration
 const configuration = new Pieces.Configuration({
@@ -23,9 +46,11 @@ const configuration = new Pieces.Configuration({
 // APIs
 const annotationsApi = new Pieces.AnnotationsApi(configuration);
 const workstreamSummariesApi = new Pieces.WorkstreamSummariesApi(configuration);
+const workstreamEventsApi = new Pieces.WorkstreamEventsApi(configuration);
 const modelsApi = new Pieces.ModelsApi(configuration);
 const assetsApi = new Pieces.AssetsApi(configuration);
 const formatApi = new Pieces.FormatApi(configuration);
+const connectorApi = new Pieces.ConnectorApi(configuration);
 
 class PiecesService {
     constructor() {
@@ -142,6 +167,112 @@ class PiecesService {
             return response.ok;
         } catch (e) {
             return false;
+        }
+    }
+
+    /**
+     * Search memory using Pieces OS search_memory API
+     * @param {string} question - Natural language question
+     * @param {Object} options - { from, to } ISO 8601 timestamps
+     */
+    async searchMemory(question, options = {}) {
+        try {
+            const { from, to } = options;
+            
+            // Search workstream summaries for narrative context
+            const summaries = await workstreamSummariesApi.searchWorkstreamSummaries({
+                searchInput: {
+                    engines: 'WORKSTREAM_SUMMARIES'
+                }
+            });
+            
+            return summaries;
+        } catch (error) {
+            console.error('[Pieces] searchMemory failed:', error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * Search annotations using Pieces OS full-text search
+     * @param {string} query - Keywords to search
+     * @param {Object} options - { from, to } ISO 8601 timestamps
+     */
+    async searchAnnotations(query, options = {}) {
+        try {
+            const { from, to } = options;
+            
+            // Get snapshot of all annotations (SDK doesn't support FTS on annotations)
+            const result = await annotationsApi.annotationsSnapshot();
+            
+            return result;
+        } catch (error) {
+            console.error('[Pieces] searchAnnotations failed:', error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * Get Google Calendar events via Pieces OS connector
+     * @param {Object} options - { timeMin, timeMax } ISO 8601 timestamps
+     * NOTE: Requires GCAL connector setup in Pieces OS. Returns empty if not configured.
+     */
+    async getCalendarEvents(options = {}) {
+        // GCAL integration requires connector setup - stub for now
+        // Future: use connectorApi.connect() flow or MCP SSE proxy
+        return { error: 'Google Calendar connector not configured' };
+    }
+
+    /**
+     * Get workstream summaries for a time range
+     * @param {Object} options - { from, to } ISO 8601 timestamps
+     */
+    async getWorkstreamSummaries(options = {}) {
+        try {
+            const { from, to } = options;
+            
+            // Get snapshot of workstream summaries
+            const result = await workstreamSummariesApi.workstreamSummariesSnapshot();
+            
+            return result;
+        } catch (error) {
+            console.error('[Pieces] getWorkstreamSummaries failed:', error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * Get browser activity via Pieces OS
+     * @param {Object} options - { timePreset, filter }
+     */
+    async getBrowserActivity(options = {}) {
+        try {
+            const { timePreset = 'last_7d', filter } = options;
+            
+            // Get snapshot of workstream events (browser activity captured there)
+            const result = await workstreamEventsApi.workstreamEventsSnapshot();
+            
+            return result;
+        } catch (error) {
+            console.error('[Pieces] getBrowserActivity failed:', error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * Get annotations by UUID
+     * @param {string[]} ids - Array of annotation UUIDs
+     */
+    async getAnnotations(ids) {
+        try {
+            const result = await annotationsApi.annotationsBatchSnapshot({
+                identifiers: ids
+            });
+            
+            return result;
+        } catch (error) {
+            console.error('[Pieces] getAnnotations failed:', error.message);
+            throw error;
         }
     }
 }

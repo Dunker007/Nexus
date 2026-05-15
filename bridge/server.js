@@ -30,6 +30,8 @@ import { StaffMeetingAgent } from './services/agents-staff-meeting.js';
 import { newsService } from './services/news.js';
 import { contentService } from './services/content.js';
 import { settingsService } from './services/settings.js';
+import { piecesService } from './services/pieces.js';
+import './services/pieces-mcp-adapter.js'; // registers LTM tools into toolRegistry
 import pipelineRoutes from './routes/pipeline.js';
 import distributionRoutes from './routes/distribution.js';
 import artProductsRoutes from './routes/art-products.js';
