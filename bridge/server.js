@@ -203,7 +203,7 @@ server.listen(PORT, '0.0.0.0', () => {
 ║            🧩 Route Decomposition Complete 🧩             ║
 ╠═══════════════════════════════════════════════════════════╣
 ║  REST API:    http://localhost:${PORT}                      ║
-║  WebSocket:   DISABLED                                    ║
+║  WebSocket:   ws://localhost:${PORT}/stream (opt-in)        ║
 ╠═══════════════════════════════════════════════════════════╣
 ║  Route Modules:                                           ║
 ║    • LLM       → /llm       (Models & Chat)               ║
@@ -215,4 +215,4 @@ server.listen(PORT, '0.0.0.0', () => {
 ║    • Income    → /income    (Revenue Dashboard)            ║
 ╚═══════════════════════════════════════════════════════════╝
     `);
-});
+})
