@@ -1,10 +1,10 @@
 # NEXUS MASTER PLAN
 
-**Version:** 1.1.0  
+**Version:** 1.2.0  
 **Created:** December 7, 2025  
-**Updated:** May 14, 2026  
+**Updated:** May 17, 2026  
 **Maintainer:** Human (Executive) + AI Agents  
-**Status:** Hardening Phase (Active)
+**Status:** Working Phase (Active) — Foundation complete. Issues-driven workflow.
 
 ---
 
