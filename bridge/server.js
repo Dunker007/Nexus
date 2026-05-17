@@ -1,6 +1,6 @@
 /**
- * LuxRig Bridge Server
- * Aggregates all AI services running on LuxRig into a single API
+ * LuxRig Bridge Server v3.0.0
+ * Thin orchestration shell — all route logic lives in ./routes/
  */
 
 import dotenv from 'dotenv';
@@ -11,56 +11,46 @@ import express from 'express';
 import { WebSocketServer } from 'ws';
 import cors from 'cors';
 import { createServer } from 'http';
-import swaggerUi from 'swagger-ui-express';
 
-// Import services
+// Core services (needed by server shell only)
 import { lmstudioService } from './services/lmstudio.js';
-import { openRouterService } from './services/openrouter.js';
 import { ollamaService } from './services/ollama.js';
 import { systemService } from './services/system.js';
-import { googleService } from './services/google.js';
-import { githubService } from './services/github.js';
-import { createAgent, SongwriterRoom, agentRegistry } from './services/agents.js';
-import { errorHandler, errorLogger, rateLimiter, asyncHandler, validate } from './services/errors.js';
-import { performanceMonitor, cache } from './services/performance.js';
-import { prisma } from './services/database.js';
-// Security and swagger imports
-import { security, securityHeaders, sessionMiddleware } from './services/security.js';
-// import { swaggerSpec } from './config/swagger.js';
-import { StaffMeetingAgent } from './services/agents-staff-meeting.js';
-import { newsService } from './services/news.js';
-import { contentService } from './services/content.js';
+import { errorHandler, errorLogger, rateLimiter } from './services/errors.js';
+import { performanceMonitor } from './services/performance.js';
+import { securityHeaders, security } from './services/security.js';
 import { settingsService } from './services/settings.js';
-import { piecesService } from './services/pieces.js';
 import './services/pieces-mcp-adapter.js'; // registers LTM tools into toolRegistry
+
+// Route modules
+import llmRoutes from './routes/llm.js';
+import agentRoutes, { activeAgents } from './routes/agents.js';
+import authRoutes from './routes/auth.js';
+import googleRoutes from './routes/google.js';
+import githubRoutes from './routes/github.js';
+import systemRoutes from './routes/system.js';
+import monitoringRoutes from './routes/monitoring.js';
+import musicRoutes from './routes/music.js';
+import newsRoutes from './routes/news.js';
+import contentRoutes from './routes/content.js';
+import projectRoutes from './routes/projects.js';
+import settingsRoutes from './routes/settings.js';
 import pipelineRoutes from './routes/pipeline.js';
 import distributionRoutes from './routes/distribution.js';
 import artProductsRoutes from './routes/art-products.js';
 import incomeRoutes from './routes/income.js';
 import smartfolioRoutes from './routes/smartfolio.js';
 import toolRoutes from './routes/tools.js';
+
 const app = express();
 const PORT = process.env.PORT || 3456;
 
-// Staff Meeting instance - commented out temporarily
-// const staffMeetingAgent = new StaffMeetingAgent();
-
-// Middleware
-const allowedOrigins = [
-    'https://dlxstudios.online',
-    'https://www.dlxstudios.online',
-    'https://bridge.dlxstudios.online',
-    'http://localhost:3000',
-    'http://localhost:3002',
-    'http://localhost:3456',
-];
+// ============ Middleware ============
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
 
-        // Match dlxstudios.online, www.dlxstudios.online, and vercel previews
         const isAllowed = origin.includes('dlxstudios.online') ||
             origin.includes('vercel.app') ||
             origin.includes('netlify.app') ||
@@ -76,37 +66,19 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json({ limit: '10mb' })); // Limit body size
-app.use(securityHeaders()); // Helmet security headers
-app.use(rateLimiter); // Standard rate limiting
-app.use(performanceMonitor.middleware()); // Track all request performance
+app.use(express.json({ limit: '10mb' }));
+app.use(securityHeaders());
+app.use(rateLimiter);
+app.use(performanceMonitor.middleware());
 
-// Swagger UI - commented out temporarily
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// ============ HTTP Server & WebSocket ============
 
-// Growth Phase Routes
-app.use('/pipeline', security.authenticateApiKey(), pipelineRoutes);
-app.use('/distribution', security.authenticateApiKey(), distributionRoutes);
-app.use('/art', security.authenticateApiKey(), artProductsRoutes);
-app.use('/income', security.authenticateApiKey(), incomeRoutes);
-app.use('/smartfolio', security.authenticateApiKey(), smartfolioRoutes);
-
-// Nexus Tool Server Routes
-app.use('/tools', security.authenticateApiKey(), toolRoutes);
-
-// Create HTTP server for both Express and WebSocket
 const server = createServer(app);
-
-// WebSocket server for real-time updates
 const wss = new WebSocketServer({ server, path: '/stream' });
-
-// Track connected clients
 const clients = new Set();
 
 wss.on('connection', (ws, req) => {
-    // Log WebSocket connection (auth removed — read-only status stream protected by CORS + rate limiting)
     try {
-        const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
         const origin = req.headers.origin || 'unknown';
         console.log(`🔌 WebSocket connection from origin: ${origin}`);
     } catch (e) {
@@ -116,10 +88,7 @@ wss.on('connection', (ws, req) => {
     console.log('🔌 Client connected to stream');
     clients.add(ws);
 
-    // Send initial status
-    try {
-        sendStatus(ws);
-    } catch (error) {
+    try { sendStatus(ws); } catch (error) {
         console.error('Initial status error:', error.message);
     }
 
@@ -129,29 +98,18 @@ wss.on('connection', (ws, req) => {
     });
 });
 
-// Broadcast to all connected clients
 function broadcast(data) {
     const message = JSON.stringify(data);
     clients.forEach(client => {
-        if (client.readyState === 1) { // OPEN
-            client.send(message);
-        }
+        if (client.readyState === 1) client.send(message);
     });
 }
 
-// Send full status to a client
 async function sendStatus(ws) {
     const status = await getFullStatus();
     ws.send(JSON.stringify({ type: 'status', data: status }));
 }
 
-// Active agents registry (Moved up for scope visibility if needed, but getFullStatus needs it)
-const activeAgents = new Map();
-
-
-
-
-// Full system status
 async function getFullStatus() {
     const [lmstudio, ollama, system, errors] = await Promise.all([
         lmstudioService.getStatus(),
@@ -162,39 +120,35 @@ async function getFullStatus() {
 
     return {
         timestamp: new Date().toISOString(),
-        services: {
-            lmstudio,
-            ollama
-        },
+        services: { lmstudio, ollama },
         system,
         errors,
         agents: Array.from(activeAgents.values()).map(agent => ({
             id: agent.id,
             name: agent.name,
             status: agent.status,
-            type: agent.id.split('-')[0] // Derive type from ID or add type property to agent
+            type: agent.id.split('-')[0]
         }))
     };
 }
 
-// ============ REST API Routes ============
+// ============ Root & Status (kept in shell) ============
 
-// Health check
 app.get('/', (req, res) => {
     res.json({
         name: 'LuxRig Bridge',
-        version: '1.0.0',
+        version: '3.0.0',
         status: 'operational',
         endpoints: {
             status: '/status',
             llm: '/llm/*',
             system: '/system',
+            agents: '/agents/*',
             stream: 'DISABLED'
         }
     });
 });
 
-// Full system status
 app.get('/status', async (req, res) => {
     try {
         const status = await getFullStatus();
@@ -204,1067 +158,61 @@ app.get('/status', async (req, res) => {
     }
 });
 
-
-
-
-// ============ LLM Routes ============
-
-// List all models from all providers
-app.get('/llm/models', async (req, res) => {
-    try {
-        const [lmModels, ollamaModels] = await Promise.all([
-            lmstudioService.listModels(),
-            ollamaService.listModels()
-        ]);
-
-        res.json({
-            lmstudio: lmModels,
-            ollama: ollamaModels,
-            total: (lmModels?.length || 0) + (ollamaModels?.length || 0)
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// List LM Studio models only
-app.get('/llm/lmstudio/models', async (req, res) => {
-    try {
-        const models = await lmstudioService.listModels();
-        res.json(models);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// List Ollama models only
-app.get('/llm/ollama/models', async (req, res) => {
-    try {
-        const models = await ollamaService.listModels();
-        res.json(models);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Chat completion (routes to best available)
-app.post('/llm/chat', security.authenticateApiKey(), async (req, res) => {
-    const { messages, model, provider } = req.body;
-
-    try {
-        let response;
-
-        if (provider === 'ollama') {
-            response = await ollamaService.chat(messages, model);
-        } else {
-            // Default to LM Studio
-            response = await lmstudioService.chat(messages, model);
-        }
-
-        res.json(response);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ Agent Routes ============
-
-// Expose direct agent access via REST endpoints (O-5)
-import { toolRegistry } from './services/tool-registry.js';
-app.post('/api/agents/:agentId/chat', security.authenticateApiKey(), async (req, res) => {
-    const { agentId } = req.params;
-    const { messages, context } = req.body;
-
-    // Check if agent exists
-    const availableAgents = toolRegistry.executeTool('get_callable_agents', {});
-    // A more thorough proxy setup
-    try {
-        const agentModule = await import('./services/agents.js');
-        const internalAgent = agentModule.agentRegistry[agentId];
-        
-        if (!internalAgent) {
-             return res.status(404).json({ error: `Agent ${agentId} not found.` });
-        }
-
-        // Instantiate the agent class, then call processTask
-        const agentInstance = new internalAgent();
-        const response = await agentInstance.processTask({ message: messages[messages.length-1].content }, context || {});
-        
-        res.json({
-            success: true,
-            agent: agentId,
-            response: response
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ System Routes ============
-
-// Real-time system metrics
-app.get('/system', async (req, res) => {
-    try {
-        const metrics = await systemService.getMetrics();
-        res.json(metrics);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// GPU stats (nvidia-smi)
-app.get('/system/gpu', async (req, res) => {
-    try {
-        const gpu = await systemService.getGPU();
-        res.json(gpu);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ Google OAuth Routes ============
-
-// Get OAuth URL
-app.get('/auth/google', (req, res) => {
-    try {
-        const authUrl = googleService.getAuthUrl();
-        res.json({ authUrl });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// OAuth callback
-app.get('/auth/google/callback', async (req, res) => {
-    try {
-        const { code } = req.query;
-        const tokens = await googleService.getTokens(code);
-
-        // In production, store tokens securely
-        // For now, return them to the client
-        res.json({
-            success: true,
-            tokens,
-            message: 'Authentication successful! Store these tokens securely.'
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Get user info
-app.get('/google/user', async (req, res) => {
-    try {
-        const accessToken = req.headers.authorization?.replace('Bearer ', '');
-        if (!accessToken) {
-            return res.status(401).json({ error: 'No access token provided' });
-        }
-
-        const userInfo = await googleService.getUserInfo(accessToken);
-        res.json(userInfo);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// List calendar events
-app.get('/google/calendar/events', async (req, res) => {
-    try {
-        const accessToken = req.headers.authorization?.replace('Bearer ', '');
-        if (!accessToken) {
-            return res.status(401).json({ error: 'No access token provided' });
-        }
-
-        const maxResults = parseInt(req.query.maxResults) || 10;
-        const events = await googleService.listCalendarEvents(accessToken, maxResults);
-        res.json(events);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// List Drive files
-app.get('/google/drive/files', async (req, res) => {
-    try {
-        const accessToken = req.headers.authorization?.replace('Bearer ', '');
-        if (!accessToken) {
-            return res.status(401).json({ error: 'No access token provided' });
-        }
-
-        const maxResults = parseInt(req.query.maxResults) || 10;
-        const files = await googleService.listDriveFiles(accessToken, maxResults);
-        res.json(files);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ GitHub OAuth Routes ============
-
-// Get OAuth URL
-app.get('/auth/github', (req, res) => {
-    try {
-        const authUrl = githubService.getAuthUrl();
-        res.json({ authUrl });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Check system connection status
-app.get('/auth/github/status', (req, res) => {
-    res.json({
-        connected: !!process.env.GITHUB_ACCESS_TOKEN
-    });
-});
-
-// OAuth callback
-app.get('/auth/github/callback', async (req, res) => {
-    try {
-        const { code } = req.query;
-        const tokens = await githubService.getTokens(code);
-
-        // In production, store tokens securely
-        // For now, return them to the client
-        res.json({
-            success: true,
-            tokens,
-            message: 'GitHub connected successfully!'
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Get user info
-app.get('/github/user', async (req, res) => {
-    try {
-        const accessToken = req.headers.authorization?.replace('Bearer ', '');
-        const userInfo = await githubService.getUserInfo(accessToken);
-        res.json(userInfo);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// List repos
-app.get('/github/repos', async (req, res) => {
-    try {
-        const accessToken = req.headers.authorization?.replace('Bearer ', '');
-        const limit = parseInt(req.query.limit) || 10;
-        const repos = await githubService.listRepos(accessToken, limit);
-        res.json(repos);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ Agent Routes ============
-
-// activeAgents is defined earlier now.
-
-// Staff Meeting Routes (must be before parameterized routes)
-// Start a meeting
-app.post('/agents/meeting/start', security.authenticateApiKey(), async (req, res) => {
-    try {
-        const { topic } = req.body;
-
-        if (!topic) {
-            return res.status(400).json({ error: 'Topic is required' });
-        }
-
-        const result = await staffMeetingAgent.startMeeting(topic);
-        res.json(result);
-    } catch (error) {
-        console.error('Meeting start error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Get meeting status
-app.get('/agents/meeting/status', security.authenticateApiKey(), async (req, res) => {
-    try {
-        const status = staffMeetingAgent.getMeetingStatus();
-        res.json(status);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Stop meeting
-app.post('/agents/meeting/stop', security.authenticateApiKey(), async (req, res) => {
-    try {
-        const result = staffMeetingAgent.stopMeeting();
-        res.json(result);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Initialize Staff Meeting Agent
-const staffMeetingAgent = new StaffMeetingAgent();
-
-// Create and execute agent task
-app.post('/agents/execute', security.authenticateApiKey(), async (req, res) => {
-    try {
-        const { agentType, task, context = {} } = req.body;
-
-        // Create or get agent
-        let agent = activeAgents.get(agentType);
-        if (!agent) {
-            agent = createAgent(agentType);
-            activeAgents.set(agentType, agent);
-        }
-
-        // Execute task
-        const result = await agent.execute(task, context);
-
-        res.json({
-            success: true,
-            agent: {
-                id: agent.id,
-                name: agent.name,
-                status: agent.status
-            },
-            result
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Get agent status
-app.get('/agents/:type/status', security.authenticateApiKey(), (req, res) => {
-    try {
-        const agent = activeAgents.get(req.params.type);
-        if (!agent) {
-            return res.status(404).json({ error: 'Agent not found' });
-        }
-
-        res.json({
-            id: agent.id,
-            name: agent.name,
-            status: agent.status,
-            currentTask: agent.currentTask,
-            memorySize: agent.memory.length
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Get agent memory
-app.get('/agents/:type/memory', security.authenticateApiKey(), async (req, res) => {
-    try {
-        const agent = activeAgents.get(req.params.type);
-        if (!agent) {
-            return res.status(404).json({ error: 'Agent not found' });
-        }
-
-        const limit = parseInt(req.query.limit) || 10;
-        const memory = await agent.getMemory(limit);
-        res.json({
-            agent: agent.name,
-            memory
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// List all active and available agents
-app.get('/agents', security.authenticateApiKey(), (req, res) => {
-    try {
-        const active = Array.from(activeAgents.values()).map(agent => ({
-            id: agent.id,
-            name: agent.name,
-            description: agent.description,
-            status: agent.status,
-            capabilities: agent.capabilities,
-            memorySize: agent.memory.length
-        }));
-
-        const available = Object.entries(agentRegistry).map(([key, AgentClass]) => {
-            // Instantiate a temporary agent to get metadata if static properties aren't available
-            // Optimized: Create a lightweight object if description/name were static, but they are instance props.
-            // For now, let's just map the keys. Ideally Agent classes would have static capability lists.
-            // We'll trust the keys map to the types.
-            return {
-                type: key,
-                name: key.charAt(0).toUpperCase() + key.slice(1) + ' Agent'
-            };
-        });
-
-        res.json({ active, available, total: active.length });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Reset agent
-app.post('/agents/:type/reset', security.authenticateApiKey(), async (req, res) => {
-    try {
-        const agent = activeAgents.get(req.params.type);
-        if (!agent) {
-            return res.status(404).json({ error: 'Agent not found' });
-        }
-
-        await agent.reset();
-        res.json({ success: true, message: 'Agent reset successfully' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ Staff Meeting Routes ============
-
-// Start AI Staff Meeting
-app.post('/agents/meeting', security.authenticateApiKey(), async (req, res) => {
-    try {
-        const { topic, participants = ['architect', 'security', 'qa'], rounds = 2 } = req.body;
-
-        if (!topic) {
-            return res.status(400).json({ error: 'Topic is required' });
-        }
-
-        const startTime = Date.now();
-
-        // Run the meeting
-        const meetingId = `meeting-${Date.now()}`;
-        const transcript = [];
-
-        // Generate meeting transcript with mock responses for now
-        // In production, this would call the actual LLM
-        for (let round = 1; round <= rounds; round++) {
-            for (const participant of participants) {
-                const message = {
-                    id: `${meetingId}-${round}-${participant}`,
-                    agent: participant,
-                    round,
-                    message: generateAgentMessage(participant, topic, round),
-                    timestamp: new Date().toISOString(),
-                    type: round === 1 ? 'brainstorm' : 'debate'
-                };
-                transcript.push(message);
-            }
-        }
-
-        // Generate consensus
-        const consensus = `The team agrees on a ${topic} approach with: microservices architecture, end-to-end encryption, and comprehensive testing.`;
-        const actionItems = [
-            `Architect to create detailed system design for ${topic}`,
-            'Security to perform threat modeling and security review',
-            'QA to define test strategy and acceptance criteria',
-            'DevOps to prepare deployment pipeline'
-        ];
-
-        const result = {
-            meetingId,
-            topic,
-            participants,
-            transcript,
-            consensus,
-            actionItems,
-            duration: Date.now() - startTime
-        };
-
-        res.json(result);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Helper function to generate agent messages
-function generateAgentMessage(agent, topic, round) {
-    const messages = {
-        architect: {
-            1: `For "${topic}", I recommend a microservices architecture with clear domain boundaries. We should use event-driven communication for scalability and implement a robust API gateway for security and rate limiting.`,
-            2: `I've considered the security concerns. We can implement defense-in-depth: API gateway validation, service-level authorization, and encrypted inter-service communication. This addresses the attack surface concerns.`
-        },
-        security: {
-            1: `I'm analyzing "${topic}" for security implications. Key concerns: authentication flows, data encryption at rest and in transit, audit logging, and rate limiting. We need to prevent OWASP Top 10 vulnerabilities.`,
-            2: `The proposed architecture still has some concerns. The API gateway is a single point of failure for auth. I recommend implementing PKCE for OAuth flows and ensuring all secrets are vault-managed, not environment variables.`
-        },
-        qa: {
-            1: `Testing strategy for "${topic}": unit tests with 80%+ coverage, integration tests for all API endpoints, E2E tests for critical user journeys, and load testing for performance baselines under 200ms latency.`,
-            2: `We also need chaos engineering to test resilience. I recommend implementing circuit breakers and testing failure scenarios. Automated regression tests should run on every PR.`
-        },
-        devops: {
-            1: `Infrastructure for "${topic}": Kubernetes for orchestration, GitOps for deployments, observability with Prometheus/Grafana, and automated scaling based on load patterns.`,
-            2: `For reliability, we need multi-region deployment with automatic failover. Blue-green deployments will minimize downtime during releases.`
-        }
-    };
-
-    return messages[agent]?.[round] || `I have valuable insights on ${topic} from a ${agent} perspective. Let's ensure we follow best practices.`;
-}
-
-// Get meeting status
-app.get('/agents/meeting/:meetingId', security.authenticateApiKey(), (req, res) => {
-    try {
-        // const status = staffMeetingAgent.getMeetingStatus();
-        res.status(501).json({ error: 'Not implemented' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ Monitoring & Health Routes ============
-
-// Health check with detailed status
-app.get('/health', async (req, res) => {
-    try {
-        const [lmstudio, ollama, system] = await Promise.all([
-            lmstudioService.getStatus(),
-            ollamaService.getStatus(),
-            systemService.getMetrics()
-        ]);
-
-        const health = {
-            status: 'healthy',
-            timestamp: new Date(),
-            uptime: process.uptime(),
-            services: {
-                lmstudio: lmstudio.online ? 'up' : 'down',
-                ollama: ollama.online ? 'up' : 'down',
-                system: system.gpu?.available ? 'up' : 'degraded'
-            },
-            memory: {
-                used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-                total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
-                external: Math.round(process.memoryUsage().external / 1024 / 1024)
-            }
-        };
-
-        // Check if any service is down
-        const allUp = Object.values(health.services).every(s => s === 'up');
-        if (!allUp) {
-            health.status = 'degraded';
-        }
-
-        res.json(health);
-    } catch (error) {
-        res.status(503).json({
-            status: 'unhealthy',
-            error: error.message,
-            timestamp: new Date()
-        });
-    }
-});
-
-// Error logs
-app.get('/monitoring/errors', async (req, res) => {
-    try {
-        const limit = parseInt(req.query.limit) || 100;
-        const [errors, stats] = await Promise.all([
-            errorLogger.getErrors(limit),
-            errorLogger.getErrorStats()
-        ]);
-        res.json({ errors, stats });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Performance metrics
-app.get('/monitoring/metrics', (req, res) => {
-    try {
-        const metrics = {
-            timestamp: new Date(),
-            uptime: process.uptime(),
-            memory: process.memoryUsage(),
-            cpu: process.cpuUsage(),
-            activeConnections: clients.size,
-            activeAgents: activeAgents.size,
-            platform: process.platform,
-            nodeVersion: process.version
-        };
-
-        res.json(metrics);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Clear error logs (admin only)
-app.post('/monitoring/errors/clear', async (req, res) => {
-    try {
-        await errorLogger.clear();
-        res.json({ success: true, message: 'Error logs cleared' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Performance stats
-app.get('/monitoring/performance', async (req, res) => {
-    try {
-        const stats = await performanceMonitor.getAllStats();
-        res.json({
-            stats,
-            cache: cache.getStats()
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ Songwriter Room (Music Pipeline) ============
-
-// Create songwriter room instance
-const songwriterRoom = new SongwriterRoom();
-
-// Get songwriter agent personas
-app.get('/music/agents', (req, res) => {
-    res.json({
-        agents: songwriterRoom.getAgentPersonas(),
-        description: 'Songwriter agents for collaborative music creation'
-    });
-});
-
-// Create a song with the songwriter room
-app.post('/music/create', async (req, res) => {
-    try {
-        const { theme, genre = 'pop', mood = 'uplifting', rounds = 2 } = req.body;
-
-        if (!theme) {
-            return res.status(400).json({ error: 'Theme is required' });
-        }
-
-        const result = await songwriterRoom.createSong(theme, { genre, mood, rounds });
-        res.json(result);
-    } catch (error) {
-        console.error('Songwriter error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Get Suno prompt directly (quick mode)
-app.post('/music/prompt', async (req, res) => {
-    try {
-        const { theme, genre = 'pop', mood = 'uplifting' } = req.body;
-
-        if (!theme) {
-            return res.status(400).json({ error: 'Theme is required' });
-        }
-
-        // Quick prompt generation without full collaboration
-        const producer = createAgent('producer');
-        const composer = createAgent('composer');
-
-        const style = await composer.processTask({
-            action: 'suggest-style',
-            theme,
-            genre,
-            mood
-        });
-
-        const prompt = await producer.processTask({
-            action: 'generate-suno-prompt',
-            content: { theme, genre, mood, style }
-        });
-
-        res.json({
-            theme,
-            genre,
-            mood,
-            sunoPrompt: prompt.fullPrompt,
-            styleTags: prompt.styleTags,
-            instructions: prompt.instructions
-        });
-    } catch (error) {
-        console.error('Prompt generation error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Create political rap with Newsician
-app.post('/music/political', async (req, res) => {
-    try {
-        const { focusArea = 'minnesota', headlines = [] } = req.body;
-
-        console.log(`🎤 Newsician creating political rap for ${focusArea}...`);
-
-        const result = await songwriterRoom.createPoliticalRap(headlines, focusArea);
-        res.json(result);
-    } catch (error) {
-        console.error('Newsician error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Create platform-friendly political track with Midwest Sentinel
-app.post('/music/sentinel', async (req, res) => {
-    try {
-        const { focusArea = 'minnesota', headlines = [] } = req.body;
-
-        console.log(`🎧 Midwest Sentinel creating boom bap track for ${focusArea}...`);
-
-        const result = await songwriterRoom.createSentinelTrack(headlines, focusArea);
-        res.json(result);
-    } catch (error) {
-        console.error('Sentinel error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ News Aggregation Routes ============
-
-// Get news items
-app.get('/news', async (req, res) => {
-    try {
-        const { category, region, limit } = req.query;
-        const news = await newsService.getNews({
-            category,
-            region,
-            limit: parseInt(limit) || 100
-        });
-        res.json(news);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Refresh news items
-app.post('/news/refresh', async (req, res) => {
-    try {
-        const result = await newsService.refreshNews();
-        res.json(result);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ Content Queue Routes ============
-
-// Get content queue
-app.get('/content/queue', async (req, res) => {
-    try {
-        const { status, type } = req.query;
-        const queue = await contentService.getQueue(status, type);
-        res.json(queue);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Add to queue
-app.post('/content/queue', async (req, res) => {
-    try {
-        const { type, data } = req.body;
-        if (!type || !data) {
-            return res.status(400).json({ error: 'Type and data are required' });
-        }
-
-        const item = await contentService.addToQueue(type, data);
-        res.json(item);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Update queue item
-app.patch('/content/queue/:id', async (req, res) => {
-    try {
-        const { status, result } = req.body;
-        const item = await contentService.updateStatus(req.params.id, status, result);
-        res.json(item);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Delete queue item
-app.delete('/content/queue/:id', async (req, res) => {
-    try {
-        await contentService.deleteItem(req.params.id);
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ Projects Routes (Labs Hub) ============
-
-// In-memory projects store as fallback
-const inMemoryProjects = new Map();
-
-// List all projects
-app.get('/projects', async (req, res) => {
-    try {
-        // Try database first
-        let projects = [];
-        try {
-            projects = await prisma.project.findMany({
-                orderBy: { updatedAt: 'desc' }
-            });
-        } catch (dbError) {
-            console.log('DB query failed, using in-memory:', dbError.message);
-        }
-
-        // If DB is empty but we have in-memory data, use that
-        if (projects.length === 0 && inMemoryProjects.size > 0) {
-            projects = Array.from(inMemoryProjects.values());
-            res.json({ projects, total: projects.length, source: 'memory' });
-            return;
-        }
-
-        // Transform from DB format to frontend format
-        const transformed = projects.map(p => ({
-            id: p.id,
-            icon: p.icon || '📦',
-            name: p.title,
-            desc: p.description || '',
-            status: p.status,
-            category: p.category,
-            priority: p.priority,
-            agents: typeof p.agents === 'string' ? JSON.parse(p.agents || '[]') : (p.agents || []),
-            href: p.href,
-            ideas: typeof p.stats === 'string' ? (JSON.parse(p.stats || '{}').ideas || 0) : (p.ideas || 0),
-            timeline: typeof p.timeline === 'string' ? JSON.parse(p.timeline || '{"startMonth":0,"durationMonths":3,"progress":0}') : (p.timeline || {}),
-            owner: p.owner || 'Unknown',
-            content: p.content
-        }));
-
-        res.json({ projects: transformed, total: transformed.length, source: 'database' });
-    } catch (error) {
-        console.error('Projects list error:', error);
-        // Return in-memory as last resort
-        if (inMemoryProjects.size > 0) {
-            res.json({ projects: Array.from(inMemoryProjects.values()), total: inMemoryProjects.size, source: 'memory' });
-        } else {
-            res.status(500).json({ error: error.message, projects: [] });
-        }
-    }
-});
-
-// Get single project
-app.get('/projects/:id', async (req, res) => {
-    try {
-        const project = await prisma.project.findUnique({
-            where: { id: req.params.id }
-        });
-
-        if (!project) {
-            return res.status(404).json({ error: 'Project not found' });
-        }
-
-        res.json({
-            id: project.id,
-            icon: project.icon || '📦',
-            name: project.title,
-            desc: project.description || '',
-            status: project.status,
-            category: project.category,
-            priority: project.priority,
-            agents: JSON.parse(project.agents || '[]'),
-            href: project.href,
-            ideas: JSON.parse(project.stats || '{}').ideas || 0,
-            timeline: JSON.parse(project.timeline || '{"startMonth":0,"durationMonths":3,"progress":0}'),
-            owner: project.owner || 'Unknown',
-            content: project.content
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Create project
-app.post('/projects', async (req, res) => {
-    try {
-        const { name, desc, icon, status, category, priority, agents, href, timeline, owner, content } = req.body;
-
-        const project = await prisma.project.create({
-            data: {
-                title: name,
-                description: desc,
-                icon: icon || '💡',
-                status: status || 'concept',
-                category: category || 'Experimental',
-                priority: priority || 'Medium',
-                agents: JSON.stringify(agents || ['architect']),
-                href: href || null,
-                timeline: JSON.stringify(timeline || { startMonth: new Date().getMonth(), durationMonths: 3, progress: 0 }),
-                stats: JSON.stringify({ ideas: 0 }),
-                owner: owner || 'Architect',
-                content: content
-            }
-        });
-
-        res.json({ success: true, project: { ...project, name: project.title, desc: project.description } });
-    } catch (error) {
-        console.error('Project create error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Update project
-app.put('/projects/:id', async (req, res) => {
-    try {
-        const { name, desc, icon, status, category, priority, agents, href, timeline, owner, ideas, content } = req.body;
-
-        const updateData = {};
-        if (name !== undefined) updateData.title = name;
-        if (desc !== undefined) updateData.description = desc;
-        if (icon !== undefined) updateData.icon = icon;
-        if (status !== undefined) updateData.status = status;
-        if (category !== undefined) updateData.category = category;
-        if (priority !== undefined) updateData.priority = priority;
-        if (agents !== undefined) updateData.agents = JSON.stringify(agents);
-        if (href !== undefined) updateData.href = href;
-        if (timeline !== undefined) updateData.timeline = JSON.stringify(timeline);
-        if (owner !== undefined) updateData.owner = owner;
-        if (ideas !== undefined) updateData.stats = JSON.stringify({ ideas });
-        if (content !== undefined) updateData.content = content;
-
-        const project = await prisma.project.update({
-            where: { id: req.params.id },
-            data: updateData
-        });
-
-        res.json({ success: true, project });
-    } catch (error) {
-        console.error('Project update error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Delete project
-app.delete('/projects/:id', async (req, res) => {
-    try {
-        await prisma.project.delete({
-            where: { id: req.params.id }
-        });
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Seed projects from static data (one-time migration)
-app.post('/projects/seed', async (req, res) => {
-    try {
-        const { projects } = req.body;
-
-        if (!projects || !Array.isArray(projects)) {
-            return res.status(400).json({ error: 'Projects array required' });
-        }
-
-        const results = [];
-        let useMemory = false;
-
-        for (const p of projects) {
-            try {
-                const existing = await prisma.project.findFirst({
-                    where: { title: p.name }
-                });
-
-                if (!existing) {
-                    const created = await prisma.project.create({
-                        data: {
-                            id: p.id,
-                            title: p.name,
-                            description: p.desc,
-                            icon: p.icon,
-                            status: p.status,
-                            category: p.category,
-                            priority: p.priority,
-                            agents: JSON.stringify(p.agents),
-                            href: p.href,
-                            timeline: JSON.stringify(p.timeline),
-                            stats: JSON.stringify({ ideas: p.ideas }),
-                            owner: p.owner,
-                            content: p.content
-                        }
-                    });
-                    results.push({ id: created.id, name: p.name, action: 'created' });
-                } else {
-                    results.push({ id: existing.id, name: p.name, action: 'skipped' });
-                }
-            } catch (dbError) {
-                // Fallback to in-memory storage
-                useMemory = true;
-                inMemoryProjects.set(p.id, p);
-                results.push({ id: p.id, name: p.name, action: 'memory' });
-            }
-        }
-
-        res.json({
-            success: true,
-            results,
-            seeded: results.filter(r => r.action === 'created' || r.action === 'memory').length,
-            source: useMemory ? 'memory' : 'database'
-        });
-    } catch (error) {
-        console.error('Seed error:', error);
-        // Last resort: store all in memory
-        try {
-            const { projects } = req.body;
-            if (projects && Array.isArray(projects)) {
-                projects.forEach(p => inMemoryProjects.set(p.id, p));
-                res.json({ success: true, seeded: projects.length, source: 'memory' });
-                return;
-            }
-        } catch { }
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ Settings Routes ============
-
-app.get('/settings', (req, res) => {
-    res.json(settingsService.getAll());
-});
-
-app.post('/settings', async (req, res) => {
-    try {
-        const updates = req.body;
-        await settingsService.updateMany(updates);
-        res.json({ success: true, settings: settingsService.getAll() });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============ Error Handler (Must be last) ============
+// ============ Mount Route Modules ============
+
+app.use('/llm', llmRoutes);
+app.use('/agents', agentRoutes);
+app.use('/api/agents', agentRoutes);   // O-5 direct agent access alias
+app.use('/auth', authRoutes);
+app.use('/google', googleRoutes);
+app.use('/github', githubRoutes);
+app.use('/system', systemRoutes);
+app.use('/health', monitoringRoutes);  // /health -> monitoringRoutes root /health
+app.use('/monitoring', monitoringRoutes);
+app.use('/music', musicRoutes);
+app.use('/news', newsRoutes);
+app.use('/content', contentRoutes);
+app.use('/projects', projectRoutes);
+app.use('/settings', settingsRoutes);
+
+// Growth Phase routes (pre-existing separate modules)
+app.use('/pipeline', security.authenticateApiKey(), pipelineRoutes);
+app.use('/distribution', security.authenticateApiKey(), distributionRoutes);
+app.use('/art', security.authenticateApiKey(), artProductsRoutes);
+app.use('/income', security.authenticateApiKey(), incomeRoutes);
+app.use('/smartfolio', security.authenticateApiKey(), smartfolioRoutes);
+app.use('/tools', security.authenticateApiKey(), toolRoutes);
+
+// ============ Error Handler (must be last middleware) ============
 app.use(errorHandler);
 
-// ============ Periodic Updates ============
+// ============ Initialization ============
 
-// Broadcast status every 5 seconds (Disabled)
-/*
-setInterval(async () => {
-    try {
-        if (clients.size > 0) {
-            const status = await getFullStatus();
-            broadcast({ type: 'status', data: status });
-        }
-    } catch (error) {
-        console.error('Status broadcast error:', error.message);
-    }
-}, 5000);
-*/
-
-// Initialize Settings
 settingsService.init().catch(console.error);
 
-// Initialize Pieces MCP integration (Phase O-3 Memory Layer)
-import("./services/mcp-connector.js").then(m => m.piecesMcp.connect()).catch(err => console.error("[Pieces MCP] Failed to auto-start:", err));
+import("./services/mcp-connector.js")
+    .then(m => m.piecesMcp.connect())
+    .catch(err => console.error("[Pieces MCP] Failed to auto-start:", err));
 
-// Start server
+// ============ Start Server ============
+
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════════╗
-║                   LUXRIG BRIDGE v2.0.0                    ║
-║              🎉 GROWTH PHASE COMPLETE 🎉                  ║
+║               LUXRIG BRIDGE v3.0.0 (Modular)             ║
+║            🧩 Route Decomposition Complete 🧩             ║
 ╠═══════════════════════════════════════════════════════════╣
 ║  REST API:    http://localhost:${PORT}                      ║
 ║  WebSocket:   DISABLED                                    ║
 ╠═══════════════════════════════════════════════════════════╣
-║  Revenue Streams:                                         ║
-║    • Pipeline   → /pipeline (Content Generation)          ║
-║    • Music      → /distribution (Streaming Revenue)       ║
-║    • Art        → /art (Etsy/POD Products)                ║
-║    • Income     → /income (Unified Dashboard)             ║
+║  Route Modules:                                           ║
+║    • LLM       → /llm       (Models & Chat)               ║
+║    • Agents    → /agents    (AI Agent Orchestration)       ║
+║    • System    → /system    (Hardware Metrics)             ║
+║    • Music     → /music     (Songwriter Pipeline)          ║
+║    • Projects  → /projects  (Labs Hub)                     ║
+║    • Pipeline  → /pipeline  (Content Generation)           ║
+║    • Income    → /income    (Revenue Dashboard)            ║
 ╚═══════════════════════════════════════════════════════════╝
     `);
 });

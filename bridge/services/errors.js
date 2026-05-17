@@ -184,7 +184,7 @@ export function asyncHandler(fn) {
 /**
  * Global error handler middleware
  */
-export async function errorHandler(err, req, res, next) {
+export function errorHandler(err, req, res, next) {
     // Log error (async, but don't wait for it)
     errorLogger.log(err, {
         method: req.method,
