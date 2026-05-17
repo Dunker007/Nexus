@@ -27,16 +27,14 @@ const determinePort = () => {
 // Get WSL gateway IP (Windows host) for Pieces OS connectivity
 const getWslGateway = () => {
     try {
-        const { execSync } = require('child_process');
-        const gateway = execSync('ip route | grep default').toString().trim().split(/\s+/)[2];
-        return gateway || 'localhost';
+        return 'localhost';
     } catch {
         return 'localhost';
     }
 };
 
-const PIECES_HOST = os.platform() === 'linux' && fs.existsSync('/mnt/c') ? getWslGateway() : 'localhost';
-const PIECES_URL = `http://${PIECES_HOST}:${determinePort()}`;
+const PIECES_HOST = 'localhost';
+const PIECES_URL = `http://${PIECES_HOST}:39301`; // Use local MCP port
 
 // Setup configuration
 const configuration = new Pieces.Configuration({
@@ -49,10 +47,11 @@ const workstreamSummariesApi = new Pieces.WorkstreamSummariesApi(configuration);
 const workstreamEventsApi = new Pieces.WorkstreamEventsApi(configuration);
 const modelsApi = new Pieces.ModelsApi(configuration);
 const assetsApi = new Pieces.AssetsApi(configuration);
-const formatApi = new Pieces.FormatApi(configuration);
-const connectorApi = new Pieces.ConnectorApi(configuration);
+const formatsApi = new Pieces.FormatsApi(configuration);
+const searchApi = new Pieces.SearchApi(configuration);
+const qgptApi = new Pieces.QGPTApi(configuration);
 
-class PiecesService {
+export class PiecesService {
     constructor() {
         this.basePath = PIECES_URL;
         console.log(`[Pieces] Initialized connection to Pieces OS at ${PIECES_URL}`);
@@ -179,14 +178,16 @@ class PiecesService {
         try {
             const { from, to } = options;
             
-            // Search workstream summaries for narrative context
-            const summaries = await workstreamSummariesApi.searchWorkstreamSummaries({
-                searchInput: {
-                    engines: 'WORKSTREAM_SUMMARIES'
-                }
+            // For general query search, we'll try to find relevant assets via QGPT
+            const result = await searchApi.fullTextSearch({
+                query: question
             });
-            
-            return summaries;
+
+            return {
+                candidates: result.iterable?.slice(0, 5) || [],
+                matchedPersonas: [],
+                matchedSummaries: []
+            };
         } catch (error) {
             console.error('[Pieces] searchMemory failed:', error.message);
             throw error;

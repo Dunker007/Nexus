@@ -286,7 +286,59 @@ toolRegistry.registerTool({
     }
 });
 
-// ─── TOOL: get_workstream_summary ───
+// ─── TOOL: upgrade_model ───
+// Escalate a complex request from local LM Studio to the Cloud via OpenRouter
+import { openRouterService } from './openrouter.js';
+
+toolRegistry.registerTool({
+    name: 'upgrade_model',
+    description: 'Elevate a complex query or reasoning task line to a smarter Cloud Model (via OpenRouter) when local capabilities are insufficient. Pass the entire context and question to get a deep response.',
+    parameters: {
+        type: 'object',
+        properties: {
+            question: {
+                type: 'string',
+                description: 'The complex question, coding problem, or reasoning task.'
+            },
+            context: {
+                type: 'string',
+                description: 'Any background context or previous tool data the cloud model needs to know.'
+            },
+            modelTier: {
+                type: 'string',
+                description: 'Which tier to route to: "fast" (Haiku), "balanced" (Sonnet), "max" (Opus/GPT-4o). Defaults to balanced.'
+            }
+        },
+        required: ['question']
+    }
+}, async (args) => {
+    const { question, context = '', modelTier = 'balanced' } = args;
+
+    let targetModel = 'anthropic/claude-3.5-sonnet'; // balanced Default
+    if (modelTier === 'fast') targetModel = 'anthropic/claude-3.5-haiku';
+    else if (modelTier === 'max') targetModel = 'anthropic/claude-3-opus';
+
+    try {
+        const messages = [
+            { role: 'system', content: 'You are a Cloud-tier specialist in the DLX Nexus ecosystem helping the local orchestrator agent figure out a problem it cannot solve itself.' },
+            { role: 'user', content: `Context:\n${context}\n\nTask/Question:\n${question}` }
+        ];
+
+        const cloudMessage = await openRouterService.evaluate(messages, { model: targetModel });
+        
+        return {
+            success: true,
+            tier: modelTier,
+            model: targetModel,
+            cloudResponse: cloudMessage.content
+        };
+    } catch (error) {
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+});
 // Get AI-generated summary of recent work activity
 toolRegistry.registerTool({
     name: 'get_workstream_summary',

@@ -15,6 +15,7 @@ import swaggerUi from 'swagger-ui-express';
 
 // Import services
 import { lmstudioService } from './services/lmstudio.js';
+import { openRouterService } from './services/openrouter.js';
 import { ollamaService } from './services/ollama.js';
 import { systemService } from './services/system.js';
 import { googleService } from './services/google.js';
@@ -261,6 +262,39 @@ app.post('/llm/chat', security.authenticateApiKey(), async (req, res) => {
         }
 
         res.json(response);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============ Agent Routes ============
+
+// Expose direct agent access via REST endpoints (O-5)
+import { toolRegistry } from './services/tool-registry.js';
+app.post('/api/agents/:agentId/chat', security.authenticateApiKey(), async (req, res) => {
+    const { agentId } = req.params;
+    const { messages, context } = req.body;
+
+    // Check if agent exists
+    const availableAgents = toolRegistry.executeTool('get_callable_agents', {});
+    // A more thorough proxy setup
+    try {
+        const agentModule = await import('./services/agents.js');
+        const internalAgent = agentModule.agentRegistry[agentId];
+        
+        if (!internalAgent) {
+             return res.status(404).json({ error: `Agent ${agentId} not found.` });
+        }
+
+        // Instantiate the agent class, then call processTask
+        const agentInstance = new internalAgent();
+        const response = await agentInstance.processTask({ message: messages[messages.length-1].content }, context || {});
+        
+        res.json({
+            success: true,
+            agent: agentId,
+            response: response
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -1212,6 +1246,9 @@ setInterval(async () => {
 
 // Initialize Settings
 settingsService.init().catch(console.error);
+
+// Initialize Pieces MCP integration (Phase O-3 Memory Layer)
+import("./services/mcp-connector.js").then(m => m.piecesMcp.connect()).catch(err => console.error("[Pieces MCP] Failed to auto-start:", err));
 
 // Start server
 server.listen(PORT, '0.0.0.0', () => {

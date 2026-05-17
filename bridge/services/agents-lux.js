@@ -1,6 +1,7 @@
 import { Agent } from './agent-core.js';
 import { lmstudioService } from './lmstudio.js';
 import { toolRegistry } from './tool-registry.js';
+import './pieces-mcp-adapter.js'; // Wire Pieces OS tools into the registry
 
 export class LuxAgent extends Agent {
     constructor() {
@@ -79,7 +80,19 @@ CRITICAL INSTRUCTIONS FOR TOOLS:
 
         // Loop up to 5 iterations for multi-tool resolution
         let iterations = 0;
-        let response = await lmstudioService.chat(messages, 'default');
+        let response;
+        try {
+            response = await lmstudioService.chat(messages, 'default');
+        } catch (err) {
+            console.error(`[Lux] LM Studio unavailable: ${err.message}`);
+            return {
+                content: `[Lux] LM Studio is not running. Tools are available but Lux cannot orchestrate without a local model. Start LM Studio and try again.`,
+                provider: 'lmstudio',
+                model: 'none',
+                iterations: 0,
+                timestamp: new Date()
+            };
+        }
 
         while (iterations < 5) {
             console.log(`\n[Lux DEBUG] Raw response content:\n${response.content}\n`);
