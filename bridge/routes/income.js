@@ -7,6 +7,7 @@
 
 import { Router } from 'express';
 import { incomeAggregatorService } from '../services/income-aggregator.js';
+import { asyncHandler, ValidationError, NotFoundError } from '../services/errors.js';
 
 const router = Router();
 
@@ -55,7 +56,7 @@ router.post('/manual', (req, res) => {
     const { amount, description, type, source, date } = req.body;
 
     if (amount === undefined) {
-        return res.status(400).json({ success: false, error: 'Amount is required' });
+        throw new ValidationError('Amount is required', 'amount');
     }
 
     const entry = incomeAggregatorService.addManualEntry({
@@ -76,7 +77,7 @@ router.post('/manual', (req, res) => {
 router.delete('/manual/:id', (req, res) => {
     const removed = incomeAggregatorService.deleteManualEntry(req.params.id);
     if (!removed) {
-        return res.status(404).json({ success: false, error: 'Entry not found' });
+        throw new NotFoundError('Income entry');
     }
     res.json({ success: true, message: 'Entry deleted', removed });
 });

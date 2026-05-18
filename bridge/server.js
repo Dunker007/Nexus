@@ -149,14 +149,10 @@ app.get('/', (req, res) => {
     });
 });
 
-app.get('/status', async (req, res) => {
-    try {
-        const status = await getFullStatus();
-        res.json(status);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+app.get('/status', asyncHandler(async (req, res) => {
+    const status = await getFullStatus();
+    res.json(status);
+}));
 
 // ============ Mount Route Modules ============
 
@@ -215,4 +211,4 @@ server.listen(PORT, '0.0.0.0', () => {
 ║    • Income    → /income    (Revenue Dashboard)            ║
 ╚═══════════════════════════════════════════════════════════╝
     `);
-})
+});
