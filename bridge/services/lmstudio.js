@@ -3,7 +3,7 @@
  * Connects to LM Studio's OpenAI-compatible API
  */
 
-const LMSTUDIO_URL = process.env.LMSTUDIO_URL || 'http://100.97.174.81:1234';
+const LMSTUDIO_URL = process.env.LMSTUDIO_URL || 'http://100.97.174.81:1235'; // migrated from 1234 (svchost conflict) 2026-05-17
 import { settingsService } from './settings.js';
 
 function getUrl() {
